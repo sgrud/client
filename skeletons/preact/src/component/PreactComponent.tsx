@@ -1,0 +1,33 @@
+import { Component } from 'preact';
+import { JSXInternal } from 'preact/src/jsx';
+import styles from './PreactComponent.sass';
+
+interface Props {
+  name: string;
+};
+
+export default class PreactComponent extends Component<Props> {
+
+  public static defaultProps: Props = {
+    name: 'world'
+  };
+
+  public static observedAttributes: string[] = [
+    'name'
+  ];
+
+  public static tagName: string = 'preact-component';
+
+  public render(props: Props): JSXInternal.Element {
+    return <>
+      <style>
+        {styles}
+      </style>
+      <div>
+        <h1>preact-component says hello {props.name}</h1>
+        <div><slot></slot></div>
+      </div>
+    </>;
+  }
+
+}

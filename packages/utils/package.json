@@ -1,0 +1,12 @@
+{
+  "name": "@sgrud/utils",
+  "version": "0.0.1",
+  "source": "./src/index.ts",
+  "main": "../../dist/utils/index.js",
+  "module": "../../dist/utils/index.module.js",
+  "unpkg": "../../dist/utils/index.umd.js",
+  "types": "../../dist/utils/src/index.d.ts",
+  "dependencies": {
+    "tslib": "2.3.0"
+  }
+}

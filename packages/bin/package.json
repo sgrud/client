@@ -1,0 +1,12 @@
+{
+  "name": "@sgrud/bin",
+  "version": "0.0.1",
+  "source": "./src/index.ts",
+  "bin": "../../dist/bin/index.js",
+  "main": "../../dist/bin/index.js",
+  "types": "../../dist/bin/src/index.d.ts",
+  "dependencies": {
+    "express": "4.17.1",
+    "tslib": "2.3.0"
+  }
+}

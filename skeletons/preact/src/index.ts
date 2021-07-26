@@ -1,0 +1,4 @@
+import register from 'preact-custom-element';
+import PreactComponent from './component/PreactComponent';
+
+register(PreactComponent, undefined, undefined, { shadow: true });

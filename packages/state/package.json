@@ -1,0 +1,12 @@
+{
+  "name": "@sgrud/state",
+  "version": "0.0.1",
+  "source": "./src/index.ts",
+  "main": "../../dist/state/index.js",
+  "module": "../../dist/state/index.module.js",
+  "unpkg": "../../dist/state/index.umd.js",
+  "types": "../../dist/state/src/index.d.ts",
+  "dependencies": {
+    "tslib": "2.3.0"
+  }
+}

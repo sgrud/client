@@ -1,0 +1,19 @@
+{
+  "name": "sgrud-skeleton-lit",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "microbundle --external none -f modern -i ./src/index.ts",
+    "postbuild": "cp src/index.html dist"
+  },
+  "dependencies": {
+    "lit": "2.0.0-rc.2"
+  },
+  "devDependencies": {
+    "microbundle": "0.13.3"
+  },
+  "browserslist": {
+    "production": [],
+    "development": []
+  }
+}
