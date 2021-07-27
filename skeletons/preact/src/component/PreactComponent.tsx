@@ -1,3 +1,4 @@
+
 import { Component } from 'preact';
 import { JSXInternal } from 'preact/src/jsx';
 import styles from './PreactComponent.sass';
@@ -8,7 +9,7 @@ interface Props {
 
 export default class PreactComponent extends Component<Props> {
 
-  public static defaultProps: Props = {
+  public static override defaultProps: Props = {
     name: 'world'
   };
 
@@ -18,7 +19,7 @@ export default class PreactComponent extends Component<Props> {
 
   public static tagName: string = 'preact-component';
 
-  public render(props: Props): JSXInternal.Element {
+  public override render(props: Props): JSXInternal.Element {
     return <>
       <style>
         {styles}

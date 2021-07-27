@@ -9,6 +9,7 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "inlineSources": true,
+    "resolveJsonModule": true,
     "sourceMap": true,
 
     "forceConsistentCasingInFileNames": true,
@@ -23,10 +24,7 @@
     "lib": [
       "dom",
       "es2018"
-    ],
-
-    "baseUrl": "./",
-    "rootDir": "./src"
+    ]
   },
 
   "angularCompilerOptions": {
@@ -37,6 +35,6 @@
   },
 
   "files": [
-    "./src/main.ts"
+    "./src/index.ts"
   ]
 }

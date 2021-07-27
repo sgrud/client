@@ -1,3 +1,5 @@
+/// <reference path="./types.d.ts"/>
+
 import register from 'preact-custom-element';
 import PreactComponent from './component/PreactComponent';
 

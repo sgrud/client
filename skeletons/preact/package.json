@@ -3,17 +3,17 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "microbundle --css inline --external none -f umd -i ./src/index.ts",
+    "build": "microbundle --css inline -f umd -i ./src/index.ts",
     "postbuild": "cp src/index.html dist"
   },
   "dependencies": {
-    "preact": "10.5.14",
-    "preact-custom-element": "4.2.1"
-  },
-  "devDependencies": {
     "@types/preact-custom-element": "4.0.1",
     "microbundle": "0.13.3",
     "node-sass": "6.0.1"
+  },
+  "devDependencies": {
+    "preact": "10.5.14",
+    "preact-custom-element": "4.2.1"
   },
   "browserslist": {
     "production": [],

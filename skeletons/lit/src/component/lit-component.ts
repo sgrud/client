@@ -4,7 +4,7 @@ import { customElement, property } from 'lit/decorators.js';
 @customElement('lit-component')
 export default class LitComponent extends LitElement {
 
-  public static styles: CSSResultGroup = css`
+  public static override styles: CSSResultGroup = css`
     h1 {
       font-style: italic;
     }
@@ -15,7 +15,7 @@ export default class LitComponent extends LitElement {
   })
   public name: string = 'world';
 
-  public render(): TemplateResult {
+  public override render(): TemplateResult {
     return html`
       <div>
         <h1>lit-component says hello ${this.name}</h1>

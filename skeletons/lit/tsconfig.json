@@ -4,6 +4,8 @@
     "module": "es2020",
     "moduleResolution": "node",
 
+    "declaration": false,
+    "declarationDir": null,
     "downlevelIteration": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,
@@ -23,15 +25,10 @@
     "lib": [
       "dom",
       "es2018"
-    ],
-
-    "baseUrl": "./",
-    "rootDir": "./src"
+    ]
   },
 
-  "include": [
-    "src/**/*.ts"
-  ],
-
-  "exclude": []
+  "files": [
+    "./src/index.ts"
+  ]
 }
