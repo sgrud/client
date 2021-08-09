@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/triple-slash-reference */
 /// <reference path="./types.d.ts"/>
 
 import register from 'preact-custom-element';

@@ -1,11 +1,10 @@
-
 import { Component } from 'preact';
 import { JSXInternal } from 'preact/src/jsx';
 import styles from './PreactComponent.sass';
 
 interface Props {
   name: string;
-};
+}
 
 export default class PreactComponent extends Component<Props> {
 

@@ -1,17 +1,24 @@
 ﻿{
   "compilerOptions": {
-    "target": "esnext",
+    "target": "es5",
     "module": "esnext",
     "moduleResolution": "node",
+
+    "baseUrl": "./",
+    "rootDir": "./packages",
+    "declarationDir": "./dist",
 
     "declaration": true,
     "declarationMap": true,
     "downlevelIteration": true,
+    "emitDecoratorMetadata": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "importHelpers": true,
     "inlineSources": true,
     "noEmitOnError": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
     "sourceMap": true,
     "stripInternal": true,
 
@@ -30,13 +37,9 @@
       "webworker"
     ],
 
-    "baseUrl": "./",
-    "rootDir": "./packages",
-    "declarationDir": "./dist",
-
     "paths": {
       "@sgrud/*": [
-        "./packages/*/src"
+        "./packages/*"
       ]
     }
   },

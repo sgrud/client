@@ -1,14 +1,15 @@
 {
   "name": "sgrud-skeleton-preact",
   "version": "0.0.0",
+  "source": "./src/index.ts",
   "private": true,
   "scripts": {
-    "build": "microbundle --css inline -f umd -i ./src/index.ts",
-    "postbuild": "cp src/index.html dist"
+    "build": "sgrud construct --format umd",
+    "postbuild": "cp src/index.html dist/"
   },
   "dependencies": {
+    "@sgrud/bin": "../../dist/bin",
     "@types/preact-custom-element": "4.0.1",
-    "microbundle": "0.13.3",
     "node-sass": "6.0.1"
   },
   "devDependencies": {

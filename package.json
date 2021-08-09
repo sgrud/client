@@ -1,16 +1,15 @@
 {
   "name": "@sgrud/client",
-  "description": "SGRUD Client Library",
   "homepage": "https://github.com/sgrud/client",
-  "version": "0.2.1",
   "license": "MIT",
+  "private": true,
   "author": {
     "name": "Codeschluss GbR",
     "email": "info@codeschluss.de",
     "url": "https://www.codeschluss.de"
   },
   "bugs": {
-    "email": "info@codeschluss.de",
+    "email": "error@codeschluss.de",
     "url": "https://github.com/sgrud/client/issues"
   },
   "repository": {
@@ -29,31 +28,37 @@
   "scripts": {
     "build": "npm-run-all --parallel build:*",
     "build:bin": "microbundle --cwd ./packages/bin -f cjs",
-    "build:bus": "microbundle --cwd ./packages/bus --workers",
-    "build:core": "microbundle --cwd ./packages/core --workers",
-    "build:data": "microbundle --cwd ./packages/data --workers",
-    "build:shell": "microbundle --cwd ./packages/shell --workers",
-    "build:state": "microbundle --cwd ./packages/state --workers",
-    "build:utils": "microbundle --cwd ./packages/utils --workers",
+    "build:bus": "microbundle --cwd ./packages/bus --worker-loader",
+    "build:core": "microbundle --cwd ./packages/core --worker-loader",
+    "build:data": "microbundle --cwd ./packages/data --worker-loader",
+    "build:shell": "microbundle --cwd ./packages/shell --worker-loader",
+    "build:state": "microbundle --cwd ./packages/state --worker-loader",
+    "build:utils": "microbundle --cwd ./packages/utils --worker-loader",
     "postbuild": "node --eval 'sgrud.postbuild()' -r ./dist/bin",
-    "test": "eslint ./packages ./unittests && jest --forceExit"
+    "test": "eslint -f codeframe ./**/*.ts && jest --forceExit",
+    "docs": "typedoc --name @sgrud ./packages/*/index.ts"
   },
   "dependencies": {
     "express": "4.17.1",
+    "fs-extra": "10.0.0",
+    "sade": "1.7.4",
     "tslib": "2.3.0"
   },
   "devDependencies": {
     "@types/express": "4.17.13",
+    "@types/fs-extra": "9.0.12",
     "@types/jest": "26.0.24",
-    "microbundle": "0.13.3",
-    "npm-run-all": "4.1.5"
-  },
-  "optionalDependencies": {
-    "@typescript-eslint/eslint-plugin": "4.28.4",
-    "@typescript-eslint/parser": "4.28.4",
-    "eslint": "7.31.0",
+    "@types/sade": "1.7.3",
+    "@typescript-eslint/eslint-plugin": "4.29.1",
+    "@typescript-eslint/parser": "4.29.1",
+    "eslint": "7.32.0",
+    "eslint-plugin-tsdoc": "0.2.14",
     "jest": "27.0.6",
-    "ts-jest": "27.0.4"
+    "microbundle": "schlusslicht/microbundle",
+    "npm-run-all": "4.1.5",
+    "rxjs": "7.3.0",
+    "ts-jest": "27.0.4",
+    "typedoc": "0.21.5"
   },
   "jest": {
     "preset": "ts-jest",
@@ -66,8 +71,8 @@
     "moduleNameMapper": {
       "@sgrud/(.*)": "<rootDir>/dist/$1"
     },
-    "modulePathIgnorePatterns": [
-      "<rootDir>/packages/*"
+    "roots": [
+      "<rootDir>/unittests"
     ]
   },
   "eslintConfig": {
@@ -75,6 +80,8 @@
     "parserOptions": {
       "project": [
         "./tsconfig.json",
+        "./examples/*/tsconfig.json",
+        "./skeletons/*/tsconfig.json",
         "./unittests/tsconfig.json"
       ]
     },
@@ -84,12 +91,19 @@
       "plugin:@typescript-eslint/recommended-requiring-type-checking"
     ],
     "plugins": [
-      "@typescript-eslint"
+      "@typescript-eslint",
+      "eslint-plugin-tsdoc"
     ],
     "rules": {
       "@typescript-eslint/ban-types": "off",
       "@typescript-eslint/brace-style": "error",
+      "@typescript-eslint/comma-dangle": "error",
+      "@typescript-eslint/dot-notation": "error",
       "@typescript-eslint/explicit-member-accessibility": "error",
+      "@typescript-eslint/indent": [
+        "error",
+        2
+      ],
       "@typescript-eslint/member-delimiter-style": "error",
       "@typescript-eslint/member-ordering": [
         "error",
@@ -109,6 +123,7 @@
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-inferrable-types": "off",
       "@typescript-eslint/no-non-null-assertion": "off",
+      "@typescript-eslint/no-shadow": "error",
       "@typescript-eslint/no-unsafe-assignment": "off",
       "@typescript-eslint/no-unsafe-call": "off",
       "@typescript-eslint/no-unsafe-member-access": "off",
@@ -119,9 +134,18 @@
         "single"
       ],
       "@typescript-eslint/require-await": "off",
+      "@typescript-eslint/restrict-plus-operands": "off",
       "@typescript-eslint/semi": "error",
+      "@typescript-eslint/typedef": [
+        "error",
+        {
+          "memberVariableDeclaration": true,
+          "parameter": true,
+          "propertyDeclaration": true
+        }
+      ],
       "arrow-parens": "error",
-      "comma-dangle": "error",
+      "default-case-last": "error",
       "grouped-accessor-pairs": "error",
       "max-len": [
         "error",
@@ -130,6 +154,7 @@
           "code": 80
         }
       ],
+      "no-case-declarations": "off",
       "no-cond-assign": "off",
       "no-multiple-empty-lines": [
         "error",
@@ -141,11 +166,32 @@
       "one-var": [
         "error",
         "never"
+      ],
+      "tsdoc/syntax": "error",
+      "valid-jsdoc": [
+        "error",
+        {
+          "prefer": {
+            "abstract": "virtual",
+            "arg": "param",
+            "argument": "param",
+            "return": "returns"
+          },
+          "requireParamDescription": true,
+          "requireParamType": false,
+          "requireReturn": false,
+          "requireReturnDescription": true,
+          "requireReturnType": false
+        }
       ]
     }
   },
   "eslintIgnore": [
-    "examples",
-    "skeletons"
+    "coverage",
+    "dist",
+    "docs",
+    "jest.*",
+    "rollup.*",
+    "webpack.*"
   ]
 }

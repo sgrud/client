@@ -1,11 +1,12 @@
 {
   "name": "@sgrud/bus",
   "version": "0.0.1",
-  "source": "./src/index.ts",
+  "source": "./index.ts",
+  "types": "./index.d.ts",
   "main": "../../dist/bus/index.js",
+  "exports": "../../dist/bus/index.modern.js",
   "module": "../../dist/bus/index.module.js",
   "unpkg": "../../dist/bus/index.umd.js",
-  "types": "../../dist/bus/src/index.d.ts",
   "dependencies": {
     "tslib": "2.3.0"
   }

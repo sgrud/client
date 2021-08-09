@@ -23,7 +23,7 @@ const values = [
   null,
   0,
   { },
-  process,
+  Object.create(process),
   Promise.resolve(),
   '',
   undefined,

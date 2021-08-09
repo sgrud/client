@@ -1,4 +1,47 @@
-const plurals: Record<string, string> = {
+/**
+ * Pluralizes words of the English language.
+ *
+ * @param singular - English word in singular form.
+ * @returns Plural form of `singular`.
+ *
+ * @example Pluralize `'money'`.
+ * ```ts
+ * pluralize('money'); // 'money'
+ * ```
+ *
+ * @example Pluralize `'thesis'`.
+ * ```ts
+ * pluralize('thesis'); // 'theses'
+ * ```
+ */
+export function pluralize(singular: string): string {
+  if (uncountables.indexOf(singular.toLowerCase()) === -1) {
+    for (const word in irregulars) {
+      const pattern = new RegExp(`${word}$`, 'i');
+
+      if (pattern.test(singular)) {
+        return singular.replace(pattern, irregulars[word]);
+      }
+    }
+
+    for (const regex in regulars) {
+      const pattern = new RegExp(regex, 'i');
+
+      if (pattern.test(singular)) {
+        return singular.replace(pattern, regulars[regex]);
+      }
+    }
+  }
+
+  return singular;
+}
+
+/**
+ * Regex mapping of singular words to their regular plural forms.
+ *
+ * @internal
+ */
+const regulars: Record<string, string> = {
   '(quiz)$'                    : '$1zes',
   '^(ox)$'                     : '$1en',
   '([m|l])ouse$'               : '$1ice',
@@ -19,6 +62,11 @@ const plurals: Record<string, string> = {
   '([^s]+)$'                   : '$1s'
 };
 
+/**
+ * Mapping of singular words to their irregular plural forms.
+ *
+ * @internal
+ */
 const irregulars: Record<string, string> = {
   child : 'children',
   foot  : 'feet',
@@ -30,6 +78,11 @@ const irregulars: Record<string, string> = {
   tooth : 'teeth'
 };
 
+/**
+ * List of uncountable singular words.
+ *
+ * @internal
+ */
 const uncountables: string[] = [
   'aircraft',
   'bison',
@@ -57,25 +110,3 @@ const uncountables: string[] = [
   'wood',
   'you'
 ];
-
-export function pluralize(singular: string): string {
-  if (uncountables.indexOf(singular.toLowerCase()) === -1) {
-    for (const word in irregulars) {
-      const pattern = new RegExp(`${word}$`, 'i');
-
-      if (pattern.test(singular)) {
-        return singular.replace(pattern, irregulars[word]);
-      }
-    }
-
-    for (const regex in plurals) {
-      const pattern = new RegExp(regex, 'i');
-
-      if (pattern.test(singular)) {
-        return singular.replace(pattern, plurals[regex]);
-      }
-    }
-  }
-
-  return singular;
-}

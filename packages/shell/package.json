@@ -1,11 +1,12 @@
 {
   "name": "@sgrud/shell",
   "version": "0.0.1",
-  "source": "./src/index.ts",
+  "source": "./index.ts",
+  "types": "./index.d.ts",
   "main": "../../dist/shell/index.js",
+  "exports": "../../dist/shell/index.modern.js",
   "module": "../../dist/shell/index.module.js",
   "unpkg": "../../dist/shell/index.umd.js",
-  "types": "../../dist/shell/src/index.d.ts",
   "dependencies": {
     "tslib": "2.3.0"
   }

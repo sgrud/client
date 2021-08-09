@@ -1,9 +1,9 @@
-import { universal } from '@sgrud/bin';
+import sgrud from '@sgrud/bin';
 
 describe('@sgrud/bin/universal', () => {
 
   it('functions', () => {
-    expect(universal).toBeInstanceOf(Function);
+    expect(sgrud.universal).toBeInstanceOf(Function);
   });
 
 });

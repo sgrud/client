@@ -1,9 +1,9 @@
-import { postbuild } from '@sgrud/bin';
+import sgrud from '@sgrud/bin';
 
 describe('@sgrud/bin/postbuild', () => {
 
   it('functions', () => {
-    expect(postbuild).toBeInstanceOf(Function);
+    expect(sgrud.postbuild).toBeInstanceOf(Function);
   });
 
 });

@@ -1,14 +1,15 @@
 {
   "name": "sgrud-skeleton-lit",
   "version": "0.0.0",
+  "source": "./src/index.ts",
   "private": true,
   "scripts": {
-    "prepare": "cd ./*/lit && microbundle --external none --no-pkg-main -f umd",
-    "build": "microbundle -f umd -i ./src/index.ts",
-    "postbuild": "cp src/index.html dist"
+    "prepare": "cd ./*/lit; microbundle --external none --no-pkg-main -f umd",
+    "build": "sgrud construct --format umd",
+    "postbuild": "cp src/index.html dist/"
   },
   "dependencies": {
-    "microbundle": "0.13.3"
+    "@sgrud/bin": "../../dist/bin"
   },
   "devDependencies": {
     "lit": "2.0.0-rc.2"

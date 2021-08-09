@@ -1,1 +1,1 @@
-# SGRUD Client Library
+# SGRUD
