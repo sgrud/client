@@ -11,13 +11,14 @@
  *   $ sgrud <command> [options]
  *
  * Available Commands
+ *   construct    Builds a SGRUD-based project using `microbundle`
  *   kickstart    Kickstarts an angular, lit, preact or vue-based SGRUD project
  *   postbuild    Replicates exported package.json files in the SGRUD monorepo
  *   universal    Runs SGRUD in universal (SSR) mode using `puppeteer`
  *
  * For more info, run any command with the `--help` flag
+ *   $ sgrud construct --help
  *   $ sgrud kickstart --help
- *   $ sgrud postbuild --help
  *
  * Options
  *   -v, --version    Displays current version
@@ -28,11 +29,13 @@
  */
 
 import { cli } from './src/cli';
+import { construct } from './src/construct';
 import { kickstart } from './src/kickstart';
 import { postbuild } from './src/postbuild';
 import { universal } from './src/universal';
 
 const sgrud = {
+  construct,
   kickstart,
   postbuild,
   universal
@@ -49,6 +52,7 @@ declare const global: typeof globalThis & {
 };
 
 export {
+  construct,
   kickstart,
   postbuild,
   universal
