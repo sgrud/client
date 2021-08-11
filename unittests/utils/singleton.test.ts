@@ -1,12 +1,9 @@
 import { Singleton } from '@sgrud/utils';
 
-// Increase coverage
-Object.setPrototypeOf = undefined!;
-
-@Singleton<typeof Test>((instance) => {
+@Singleton<typeof Class>((instance) => {
   instance.param = 'updated';
 })
-class Test implements Singleton<typeof Test> {
+class Class implements Singleton<typeof Class> {
 
   public param: string = 'initialized';
 
@@ -15,34 +12,34 @@ class Test implements Singleton<typeof Test> {
   ) { }
 
   public reconstruct(field: number): void {
-    this.field ||= field;
+    void field;
   }
 
 }
 
-const test = new Test(1);
+const singleton = new Class(0);
 
 describe('@sgrud/utils/singleton', () => {
 
   describe('providing a construct function', () => {
     it('mutates the singleton', () => {
-      expect(test.param).toBe('updated');
+      expect(singleton.param).toBe('updated');
     });
   });
 
-  describe('creating a new singleton', () => {
+  describe('creating a new instance', () => {
     it('returns the singleton instance', () => {
-      expect(new Test(2)).toBe(test);
-    });
-
-    it('calls the reconstruct method', () => {
-      const spy = jest.spyOn(test, 'reconstruct');
-      expect(new Test(3).field).toBe(1);
-      expect(spy).toHaveBeenCalledWith(3);
+      expect(new Class(1)).toBe(singleton);
     });
 
     it('does not mutate the singleton', () => {
-      expect(new Test(4).field).toBe(1);
+      expect(new Class(2).field).toBe(0);
+    });
+
+    it('calls the reconstruct method', () => {
+      const spy = jest.spyOn(singleton, 'reconstruct');
+      expect(new Class(3).field).toBe(0);
+      expect(spy).toHaveBeenCalledWith(3);
     });
   });
 

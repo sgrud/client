@@ -3,6 +3,8 @@
  * classes. When a `@Singleton()` decorated class implements this interface, its
  * `reconstruct` method will be called every time the singleton instance is
  * retreived via the `new` operator.
+ *
+ * @typeParam T - Class constructor type.
  */
 export interface Singleton<T extends new (...args: any[]) => any> {
   reconstruct: (...args: ConstructorParameters<T>) => void;
@@ -13,9 +15,10 @@ export interface Singleton<T extends new (...args: any[]) => any> {
  * class.
  *
  * @param construct - Construct function.
+ * @typeParam T - Class constructor type.
  * @returns Generic class decorator.
  *
- * @example SIngleton class.
+ * @example Singleton class.
  * ```ts
  * import { Singleton } from '@sgrud/util';
  *
