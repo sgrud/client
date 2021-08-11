@@ -66,7 +66,7 @@ export const typeOf: {
    * typeOf.global(null); // false
    * ```
    */
-  global(value: unknown): value is typeof globalThis;
+  global: (value: unknown) => value is typeof globalThis;
 
   /**
    * Type-check for `null`.
