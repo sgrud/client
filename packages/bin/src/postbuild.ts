@@ -101,7 +101,7 @@ export function postbuild({
       }
     }
 
-    if (Object.keys(outList).length > 1) {
+    if (Object.keys(outList).length) {
       const sorted = Object.values(outList).sort();
       const [a, b] = [dirname(sorted[0]), dirname(sorted[sorted.length - 1])];
 
