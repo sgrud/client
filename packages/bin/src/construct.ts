@@ -6,6 +6,7 @@ cli.command('construct [...entries]')
   .example('construct # Run with default options')
   .example('construct ./project/main.ts # Build entry ./project/main.ts')
   .example('construct --cwd ./project --format umd # Build ./project as umd')
+  .option('--compress', 'Compress/minify build output', true)
   .option('--cwd', 'Use an alternative working directory', './')
   .option('--entries', 'Entry modules to build  (default package.json#source)')
   .option('--format', 'Build specified formats', 'cjs,esm,modern,umd')
@@ -23,6 +24,7 @@ cli.command('construct [...entries]')
  *   $ sgrud construct [...entries] [options]
  *
  * Options
+ *   --compress    Compress/minify build output  (default true)
  *   --cwd         Use an alternative working directory  (default ./)
  *   --entries     Entry modules to build  (default package.json#source)
  *   --format      Build specified formats  (default cjs,esm,modern,umd)
@@ -34,6 +36,7 @@ cli.command('construct [...entries]')
  *   $ sgrud construct --cwd ./project --format umd # Build ./project as umd
  * ```
  *
+ * @param compress - Compress/minify build output. (default: `true`)
  * @param cwd - Use an alternative working directory. (default: `'./'`)
  * @param entries - Entry modules to build. (default: `package.json#source`)
  * @param format - Build specified formats. (default: `'cjs,esm,modern,umd'`)
@@ -57,10 +60,12 @@ cli.command('construct [...entries]')
  * ```
  */
 export function construct({
+  compress = true,
   cwd = './',
   entries = undefined,
   format = 'cjs,esm,modern,umd'
 }: {
+  compress?: boolean;
   cwd?: string;
   entries?: [];
   format?: string;
@@ -88,7 +93,7 @@ export function construct({
   void (wrapper as {
     exports: (opts: Record<string, any>) => Promise<{ output: string }>;
   }).exports({
-    compress: true,
+    compress,
     css: 'inline',
     'css-modules': false,
     cwd,
