@@ -1,56 +1,38 @@
 import { Singleton } from '@sgrud/utils';
 
-class Class {
-
-  public param: string = 'default';
-
-  public constructor(
-    public field: number
-  ) { }
-
-}
-
-@Singleton<typeof ClassOne>()
-class ClassOne extends Class { }
-
-@Singleton<typeof ClassTwo>((instance) => {
-  instance.param = 'updated';
-})
-class ClassTwo extends Class implements Singleton<typeof Class> {
-
-  public reconstruct(field: number): void {
-    void field;
-  }
-
-}
-
-const singleton = new ClassOne(0);
-const coupleton = new ClassTwo(0);
-
 describe('@sgrud/utils/singleton', () => {
 
-  describe('providing a construct function', () => {
-    it('mutates the singleton', () => {
-      expect(singleton.param).toBe('default');
-      expect(coupleton.param).toBe('updated');
-    });
-  });
+  class Class {
+    public member: number = 0;
+    public constructor(public readonly param: number) { }
+  }
+
+  @Singleton<typeof ClassOne>()
+  class ClassOne extends Class { }
+
+  @Singleton<typeof ClassTwo>((instance, [param]) => {
+    instance.member = param;
+    return instance;
+  })
+  class ClassTwo extends Class { }
+
+  const classOne = new ClassOne(1);
+  const classTwo = new ClassTwo(2);
 
   describe('creating a new instance', () => {
     it('returns the singleton instance', () => {
-      expect(new ClassOne(1)).toBe(singleton);
-      expect(new ClassTwo(1)).toBe(coupleton);
+      expect(new ClassOne(3)).toBe(classOne);
+      expect(new ClassTwo(4)).toBe(classTwo);
     });
 
     it('does not mutate the singleton', () => {
-      expect(new ClassOne(2).field).toBe(0);
-      expect(new ClassTwo(2).field).toBe(0);
+      expect(new ClassOne(5).param).toBe(1);
+      expect(new ClassTwo(6).param).toBe(2);
     });
 
-    it('calls the reconstruct method', () => {
-      const spy = jest.spyOn(coupleton, 'reconstruct');
-      expect(new ClassTwo(3).field).toBe(0);
-      expect(spy).toHaveBeenCalledWith(3);
+    it('calls the decorated method', () => {
+      expect(new ClassOne(7).member).toBe(0);
+      expect(new ClassTwo(8).member).toBe(8);
     });
   });
 

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+
 import { execSync } from 'child_process';
 import { copySync, existsSync, mkdirpSync } from 'fs-extra';
 import { join, resolve } from 'path';

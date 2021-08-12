@@ -1,4 +1,6 @@
+import { Assign } from '@sgrud/utils';
 import { readFileSync } from 'fs-extra';
+import { Module } from 'module';
 import { cli } from './cli';
 
 cli.command('construct [...entries]')
@@ -86,13 +88,15 @@ export function construct({
     ]`
   );
 
-  const wrapper = new module.constructor();
-  wrapper.paths = module.paths;
-  wrapper._compile(patched, resolve);
-
-  void (wrapper as {
+  const microbundle = new Module('microbundle', module) as Assign<{
+    _compile: (content: string, filename: string) => void;
     exports: (opts: Record<string, any>) => Promise<{ output: string }>;
-  }).exports({
+  }, InstanceType<typeof Module>>;
+
+  microbundle.paths = module.paths;
+  microbundle._compile(patched, resolve);
+
+  void microbundle.exports({
     compress,
     css: 'inline',
     'css-modules': false,

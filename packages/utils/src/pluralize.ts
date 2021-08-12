@@ -6,11 +6,13 @@
  *
  * @example Pluralize `'money'`.
  * ```ts
+ * import { pluralize } from '@sgrud/utils';
  * pluralize('money'); // 'money'
  * ```
  *
  * @example Pluralize `'thesis'`.
  * ```ts
+ * import { pluralize } from '@sgrud/utils';
  * pluralize('thesis'); // 'theses'
  * ```
  */

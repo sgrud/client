@@ -59,9 +59,9 @@ export const typeOf: {
    * Type-check for `global`.
    *
    * @param value - Value to type-check.
-   * @returns Whether `value` is of type `global`.
+   * @returns Whether `value` is of type `typeof globalThis`.
    *
-   * @example Type-check `null` for `global`.
+   * @example Type-check `null` for `typeof globalThis`.
    * ```ts
    * typeOf.global(null); // false
    * ```

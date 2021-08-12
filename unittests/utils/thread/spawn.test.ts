@@ -2,29 +2,27 @@ import { Spawn, Thread } from '@sgrud/utils';
 import { from, Observable, switchMap } from 'rxjs';
 import { Worker } from 'worker_threads';
 
-class Class {
-
-  @Spawn(Worker.bind(Worker, '(' + (() => {
-    /* eslint-disable */
-    require('./dist/utils/index.js').Thread()(class {
-      // @ts-expect-error
-      callable = (...args) => args.length;
-      thirteen = 13;
-    });
-    /* eslint-enable */
-  }) + ')()', { eval: true }) as any)
-  public static readonly worker: Thread<{
-    callable: (...args: any) => number;
-    interval: Observable<number>;
-    thirteen: number;
-  }>;
-
-}
-
 describe('@sgrud/utils/thread/spawn', () => {
 
-  describe('applying the decorator', () => {
-    it('spawns the worker', () => {
+  class Class {
+    @Spawn(Worker.bind(Worker, '(' + (() => {
+      /* eslint-disable */
+      require('./dist/utils/index.js').Thread()(class {
+        // @ts-expect-error
+        callable = (...args) => args.length;
+        thirteen = 13;
+      });
+      /* eslint-enable */
+    }) + ')()', { eval: true }) as any)
+    public static readonly worker: Thread<{
+      callable: (...args: any) => number;
+      interval: Observable<number>;
+      thirteen: number;
+    }>;
+  }
+
+  describe('applying the `@Spawn()` decorator', () => {
+    it('spawns the target worker', () => {
       from(Class.worker).subscribe((worker) => {
         expect(worker).toBeInstanceOf(Function);
       });

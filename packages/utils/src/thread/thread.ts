@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+
 import { expose, Remote } from 'comlink';
 
 /**
@@ -7,7 +8,7 @@ import { expose, Remote } from 'comlink';
  * Promise.
  *
  *
- * @typeParam T - Instance type.
+ * @typeParam T - Class instance type.
  */
 export type Thread<T> = Promise<Remote<T>>;
 
@@ -22,8 +23,7 @@ export type Thread<T> = Promise<Remote<T>>;
  * import { Thread } from '@sgrud/utils';
  *
  * @Thread()
- * class WebWorker {
- * }
+ * export class WebWorker { }
  * ```
  */
 export function Thread() {

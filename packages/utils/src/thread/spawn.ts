@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+
 import { Remote, wrap } from 'comlink';
 
 /**
@@ -16,9 +17,8 @@ import { Remote, wrap } from 'comlink';
  * import WebWorkerThread from 'worker:./web-worker';
  * import { WebWorker } from './web-worker';
  *
- * class WebWorkerHandler {
- *   @Spawn(WebWorkerThread)
- *   private static readonly worker: Thread<WebWorker>;
+ * export class WebWorkerHandler {
+ *   @Spawn(WebWorkerThread) private static readonly worker: Thread<WebWorker>;
  * }
  * ```
  */

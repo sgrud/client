@@ -1,37 +1,26 @@
 /**
- * Singleton interface enforcing the `reconstruct` method on implementing
- * classes. When a `@Singleton()` decorated class implements this interface, its
- * `reconstruct` method will be called every time the singleton instance is
- * retreived via the `new` operator.
- *
- * @typeParam T - Class constructor type.
- */
-export interface Singleton<T extends new (...args: any[]) => any> {
-  reconstruct: (...args: ConstructorParameters<T>) => void;
-}
-
-/**
  * Class decorator factory. Enforces transparent singleton pattern on decorated
- * class.
+ * class. When calling the `new` operaor on a decorated class, if provided, the
+ * `apply` callback is fired with the singleton instence and the construction
+ * invocation parameters.
  *
- * @param construct - Construct function.
+ * @param apply - Construct function.
  * @typeParam T - Class constructor type.
  * @returns Generic class decorator.
  *
  * @example Singleton class.
  * ```ts
- * import { Singleton } from '@sgrud/util';
+ * import { Singleton } from '@sgrud/utils';
  *
  * @Singleton()
- * class MySingleton {
- * }
+ * export class Service { }
  * ```
  */
 export function Singleton<T extends new (...args: any[]) => any>(
-  construct?: (
-    instance: InstanceType<T>,
-    ...args: ConstructorParameters<T>
-  ) => void
+  apply?: (
+    self: InstanceType<T>,
+    args: ConstructorParameters<T>
+  ) => InstanceType<T>
 ) {
 
   /**
@@ -42,22 +31,24 @@ export function Singleton<T extends new (...args: any[]) => any>(
   return function(
     constructor: T
   ): T {
-    let singleton: InstanceType<T>;
-
-    return class extends constructor {
+    class Class extends constructor {
 
       public constructor(...args: any[]) {
-        if (!singleton) {
+        if (!self) {
           super(...args);
-          singleton = this as InstanceType<T>;
-          construct?.(singleton, ...args as ConstructorParameters<T>);
+          self = this;
         }
 
-        singleton.reconstruct?.(...args);
-        return singleton;
+        return apply?.(
+          self as InstanceType<T>,
+          args as ConstructorParameters<T>
+        ) || self;
       }
 
-    };
+    }
+
+    let self: Class;
+    return Class;
   };
 
 }

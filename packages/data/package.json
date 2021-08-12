@@ -8,6 +8,6 @@
   "module": "../../dist/data/index.module.js",
   "unpkg": "../../dist/data/index.umd.js",
   "dependencies": {
-    "tslib": "2.3.0"
+    "tslib": "2.3.1"
   }
 }

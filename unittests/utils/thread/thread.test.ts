@@ -1,11 +1,8 @@
 import { Thread } from '@sgrud/utils';
 
-@Thread()
-class Class {
-
-}
-
 describe('@sgrud/utils/thread/spawn', () => {
+
+  @Thread() class Class { }
 
   describe('applying the decorator', () => {
     it('exposes the worker', () => {
