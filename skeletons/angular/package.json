@@ -7,12 +7,12 @@
   },
   "dependencies": {
     "@angular-builders/custom-webpack": "12.1.0",
-    "@angular/cli": "12.2.0",
-    "@angular/core": "12.2.0",
-    "@angular/elements": "12.2.0",
-    "@angular/platform-browser": "12.2.0",
-    "@angular/platform-browser-dynamic": "12.2.0",
-    "tslib": "2.3.0",
+    "@angular/cli": "12.2.1",
+    "@angular/core": "12.2.1",
+    "@angular/elements": "12.2.1",
+    "@angular/platform-browser": "12.2.1",
+    "@angular/platform-browser-dynamic": "12.2.1",
+    "tslib": "2.3.1",
     "typescript": "4.3.5"
   },
   "browserslist": {
