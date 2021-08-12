@@ -5,13 +5,15 @@
   "types": "./index.d.ts",
   "main": "../../dist/bin/index.js",
   "dependencies": {
-    "@sgrud/utils": "*",
     "express": "4.17.1",
     "fs-extra": "10.0.0",
     "microbundle": "0.13.3",
     "rollup-plugin-web-worker-loader": "1.6.1",
     "sade": "1.7.4",
     "tslib": "2.3.1"
+  },
+  "optionalDependencies": {
+    "@sgrud/utils": "*"
   },
   "bin": {
     "sgrud": "./index.js"

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
 import { Remote, wrap } from 'comlink';
+import { typeOf } from '../typing/type-of';
 
 /**
  * Class property decorator factory. Spawns a worker process, wraps it with
@@ -41,7 +42,7 @@ export function Spawn(
     const worker = new workerFactory();
     let remote: Remote<new (...args: any[]) => Worker> = wrap(worker);
 
-    if (typeof process !== 'undefined') {
+    if (typeOf.process(globalThis.process)) {
       const nodeEndpoint = require('comlink/dist/umd/node-adapter.min');
       remote = wrap(nodeEndpoint(worker));
     }
