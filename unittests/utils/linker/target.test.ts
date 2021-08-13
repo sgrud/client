@@ -1,6 +1,6 @@
 import { Linker, Target, Uplink } from '@sgrud/utils';
 
-describe('@sgrud/utils/linker/uplink', () => {
+describe('@sgrud/utils/linker/target', () => {
 
   @Target<typeof Service>(0)
   class Service {

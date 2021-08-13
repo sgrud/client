@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-describe('@sgrud/utils/thread/spawn', () => {
+describe('@sgrud/utils/thread/transfer', () => {
 
   const { Spawn } = require('@sgrud/utils');
   const { from, Observable, switchMap } = require('rxjs');

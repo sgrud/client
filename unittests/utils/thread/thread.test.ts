@@ -1,6 +1,6 @@
 import { Thread } from '@sgrud/utils';
 
-describe('@sgrud/utils/thread/spawn', () => {
+describe('@sgrud/utils/thread/thread', () => {
 
   @Thread() class Class { }
 

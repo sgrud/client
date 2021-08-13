@@ -1,6 +1,6 @@
 import { typeOf } from '@sgrud/utils';
 
-describe('@sgrud/utils/typeOf', () => {
+describe('@sgrud/utils/typing/typeOf', () => {
 
   const methods = [
     typeOf.array,
