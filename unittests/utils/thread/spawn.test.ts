@@ -1,5 +1,5 @@
 import { Spawn, Thread } from '@sgrud/utils';
-import { from, Observable, switchMap } from 'rxjs';
+import { from, switchMap } from 'rxjs';
 import { Worker } from 'worker_threads';
 
 describe('@sgrud/utils/thread/spawn', () => {
@@ -16,12 +16,11 @@ describe('@sgrud/utils/thread/spawn', () => {
     }) + ')()', { eval: true }) as any)
     public static readonly worker: Thread<{
       callable: (...args: any) => number;
-      interval: Observable<number>;
       thirteen: number;
     }>;
   }
 
-  describe('applying the `@Spawn()` decorator', () => {
+  describe('applying the decorator', () => {
     it('spawns the target worker', () => {
       from(Class.worker).subscribe((worker) => {
         expect(worker).toBeInstanceOf(Function);

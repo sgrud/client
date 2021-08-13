@@ -4,20 +4,26 @@
 import { expose, proxy, ProxyMarked, transferHandlers, wrap } from 'comlink';
 import { Observable, Observer, Subscribable } from 'rxjs';
 
+/**
+ * Observable transfer handler. This specific implementation of
+ * {@link https://www.npmjs.com/package/comlink#api|comlink.transferHandlers}
+ * should transparently proxy {@link https://www.npmjs.com/package/rxjs|rxjs}
+ * `Observables` and the like between a worker and the main threads.
+ *
+ * @see {@link https://github.com/GoogleChromeLabs/comlink/issues/219}
+ */
 transferHandlers.set('observable', {
   canHandle: <T>(value: unknown): value is Observable<T> => {
     return value instanceof Observable;
   },
   deserialize: <T>(value: unknown) => {
     return new Observable<T>((observer) => {
-      const subscribable = transferHandlers.get('proxy')!.deserialize(value);
-      const subscription = (subscribable as Subscribable<T>).subscribe(proxy({
+      value = transferHandlers.get('proxy')!.deserialize(value);
+      return (value as Subscribable<T>).subscribe(proxy({
         next: (next: T) => observer.next(next),
         error: (error: unknown) => observer.error(error),
         complete: () => observer.complete()
       }));
-
-      return () => subscription.unsubscribe();
     });
   },
   serialize: <T>(value: Observable<T>) => {
@@ -37,6 +43,13 @@ if (typeof process !== 'undefined') {
   const nodeEndpoint = require('comlink/dist/umd/node-adapter.min');
   const { MessageChannel } = require('worker_threads');
 
+  /**
+   * NodeJS proxy transfer handler. This specific implementation of
+   * {@link https://www.npmjs.com/package/comlink#api|comlink.transferHandlers}
+   * adopts the default `proxyTransferHandler` for useage under NodeJS.
+   *
+   * @see {@link https://github.com/GoogleChromeLabs/comlink/issues/313}
+   */
   transferHandlers.set('proxy', {
     canHandle: transferHandlers.get('proxy')!.canHandle,
     deserialize: (value: unknown) => {
