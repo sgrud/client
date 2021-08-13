@@ -1,10 +1,10 @@
 import { Singleton } from '../singleton';
 
 /**
- * Linker is the singleton link map used by {@link Uplink} to lookup the linked
- * instances of targeted constructors. To preemptively insert some links, the
- * inherited `MapConstructor` or `Map.prototype.set` methods are available. The
- * former will insert all entries into this singleton link map, internally
+ * Linker is the {@link Singleton} link map used by {@link Uplink} to lookup the
+ * linked instances of targeted constructors. To preemptively insert some links,
+ * the inherited `MapConstructor` or `Map.prototype.set` methods are available.
+ * The former will insert all entries into this singleton link map, internally
  * calling the latter for each.
  *
  * @typeParam K - Target constructor type.
@@ -27,6 +27,9 @@ import { Singleton } from '../singleton';
  *   Service, new Service('linked')
  * ]);
  * ```
+ *
+ * @see {@link Target}
+ * @see {@link Uplink}
  */
 @Singleton<typeof Linker>((self, [entries]) => {
   if (entries) {

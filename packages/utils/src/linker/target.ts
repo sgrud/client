@@ -36,6 +36,9 @@ export type Target<V> = new (...args: any[]) => V;
  *   public constructor(param: string) { }
  * }
  * ```
+ *
+ * @see {@link Linker}
+ * @see {@link Uplink}
  */
 export function Target<K extends new (...args: any[]) => any>(
   ...factoryArgs: ConstructorParameters<K>

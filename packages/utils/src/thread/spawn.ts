@@ -22,6 +22,8 @@ import { typeOf } from '../typing/type-of';
  *   @Spawn(WebWorkerThread) private static readonly worker: Thread<WebWorker>;
  * }
  * ```
+ *
+ * @see {@link Thread}
  */
 export function Spawn(
   workerFactory: new (...args: any[]) => Worker,

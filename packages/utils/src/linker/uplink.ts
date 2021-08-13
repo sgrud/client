@@ -18,6 +18,9 @@ import { Linker } from './linker';
  *   @Uplink(() => Service) private readonly service!: Service;
  * }
  * ```
+ *
+ * @see {@link Linker}
+ * @see {@link Target}
  */
 export function Uplink<K extends new () => any>(
   targetFactory: () => K
