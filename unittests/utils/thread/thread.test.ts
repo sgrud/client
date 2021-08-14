@@ -2,10 +2,11 @@ import { Thread } from '@sgrud/utils';
 
 describe('@sgrud/utils/thread/thread', () => {
 
-  @Thread() class Class { }
+  @Thread()
+  class Class { }
 
   describe('applying the decorator', () => {
-    it('exposes the worker', () => {
+    it('exposes the worker to the main thread', () => {
       expect(new Class()).toBeInstanceOf(Class);
     });
   });

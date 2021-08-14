@@ -11,12 +11,12 @@ describe('@sgrud/utils/linker/target', () => {
     @Uplink<Target<Service>>(() => Service) public readonly service!: Service;
   }
 
-  const service = new Linker().get(Service as Target<Service>) as Service;
-
   describe('applying the decorator', () => {
+    const service = new Linker<Target<Service>, Service>().get(Service);
+
     it('links the instance to the target constructor', () => {
       expect(service).toBeInstanceOf(Service);
-      expect(service).toBe(new Linker().get(Service as Target<Service>));
+      expect(service).toBe(new Linker<Target<Service>, Service>().get(Service));
     });
 
     it('creates the instance from provided constructor parameters', () => {

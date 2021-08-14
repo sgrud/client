@@ -17,23 +17,32 @@ describe('@sgrud/utils/linker/uplink', () => {
   }
 
   describe('applying the decorator', () => {
+    const classOne = new ClassOne();
+    const classTwo = new ClassTwo();
+
     it('links the instance to the prototype', () => {
-      expect(ClassOne.prototype.service).toBeInstanceOf(Service);
-      expect(ClassTwo.prototype.service).toBeInstanceOf(Service);
+      expect(classOne.service).toBeInstanceOf(Service);
+      expect(classTwo.service).toBeInstanceOf(Service);
     });
   });
 
   describe('applying the decorator again', () => {
+    const classOne = new ClassOne();
+    const classTwo = new ClassTwo();
+
     it('links the same instance to the prototype', () => {
-      expect(new ClassOne().service).toBe(new ClassTwo().service);
-      expect(new ClassOne().service.member).toBe(new ClassTwo().service.member);
+      expect(classOne.service).toBe(classTwo.service);
+      expect(classOne.service.member).toBe(classTwo.service.member);
     });
   });
 
   describe('creating circular depencencies', () => {
+    const classOne = new ClassOne();
+    const classTwo = new ClassTwo();
+
     it('correctly resolves each dependency', () => {
-      expect(new ClassOne().class).toBeInstanceOf(ClassTwo);
-      expect(new ClassTwo().class).toBeInstanceOf(ClassOne);
+      expect(classOne.class).toBeInstanceOf(ClassTwo);
+      expect(classTwo.class).toBeInstanceOf(ClassOne);
     });
   });
 

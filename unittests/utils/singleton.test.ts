@@ -16,10 +16,10 @@ describe('@sgrud/utils/singleton', () => {
   })
   class ClassTwo extends Class { }
 
-  const classOne = new ClassOne(1);
-  const classTwo = new ClassTwo(2);
-
   describe('creating a new instance', () => {
+    const classOne = new ClassOne(1);
+    const classTwo = new ClassTwo(2);
+
     it('returns the singleton instance', () => {
       expect(new ClassOne(3)).toBe(classOne);
       expect(new ClassTwo(4)).toBe(classTwo);
