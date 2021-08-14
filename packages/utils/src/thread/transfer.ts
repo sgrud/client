@@ -2,25 +2,25 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 
 import { expose, proxy, ProxyMarked, transferHandlers, wrap } from 'comlink';
-import { Observable, Observer, Subscribable } from 'rxjs';
+import { Observable, Observer, Subscribable, Subscriber } from 'rxjs';
 
 /**
  * Observable transfer handler. This specific implementation of
  * {@link https://www.npmjs.com/package/comlink#api|comlink.transferHandlers}
  * should transparently proxy {@link https://www.npmjs.com/package/rxjs|rxjs}
- * `Observables` and the like between a worker and the main threads.
+ * `Observable` between a worker and the main threads.
  *
  * @see {@link https://github.com/GoogleChromeLabs/comlink/issues/219}
  */
 transferHandlers.set('observable', {
-  canHandle: <T>(value: unknown): value is Observable<T> => {
+  canHandle: (value: unknown): value is Observable<unknown> => {
     return value instanceof Observable;
   },
-  deserialize: <T>(value: unknown) => {
-    return new Observable<T>((observer) => {
+  deserialize: (value: unknown) => {
+    return new Observable<unknown>((observer) => {
       value = transferHandlers.get('proxy')!.deserialize(value);
-      return (value as Subscribable<T>).subscribe(proxy({
-        next: (next: T) => observer.next(next),
+      (value as Subscribable<unknown>).subscribe(proxy({
+        next: (next: unknown) => observer.next(next),
         error: (error: unknown) => observer.error(error),
         complete: () => observer.complete()
       }));
@@ -36,6 +36,24 @@ transferHandlers.set('observable', {
         });
       }
     });
+  }
+});
+
+/**
+ * Subscriber transfer handler. This specific implementation of
+ * {@link https://www.npmjs.com/package/comlink#api|comlink.transferHandlers}
+ * should transparently proxy {@link https://www.npmjs.com/package/rxjs|rxjs}
+ * `Subscriber` between a worker and the main threads.
+ */
+transferHandlers.set('subscriber', {
+  canHandle: (value: unknown): value is Subscriber<unknown> => {
+    return value instanceof Subscriber;
+  },
+  deserialize: (value: unknown) => {
+    return transferHandlers.get('proxy')!.deserialize(value);
+  },
+  serialize: (value: Subscriber<unknown>) => {
+    return transferHandlers.get('proxy')!.serialize(value);
   }
 });
 
