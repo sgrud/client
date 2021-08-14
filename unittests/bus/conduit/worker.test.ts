@@ -8,8 +8,12 @@ describe('@sgrud/bus/conduit/worker', () => {
       const worker = new ConduitWorker();
       const subject = new Subject<number>();
 
-      const one = worker.get('sgrud.bus.test').subscribe((next) => {
-        expect(next).toBe(1);
+      const one = worker.get('sgrud.bus.test').subscribe(({
+        handle,
+        value
+      }) => {
+        expect(handle).toBe('sgrud.bus.test.subject');
+        expect(value).toBe(0);
         one.unsubscribe();
       });
 
@@ -19,7 +23,7 @@ describe('@sgrud/bus/conduit/worker', () => {
       });
 
       worker.set('sgrud.bus.test.subject', subject);
-      setTimeout(() => subject.next(1), 1000);
+      setTimeout(() => subject.next(0), 1000);
     });
   });
 
@@ -28,14 +32,22 @@ describe('@sgrud/bus/conduit/worker', () => {
       const worker = new ConduitWorker();
       const behaviorSubject = new BehaviorSubject<number>(1);
 
-      const one = worker.get('sgrud.bus.test').subscribe((next) => {
-        expect(next).toBe(behaviorSubject.value);
+      const one = worker.get('sgrud.bus.test').subscribe(({
+        handle,
+        value
+      }) => {
+        expect(handle).toBe('sgrud.bus.test.behaviorSubject');
+        expect(value).toBe(behaviorSubject.value);
         one.unsubscribe();
       });
 
-      const two = worker.get('sgrud.bus.test').subscribe((next) => {
-        expect(next).toBe(behaviorSubject.value);
-        if (next === 2) two.unsubscribe();
+      const two = worker.get('sgrud.bus.test').subscribe(({
+        handle,
+        value
+      }) => {
+        expect(handle).toBe('sgrud.bus.test.behaviorSubject');
+        expect(value).toBe(behaviorSubject.value);
+        if (value === 2) two.unsubscribe();
       });
 
       two.add(() => {

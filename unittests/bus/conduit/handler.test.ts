@@ -16,8 +16,12 @@ describe('@sgrud/bus/conduit/handler', () => {
       const handler = new ConduitHandler();
       const subject = new Subject<number>();
 
-      const one = handler.get(['sgrud', 'bus', 'test']).subscribe((next) => {
-        expect(next).toBe(1);
+      const one = handler.get('sgrud.bus.test').subscribe(({
+        handle,
+        value
+      }) => {
+        expect(handle).toBe('sgrud.bus.test.subject');
+        expect(value).toBe(0);
         one.unsubscribe();
       });
 
@@ -27,7 +31,7 @@ describe('@sgrud/bus/conduit/handler', () => {
       });
 
       handler.set('sgrud.bus.test.subject', subject);
-      setTimeout(() => subject.next(1), 1000);
+      setTimeout(() => subject.next(0), 1000);
     });
   });
 
@@ -36,14 +40,22 @@ describe('@sgrud/bus/conduit/handler', () => {
       const handler = new ConduitHandler();
       const behaviorSubject = new BehaviorSubject<number>(1);
 
-      const one = handler.get('sgrud.bus.test').subscribe((next) => {
-        expect(next).toBe(behaviorSubject.value);
+      const one = handler.get('sgrud.bus.test').subscribe(({
+        handle,
+        value
+      }) => {
+        expect(handle).toBe('sgrud.bus.test.behaviorSubject');
+        expect(value).toBe(behaviorSubject.value);
         one.unsubscribe();
       });
 
-      const two = handler.get('sgrud.bus.test').subscribe((next) => {
-        expect(next).toBe(behaviorSubject.value);
-        if (next === 2) two.unsubscribe();
+      const two = handler.get('sgrud.bus.test').subscribe(({
+        handle,
+        value
+      }) => {
+        expect(handle).toBe('sgrud.bus.test.behaviorSubject');
+        expect(value).toBe(behaviorSubject.value);
+        if (value === 2) two.unsubscribe();
       });
 
       two.add(() => {
@@ -51,7 +63,7 @@ describe('@sgrud/bus/conduit/handler', () => {
         done();
       });
 
-      handler.set(['sgrud', 'bus', 'test', 'behaviorSubject'], behaviorSubject);
+      handler.set('sgrud.bus.test.behaviorSubject', behaviorSubject);
       setTimeout(() => behaviorSubject.next(2), 1000);
     });
   });
