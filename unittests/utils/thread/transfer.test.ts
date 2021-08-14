@@ -4,7 +4,7 @@ describe('@sgrud/utils/thread/transfer', () => {
 
   /**
    * This test will fail if used with TypeScript imports instead of `require`
-   * calls, as it needs identical imports in the test case ans worker thread.
+   * calls, as it needs identical imports in the test case and worker thread.
    */
   const { Spawn } = require('@sgrud/utils');
   const { from, Observable, switchMap, take } = require('rxjs');

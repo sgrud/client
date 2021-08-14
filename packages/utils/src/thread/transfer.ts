@@ -3,6 +3,7 @@
 
 import { expose, proxy, ProxyMarked, transferHandlers, wrap } from 'comlink';
 import { Observable, Observer, Subscribable, Subscriber } from 'rxjs';
+import { typeOf } from '../typing/type-of';
 
 /**
  * Observable transfer handler. This specific implementation of
@@ -26,11 +27,11 @@ transferHandlers.set('observable', {
       }));
     });
   },
-  serialize: <T>(value: Observable<T>) => {
+  serialize: (value: Observable<unknown>) => {
     return transferHandlers.get('proxy')!.serialize({
-      subscribe: (observer: Observer<T>) => {
+      subscribe: (observer: Observer<unknown>) => {
         return value.subscribe({
-          next: (next: T) => observer.next(next),
+          next: (next: unknown) => observer.next(next),
           error: (error: unknown) => observer.error(error),
           complete: () => observer.complete()
         });
@@ -57,7 +58,7 @@ transferHandlers.set('subscriber', {
   }
 });
 
-if (typeof process !== 'undefined') {
+if (typeOf.process(globalThis.process)) {
   const nodeEndpoint = require('comlink/dist/umd/node-adapter.min');
   const { MessageChannel } = require('worker_threads');
 
