@@ -67,6 +67,9 @@
   "jest": {
     "preset": "ts-jest",
     "collectCoverage": true,
+    "coverageReporters": [
+      "text"
+    ],
     "globals": {
       "ts-jest": {
         "tsconfig": "<rootDir>/unittests/tsconfig.json"
