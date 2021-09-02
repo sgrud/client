@@ -3,7 +3,7 @@ import { Singleton } from '@sgrud/utils';
 describe('@sgrud/utils/singleton', () => {
 
   class Class {
-    public member: number = 0;
+    public member: number = 1;
     public constructor(public readonly param: number) { }
   }
 
@@ -17,22 +17,22 @@ describe('@sgrud/utils/singleton', () => {
   class ClassTwo extends Class { }
 
   describe('creating a new instance', () => {
-    const classOne = new ClassOne(1);
-    const classTwo = new ClassTwo(2);
+    const classOne = new ClassOne(2);
+    const classTwo = new ClassTwo(3);
 
     it('returns the singleton instance', () => {
-      expect(new ClassOne(3)).toBe(classOne);
-      expect(new ClassTwo(4)).toBe(classTwo);
+      expect(new ClassOne(4)).toBe(classOne);
+      expect(new ClassTwo(5)).toBe(classTwo);
     });
 
     it('does not mutate the singleton', () => {
-      expect(new ClassOne(5).param).toBe(1);
-      expect(new ClassTwo(6).param).toBe(2);
+      expect(new ClassOne(6).param).toBe(2);
+      expect(new ClassTwo(7).param).toBe(3);
     });
 
     it('calls the decorated method', () => {
-      expect(new ClassOne(7).member).toBe(0);
-      expect(new ClassTwo(8).member).toBe(8);
+      expect(new ClassOne(8).member).toBe(1);
+      expect(new ClassTwo(9).member).toBe(9);
     });
   });
 

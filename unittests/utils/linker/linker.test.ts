@@ -3,11 +3,11 @@ import { Linker } from '@sgrud/utils';
 describe('@sgrud/utils/linker/linker', () => {
 
   class ServiceOne {
-    public constructor(public param: number = 0) { }
+    public constructor(public param: number = 1) { }
   }
 
   class ServiceTwo {
-    public constructor(public param: number = 1) { }
+    public constructor(public param: number = 2) { }
   }
 
   describe('creating a new linker', () => {
@@ -24,12 +24,12 @@ describe('@sgrud/utils/linker/linker', () => {
     it('returns the linked instance', () => {
       expect(linker.get(ServiceOne)).toBeInstanceOf(ServiceOne);
       expect(linker.get(ServiceOne)).toBe(new Linker().get(ServiceOne));
-      expect(linker.get(ServiceOne).param).toBe(0);
+      expect(linker.get(ServiceOne).param).toBe(1);
     });
   });
 
   describe('preemptively inserting an instance', () => {
-    const arg = [ServiceTwo, new ServiceTwo(2)];
+    const arg = [ServiceTwo, new ServiceTwo(3)];
     const spy = jest.spyOn(Linker.prototype, 'set');
     const linker = new Linker([arg as [typeof ServiceTwo, ServiceTwo]]);
 
@@ -37,7 +37,7 @@ describe('@sgrud/utils/linker/linker', () => {
       expect(spy).toHaveBeenCalledWith(...arg);
       expect(linker.get(ServiceTwo)).toBeInstanceOf(ServiceTwo);
       expect(linker.get(ServiceTwo)).toBe(new Linker().get(ServiceTwo));
-      expect(linker.get(ServiceTwo).param).toBe(2);
+      expect(linker.get(ServiceTwo).param).toBe(3);
     });
   });
 

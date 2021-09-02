@@ -15,7 +15,7 @@ describe('@sgrud/utils/thread/transfer', () => {
       require('./dist/utils/index.js').Thread()(class {
         /* eslint-disable */
         observable = require('rxjs').of(1, 2, 3);
-        subject = new (require('rxjs').BehaviorSubject)(0);
+        subject = new (require('rxjs').BehaviorSubject)(1);
         /* eslint-enable */
       });
     }) + ')()', { eval: true }))
@@ -62,7 +62,7 @@ describe('@sgrud/utils/thread/transfer', () => {
         switchMap((subject: any) => subject),
         take(1)
       ).subscribe({
-        next: (next: number) => expect(next).toBe(0),
+        next: (next: number) => expect(next).toBe(1),
         error: console.error,
         complete: () => done()
       });

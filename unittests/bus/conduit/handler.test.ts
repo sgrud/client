@@ -21,7 +21,7 @@ describe('@sgrud/bus/conduit/handler', () => {
         value
       }) => {
         expect(handle).toBe('sgrud.bus.test.subject');
-        expect(value).toBe(0);
+        expect(value).toBe(1);
         one.unsubscribe();
       });
 
@@ -31,14 +31,14 @@ describe('@sgrud/bus/conduit/handler', () => {
       });
 
       handler.set('sgrud.bus.test.subject', subject);
-      setTimeout(() => subject.next(0), 1000);
+      setTimeout(() => subject.next(1), 1000);
     });
   });
 
   describe('creating and subscribing to a BehaviorSubject conduit', () => {
     it('observes values emitted within its parent handle', (done) => {
       const handler = new ConduitHandler();
-      const behaviorSubject = new BehaviorSubject<number>(1);
+      const behaviorSubject = new BehaviorSubject<number>(2);
 
       const one = handler.get('sgrud.bus.test').subscribe(({
         handle,
@@ -55,7 +55,7 @@ describe('@sgrud/bus/conduit/handler', () => {
       }) => {
         expect(handle).toBe('sgrud.bus.test.behaviorSubject');
         expect(value).toBe(behaviorSubject.value);
-        if (value === 2) two.unsubscribe();
+        if (value === 3) two.unsubscribe();
       });
 
       two.add(() => {
@@ -64,7 +64,7 @@ describe('@sgrud/bus/conduit/handler', () => {
       });
 
       handler.set('sgrud.bus.test.behaviorSubject', behaviorSubject);
-      setTimeout(() => behaviorSubject.next(2), 1000);
+      setTimeout(() => behaviorSubject.next(3), 1000);
     });
   });
 

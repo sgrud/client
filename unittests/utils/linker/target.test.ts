@@ -2,7 +2,7 @@ import { Linker, Target, Uplink } from '@sgrud/utils';
 
 describe('@sgrud/utils/linker/target', () => {
 
-  @Target<typeof Service>(0)
+  @Target<typeof Service>(1)
   class Service {
     public constructor(public readonly param: number) { }
   }
@@ -20,7 +20,7 @@ describe('@sgrud/utils/linker/target', () => {
     });
 
     it('creates the instance from provided constructor parameters', () => {
-      expect(service.param).toBe(0);
+      expect(service.param).toBe(1);
     });
   });
 
