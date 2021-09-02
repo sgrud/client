@@ -37,7 +37,7 @@
     "install": "microbundle --cwd ./packages/bin --format cjs",
     "postinstall": "node -e 'sgrud.postbuild();' -r ./dist/bin",
     "prepare": "npm install -s --no-audit --no-save ./dist/bin",
-    "test": "eslint -f codeframe ./**/*.ts && jest --forceExit",
+    "test": "eslint -f codeframe --fix ./ && jest --forceExit",
     "docs": "typedoc --name @sgrud ./packages/*/index.ts"
   },
   "dependencies": {
@@ -136,6 +136,10 @@
       "@typescript-eslint/no-unsafe-member-access": "off",
       "@typescript-eslint/no-unsafe-return": "off",
       "@typescript-eslint/no-unused-vars": "error",
+      "@typescript-eslint/object-curly-spacing": [
+        "error",
+        "always"
+      ],
       "@typescript-eslint/quotes": [
         "error",
         "single"
@@ -143,6 +147,11 @@
       "@typescript-eslint/require-await": "off",
       "@typescript-eslint/restrict-plus-operands": "off",
       "@typescript-eslint/semi": "error",
+      "@typescript-eslint/space-before-function-paren": [
+        "error",
+        "never"
+      ],
+      "@typescript-eslint/type-annotation-spacing": "error",
       "@typescript-eslint/typedef": [
         "error",
         {
@@ -194,7 +203,6 @@
     }
   },
   "eslintIgnore": [
-    "coverage",
     "dist",
     "docs",
     "jest.*",
