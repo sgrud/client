@@ -103,6 +103,15 @@ export function construct({
     cwd,
     entries,
     format,
+    globals: [
+      '@sgrud/bin=sgrud.bin',
+      '@sgrud/bus=sgrud.bus',
+      '@sgrud/core=sgrud.core',
+      '@sgrud/data=sgrud.data',
+      '@sgrud/shell=sgrud.shell',
+      '@sgrud/state=sgrud.state',
+      '@sgrud/utils=sgrud.utils'
+    ].join(','),
     'pkg-main': true
   }).then(({ output }) => console.log(output));
 }

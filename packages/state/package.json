@@ -1,5 +1,6 @@
 {
   "name": "@sgrud/state",
+  "amdName": "sgrud.state",
   "version": "0.0.1",
   "source": "./index.ts",
   "types": "./index.d.ts",

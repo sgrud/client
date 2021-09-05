@@ -1,5 +1,6 @@
 {
   "name": "@sgrud/utils",
+  "amdName": "sgrud.utils",
   "version": "0.0.1",
   "source": "./index.ts",
   "types": "./index.d.ts",
