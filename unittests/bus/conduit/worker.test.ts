@@ -4,10 +4,10 @@ import { BehaviorSubject, Subject } from 'rxjs';
 describe('@sgrud/bus/conduit/worker', () => {
 
   describe('creating and subscribing to a Subject conduit', () => {
-    it('observes values emitted within its parent handle', (done) => {
-      const worker = new ConduitWorker();
-      const subject = new Subject<number>();
+    const worker = new ConduitWorker();
+    const subject = new Subject<number>();
 
+    it('observes values emitted within its parent handle', (done) => {
       const one = worker.get('sgrud.bus.test').subscribe(({
         handle,
         value
@@ -28,10 +28,10 @@ describe('@sgrud/bus/conduit/worker', () => {
   });
 
   describe('creating and subscribing to a BehaviorSubject conduit', () => {
-    it('observes values emitted within its parent handle', (done) => {
-      const worker = new ConduitWorker();
-      const behaviorSubject = new BehaviorSubject<number>(2);
+    const worker = new ConduitWorker();
+    const behaviorSubject = new BehaviorSubject<number>(2);
 
+    it('observes values emitted within its parent handle', (done) => {
       const one = worker.get('sgrud.bus.test').subscribe(({
         handle,
         value

@@ -12,10 +12,10 @@ describe('@sgrud/bus/conduit/handler', () => {
   });
 
   describe('creating and subscribing to a Subject conduit', () => {
-    it('observes values emitted within its parent handle', (done) => {
-      const handler = new ConduitHandler();
-      const subject = new Subject<number>();
+    const handler = new ConduitHandler();
+    const subject = new Subject<number>();
 
+    it('observes values emitted within its parent handle', (done) => {
       const one = handler.get('sgrud.bus.test').subscribe(({
         handle,
         value
@@ -36,10 +36,10 @@ describe('@sgrud/bus/conduit/handler', () => {
   });
 
   describe('creating and subscribing to a BehaviorSubject conduit', () => {
-    it('observes values emitted within its parent handle', (done) => {
-      const handler = new ConduitHandler();
-      const behaviorSubject = new BehaviorSubject<number>(2);
+    const handler = new ConduitHandler();
+    const behaviorSubject = new BehaviorSubject<number>(2);
 
+    it('observes values emitted within its parent handle', (done) => {
       const one = handler.get('sgrud.bus.test').subscribe(({
         handle,
         value
