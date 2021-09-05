@@ -10,30 +10,22 @@ import { Singleton } from '../singleton';
  * @typeParam K - Target constructor type.
  * @typeParam V - Linked instance type.
  *
- * @example Retreive a linked instance.
- * ```ts
- * import { Linker } from '@sgrud/utils';
- * import { Service } from './service';
- *
- * new Linker().get(Service);
- * ```
- *
  * @example Preemptively link an instance.
  * ```ts
  * import { Linker } from '@sgrud/utils';
  * import { Service } from './service';
  *
  * new Linker([
- *   Service, new Service('linked')
+ *   [Service, new Service('linked')]
  * ]);
  * ```
  *
  * @see {@link Target}
  * @see {@link Uplink}
  */
-@Singleton<typeof Linker>((self, [entries]) => {
-  if (entries) {
-    for (const [key, value] of entries) {
+@Singleton<typeof Linker>((self, [tuples]) => {
+  if (tuples) {
+    for (const [key, value] of tuples) {
       self.set(key, value);
     }
   }
@@ -51,6 +43,14 @@ export class Linker<K extends new () => V, V> extends Map<K, V> {
    *
    * @param target - Target constructor.
    * @returns Linked instance.
+   *
+   * @example Retreive a linked instance.
+   * ```ts
+   * import { Linker } from '@sgrud/utils';
+   * import { Service } from './service';
+   *
+   * new Linker().get(Service);
+   * ```
    */
   public override get(target: K): V {
     let instance = super.get(target);

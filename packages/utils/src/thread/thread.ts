@@ -9,7 +9,7 @@ import { TypeOf } from '../typing/type-of';
  * Promise. Use in conjnction with the `@Thread()` decorator.
  *
  *
- * @typeParam T - Class instance type.
+ * @typeParam T - Thread instance type.
  */
 export type Thread<T> = Promise<Remote<T>>;
 
@@ -17,7 +17,7 @@ export type Thread<T> = Promise<Remote<T>>;
  * Class decorator factory. Exposes the decorated class as worker via
  * {@link https://www.npmjs.com/package/comlink#api|comlink.expose}.
  *
- * @returns Generic class decorator.
+ * @returns Class decorator.
  *
  * @example WebWorker thread.
  * ```ts
@@ -33,12 +33,9 @@ export function Thread() {
 
   /**
    * @param constructor - Class constructor to be decorated.
-   * @typeParam T - Class constructor type.
    */
-  return function<
-    T extends new (...args: any[]) => InstanceType<T>
-  >(
-    constructor: T
+  return function(
+    constructor: new (...args: any[]) => any
   ): void {
     if (TypeOf.function(globalThis.importScripts)) {
       expose(constructor);

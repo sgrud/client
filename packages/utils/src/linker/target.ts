@@ -5,16 +5,6 @@ import { Linker } from './linker';
  * Use in conjnction with the `@Target()` decorator.
  *
  * @typeParam V - Linked instance type.
- *
- * @example Uplink a service.
- * ```ts
- * import { Target, Uplink } from '@sgrud/utils';
- * import { Service } from './service';
- *
- * export class ServiceHandler {
- *   @Uplink<Target<Service>>(() => Service) private readonly service!: Service;
- * }
- * ```
  */
 export type Target<V> = new (...args: any[]) => V;
 
@@ -25,7 +15,7 @@ export type Target<V> = new (...args: any[]) => V;
  *
  * @param factoryArgs - Arguments for the target constructor.
  * @typeParam K - Target constructor type.
- * @returns Generic class decorator.
+ * @returns Class decorator.
  *
  * @example Target a service.
  * ```ts
@@ -34,6 +24,17 @@ export type Target<V> = new (...args: any[]) => V;
  * @Target<typeof Service>('default')
  * export class Service {
  *   public constructor(param: string) { }
+ * }
+ * ```
+ *
+ * @example Uplink a targeted service.
+ * ```ts
+ * import { Target, Uplink } from '@sgrud/utils';
+ * import { Service } from './service';
+ *
+ * export class ServiceHandler {
+ *   @Uplink<Target<Service>>(() => Service)
+ *   private readonly service!: Service;
  * }
  * ```
  *

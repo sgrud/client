@@ -15,7 +15,8 @@ import { Linker } from './linker';
  * import { Service } from './service';
  *
  * export class ServiceHandler {
- *   @Uplink(() => Service) private readonly service!: Service;
+ *   @Uplink(() => Service)
+ *   private readonly service!: Service;
  * }
  * ```
  *

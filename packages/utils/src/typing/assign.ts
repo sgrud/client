@@ -6,6 +6,15 @@
  *
  * @typeParam S - Source type.
  * @typeParam T - Target type.
+ *
+ * @example Assign `valueOf()` to `string`.
+ * ```ts
+ * import { Assign } from '@sgrud/utils';
+ *
+ * const str = 'Hello world' as Assign<{
+ *   valueOf: () => 'Hello world';
+ * }, string>;
+ * ```
  */
 export type Assign<S, T> = {
   [K in keyof (S & T)]:

@@ -5,8 +5,8 @@
  * invocation parameters.
  *
  * @param apply - Construct function.
- * @typeParam T - Class constructor type.
- * @returns Generic class decorator.
+ * @typeParam T - Constructor type.
+ * @returns Class decorator.
  *
  * @example Singleton class.
  * ```ts
@@ -25,7 +25,6 @@ export function Singleton<T extends new (...args: any[]) => any>(
 
   /**
    * @param constructor - Class constructor to be decorated.
-   * @typeParam T - Class constructor type.
    * @returns Decoated class constructor.
    */
   return function(

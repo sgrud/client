@@ -10,7 +10,7 @@ import { TypeOf } from '../typing/type-of';
  *
  * @param workerFactory - Worker constructor.
  * @param factoryArgs - Worker Constructor arguments.
- * @returns Generic class property decorator.
+ * @returns Class property decorator.
  *
  * @example Spawn a WebWorker.
  * ```ts
@@ -19,7 +19,8 @@ import { TypeOf } from '../typing/type-of';
  * import { WebWorker } from './web-worker';
  *
  * export class WebWorkerHandler {
- *   @Spawn(WebWorkerThread) private static readonly worker: Thread<WebWorker>;
+ *   @Spawn(WebWorkerThread)
+ *   private static readonly worker: Thread<WebWorker>;
  * }
  * ```
  *
@@ -33,12 +34,9 @@ export function Spawn(
   /**
    * @param constructor - Class constructor to be decorated.
    * @param propertyKey - Class property to be decorated.
-   * @typeParam T - Class constructor type.
    */
-  return function<
-    T extends new (...args: any[]) => InstanceType<T>
-  >(
-    constructor: T,
+  return function(
+    constructor: new (...args: any[]) => any,
     propertyKey: PropertyKey
   ): void {
     const worker = new workerFactory();
