@@ -40,8 +40,6 @@ export function pluralize(singular: string): string {
 
 /**
  * Regex mapping of singular words to their regular plural forms.
- *
- * @internal
  */
 const regulars: Record<string, string> = {
   '(quiz)$'                    : '$1zes',
@@ -66,8 +64,6 @@ const regulars: Record<string, string> = {
 
 /**
  * Mapping of singular words to their irregular plural forms.
- *
- * @internal
  */
 const irregulars: Record<string, string> = {
   child : 'children',
@@ -82,8 +78,6 @@ const irregulars: Record<string, string> = {
 
 /**
  * List of uncountable singular words.
- *
- * @internal
  */
 const uncountables: string[] = [
   'aircraft',
