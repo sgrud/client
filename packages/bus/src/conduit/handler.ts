@@ -10,11 +10,27 @@ export type ConduitValue<T> = {
   value: T;
 };
 
-@Singleton<typeof ConduitHandler>()
+@Singleton<typeof ConduitHandler>((self, [tuples]) => {
+  if (tuples) {
+    for (const [key, value] of tuples) {
+      self.set(key, value);
+    }
+  }
+
+  return self;
+})
 export class ConduitHandler {
 
   @Spawn(ConduitWorkerThread)
   private static readonly worker: Thread<ConduitWorker>;
+
+  public constructor(tuples?: [ConduitHandle, Observable<any>][]) {
+    if (tuples) {
+      for (const [key, value] of tuples) {
+        this.set(key, value);
+      }
+    }
+  }
 
   public get<T>(handle: ConduitHandle): Observable<ConduitValue<T>> {
     return from(ConduitHandler.worker).pipe(
