@@ -3,7 +3,7 @@
 
 import { expose, proxy, ProxyMarked, transferHandlers, wrap } from 'comlink';
 import { Observable, Observer, Subscribable, Subscriber } from 'rxjs';
-import { typeOf } from '../typing/type-of';
+import { TypeOf } from '../typing/type-of';
 
 /**
  * Observable transfer handler. This specific implementation of
@@ -58,7 +58,7 @@ transferHandlers.set('subscriber', {
   }
 });
 
-if (typeOf.process(globalThis.process)) {
+if (TypeOf.process(globalThis.process)) {
   const nodeEndpoint = require('comlink/dist/umd/node-adapter.min');
   const { MessageChannel } = require('worker_threads');
 

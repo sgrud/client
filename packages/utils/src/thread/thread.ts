@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
 import { expose, Remote } from 'comlink';
-import { typeOf } from '../typing/type-of';
+import { TypeOf } from '../typing/type-of';
 
 /**
  * Type representing an exposed class in a remote context. Created by wrapping
@@ -40,9 +40,9 @@ export function Thread() {
   >(
     constructor: T
   ): void {
-    if (typeOf.function(globalThis.importScripts)) {
+    if (TypeOf.function(globalThis.importScripts)) {
       expose(constructor);
-    } else if (typeOf.process(globalThis.process)) {
+    } else if (TypeOf.process(globalThis.process)) {
       const nodeEndpoint = require('comlink/dist/umd/node-adapter.min');
       const { isMainThread, parentPort } = require('worker_threads');
 

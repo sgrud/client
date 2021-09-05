@@ -1,28 +1,30 @@
-import { typeOf } from '@sgrud/utils';
+/* eslint-disable @typescript-eslint/unbound-method */
 
-describe('@sgrud/utils/typing/typeOf', () => {
+import { TypeOf } from '@sgrud/utils';
+
+describe('@sgrud/utils/typing/type-of', () => {
 
   const methods = [
-    typeOf.array,
-    typeOf.boolean,
-    typeOf.date,
-    typeOf.function,
-    typeOf.global,
-    typeOf.null,
-    typeOf.number,
-    typeOf.object,
-    typeOf.process,
-    typeOf.promise,
-    typeOf.string,
-    typeOf.undefined,
-    typeOf.window
+    TypeOf.array,
+    TypeOf.boolean,
+    TypeOf.date,
+    TypeOf.function,
+    TypeOf.global,
+    TypeOf.null,
+    TypeOf.number,
+    TypeOf.object,
+    TypeOf.process,
+    TypeOf.promise,
+    TypeOf.string,
+    TypeOf.undefined,
+    TypeOf.window
   ];
 
   const values = [
     [],
     true,
     new Date(),
-    () => void 0,
+    () => undefined,
     { [Symbol.toStringTag]: 'global' },
     null,
     0,

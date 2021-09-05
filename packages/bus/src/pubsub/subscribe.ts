@@ -1,4 +1,4 @@
-import { typeOf } from '@sgrud/utils';
+import { TypeOf } from '@sgrud/utils';
 import { ConduitHandle, ConduitHandler } from '../conduit/handler';
 
 /**
@@ -60,7 +60,7 @@ export function Subscribe(
     prototype: Object,
     propertyKey: PropertyKey
   ): void {
-    if (typeOf.string(source) && source) {
+    if (TypeOf.string(source) && source) {
       Object.defineProperty(prototype, source, {
         enumerable: true,
         set: function(this: any, value: string): void {

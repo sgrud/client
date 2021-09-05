@@ -1,7 +1,17 @@
 /**
- * Strict type-assertion and runtime type-checking utility.
+ * Strict type-assertion and runtime type-checking utility. When type-checking
+ * variables in the global scope, e.g., `window` or `process`, make use of the
+ * `globalThis` object.
+ *
+ * @example Type-check global context.
+ * ```ts
+ * import { TypeOf } from '@sgrud/utils';
+ *
+ * TypeOf.process(globalThis.process); // running in node context
+ * TypeOf.window(globalThis.window);   // running in browser context
+ * ```
  */
-export const typeOf: {
+export abstract class TypeOf {
 
   /**
    * Type-check for `Array<any>`.
@@ -11,10 +21,14 @@ export const typeOf: {
    *
    * @example Type-check `null` for `Array<any>`.
    * ```ts
-   * typeOf.array(null); // false
+   * import { TypeOf } from '@sgrud/utils';
+   *
+   * TypeOf.array(null); // false
    * ```
    */
-  array: (value: unknown) => value is Array<any>;
+  public static array(value: unknown): value is Array<any> {
+    return test('Array', value);
+  }
 
   /**
    * Type-check for `boolean`.
@@ -24,10 +38,14 @@ export const typeOf: {
    *
    * @example Type-check `null` for `boolean`.
    * ```ts
-   * typeOf.boolean(null); // false
+   * import { TypeOf } from '@sgrud/utils';
+   *
+   * TypeOf.boolean(null); // false
    * ```
    */
-  boolean: (value: unknown) => value is boolean;
+  public static boolean(value: unknown): value is boolean {
+    return test('Boolean', value);
+  }
 
   /**
    * Type-check for `Date`.
@@ -37,10 +55,14 @@ export const typeOf: {
    *
    * @example Type-check `null` for `Date`.
    * ```ts
-   * typeOf.date(null); // false
+   * import { TypeOf } from '@sgrud/utils';
+   *
+   * TypeOf.date(null); // false
    * ```
    */
-  date: (value: unknown) => value is Date;
+  public static date(value: unknown): value is Date {
+    return test('Date', value);
+  }
 
   /**
    * Type-check for `Function`.
@@ -50,10 +72,14 @@ export const typeOf: {
    *
    * @example Type-check `null` for `Function`.
    * ```ts
-   * typeOf.function(null); // false
+   * import { TypeOf } from '@sgrud/utils';
+   *
+   * TypeOf.function(null); // false
    * ```
    */
-  function: (value: unknown) => value is Function;
+  public static function(value: unknown): value is Function {
+    return test('Function', value);
+  }
 
   /**
    * Type-check for `global`.
@@ -63,10 +89,14 @@ export const typeOf: {
    *
    * @example Type-check `null` for `typeof globalThis`.
    * ```ts
-   * typeOf.global(null); // false
+   * import { TypeOf } from '@sgrud/utils';
+   *
+   * TypeOf.global(null); // false
    * ```
    */
-  global: (value: unknown) => value is typeof globalThis;
+  public static global(value: unknown): value is typeof globalThis {
+    return test('global', value);
+  }
 
   /**
    * Type-check for `null`.
@@ -76,10 +106,14 @@ export const typeOf: {
    *
    * @example Type-check `null` for `null`.
    * ```ts
-   * typeOf.null(null); // true
+   * import { TypeOf } from '@sgrud/utils';
+   *
+   * TypeOf.null(null); // true
    * ```
    */
-  null: (value: unknown) => value is null;
+  public static null(value: unknown): value is null {
+    return test('Null', value);
+  }
 
   /**
    * Type-check for `number`.
@@ -89,10 +123,14 @@ export const typeOf: {
    *
    * @example Type-check `null` for `number`.
    * ```ts
-   * typeOf.number(null); // false
+   * import { TypeOf } from '@sgrud/utils';
+   *
+   * TypeOf.number(null); // false
    * ```
    */
-  number: (value: unknown) => value is number;
+  public static number(value: unknown): value is number {
+    return test('Number', value);
+  }
 
   /**
    * Type-check for `object`.
@@ -102,10 +140,14 @@ export const typeOf: {
    *
    * @example Type-check `null` for `object`.
    * ```ts
-   * typeOf.object(null); // false
+   * import { TypeOf } from '@sgrud/utils';
+   *
+   * TypeOf.object(null); // false
    * ```
    */
-  object: (value: unknown) => value is object;
+  public static object(value: unknown): value is object {
+    return test('Object', value);
+  }
 
   /**
    * Type-check for `NodeJS.Process`.
@@ -115,10 +157,14 @@ export const typeOf: {
    *
    * @example Type-check `null` for `NodeJS.Process`.
    * ```ts
-   * typeOf.process(null); // false
+   * import { TypeOf } from '@sgrud/utils';
+   *
+   * TypeOf.process(null); // false
    * ```
    */
-  process: (value: unknown) => value is NodeJS.Process;
+  public static process(value: unknown): value is NodeJS.Process {
+    return test('process', value);
+  }
 
   /**
    * Type-check for `Promise<any>`.
@@ -128,10 +174,14 @@ export const typeOf: {
    *
    * @example Type-check `null` for `Promise<any>`.
    * ```ts
-   * typeOf.promise(null); // false
+   * import { TypeOf } from '@sgrud/utils';
+   *
+   * TypeOf.promise(null); // false
    * ```
    */
-  promise: (value: unknown) => value is Promise<any>;
+  public static promise(value: unknown): value is Promise<any> {
+    return test('Promise', value);
+  }
 
   /**
    * Type-check for `string`.
@@ -141,10 +191,14 @@ export const typeOf: {
    *
    * @example Type-check `null` for `string`.
    * ```ts
-   * typeOf.string(null); // false
+   * import { TypeOf } from '@sgrud/utils';
+   *
+   * TypeOf.string(null); // false
    * ```
    */
-  string: (value: unknown) => value is string;
+  public static string(value: unknown): value is string {
+    return test('String', value);
+  }
 
   /**
    * Type-check for `undefined`.
@@ -154,10 +208,14 @@ export const typeOf: {
    *
    * @example Type-check `null` for `undefined`.
    * ```ts
-   * typeOf.undefined(null); // false
+   * import { TypeOf } from '@sgrud/utils';
+   *
+   * TypeOf.undefined(null); // false
    * ```
    */
-  undefined: (value: unknown) => value is undefined;
+  public static undefined(value: unknown): value is undefined {
+    return test('Undefined', value);
+  }
 
   /**
    * Type-check for `Window`.
@@ -167,31 +225,20 @@ export const typeOf: {
    *
    * @example Type-check `null` for `Window`.
    * ```ts
-   * typeOf.window(null); // false
+   * import { TypeOf } from '@sgrud/utils';
+   *
+   * TypeOf.window(null); // false
    * ```
    */
-  window: (value: unknown) => value is Window;
+  public static window(value: unknown): value is Window {
+    return test('Window', value);
+  }
 
-} = {
-  array: (value: unknown): value is Array<any> => test('Array', value),
-  boolean: (value: unknown): value is boolean => test('Boolean', value),
-  date: (value: unknown): value is Date => test('Date', value),
-  function: (value: unknown): value is Function => test('Function', value),
-  global: (value: unknown): value is typeof globalThis => test('global', value),
-  null: (value: unknown): value is null => test('Null', value),
-  number: (value: unknown): value is number => test('Number', value),
-  object: (value: unknown): value is object => test('Object', value),
-  process: (value: unknown): value is NodeJS.Process => test('process', value),
-  promise: (value: unknown): value is Promise<any> => test('Promise', value),
-  string: (value: unknown): value is string => test('String', value),
-  undefined: (value: unknown): value is undefined => test('Undefined', value),
-  window: (value: unknown): value is Window => test('Window', value)
-};
+}
 
 /**
  * Type-check `value` for `type`.
  *
- * @internal
  * @param type - Type to check.
  * @param value - Value to check.
  * @returns Whether `value` is `type`.

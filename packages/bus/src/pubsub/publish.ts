@@ -1,4 +1,4 @@
-import { typeOf } from '@sgrud/utils';
+import { TypeOf } from '@sgrud/utils';
 import { Observable, Subject } from 'rxjs';
 import { ConduitHandle, ConduitHandler } from '../conduit/handler';
 
@@ -68,7 +68,7 @@ export function Publish(
     prototype: Object,
     propertyKey: PropertyKey
   ): void {
-    if (typeOf.string(source) && source) {
+    if (TypeOf.string(source) && source) {
       Object.defineProperties(prototype, {
         [source]: {
           enumerable: true,
