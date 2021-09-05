@@ -234,6 +234,13 @@ export abstract class TypeOf {
     return test('Window', value);
   }
 
+  /**
+   * @internal
+   */
+  private constructor() {
+    throw new TypeError();
+  }
+
 }
 
 /**
