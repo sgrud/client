@@ -12,7 +12,7 @@
     "@sgrud/bin": "../../dist/bin"
   },
   "devDependencies": {
-    "lit": "2.0.0-rc.3"
+    "lit": "2.0.0-rc.4"
   },
   "browserslist": {
     "production": [],
