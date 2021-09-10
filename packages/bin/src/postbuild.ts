@@ -14,7 +14,7 @@ cli.command('postbuild')
 
 /**
  * Replicates exported `package.json` files in the
- * {@link https://github.com/sgrud/client|SGRUD monorepo}.
+ * [SGRUD monorepo](https://github.com/sgrud/client).
  *
  * ```text
  * Description

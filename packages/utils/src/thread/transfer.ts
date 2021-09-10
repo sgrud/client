@@ -7,11 +7,11 @@ import { TypeOf } from '../typing/type-of';
 
 /**
  * Observable transfer handler. This specific implementation of
- * {@link https://www.npmjs.com/package/comlink#api|comlink.transferHandlers}
- * should transparently proxy {@link https://www.npmjs.com/package/rxjs|rxjs}
- * `Observable` between a worker and the main threads.
+ * [comlink.transferHandlers](https://www.npmjs.com/package/comlink#api) should
+ * transparently proxy [rxjs](https://www.npmjs.com/package/rxjs) `Observable`
+ * between a worker and the main threads.
  *
- * @see {@link https://github.com/GoogleChromeLabs/comlink/issues/219}
+ * @see https://github.com/GoogleChromeLabs/comlink/issues/219
  */
 transferHandlers.set('observable', {
   canHandle: (value: unknown): value is Observable<unknown> => {
@@ -42,9 +42,9 @@ transferHandlers.set('observable', {
 
 /**
  * Subscriber transfer handler. This specific implementation of
- * {@link https://www.npmjs.com/package/comlink#api|comlink.transferHandlers}
- * should transparently proxy {@link https://www.npmjs.com/package/rxjs|rxjs}
- * `Subscriber` between a worker and the main threads.
+ * [comlink.transferHandlers](https://www.npmjs.com/package/comlink#api) should
+ * transparently proxy [rxjs](https://www.npmjs.com/package/rxjs) `Subscriber`
+ * between a worker and the main threads.
  */
 transferHandlers.set('subscriber', {
   canHandle: (value: unknown): value is Subscriber<unknown> => {
@@ -64,10 +64,10 @@ if (TypeOf.process(globalThis.process)) {
 
   /**
    * NodeJS proxy transfer handler. This specific implementation of
-   * {@link https://www.npmjs.com/package/comlink#api|comlink.transferHandlers}
+   * [comlink.transferHandlers](https://www.npmjs.com/package/comlink#api)
    * adopts the default `proxyTransferHandler` for useage under NodeJS.
    *
-   * @see {@link https://github.com/GoogleChromeLabs/comlink/issues/313}
+   * @see https://github.com/GoogleChromeLabs/comlink/issues/313
    */
   transferHandlers.set('proxy', {
     canHandle: transferHandlers.get('proxy')!.canHandle,

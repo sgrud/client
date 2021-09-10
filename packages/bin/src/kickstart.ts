@@ -13,11 +13,9 @@ cli.command('kickstart [library]')
   .action((library, opts) => kickstart({ library, ...opts }));
 
 /**
- * Kickstarts an
- * {@link https://angular.io|angular},
- * {@link https://lit.dev|lit},
- * {@link https://preactjs.com|preact} or
- * {@link https://vuejs.org|vue}-based SGRUD project.
+ * Kickstarts an [angular](https://angular.io), [lit](https://lit.dev),
+ * [preact](https://preactjs.com) or [vue](https://vuejs.org)-based SGRUD
+ * project.
  *
  * ```text
  * Description

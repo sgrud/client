@@ -5,8 +5,8 @@ import { TypeOf } from '../typing/type-of';
 
 /**
  * Class property decorator factory. Spawns a worker process, wraps it with
- * {@link https://www.npmjs.com/package/comlink#api|comlink.wrap} and
- * assignes it to the decorated class property.
+ * [comlink.wrap](https://www.npmjs.com/package/comlink#api) and assignes it to
+ * the decorated class property.
  *
  * @param workerFactory - Worker constructor.
  * @param factoryArgs - Worker Constructor arguments.

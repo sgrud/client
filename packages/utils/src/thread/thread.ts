@@ -5,7 +5,7 @@ import { TypeOf } from '../typing/type-of';
 
 /**
  * Type representing an exposed class in a remote context. Created by wrapping
- * {@link https://www.npmjs.com/package/comlink#typescript|comlink.Remote} in a
+ * [comlink.Remote](https://www.npmjs.com/package/comlink#typescript) in a
  * Promise. Use in conjnction with the `@Thread()` decorator.
  *
  *
@@ -15,7 +15,7 @@ export type Thread<T> = Promise<Remote<T>>;
 
 /**
  * Class decorator factory. Exposes the decorated class as worker via
- * {@link https://www.npmjs.com/package/comlink#api|comlink.expose}.
+ * [comlink.expose](https://www.npmjs.com/package/comlink#api).
  *
  * @returns Class decorator.
  *

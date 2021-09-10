@@ -16,7 +16,7 @@ cli.command('construct [...entries]')
 
 /**
  * Builds a SGRUD-based project using
- * {@link https://www.npmjs.com/package/microbundle|microbundle}.
+ * [microbundle](https://www.npmjs.com/package/microbundle).
  *
  * ```text
  * Description

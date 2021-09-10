@@ -12,7 +12,7 @@ cli.command('universal')
 
 /**
  * Runs SGRUD in universal (SSR) mode using
- * {@link https://www.npmjs.com/package/puppeteer|puppeteer}.
+ * [puppeteer](https://www.npmjs.com/package/puppeteer).
  *
  * ```text
  * Description
