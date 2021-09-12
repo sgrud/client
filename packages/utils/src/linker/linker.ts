@@ -63,4 +63,32 @@ export class Linker<K extends new () => V, V> extends Map<K, V> {
     return instance;
   }
 
+  /**
+   * Returns all linked instances, which satisfy `instanceof target`. Use this
+   * method when multiple linked constructors extend the same base class and are
+   * to be retreived.
+   *
+   * @param target - Target constructor.
+   * @returns Linked instances.
+   *
+   * @example Retreive all linked instances.
+   * ```ts
+   * import { Linker } from '@sgrud/utils';
+   * import { Service } from './service';
+   *
+   * new Linker().getAll(Service);
+   * ```
+   */
+  public getAll(target: K): V[] {
+    const instances = [];
+
+    for (const instance of this.values()) {
+      if (instance instanceof target) {
+        instances.push(instance);
+      }
+    }
+
+    return instances;
+  }
+
 }

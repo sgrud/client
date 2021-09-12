@@ -2,12 +2,18 @@ import { Linker } from '@sgrud/utils';
 
 describe('@sgrud/utils/linker/linker', () => {
 
-  class ServiceOne {
-    public constructor(public param: number = 1) { }
+  class Service { }
+
+  class ServiceOne extends Service {
+    public constructor(public param: number = 1) {
+      super();
+    }
   }
 
-  class ServiceTwo {
-    public constructor(public param: number = 2) { }
+  class ServiceTwo extends Service {
+    public constructor(public param: number = 2) {
+      super();
+    }
   }
 
   describe('creating a new linker', () => {
@@ -38,6 +44,15 @@ describe('@sgrud/utils/linker/linker', () => {
       expect(linker.get(ServiceTwo)).toBeInstanceOf(ServiceTwo);
       expect(linker.get(ServiceTwo)).toBe(new Linker().get(ServiceTwo));
       expect(linker.get(ServiceTwo).param).toBe(3);
+    });
+  });
+
+  describe('resolving all extending constructors', () => {
+    const linker = new Linker();
+
+    it('returns all linked instance', () => {
+      expect(linker.getAll(Service)).toContain(linker.get(ServiceOne));
+      expect(linker.getAll(Service)).toContain(linker.get(ServiceTwo));
     });
   });
 
