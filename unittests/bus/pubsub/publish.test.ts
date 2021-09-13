@@ -10,8 +10,12 @@ describe('@sgrud/bus/pubsub/publish', () => {
 
   class ClassTwo {
     @Publish('sgrud.bus.test', 'handle')
-    public readonly conduit: Subject<number> = new Subject<number>();
-    public constructor(public readonly handle: string) { }
+    public readonly conduit: Subject<number>;
+    public handle?: string;
+    public constructor(handle?: string) {
+      if (handle) this.handle = handle;
+      this.conduit = new Subject<number>();
+    }
   }
 
   describe('applying the decorator', () => {
@@ -64,8 +68,10 @@ describe('@sgrud/bus/pubsub/publish', () => {
   });
 
   describe('calling next on the decorated instance property', () => {
-    const classTwo = new ClassTwo('two');
+    const classTwo = new ClassTwo();
     const handler = new ConduitHandler();
+
+    classTwo.handle = 'two';
 
     it('emits values through the scoped handle', (done) => {
       const two = handler.get('sgrud.bus.test').subscribe(({

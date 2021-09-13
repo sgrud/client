@@ -1,5 +1,5 @@
 import { ConduitWorker } from '@sgrud/bus';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject, catchError, of, Subject, timeout } from 'rxjs';
 
 describe('@sgrud/bus/conduit/worker', () => {
 
@@ -57,6 +57,36 @@ describe('@sgrud/bus/conduit/worker', () => {
 
       worker.set('sgrud.bus.test.behaviorSubject', behaviorSubject);
       setTimeout(() => behaviorSubject.next(3), 1000);
+    });
+  });
+
+  describe('creating and subscribing to an empty conduit', () => {
+    const subject = new Subject<number>();
+    const worker = new ConduitWorker();
+
+    it('does not emit any values', (done) => {
+      const one = worker.get('sgrud.bus.test.nonexistent').pipe(
+        timeout(2000),
+        catchError(() => of({
+          handle: null,
+          value: new Error()
+        }))
+      ).subscribe(({
+        handle,
+        value
+      }) => {
+        expect(handle).toBe(null);
+        expect(value).toBeInstanceOf(Error);
+        one.unsubscribe();
+      });
+
+      one.add(() => {
+        subject.complete();
+        done();
+      });
+
+      worker.set('sgrud.bus.test.subject', subject);
+      setTimeout(() => subject.next(1), 1000);
     });
   });
 

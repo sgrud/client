@@ -16,6 +16,7 @@ describe('@sgrud/utils/thread/transfer', () => {
         /* eslint-disable */
         observable = require('rxjs').of(1, 2, 3);
         subject = new (require('rxjs').BehaviorSubject)(1);
+        error = require('rxjs').throwError(() => new Error());
         /* eslint-enable */
       });
     }) + ')()', { eval: true }))
@@ -28,9 +29,11 @@ describe('@sgrud/utils/thread/transfer', () => {
     it('returns the promised observable from the worker', (done) => {
       from(Class.worker).pipe(
         switchMap((worker: any) => Promise.resolve(worker.observable))
-      ).subscribe((observable: any) => {
-        expect(observable).toBeInstanceOf(Observable);
-        done();
+      ).subscribe({
+        next: (observable: any) => {
+          expect(observable).toBeInstanceOf(Observable);
+          done();
+        }
       });
     });
   });
@@ -46,7 +49,6 @@ describe('@sgrud/utils/thread/transfer', () => {
         switchMap((observable: any) => observable)
       ).subscribe({
         next: callback,
-        error: console.error,
         complete: () => {
           expect(callback).toHaveBeenCalled();
           done();
@@ -62,9 +64,24 @@ describe('@sgrud/utils/thread/transfer', () => {
         switchMap((subject: any) => subject),
         take(1)
       ).subscribe({
-        next: (next: number) => expect(next).toBe(1),
-        error: console.error,
-        complete: () => done()
+        next: (next: number) => {
+          expect(next).toBe(1);
+          done();
+        }
+      });
+    });
+  });
+
+  describe('subscribing to an error', () => {
+    it('throws the error emitted by the worker', (done) => {
+      from(Class.worker).pipe(
+        switchMap((worker: any) => Promise.resolve(worker.error)),
+        switchMap((error: any) => error)
+      ).subscribe({
+        error: (error: any) => {
+          expect(error).toMatchObject({ });
+          done();
+        }
       });
     });
   });
