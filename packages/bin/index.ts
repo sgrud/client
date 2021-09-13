@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * `@sgrud/bin` - The SGRUD CLI.
+ * `@sgrud/bin` - The [SGRUD](https://github.com/sgrud/client) CLI.
  *
  * ```text
  * Description

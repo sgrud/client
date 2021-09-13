@@ -12,7 +12,7 @@
  * ```ts
  * import { Singleton } from '@sgrud/utils';
  *
- * @Singleton()
+ * @Singleton<typeof Service>()
  * export class Service { }
  * ```
  */
