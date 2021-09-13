@@ -2,6 +2,9 @@
  * @packageDocumentation
  */
 
+export * from './src/http/client';
+export * from './src/http/proxy';
+export * from './src/http/state';
 export * from './src/linker/linker';
 export * from './src/linker/target';
 export * from './src/linker/uplink';
