@@ -1,6 +1,9 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+
 import { Assign } from '@sgrud/utils';
 import { readFileSync } from 'fs-extra';
 import { Module } from 'module';
+import { resolve } from 'path';
 import { cli } from './cli';
 
 cli.command('construct [...entries]')
@@ -72,8 +75,11 @@ export function construct({
   entries?: [];
   format?: string;
 } = { }): void {
-  const resolve = require.resolve('microbundle');
-  const patched = readFileSync(resolve).toString().replace(
+  const builder = require.resolve('microbundle');
+  const current = require(resolve(cwd, 'package.json'));
+  const general = require(resolve(__dirname, 'package.json'));
+  const helpers = current.dependencies['@babel/runtime'] as string;
+  const patched = readFileSync(builder).toString().replace(
     'if (modern) cache = false;',
     'cache = false;'
   ).replace(
@@ -86,7 +92,23 @@ export function construct({
         sourcemap: options.compress === false && options.sourcemap,
       }),
     ]`
+  ).replace(
+    /babelHelpers: 'bundled'/g,
+    `babelHelpers: 'runtime', plugins: [
+      ['@babel/plugin-transform-runtime', {
+        version: ${helpers ? `'${helpers}'` : 'undefined'}
+      }]
+    ]`
   );
+
+  const globals = Object.entries<string>({
+    ...current.amdNames,
+    ...general.amdNames
+  }).map(([key, value]) => {
+    return null === value
+      ? `${key}=${key.split(/\W/).filter(Boolean).join('.')}`
+      : `${key}=${value}`;
+  }).join(',');
 
   const microbundle = new Module('microbundle', module) as Assign<{
     _compile: (content: string, filename: string) => void;
@@ -94,7 +116,7 @@ export function construct({
   }, InstanceType<typeof Module>>;
 
   microbundle.paths = module.paths;
-  microbundle._compile(patched, resolve);
+  microbundle._compile(patched, builder);
 
   void microbundle.exports({
     compress,
@@ -103,15 +125,7 @@ export function construct({
     cwd,
     entries,
     format,
-    globals: [
-      '@sgrud/bin=sgrud.bin',
-      '@sgrud/bus=sgrud.bus',
-      '@sgrud/core=sgrud.core',
-      '@sgrud/data=sgrud.data',
-      '@sgrud/shell=sgrud.shell',
-      '@sgrud/state=sgrud.state',
-      '@sgrud/utils=sgrud.utils'
-    ].join(','),
+    globals,
     'pkg-main': true
   }).then(({ output }) => console.log(output));
 }

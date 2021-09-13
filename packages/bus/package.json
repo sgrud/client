@@ -10,7 +10,11 @@
   "unpkg": "../../dist/bus/index.umd.js",
   "dependencies": {
     "@sgrud/utils": "latest",
+    "@babel/runtime": "7.15.4",
     "rxjs": "7.3.0",
     "tslib": "2.3.1"
+  },
+  "amdNames": {
+    "@babel/runtime/helpers/createForOfIteratorHelperLoose": null
   }
 }

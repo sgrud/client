@@ -9,6 +9,7 @@
   "module": "../../dist/data/index.module.js",
   "unpkg": "../../dist/data/index.umd.js",
   "dependencies": {
+    "@babel/runtime": "7.15.4",
     "tslib": "2.3.1"
   }
 }
