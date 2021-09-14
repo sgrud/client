@@ -1,6 +1,8 @@
 /**
+ * `@sgrud/utils` - The [SGRUD](https://github.com/sgrud/client) utilities.
+ *
  * Utilities to be used with and internally used by `@sgrud`. The different
- * utilities can roughly be categorized into the following aspects:
+ * utilities can roughly be categorized into the following functional aspects:
  *
  * - HTTP client utilities
  *   - {@link HttpClient}: a simple `rxjs/ajax`-based HTTP client
