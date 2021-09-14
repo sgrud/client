@@ -65,7 +65,7 @@ if (TypeOf.process(globalThis.process)) {
   /**
    * NodeJS proxy transfer handler. This specific implementation of
    * [comlink.transferHandlers](https://www.npmjs.com/package/comlink#api)
-   * adopts the default `proxyTransferHandler` for useage under NodeJS.
+   * adopts the default `proxyTransferHandler` for usage under NodeJS.
    *
    * @see https://github.com/GoogleChromeLabs/comlink/issues/313
    */

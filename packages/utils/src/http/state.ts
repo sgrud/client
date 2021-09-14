@@ -24,7 +24,7 @@ export class HttpState extends HttpProxy {
 
   /**
    * Internal map containing all running requests. Updating this map should
-   * always be acompanied by an emittance of the {@link changes}.
+   * always be accompanied by an emittance of the {@link changes}.
    */
   private readonly running: Map<AjaxConfig, AjaxResponse<any>>;
 

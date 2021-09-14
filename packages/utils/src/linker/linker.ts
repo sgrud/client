@@ -37,14 +37,14 @@ export class Linker<K extends new () => V, V> extends Map<K, V> {
   /**
    * Overridden `Map.prototype.get` method. Looks up the linked instance based
    * on the target constructor. If no linked instance is found, one is created
-   * by calling the `new` operaor on the target constructor. Therefor the target
-   * constructors must not require parameters (i.e. all parameters have to be
-   * optional).
+   * by calling the `new` operator on the target constructor. Therefor the
+   * target constructors must not require parameters (i.e. all parameters have
+   * to be optional).
    *
    * @param target - Target constructor.
    * @returns Linked instance.
    *
-   * @example Retreive a linked instance.
+   * @example Retrieve a linked instance.
    * ```ts
    * import { Linker } from '@sgrud/utils';
    * import { Service } from './service';
@@ -66,12 +66,12 @@ export class Linker<K extends new () => V, V> extends Map<K, V> {
   /**
    * Returns all linked instances, which satisfy `instanceof target`. Use this
    * method when multiple linked constructors extend the same base class and are
-   * to be retreived.
+   * to be retrieved.
    *
    * @param target - Target constructor.
    * @returns Linked instances.
    *
-   * @example Retreive all linked instances.
+   * @example Retrieve all linked instances.
    * ```ts
    * import { Linker } from '@sgrud/utils';
    * import { Service } from './service';

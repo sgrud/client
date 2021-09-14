@@ -6,7 +6,7 @@ import { TypeOf } from '../typing/type-of';
 /**
  * Type representing an exposed class in a remote context. Created by wrapping
  * [comlink.Remote](https://www.npmjs.com/package/comlink#typescript) in a
- * Promise. Use in conjnction with the `@Thread()` decorator.
+ * Promise. Use in conjunction with the `@Thread()` decorator.
  *
  *
  * @typeParam T - Thread instance type.

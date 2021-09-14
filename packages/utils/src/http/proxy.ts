@@ -41,7 +41,7 @@ export abstract class HttpProxy {
    * whenever a request is fired through the {@link HttpClient}. The extending
    * class can either pass the `request` to the next `handler`, with or without
    * modifying it, or an interceptor can chose to completely handle a `request`
-   * by itself through returing an Observable of an AjaxResponse.
+   * by itself through returning an Observable of an AjaxResponse.
    *
    * @param request - Request.
    * @param handler - Next handler.

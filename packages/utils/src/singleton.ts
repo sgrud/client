@@ -1,7 +1,7 @@
 /**
  * Class decorator factory. Enforces transparent singleton pattern on decorated
- * class. When calling the `new` operaor on a decorated class, if provided, the
- * `apply` callback is fired with the singleton instence and the construction
+ * class. When calling the `new` operator on a decorated class, if provided, the
+ * `apply` callback is fired with the singleton instance and the construction
  * invocation parameters.
  *
  * @param apply - Construct function.
@@ -25,7 +25,7 @@ export function Singleton<T extends new (...args: any[]) => any>(
 
   /**
    * @param constructor - Class constructor to be decorated.
-   * @returns Decoated class constructor.
+   * @returns Decorated class constructor.
    */
   return function(
     constructor: T

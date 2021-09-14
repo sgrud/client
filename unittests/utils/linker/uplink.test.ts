@@ -36,7 +36,7 @@ describe('@sgrud/utils/linker/uplink', () => {
     });
   });
 
-  describe('creating circular depencencies', () => {
+  describe('creating circular dependencies', () => {
     const classOne = new ClassOne();
     const classTwo = new ClassTwo();
 

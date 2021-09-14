@@ -2,14 +2,14 @@
  * Utilities to be used with and internally used by `@sgrud`. The different
  * utilities can roughly be categorized into the following aspects:
  *
- * - HTTP request utilities
- *   - {@link HttpClient}: a simle `rxjs/ajax`-based HTTP client
- *   - {@link HttpProxy}: implementation-base for proxies/interceptors
+ * - HTTP client utilities
+ *   - {@link HttpClient}: a simple `rxjs/ajax`-based HTTP client
+ *   - {@link HttpProxy}: abstract base class for proxies/interceptors
  *   - {@link HttpState}: built-in HTTP proxy collecting request progress
  * - Dependency-linking utilities
- *   - {@link Linker}: overloaded map containing all linked instances
- *   - {@link Target}: class decorator linking the targeted constructor
- *   - {@link Uplink}: property decorator uplinking a linked constructor
+ *   - {@link Linker}: extended `Map`, containing all linked instances
+ *   - {@link Target}: class decorator linking the decorated constructor
+ *   - {@link Uplink}: property decorator uplinking a target constructor
  * - Threading utilities
  *   - {@link Spawn}: property decorator to easily spawn a `WebWorker`
  *   - {@link Thread}: class decorator exposing the class inside a `WebWorker`

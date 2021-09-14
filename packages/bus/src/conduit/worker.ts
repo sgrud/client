@@ -21,7 +21,7 @@ export class ConduitWorker {
 
   /**
    * Internal map containing all established conduits. Updating this map should
-   * always be acompanied by an emittance of the {@link changes}.
+   * always be accompanied by an emittance of the {@link changes}.
    */
   private readonly conduits: Map<string, Observable<ConduitValue<any>>>;
 

@@ -73,7 +73,7 @@ export class ConduitHandler {
    * import { ConduitHandler } from '@sgrud/bus';
    *
    * new ConduitHandler([
-   *   ['io.github.sgrud.example', of('puhlished')]
+   *   ['io.github.sgrud.example', of('published')]
    * ]);
    * ```
    */
@@ -89,7 +89,7 @@ export class ConduitHandler {
    * Gets the conduit representing the supplied `handle`. Calling this method
    * yields an Observable originating from the {@link ConduitWorker} which emits
    * all {@link ConduitValue}s published under the supplied `handle`. When
-   * getting `'io.github.sgrud'`, all conduits published hierarchically beneeth
+   * getting `'io.github.sgrud'`, all conduits published hierarchically beneath
    * this `handle`, e.g., `'io.github.sgrud.bus.status'`, will also be emitted
    * by the returned Observable.
    *
@@ -118,7 +118,7 @@ export class ConduitHandler {
    * Publishes the supplied `conduit` under the supplied `handle`. This method
    * will register the passed Observable  with the {@link ConduitWorker}. When
    * calling `complete` on the Observable source, the `conduit` will
-   * selfdestruct. When overwriting a `conduit` by supplying a previously used
+   * self destruct. When overwriting a `conduit` by supplying a previously used
    * `handle`, the previously supplied `conduit` will be unsubscribed.
    *
    * @param handle - Conduit handle.
@@ -130,7 +130,7 @@ export class ConduitHandler {
    * import { ConduitHandler } from '@sgrud/bus';
    * import { of } from 'rxjs';
    *
-   * new ConduitHandler().set('io.github.sgrud.example', of('puhlished'));
+   * new ConduitHandler().set('io.github.sgrud.example', of('published'));
    * ```
    *
    * @see {@link ConduitHandle}

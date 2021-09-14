@@ -2,7 +2,7 @@ import { Linker } from './linker';
 
 /**
  * Type helper to allow uplinking targeted constructors with required arguments.
- * Use in conjnction with the `@Target()` decorator.
+ * Use in conjunction with the `@Target()` decorator.
  *
  * @typeParam V - Linked instance type.
  */

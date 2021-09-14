@@ -3,7 +3,7 @@ import { Linker } from './linker';
 /**
  * Prototype property decorator factory. Replaces the decorated prototype
  * property with a getter, which looks up the linked instance of a target
- * constructor forwared-referenced by the `linkFactory()`.
+ * constructor forwarded-referenced by the `linkFactory()`.
  *
  * @param targetFactory - Forward reference to the target constructor.
  * @typeParam K - Target constructor type.
