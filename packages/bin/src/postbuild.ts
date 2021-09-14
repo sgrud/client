@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
 import { execSync } from 'child_process';
-import { existsSync, writeFileSync } from 'fs-extra';
-import { dirname, join, relative, resolve } from 'path';
+import { createHash } from 'crypto';
+import { existsSync, readFileSync, writeFileSync } from 'fs-extra';
+import { dirname, join, normalize, relative, resolve } from 'path';
 import { cli } from './cli';
 
 cli.command('postbuild')
@@ -51,81 +52,82 @@ export function postbuild({
 }: {
   cwd?: string;
 } = { }): void {
-  const outDone = [];
-  const pkgJson = require(resolve(cwd, 'package.json'));
-  const srcHead = execSync('git rev-parse HEAD', { cwd }).toString().trim();
+  const commit = execSync('git rev-parse HEAD', { cwd }).toString().trim();
+  const module = require(resolve(cwd, 'package.json'));
+  const sha265 = createHash('sha256');
+  const writes = [];
 
-  for (const srcPath of pkgJson.exports as string[]) {
-    const outList = { } as Record<string, string>;
-    const srcFile = join(cwd, srcPath, 'package.json');
-    const srcJson = require(resolve(srcFile));
+  for (const bundle of module.exports as string[]) {
+    const origin = join(cwd, bundle, 'package.json');
+    const source = require(resolve(origin));
+    const target = { } as Record<string, string>;
 
-    for (const key in srcJson) {
+    for (const key in source) {
       switch (key) {
         case 'exports':
         case 'main':
         case 'module':
         case 'unpkg':
-          if (existsSync(join(srcPath, srcJson[key]))) {
-            outList[key] = srcJson[key];
+          if (existsSync(join(bundle, source[key]))) {
+            target[key] = source[key];
           }
           break;
 
         case 'source':
-          delete srcJson[key];
+          delete source[key];
           break;
       }
     }
 
-    for (const key in pkgJson) {
+    for (const key in module) {
       switch (key) {
         case 'author':
         case 'bugs':
         case 'license':
-          srcJson[key] = pkgJson[key];
+          source[key] = module[key];
           break;
 
         case 'homepage':
-          srcJson[key] = join(
-            pkgJson[key],
-            'tree',
-            srcHead.substr(0, 7),
-            srcPath
-          );
+          source[key] = [
+            module[key], 'tree', commit.substr(0, 7), normalize(bundle)
+          ].join('/');
           break;
 
         case 'repository':
-          srcJson[key] = pkgJson[key];
-          srcJson[key].commit = srcHead;
-          srcJson[key].directory = srcPath;
+          source[key] = module[key];
+          source[key].commit = commit;
+          source[key].directory = bundle;
           break;
       }
     }
 
-    if (Object.keys(outList).length) {
-      const sorted = Object.values(outList).sort();
+    if (Object.keys(target).length) {
+      const sorted = Object.values(target).sort();
       const [a, b] = [dirname(sorted[0]), dirname(sorted[sorted.length - 1])];
-
       let i = 0; while (i < a.length && a[i] === b[i]) i++;
-      const outPath = join(srcPath, a.substring(0, i));
-      const outFile = join(cwd, outPath, 'package.json');
-      if (existsSync(outFile)) continue;
 
-      for (const key in outList) {
-        outList[key] = './' + relative(outPath, join(srcPath, outList[key]));
+      const digest = { } as Record<string, string>;
+      const folder = join(bundle, a.substring(0, i));
+      const output = join(cwd, folder, 'package.json');
+      if (existsSync(output)) continue;
+
+      for (const key in target) {
+        const bytes = readFileSync(join(bundle, target[key]));
+        digest[key] = 'sha256-' + sha265.copy().update(bytes).digest('base64');
+        target[key] = './' + relative(folder, join(bundle, target[key]));
       }
 
-      const outJson = JSON.stringify({ ...srcJson, ...outList });
-      outDone.push([srcFile, outFile, outJson]);
+      const content = JSON.stringify({ ...source, ...target, digest });
+      writes.push([origin, output, content]);
     }
   }
 
-  if (outDone.length) {
+  if (writes.length) {
     console.log('Replicating exported package.json');
     const [_, g, b] = ['\x1b[0m', '\x1b[32m', '\x1b[34m'];
-    for (const [srcFile, outFile, outJson] of outDone) {
-      console.log(b, srcFile, g, '→', b, outFile, _);
-      writeFileSync(outFile, outJson);
+    for (const [origin, output, content] of writes) {
+      console.log(b, origin, g, '→', b, output, _);
+      writeFileSync(output, content);
     }
   }
 }
