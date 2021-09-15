@@ -5,8 +5,8 @@
   "source": "./index.ts",
   "types": "./index.d.ts",
   "main": "../../dist/shell/index.js",
-  "exports": "../../dist/shell/index.modern.js",
-  "module": "../../dist/shell/index.module.js",
+  "module": "../../dist/shell/index.mjs",
+  "exports": "../../dist/shell/index.esm.js",
   "unpkg": "../../dist/shell/index.umd.js",
   "dependencies": {
     "@babel/runtime": "7.15.4",

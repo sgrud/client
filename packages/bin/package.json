@@ -5,8 +5,8 @@
   "source": "./index.ts",
   "types": "./index.d.ts",
   "main": "../../dist/bin/index.js",
-  "exports": "../../dist/bin/index.modern.js",
-  "module": "../../dist/bin/index.module.js",
+  "module": "../../dist/bin/index.mjs",
+  "exports": "../../dist/bin/index.esm.js",
   "unpkg": "../../dist/bin/index.umd.js",
   "dependencies": {
     "@babel/plugin-transform-runtime": "7.15.0",

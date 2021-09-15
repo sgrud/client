@@ -5,8 +5,8 @@
   "source": "./index.ts",
   "types": "./index.d.ts",
   "main": "../../dist/bus/index.js",
-  "exports": "../../dist/bus/index.modern.js",
-  "module": "../../dist/bus/index.module.js",
+  "module": "../../dist/bus/index.mjs",
+  "exports": "../../dist/bus/index.esm.js",
   "unpkg": "../../dist/bus/index.umd.js",
   "dependencies": {
     "@sgrud/utils": "latest",
