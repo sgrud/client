@@ -1,0 +1,15 @@
+{
+  "imports": {
+    "@babel/runtime/helpers/": "/node_modules/@babel/runtime/helpers/esm/",
+    "@sgrud/bus": "/node_modules/@sgrud/bus/index.esm.js",
+    "@sgrud/core": "/node_modules/@sgrud/core/index.esm.js",
+    "@sgrud/data": "/node_modules/@sgrud/data/index.esm.js",
+    "@sgrud/shell": "/node_modules/@sgrud/shell/index.esm.js",
+    "@sgrud/state": "/node_modules/@sgrud/state/index.esm.js",
+    "@sgrud/utils": "/node_modules/@sgrud/utils/index.esm.js",
+    "comlink": "/node_modules/comlink/dist/esm/comlink.min.js",
+    "rxjs": "/node_modules/rxjs/dist/esm/index.js",
+    "rxjs/ajax": "/node_modules/rxjs/dist/esm/ajax/index.js",
+    "tslib": "/node_modules/tslib/tslib.es6.js"
+  }
+}

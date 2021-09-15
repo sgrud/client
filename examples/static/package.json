@@ -1,0 +1,29 @@
+{
+  "name": "sgrud-example-static",
+  "version": "0.0.0",
+  "private": true,
+  "source": "./src/babel-runtime.js",
+  "main": "./node_modules/@babel/runtime/helpers.js",
+  "scripts": {
+    "start": "http-server -e js",
+    "umd": "microbundle -f umd --external none --name babel.runtime.helpers"
+  },
+  "dependencies": {
+    "@babel/runtime": "7.15.4",
+    "@sgrud/bus": "../../dist/bus",
+    "@sgrud/core": "../../dist/core",
+    "@sgrud/data": "../../dist/data",
+    "@sgrud/shell": "../../dist/shell",
+    "@sgrud/state": "../../dist/state",
+    "@sgrud/utils": "../../dist/utils",
+    "comlink": "4.3.1",
+    "core-js-bundle": "3.17.3",
+    "es-module-shims": "0.14.0",
+    "rxjs": "7.3.0",
+    "tslib": "2.3.1"
+  },
+  "devDependencies": {
+    "http-server": "13.0.2",
+    "microbundle": "0.13.3"
+  }
+}
