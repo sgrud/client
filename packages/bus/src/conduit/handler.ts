@@ -19,19 +19,20 @@ import { ConduitWorker } from './worker';
 export type ConduitHandle = `${string}.${string}.${string}`;
 
 /**
- * Type of all values emitted by any conduit. Contains the emitted `value` as
- * well as the emitting `handle`. As a {@link ConduitHandle} represents a
- * domain-like hierarchy, it may contain any number of children, whose
- * emittances are merged into their respective parents.
+ * Interface describing all values emitted by any conduit. All values emitted by
+ * any conduit contain the emitted `value` as well as the emitting `handle`. As
+ * a {@link ConduitHandle} represents a domain-like hierarchy, it may contain
+ * any number of children, whose emittances are merged into their respective
+ * parents.
  *
  * @typeParam T - Conduit type.
  *
  * @see {@link ConduitHandler}
  */
-export type ConduitValue<T> = {
+export interface ConduitValue<T> {
   handle: ConduitHandle;
   value: T;
-};
+}
 
 /**
  * The ConduitHandler is a {@link Singleton} implementing and orchestrating the

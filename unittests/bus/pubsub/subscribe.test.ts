@@ -45,17 +45,17 @@ describe('@sgrud/bus/pubsub/subscribe', () => {
     const handler = new ConduitHandler();
 
     it('observes values emitted by the supplied handle', (done) => {
-      const one = classOne.conduit.subscribe(({
+      const subscription = classOne.conduit.subscribe(({
         handle,
         value
       }) => {
         expect(handle).toBe('sgrud.bus.test.one');
         expect(value).toBe(1);
-        one.unsubscribe();
+        subscription.unsubscribe();
       });
 
-      one.add(done);
-      setTimeout(() => handler.set('sgrud.bus.test.one', of(1)), 1000);
+      subscription.add(done);
+      handler.set('sgrud.bus.test.one', of(1));
     });
   });
 
@@ -64,17 +64,17 @@ describe('@sgrud/bus/pubsub/subscribe', () => {
     const handler = new ConduitHandler();
 
     it('observes values emitted by the scoped handle', (done) => {
-      const two = classTwo.conduit.subscribe(({
+      const subscription = classTwo.conduit.subscribe(({
         handle,
         value
       }) => {
         expect(handle).toBe('sgrud.bus.test.two');
         expect(value).toBe(2);
-        two.unsubscribe();
+        subscription.unsubscribe();
       });
 
-      two.add(done);
-      setTimeout(() => handler.set('sgrud.bus.test.two', of(2)), 1000);
+      subscription.add(done);
+      handler.set('sgrud.bus.test.two', of(2));
     });
   });
 

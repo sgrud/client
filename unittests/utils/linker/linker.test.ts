@@ -5,13 +5,13 @@ describe('@sgrud/utils/linker/linker', () => {
   class Service { }
 
   class ServiceOne extends Service {
-    public constructor(public param: number = 1) {
+    public constructor(public param: string = 'one') {
       super();
     }
   }
 
   class ServiceTwo extends Service {
-    public constructor(public param: number = 2) {
+    public constructor(public param: string = 'two') {
       super();
     }
   }
@@ -30,27 +30,29 @@ describe('@sgrud/utils/linker/linker', () => {
     it('returns the linked instance', () => {
       expect(linker.get(ServiceOne)).toBeInstanceOf(ServiceOne);
       expect(linker.get(ServiceOne)).toBe(new Linker().get(ServiceOne));
-      expect(linker.get(ServiceOne).param).toBe(1);
+      expect(linker.get(ServiceOne).param).toBe('one');
     });
   });
 
   describe('preemptively inserting an instance', () => {
-    const arg = [ServiceTwo, new ServiceTwo(3)];
+    const arg = [ServiceTwo, new ServiceTwo('three')];
     const spy = jest.spyOn(Linker.prototype, 'set');
-    const linker = new Linker([arg as [typeof ServiceTwo, ServiceTwo]]);
+    const linker = new Linker([
+      arg as [typeof ServiceTwo, ServiceTwo]
+    ]);
 
     it('links the target constructor to the inserted instance', () => {
-      expect(spy).toHaveBeenCalledWith(...arg);
       expect(linker.get(ServiceTwo)).toBeInstanceOf(ServiceTwo);
       expect(linker.get(ServiceTwo)).toBe(new Linker().get(ServiceTwo));
-      expect(linker.get(ServiceTwo).param).toBe(3);
+      expect(linker.get(ServiceTwo).param).toBe('three');
+      expect(spy).toHaveBeenCalledWith(...arg);
     });
   });
 
   describe('resolving all extending constructors', () => {
     const linker = new Linker();
 
-    it('returns all linked instance', () => {
+    it('returns all extending linked instance', () => {
       expect(linker.getAll(Service)).toContain(linker.get(ServiceOne));
       expect(linker.getAll(Service)).toContain(linker.get(ServiceTwo));
     });

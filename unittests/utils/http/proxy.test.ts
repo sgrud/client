@@ -39,7 +39,7 @@ describe('@sgrud/utils/http/proxy', () => {
     const linker = new Linker();
     const proxies = linker.getAll(HttpProxy as Target<HttpProxy>);
 
-    it('appends to the proxy chain', () => {
+    it('appends the targets to the proxy chain', () => {
       expect(proxies).toContain(linker.get(ProxyOne));
       expect(proxies).toContain(linker.get(ProxyTwo));
     });
@@ -48,25 +48,26 @@ describe('@sgrud/utils/http/proxy', () => {
   describe('firing a request', () => {
     const request = HttpClient.get('one');
 
-    it('intercepts it with the proxy', (done) => {
-      const one = request.subscribe((response) => {
+    it('intercepts the request with the proxy', (done) => {
+      const subscription = request.subscribe((response) => {
         expect(response.response).toBe('one');
       });
 
-      one.add(done);
+      subscription.add(done);
     });
   });
 
   describe('firing a request', () => {
     const request = HttpClient.get('two');
 
-    it('intercepts it with the proxy chain', (done) => {
-      const two = request.subscribe((response) => {
+    it('intercepts the request with the proxy chain', (done) => {
+      const subscription = request.subscribe((response) => {
+        expect(response.request.headers.next).toBe('two');
         expect(response.responseHeaders.prev).toBe('one');
         expect(response.response).toBe('two');
       });
 
-      two.add(done);
+      subscription.add(done);
     });
   });
 

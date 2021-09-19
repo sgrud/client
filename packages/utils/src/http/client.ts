@@ -81,6 +81,27 @@ export class HttpClient implements HttpHandler {
   }
 
   /**
+   * Fires a `HTTP HEAD` request upon subscription. Shorthand for calling
+   * {@link handle} with respective arguments.
+   *
+   * @param url - Request URL.
+   * @typeParam T - Response type.
+   * @returns Observable response.
+   *
+   * @example Fire a `HEAD` request against `https://example.com`.
+   * ```ts
+   * import { HttpClient } from '@sgrud/utils';
+   *
+   * HttpClient.head('https://example.com').subscribe();
+   * ```
+   *
+   * @see {@link handle}
+   */
+  public static head<T>(url: string): Observable<AjaxResponse<T>> {
+    return new this().handle<T>({ method: 'HEAD', url });
+  }
+
+  /**
    * Fires a `HTTP PATCH` request upon subscription. Shorthand for calling
    * {@link handle} with respective arguments.
    *

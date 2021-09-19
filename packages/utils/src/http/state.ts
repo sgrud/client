@@ -71,6 +71,9 @@ export class HttpState extends HttpProxy {
     request: AjaxConfig,
     handler: HttpHandler
   ): Observable<AjaxResponse<T>> {
+    const includeDownloadProgress = request.includeDownloadProgress;
+    const includeUploadProgress = request.includeUploadProgress;
+
     return handler.handle<T>({
       ...request,
       includeDownloadProgress: true,
@@ -80,8 +83,10 @@ export class HttpState extends HttpProxy {
         this.running.set(request, event);
         this.changes.next(this);
       }),
-      filter((event) => {
-        return event.type?.endsWith('_load');
+      filter(({ type }) => {
+        return Boolean(type?.endsWith('_load') ||
+          (includeDownloadProgress && type?.startsWith('download_')) ||
+          (includeUploadProgress && type?.startsWith('upload_')));
       }),
       finalize(() => {
         this.running.delete(request);

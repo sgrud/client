@@ -3,7 +3,7 @@
 import { execSync } from 'child_process';
 import { createHash } from 'crypto';
 import { existsSync, readFileSync, writeFileSync } from 'fs-extra';
-import { dirname, join, normalize, relative, resolve } from 'path';
+import { dirname, join, normalize, relative, resolve, sep } from 'path';
 import { cli } from './cli';
 
 cli.command('postbuild')
@@ -34,6 +34,7 @@ cli.command('postbuild')
  * ```
  *
  * @param cwd - Use an alternative working directory. (default: `'./'`)
+ * @returns Execution promise.
  *
  * @example Run with default options.
  * ```js
@@ -47,17 +48,17 @@ cli.command('postbuild')
  * sgrud.postbuild({ cwd: './projects/sgrud' });
  * ```
  */
-export function postbuild({
+export async function postbuild({
   cwd = './'
 }: {
   cwd?: string;
-} = { }): void {
+} = { }): Promise<void> {
   const commit = execSync('git rev-parse HEAD', { cwd }).toString().trim();
   const module = require(resolve(cwd, 'package.json'));
   const sha265 = createHash('sha256');
   const writes = [];
 
-  for (const bundle of module.exports as string[]) {
+  for (const bundle of module.exports.values?.() || ['.']) {
     const origin = join(cwd, bundle, 'package.json');
     const source = require(resolve(origin));
     const target = { } as Record<string, string>;
@@ -90,7 +91,7 @@ export function postbuild({
         case 'homepage':
           source[key] = [
             module[key], 'tree', commit.substr(0, 7), normalize(bundle)
-          ].join('/');
+          ].join(sep);
           break;
 
         case 'repository':

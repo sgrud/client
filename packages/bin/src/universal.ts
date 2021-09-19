@@ -34,6 +34,7 @@ cli.command('universal')
  *
  * @param host - Host to bind to. (default: `'127.0.0.1'`)
  * @param port - Port to bind to. (default: `'4000'`)
+ * @returns Execution promise.
  *
  * @example Run with default options.
  * ```js
@@ -53,13 +54,13 @@ cli.command('universal')
  * sgrud.universal({ host: '192.168.0.10', port: '8080' });
  * ```
  */
-export function universal({
+export async function universal({
   host = '127.0.0.1',
   port = '4000'
 }: {
   host?: string;
   port?: string;
-} = { }): void {
+} = { }): Promise<void> {
   const server = express();
 
   server.get('*', (request, response) => {

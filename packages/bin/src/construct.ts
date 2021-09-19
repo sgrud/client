@@ -15,7 +15,7 @@ cli.command('construct [...entries]')
   .option('--cwd', 'Use an alternative working directory', './')
   .option('--entries', 'Entry modules to build  (default package.json#source)')
   .option('--format', 'Build specified formats', 'cjs,esm,modern,umd')
-  .action((entries, opts) => construct({ entries, ...opts }));
+  .action((entries, opts) => construct({ ...opts, entries }));
 
 /**
  * Builds a SGRUD-based project using
@@ -45,6 +45,7 @@ cli.command('construct [...entries]')
  * @param cwd - Use an alternative working directory. (default: `'./'`)
  * @param entries - Entry modules to build. (default: `package.json#source`)
  * @param format - Build specified formats. (default: `'cjs,esm,modern,umd'`)
+ * @returns Execution promise.
  *
  * @example Run with default options.
  * ```js
@@ -64,7 +65,7 @@ cli.command('construct [...entries]')
  * sgrud.construct({ cwd: './project', format: 'umd' });
  * ```
  */
-export function construct({
+export async function construct({
   compress = true,
   cwd = './',
   entries = undefined,
@@ -74,7 +75,7 @@ export function construct({
   cwd?: string;
   entries?: [];
   format?: string;
-} = { }): void {
+} = { }): Promise<void> {
   const builder = require.resolve('microbundle');
   const current = require(resolve(cwd, 'package.json'));
   const general = require(resolve(__dirname, 'package.json'));
@@ -112,13 +113,13 @@ export function construct({
 
   const microbundle = new Module('microbundle', module) as Assign<{
     _compile: (content: string, filename: string) => void;
-    exports: (opts: Record<string, any>) => Promise<{ output: string }>;
+    exports: (opts: object) => Promise<{ output: string }>;
   }, InstanceType<typeof Module>>;
 
   microbundle.paths = module.paths;
   microbundle._compile(patched, builder);
 
-  void microbundle.exports({
+  return microbundle.exports({
     compress,
     css: 'inline',
     'css-modules': false,
@@ -127,5 +128,7 @@ export function construct({
     format,
     globals,
     'pkg-main': true
-  }).then(({ output }) => console.log(output));
+  }).then(({ output }) => {
+    console.log(output);
+  });
 }

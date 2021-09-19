@@ -10,7 +10,7 @@ cli.command('kickstart [library]')
   .example('kickstart # Run with default options')
   .example('kickstart preact --cwd ./project # Kickstart preact in ./project')
   .option('--cwd', 'Use an alternative working directory', './')
-  .action((library, opts) => kickstart({ library, ...opts }));
+  .action((library, opts) => kickstart({ ...opts, library }));
 
 /**
  * Kickstarts an [angular](https://angular.io), [lit](https://lit.dev),
@@ -35,6 +35,7 @@ cli.command('kickstart [library]')
  *
  * @param library - Library which to base upon. (default: `'lit'`)
  * @param cwd - Use an alternative working directory. (default: `'./'`)
+ * @returns Execution promise.
  *
  * @example Run with default options.
  * ```js
@@ -48,13 +49,13 @@ cli.command('kickstart [library]')
  * sgrud.Kickstart({ cwd: './sgrud-vue', library: 'vue' });
  * ```
  */
-export function kickstart({
+export async function kickstart({
   cwd = './',
   library = 'lit'
 }: {
   cwd?: string;
   library?: string;
-} = { }): void {
+} = { }): Promise<void> {
   const gitPath = join(cwd, 'node_modules', '.cache', 'sgrud');
   const pkgJson = require(resolve(join(__dirname, 'package.json')));
 

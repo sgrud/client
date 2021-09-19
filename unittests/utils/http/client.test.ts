@@ -5,6 +5,7 @@ describe('@sgrud/utils/http/client', () => {
   const methods = [
     HttpClient.delete.bind(HttpClient),
     HttpClient.get.bind(HttpClient),
+    HttpClient.head.bind(HttpClient),
     HttpClient.patch.bind(HttpClient),
     HttpClient.post.bind(HttpClient),
     HttpClient.put.bind(HttpClient)
@@ -13,12 +14,13 @@ describe('@sgrud/utils/http/client', () => {
   const requests = [
     'DELETE',
     'GET',
+    'HEAD',
     'PATCH',
     'POST',
     'PUT'
   ];
 
-  const xhr = {
+  const xhrMock = {
     status: 200,
     open: jest.fn(),
     send: jest.fn(),
@@ -29,7 +31,8 @@ describe('@sgrud/utils/http/client', () => {
     response: { body: null }
   };
 
-  global.XMLHttpRequest = jest.fn().mockImplementation(() => xhr) as any;
+  afterEach(() => xhrMock.addEventListener.mockClear());
+  global.XMLHttpRequest = jest.fn().mockImplementation(() => xhrMock) as any;
 
   describe('firing a custom request', () => {
     it('dispatches a custom XHR', (done) => {
@@ -37,15 +40,15 @@ describe('@sgrud/utils/http/client', () => {
         method: 'HEAD',
         url: 'url'
       }).subscribe((response) => {
-        expect(response.response).toMatchObject(xhr.response);
-        expect(xhr.open).toHaveBeenCalledWith('HEAD', 'url', true);
-        expect(xhr.send).toHaveBeenCalledWith();
+        expect(response.response).toMatchObject(xhrMock.response);
+        expect(xhrMock.open).toHaveBeenCalledWith('HEAD', 'url', true);
+        expect(xhrMock.send).toHaveBeenCalledWith();
       });
 
       setTimeout(() => {
-        xhr.addEventListener.mock.calls.find(([call]) => {
+        xhrMock.addEventListener.mock.calls.find(([call]) => {
           return call === 'load';
-        }).pop()('json');
+        })[1]({ type: 'load' });
       });
 
       subscription.add(done);
@@ -57,14 +60,14 @@ describe('@sgrud/utils/http/client', () => {
 
     it('dispatches a XHR ' + request, (done) => {
       const subscription = method('url', undefined).subscribe(() => {
-        expect(xhr.open).toHaveBeenCalledWith(request, 'url', true);
-        expect(xhr.send).toHaveBeenCalledWith();
+        expect(xhrMock.open).toHaveBeenCalledWith(request, 'url', true);
+        expect(xhrMock.send).toHaveBeenCalledWith();
       });
 
       setTimeout(() => {
-        xhr.addEventListener.mock.calls.reverse().find(([call]) => {
+        xhrMock.addEventListener.mock.calls.find(([call]) => {
           return call === 'load';
-        }).pop()('json');
+        })[1]({ type: 'load' });
       });
 
       subscription.add(done);

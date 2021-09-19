@@ -21,7 +21,7 @@ describe('@sgrud/utils/thread/spawn', () => {
   }
 
   describe('applying the decorator', () => {
-    it('spawns the worker and links it to the main thread', () => {
+    it('spawns the worker through the factory', () => {
       from(Class.worker).subscribe((worker) => {
         expect(worker).toBeInstanceOf(Function);
       });
@@ -29,7 +29,7 @@ describe('@sgrud/utils/thread/spawn', () => {
   });
 
   describe('getting a primitive', () => {
-    it('returns the promised value from the worker', (done) => {
+    it('returns the promisified value', (done) => {
       from(Class.worker).pipe(
         switchMap((worker) => Promise.resolve(worker.thirteen))
       ).subscribe((thirteen) => {
@@ -39,8 +39,8 @@ describe('@sgrud/utils/thread/spawn', () => {
     });
   });
 
-  describe('calling a worker function', () => {
-    it('returns the promised return value from the worker', (done) => {
+  describe('calling a function', () => {
+    it('returns the promisified return value', (done) => {
       from(Class.worker).pipe(
         switchMap((worker) => Promise.resolve(worker.callable([], 1, '2')))
       ).subscribe((length) => {

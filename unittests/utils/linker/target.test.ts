@@ -2,9 +2,9 @@ import { Linker, Target, Uplink } from '@sgrud/utils';
 
 describe('@sgrud/utils/linker/target', () => {
 
-  @Target<typeof Service>(1)
+  @Target<typeof Service>('target')
   class Service {
-    public constructor(public readonly param: number) { }
+    public constructor(public readonly param: string) { }
   }
 
   class Class {
@@ -14,13 +14,13 @@ describe('@sgrud/utils/linker/target', () => {
   describe('applying the decorator', () => {
     const service = new Linker<Target<Service>, Service>().get(Service);
 
+    it('creates the instance from provided constructor parameters', () => {
+      expect(service.param).toBe('target');
+    });
+
     it('links the instance to the target constructor', () => {
       expect(service).toBeInstanceOf(Service);
       expect(service).toBe(new Linker<Target<Service>, Service>().get(Service));
-    });
-
-    it('creates the instance from provided constructor parameters', () => {
-      expect(service.param).toBe(1);
     });
   });
 

@@ -8,12 +8,6 @@
   "module": "../../dist/utils/index.mjs",
   "exports": "../../dist/utils/index.esm.js",
   "unpkg": "../../dist/utils/index.umd.js",
-  "dependencies": {
-    "@babel/runtime": "7.15.4",
-    "comlink": "4.3.1",
-    "rxjs": "7.3.0",
-    "tslib": "2.3.1"
-  },
   "amdNames": {
     "@babel/runtime/helpers/assertThisInitialized": null,
     "@babel/runtime/helpers/construct": null,
@@ -24,5 +18,11 @@
     "@babel/runtime/helpers/wrapNativeSuper": null,
     "comlink": "Comlink",
     "rxjs/ajax": null
+  },
+  "dependencies": {
+    "@babel/runtime": "7.15.4",
+    "comlink": "4.3.1",
+    "rxjs": "7.3.0",
+    "tslib": "2.3.1"
   }
 }
