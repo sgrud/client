@@ -51,7 +51,7 @@ cli.command('construct [...entries]')
  * @example Build entry `./project/main.ts`.
  * ```js
  * require('@sgrud/bin');
- * sgrud.construct({ entries: './project/main.ts' });
+ * sgrud.construct({ entries: ['./project/main.ts'] });
  * ```
  *
  * @example Build `./project` as `umd`.
