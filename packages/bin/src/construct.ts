@@ -13,9 +13,8 @@ cli.command('construct [...entries]')
   .example('construct --cwd ./project --format umd # Build ./project as umd')
   .option('--compress', 'Compress/minify build output', true)
   .option('--cwd', 'Use an alternative working directory', './')
-  .option('--entries', 'Entry modules to build  (default package.json#source)')
   .option('--format', 'Build specified formats', 'cjs,esm,modern,umd')
-  .action((entries, opts) => construct({ ...opts, entries }));
+  .action((args, opts) => construct({ ...opts, entries: [args, ...opts._] }));
 
 /**
  * Builds a SGRUD-based project using
@@ -31,7 +30,6 @@ cli.command('construct [...entries]')
  * Options
  *   --compress    Compress/minify build output  (default true)
  *   --cwd         Use an alternative working directory  (default ./)
- *   --entries     Entry modules to build  (default package.json#source)
  *   --format      Build specified formats  (default cjs,esm,modern,umd)
  *   -h, --help    Displays this message
  *
@@ -84,7 +82,7 @@ export async function construct({
   cwd?: string;
 
   /**
-   * Entry modules to build.
+   * Entrypoints to build.
    *
    * @defaultValue `package.json#source`
    */
