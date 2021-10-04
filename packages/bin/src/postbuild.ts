@@ -33,7 +33,7 @@ cli.command('postbuild')
  *   $ sgrud postbuild --cwd ./projects/sgrud # Run in ./projects/sgrud
  * ```
  *
- * @param cwd - Use an alternative working directory. (default: `'./'`)
+ * @param options - Options object.
  * @returns Execution promise.
  *
  * @example Run with default options.
@@ -51,7 +51,14 @@ cli.command('postbuild')
 export async function postbuild({
   cwd = './'
 }: {
+
+  /**
+   * Use an alternative working directory.
+   *
+   * @defaultValue `'./'`
+   */
   cwd?: string;
+
 } = { }): Promise<void> {
   const commit = execSync('git rev-parse HEAD', { cwd }).toString().trim();
   const module = require(resolve(cwd, 'package.json'));

@@ -8,7 +8,6 @@ import { TypeOf } from '../typing/type-of';
  * [comlink.Remote](https://www.npmjs.com/package/comlink#typescript) in a
  * Promise. Use in conjunction with the `@Thread()` decorator.
  *
- *
  * @typeParam T - Thread instance type.
  */
 export type Thread<T> = Promise<Remote<T>>;

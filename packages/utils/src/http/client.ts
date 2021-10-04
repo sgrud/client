@@ -34,6 +34,8 @@ export interface HttpHandler {
  * function of this wrapper is to pipe all requests through a chain of classes
  * extending {@link HttpProxy}. Thereby interceptors for various requests can be
  * implemented to, e.g., provide API credentials etc.
+ *
+ * @decorator {@link Singleton}
  */
 @Singleton<typeof HttpClient>()
 export class HttpClient implements HttpHandler {

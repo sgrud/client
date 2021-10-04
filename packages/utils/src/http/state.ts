@@ -10,6 +10,8 @@ import { HttpProxy } from './proxy';
  * all currently active {@link requests} every time a new request is fired or a
  * running request is completed.
  *
+ * @decorator {@link Target}
+ *
  * @see {@link HttpClient}
  * @see {@link HttpProxy}
  */

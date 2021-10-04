@@ -33,8 +33,7 @@ cli.command('kickstart [library]')
  *   $ sgrud kickstart preact --cwd ./project # Kickstart preact in ./project
  * ```
  *
- * @param library - Library which to base upon. (default: `'lit'`)
- * @param cwd - Use an alternative working directory. (default: `'./'`)
+ * @param options - Options object.
  * @returns Execution promise.
  *
  * @example Run with default options.
@@ -53,8 +52,21 @@ export async function kickstart({
   cwd = './',
   library = 'lit'
 }: {
+
+  /**
+   * Use an alternative working directory.
+   *
+   * @defaultValue `'./'`
+   */
   cwd?: string;
+
+  /**
+   * Library which to base upon.
+   *
+   * @defaultValue `'lit'`
+   */
   library?: string;
+
 } = { }): Promise<void> {
   const gitPath = join(cwd, 'node_modules', '.cache', 'sgrud');
   const pkgJson = require(resolve(join(__dirname, 'package.json')));

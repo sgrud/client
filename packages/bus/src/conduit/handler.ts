@@ -38,6 +38,8 @@ export interface ConduitValue<T> {
  * The ConduitHandler is a {@link Singleton} implementing and orchestrating the
  * establishment, transferral and deconstruction of conduits in conjunction with
  * the {@link ConduitWorker} process.
+ *
+ * @decorator {@link Singleton}
  */
 @Singleton<typeof ConduitHandler>((self, [tuples]) => {
   if (tuples) {
@@ -55,6 +57,8 @@ export class ConduitHandler {
    * {@link ConduitWorker} is run inside a `WebWorker` context and handles all
    * published and subscribed conduits and the aggregation of their values
    * depending on their hierarchy.
+   *
+   * @decorator {@link Spawn}
    *
    * @see {@link ConduitWorker}
    */

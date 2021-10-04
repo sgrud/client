@@ -21,7 +21,7 @@ import { ConduitHandle, ConduitHandler } from '../conduit/handler';
  * source as otherwise memory leaks may occur due to dangling subscriptions.
  *
  * @param handle - Conduit handle.
- * @param source - Property key or Observable. (default: `new Subject<any>()`)
+ * @param source - Property key or Observable.
  * @returns Prototype property decorator.
  *
  * @example Publish the `'io.github.sgrud.example'` conduit.

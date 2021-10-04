@@ -7,6 +7,8 @@ import { ConduitHandle, ConduitValue } from './handler';
  * published and subscribed conduits and the aggregation of their values
  * depending on their hierarchy.
  *
+ * @decorator {@link Thread}
+ *
  * @see {@link ConduitHandler}
  */
 @Thread()

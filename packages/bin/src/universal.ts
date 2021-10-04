@@ -32,8 +32,7 @@ cli.command('universal')
  *   $ sgrud universal -H 192.168.0.10 -p 8080 # Listen on 192.168.0.10:8080
  * ```
  *
- * @param host - Host to bind to. (default: `'127.0.0.1'`)
- * @param port - Port to bind to. (default: `'4000'`)
+ * @param options - Options object.
  * @returns Execution promise.
  *
  * @example Run with default options.
@@ -58,8 +57,21 @@ export async function universal({
   host = '127.0.0.1',
   port = '4000'
 }: {
+
+  /**
+   * Host to bind to.
+   *
+   * @defaultValue `'127.0.0.1'`
+   */
   host?: string;
+
+  /**
+   * Port to bind to.
+   *
+   * @defaultValue `'4000'`
+   */
   port?: string;
+
 } = { }): Promise<void> {
   const server = express();
 

@@ -7,6 +7,7 @@ import { Singleton } from '../singleton';
  * The former will insert all entries into this singleton link map, internally
  * calling the latter for each.
  *
+ * @decorator {@link Singleton}
  * @typeParam K - Target constructor type.
  * @typeParam V - Linked instance type.
  *

@@ -41,10 +41,7 @@ cli.command('construct [...entries]')
  *   $ sgrud construct --cwd ./project --format umd # Build ./project as umd
  * ```
  *
- * @param compress - Compress/minify build output. (default: `true`)
- * @param cwd - Use an alternative working directory. (default: `'./'`)
- * @param entries - Entry modules to build. (default: `package.json#source`)
- * @param format - Build specified formats. (default: `'cjs,esm,modern,umd'`)
+ * @param options - Options object.
  * @returns Execution promise.
  *
  * @example Run with default options.
@@ -71,10 +68,35 @@ export async function construct({
   entries = undefined,
   format = 'cjs,esm,modern,umd'
 }: {
+
+  /**
+   * Compress/minify build output.
+   *
+   * @defaultValue `true`
+   */
   compress?: boolean;
+
+  /**
+   * Use an alternative working directory.
+   *
+   * @defaultValue `'./'`
+   */
   cwd?: string;
-  entries?: [];
+
+  /**
+   * Entry modules to build.
+   *
+   * @defaultValue `package.json#source`
+   */
+  entries?: string[];
+
+  /**
+   * Build specified formats.
+   *
+   * @defaultValue `'cjs,esm,modern,umd'`
+   */
   format?: string;
+
 } = { }): Promise<void> {
   const builder = require.resolve('microbundle');
   const current = require(resolve(cwd, 'package.json'));
