@@ -1,0 +1,22 @@
+{
+  "name": "@sgrud",
+  "excludeExternals": true,
+  "githubPages": false,
+  "entryPoints": [
+    "./packages/bin/index.ts",
+    "./packages/bus/index.ts",
+    "./packages/core/index.ts",
+    "./packages/data/index.ts",
+    "./packages/shell/index.ts",
+    "./packages/state/index.ts",
+    "./packages/utils/index.ts"
+  ],
+  "sort": [
+    "static-first",
+    "visibility"
+  ],
+  "validation": {
+    "notExported": true,
+    "invalidLink": true
+  }
+}

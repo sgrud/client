@@ -1,0 +1,43 @@
+name: GitHub Wiki
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  typedoc:
+    name: Typedoc
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install node
+        uses: actions/setup-node@v2
+
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          path: ./repo
+          repository: ${{github.repository}}
+
+      - name: Checkout wiki
+        uses: actions/checkout@v2
+        with:
+          path: ./wiki
+          repository: ${{github.repository}}.wiki
+
+      - name: Build wiki
+        working-directory: ./repo
+        run: |
+          npm install --also development --ignore-scripts
+          npm install typedoc-github-wiki-theme typedoc-plugin-markdown
+          npx typedoc --theme ./node_modules/typedoc-github-wiki-theme/dist
+
+      - name: Push wiki
+        working-directory: ./wiki
+        run: |
+          git rm -rf ./ && git clean -fxd
+          cp -RT ../repo/docs/ ./ && git add --all
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit --message "${{github.event.head_commit.message}}"
+          git push

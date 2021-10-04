@@ -37,8 +37,7 @@
     "install": "microbundle --cwd ./packages/bin --target node",
     "postinstall": "node -e 'sgrud.postbuild();' -r ./dist/bin",
     "prepare": "npm install -s --no-audit --no-save ./dist/bin",
-    "test": "eslint -f codeframe --fix ./ && jest --forceExit",
-    "docs": "typedoc --name @sgrud ./packages/*/index.ts"
+    "test": "eslint -f codeframe --fix ./ && jest && typedoc"
   },
   "dependencies": {
     "@babel/plugin-transform-runtime": "7.15.0",
@@ -64,11 +63,13 @@
     "npm-run-all": "4.1.5",
     "rxjs": "7.3.0",
     "ts-jest": "27.0.5",
-    "typedoc": "0.22.3"
+    "typedoc": "0.22.5"
   },
   "jest": {
     "preset": "ts-jest",
     "collectCoverage": true,
+    "forceExit": true,
+    "verbose": true,
     "coverageReporters": [
       "text"
     ],
