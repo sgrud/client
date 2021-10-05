@@ -2,4 +2,4 @@
  * @packageDocumentation
  */
 
-throw new Error('Not Implemented!');
+console.error('Not Implemented!');
