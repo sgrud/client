@@ -33,9 +33,9 @@
     "build:shell": "sgrud construct --cwd ./packages/shell",
     "build:state": "sgrud construct --cwd ./packages/state",
     "build:utils": "sgrud construct --cwd ./packages/utils",
-    "postbuild": "node -e 'sgrud.postbuild();' -r ./dist/bin",
-    "install": "microbundle --cwd ./packages/bin --target node",
-    "postinstall": "node -e 'sgrud.postbuild();' -r ./dist/bin",
+    "postbuild": "node -e 'sgrud.bin.postbuild();' -r ./dist/bin",
+    "install": "microbundle -f cjs --cwd ./packages/bin --target node",
+    "postinstall": "node -e 'sgrud.bin.postbuild();' -r ./dist/bin",
     "prepare": "npm install -s --no-audit --no-save ./dist/bin",
     "test": "eslint -f codeframe ./ && jest && typedoc"
   },

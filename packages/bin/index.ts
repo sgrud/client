@@ -36,7 +36,7 @@ import { postbuild } from './src/postbuild';
 import { runtimify } from './src/runtimify';
 import { universal } from './src/universal';
 
-const sgrud = {
+const bin = {
   construct,
   kickstart,
   postbuild,
@@ -47,11 +47,11 @@ const sgrud = {
 if (process.argv[1]?.endsWith('sgrud')) {
   cli.parse(process.argv);
 } else {
-  global.sgrud = sgrud;
+  global.sgrud = { bin };
 }
 
 declare const global: typeof globalThis & {
-  sgrud: typeof sgrud;
+  sgrud: { bin: typeof bin };
 };
 
 export {
