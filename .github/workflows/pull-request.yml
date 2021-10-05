@@ -1,0 +1,36 @@
+name: Pull Request
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  unittests:
+    name: Unittests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version:
+          - 12.x
+          - 14.x
+          - 16.x
+    steps:
+      - name: Install node
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          path: ./repo
+          repository: ${{github.repository}}
+
+      - name: Run unittests
+        working-directory: ./repo
+        run: |
+          npm install
+          npm run build
+          npm test
