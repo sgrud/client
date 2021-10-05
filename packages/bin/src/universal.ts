@@ -41,19 +41,19 @@ cli.command('universal')
  * @example Run with default options.
  * ```js
  * require('@sgrud/bin');
- * sgrud.universal();
+ * sgrud.bin.universal();
  * ```
  *
  * @example Listen on all IPs.
  * ```js
  * require('@sgrud/bin');
- * sgrud.universal({ host: '0.0.0.0' });
+ * sgrud.bin.universal({ host: '0.0.0.0' });
  * ```
  *
  * @example Listen on `192.168.0.10:8080`.
  * ```js
  * require('@sgrud/bin');
- * sgrud.universal({ host: '192.168.0.10', port: '8080' });
+ * sgrud.bin.universal({ host: '192.168.0.10', port: '8080' });
  * ```
  */
 export async function universal({

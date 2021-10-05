@@ -39,13 +39,13 @@ cli.command('kickstart [library]')
  * @example Run with default options.
  * ```js
  * require('@sgrud/bin');
- * sgrud.Kickstart();
+ * sgrud.bin.Kickstart();
  * ```
  *
  * @example Kickstart vue in `./sgrud-vue`.
  * ```js
  * require('@sgrud/bin');
- * sgrud.Kickstart({ cwd: './sgrud-vue', library: 'vue' });
+ * sgrud.bin.Kickstart({ cwd: './sgrud-vue', library: 'vue' });
  * ```
  */
 export async function kickstart({

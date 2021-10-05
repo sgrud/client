@@ -39,13 +39,13 @@ cli.command('runtimify <...modules>')
  * @example Runtimify `@babel/runtime`.
  * ```js
  * require('@sgrud/bin');
- * sgrud.runtimify({ modules: ['@babel/runtime:helpers'] });
+ * sgrud.bin.runtimify({ modules: ['@babel/runtime:helpers'] });
  * ```
  *
  * @example Runtimify `lit`.
  * ```js
  * require('@sgrud/bin');
- * sgrud.runtimify({ modules: ['lit:!static'] });
+ * sgrud.bin.runtimify({ modules: ['lit:!static'] });
  * ```
  */
 export async function runtimify({

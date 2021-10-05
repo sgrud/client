@@ -45,19 +45,19 @@ cli.command('construct [...entries]')
  * @example Run with default options.
  * ```js
  * require('@sgrud/bin');
- * sgrud.construct();
+ * sgrud.bin.construct();
  * ```
  *
  * @example Build entry `./project/main.ts`.
  * ```js
  * require('@sgrud/bin');
- * sgrud.construct({ entries: ['./project/main.ts'] });
+ * sgrud.bin.construct({ entries: ['./project/main.ts'] });
  * ```
  *
  * @example Build `./project` as `umd`.
  * ```js
  * require('@sgrud/bin');
- * sgrud.construct({ cwd: './project', format: 'umd' });
+ * sgrud.bin.construct({ cwd: './project', format: 'umd' });
  * ```
  */
 export async function construct({

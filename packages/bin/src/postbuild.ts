@@ -39,13 +39,13 @@ cli.command('postbuild')
  * @example Run with default options.
  * ```js
  * require('@sgrud/bin');
- * sgrud.postbuild();
+ * sgrud.bin.postbuild();
  * ```
  *
  * @example Run in `./projects/sgrud`.
  * ```js
  * require('@sgrud/bin');
- * sgrud.postbuild({ cwd: './projects/sgrud' });
+ * sgrud.bin.postbuild({ cwd: './projects/sgrud' });
  * ```
  */
 export async function postbuild({
