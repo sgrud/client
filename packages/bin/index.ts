@@ -14,6 +14,7 @@
  *   construct    Builds a SGRUD-based project using `microbundle`
  *   kickstart    Kickstarts an angular, lit, preact or vue-based SGRUD project
  *   postbuild    Replicates exported package.json files in the SGRUD monorepo
+ *   runtimify    Extracts and bundles runtime helpers using `microbundle`
  *   universal    Runs SGRUD in universal (SSR) mode using `puppeteer`
  *
  * For more info, run any command with the `--help` flag
@@ -32,12 +33,14 @@ import { cli } from './src/cli';
 import { construct } from './src/construct';
 import { kickstart } from './src/kickstart';
 import { postbuild } from './src/postbuild';
+import { runtimify } from './src/runtimify';
 import { universal } from './src/universal';
 
 const sgrud = {
   construct,
   kickstart,
   postbuild,
+  runtimify,
   universal
 };
 
@@ -55,5 +58,6 @@ export {
   construct,
   kickstart,
   postbuild,
+  runtimify,
   universal
 };
