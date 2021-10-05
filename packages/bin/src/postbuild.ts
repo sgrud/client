@@ -65,7 +65,7 @@ export async function postbuild({
   const sha265 = createHash('sha256');
   const writes = [];
 
-  for (const bundle of module.exports.values?.() || ['.']) {
+  for (const bundle of module.exports?.values?.() || ['.']) {
     const origin = join(cwd, bundle, 'package.json');
     const source = require(resolve(origin));
     const target = { } as Record<string, string>;
