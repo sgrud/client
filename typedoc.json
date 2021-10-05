@@ -3,6 +3,7 @@
   "treatWarningsAsErrors": true,
   "excludeExternals": true,
   "githubPages": false,
+  "gitRevision": "main",
   "entryPoints": [
     "./packages/bin/index.ts",
     "./packages/bus/index.ts",
