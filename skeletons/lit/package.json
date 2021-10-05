@@ -1,21 +1,30 @@
 {
   "name": "sgrud-skeleton-lit",
+  "amdName": "sgrud.skeleton.lit",
   "version": "0.0.0",
   "source": "./src/index.ts",
+  "exports": "./dist/sgrud-skeleton-lit.esm.js",
+  "unpkg": "./dist/sgrud-skeleton-lit.umd.js",
   "private": true,
   "scripts": {
-    "prepare": "cd ./*/lit; microbundle --external none --no-pkg-main -f umd",
-    "build": "sgrud construct --format umd",
-    "postbuild": "cp src/index.html dist/"
+    "build": "sgrud construct --format modern,umd",
+    "install": "sgrud runtimify @babel/runtime:helpers lit:!static",
+    "postbuild": "sgrud postbuild && cp ./src/index.html ./dist"
+  },
+  "amdNames": {
+    "@babel/runtime/helpers/inheritsLoose": null,
+    "@babel/runtime/helpers/taggedTemplateLiteralLoose": null,
+    "lit/decorators.js": "lit"
   },
   "dependencies": {
-    "@sgrud/bin": "../../dist/bin"
+    "@babel/runtime": "7.15.4",
+    "@lit/reactive-element": "1.0.0",
+    "lit": "2.0.0",
+    "lit-element": "3.0.0",
+    "lit-html": "2.0.0",
+    "tslib": "2.3.1"
   },
   "devDependencies": {
-    "lit": "2.0.0-rc.4"
-  },
-  "browserslist": {
-    "production": [],
-    "development": []
+    "@sgrud/bin": "../../dist/bin"
   }
 }

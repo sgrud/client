@@ -1,23 +1,29 @@
 {
   "name": "sgrud-skeleton-preact",
+  "amdName": "sgrud.skeleton.preact",
   "version": "0.0.0",
   "source": "./src/index.ts",
+  "exports": "./dist/sgrud-skeleton-preact.esm.js",
+  "unpkg": "./dist/sgrud-skeleton-preact.umd.js",
   "private": true,
   "scripts": {
-    "build": "sgrud construct --format umd",
-    "postbuild": "cp src/index.html dist/"
+    "build": "sgrud construct --format modern,umd",
+    "install": "sgrud runtimify @babel/runtime:helpers",
+    "postbuild": "sgrud postbuild && cp ./src/index.html ./dist"
+  },
+  "amdNames": {
+    "@babel/runtime/helpers/inheritsLoose": null,
+    "preact/jsx-runtime": "jsxRuntime"
   },
   "dependencies": {
+    "@babel/runtime": "7.15.4",
+    "preact": "10.5.14",
+    "preact-custom-element": "4.2.1",
+    "tslib": "2.3.1"
+  },
+  "devDependencies": {
     "@sgrud/bin": "../../dist/bin",
     "@types/preact-custom-element": "4.0.1",
     "node-sass": "6.0.1"
-  },
-  "devDependencies": {
-    "preact": "10.5.14",
-    "preact-custom-element": "4.2.1"
-  },
-  "browserslist": {
-    "production": [],
-    "development": []
   }
 }

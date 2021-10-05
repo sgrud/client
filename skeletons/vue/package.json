@@ -1,26 +1,26 @@
 {
   "name": "sgrud-skeleton-view",
   "version": "0.0.0",
+  "main": "./dist/vue-component.min.js",
   "private": true,
   "scripts": {
-    "build": "vue-cli-service build --inline-vue --target wc src/**/*.vue",
-    "postbuild": "cp src/index.html dist/"
+    "build": "vue-cli-service build --target wc ./src/**/*.vue",
+    "postbuild": "sgrud postbuild && cp ./src/index.html ./dist"
   },
   "dependencies": {
+    "vue": "2.6.14"
+  },
+  "devDependencies": {
+    "@sgrud/bin": "../../dist/bin",
     "@vue/cli-plugin-babel": "4.5.13",
     "@vue/cli-plugin-typescript": "4.5.13",
     "@vue/cli-service": "4.5.13",
-    "core-js": "3.17.3",
+    "core-js": "3.18.1",
     "node-sass": "6.0.1",
     "sass-loader": "version-10",
     "typescript": "4.4.3",
-    "vue": "2.6.14",
     "vue-class-component": "7.2.6",
     "vue-property-decorator": "9.1.2",
     "vue-template-compiler": "2.6.14"
-  },
-  "browserslist": {
-    "production": [],
-    "development": []
   }
 }
