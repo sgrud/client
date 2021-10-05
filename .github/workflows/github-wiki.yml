@@ -1,6 +1,7 @@
 name: GitHub Wiki
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -25,7 +26,7 @@ jobs:
           path: ./wiki
           repository: ${{github.repository}}.wiki
 
-      - name: Build wiki
+      - name: Build docs
         working-directory: ./repo
         run: |
           npm install --ignore-scripts
