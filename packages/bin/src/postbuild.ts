@@ -11,7 +11,7 @@ cli.command('postbuild')
   .example('postbuild # Run with default options')
   .example('postbuild --cwd ./projects/sgrud # Run in ./projects/sgrud')
   .option('--cwd', 'Use an alternative working directory', './')
-  .action((opts) => postbuild(opts));
+  .action((opts) => postbuild({ ...opts }));
 
 /**
  * Replicates exported `package.json` files in the

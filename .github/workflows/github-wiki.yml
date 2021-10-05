@@ -28,7 +28,7 @@ jobs:
       - name: Build wiki
         working-directory: ./repo
         run: |
-          npm install --also development --ignore-scripts
+          npm install --ignore-scripts
           npm install typedoc-github-wiki-theme typedoc-plugin-markdown
           npx typedoc --theme ./node_modules/typedoc-github-wiki-theme/dist
 

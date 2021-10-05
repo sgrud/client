@@ -1,5 +1,6 @@
 {
   "name": "@sgrud",
+  "treatWarningsAsErrors": true,
   "excludeExternals": true,
   "githubPages": false,
   "entryPoints": [
