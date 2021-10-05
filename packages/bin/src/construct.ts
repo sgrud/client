@@ -14,7 +14,7 @@ cli.command('construct [...entries]')
   .option('--compress', 'Compress/minify build output', true)
   .option('--cwd', 'Use an alternative working directory', './')
   .option('--format', 'Build specified formats', 'cjs,esm,modern,umd')
-  .action((args, opts) => construct({ ...opts, entries: [args, ...opts._] }));
+  .action((_ = [], opts) => construct({ ...opts, entries: opts._.concat(_) }));
 
 /**
  * Builds a SGRUD-based project using

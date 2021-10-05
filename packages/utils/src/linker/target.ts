@@ -5,8 +5,12 @@ import { Linker } from './linker';
  * Use in conjunction with the `@Target()` decorator.
  *
  * @typeParam V - Linked instance type.
+ *
+ * @see {@link Target}
  */
-export type Target<V> = new (...args: any[]) => V;
+export interface Target<V> {
+  new(...args: any[]): V;
+}
 
 /**
  * Class decorator factory. Links the decorated target constructor to its

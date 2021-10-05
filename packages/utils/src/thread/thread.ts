@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-interface */
 /* eslint-disable @typescript-eslint/no-var-requires */
 
 import { expose, Remote } from 'comlink';
@@ -9,8 +10,10 @@ import { TypeOf } from '../typing/type-of';
  * Promise. Use in conjunction with the `@Thread()` decorator.
  *
  * @typeParam T - Thread instance type.
+ *
+ * @see {@link Thread}
  */
-export type Thread<T> = Promise<Remote<T>>;
+export interface Thread<T> extends Promise<Remote<T>> { }
 
 /**
  * Class decorator factory. Exposes the decorated class as worker via
