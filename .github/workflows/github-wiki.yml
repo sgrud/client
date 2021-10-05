@@ -37,8 +37,8 @@ jobs:
         working-directory: ./wiki
         run: |
           git rm -rf ./ && git clean -fxd
-          cp -RT ../repo/docs/ ./ && git add --all
+          cp -RT ../repo/docs/ ./ && git add -A
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git commit --message "${{github.event.head_commit.message}}"
+          git commit -m "${{github.event.head_commit.message}}"
           git push
