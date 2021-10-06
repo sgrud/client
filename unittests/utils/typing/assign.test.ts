@@ -2,17 +2,17 @@ import { assign } from '@sgrud/utils';
 
 describe('@sgrud/utils/typing/assign', () => {
 
-  const values = [
-    { 1: 1, deep: { 1: true } },
-    { 2: 2, deep: { 2: true } },
-    { 3: 3, deep: { 3: true } }
-  ];
+  const values = Object.freeze([
+    Object.freeze({ 0: Object.freeze({ 1: Object.freeze({ 0: 1 }) }), 1: 1 }),
+    Object.freeze({ 0: Object.freeze({ 2: Object.freeze({ 0: 2 }) }), 2: 2 }),
+    Object.freeze({ 0: Object.freeze({ 3: Object.freeze({ 0: 3 }) }), 3: 3 })
+  ]);
 
   describe.each(values)('assigning source %O', (source) => {
     describe.each(values)('to target %O', (target) => {
-      const result = assign(target, source);
+      if (JSON.stringify(source) !== JSON.stringify(target)) {
+        const result = assign({ ...target }, { ...source });
 
-      if (source !== target) {
         it('deep copies the source to the target', () => {
           expect(result).toMatchObject(source);
           expect(result).toMatchObject(target);

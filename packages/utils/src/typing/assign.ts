@@ -56,7 +56,7 @@ export function assign<
   for (const source of sources) {
     for (const key in source) {
       if (TypeOf.object(target[key]) && TypeOf.object(source[key])) {
-        target[key] = assign(target[key], source[key]);
+        target[key] = assign({ ...target[key] }, source[key]);
       } else {
         target[key] = source[key] as T[S[number][PropertyKey]];
       }
