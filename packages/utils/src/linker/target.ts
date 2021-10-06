@@ -16,7 +16,7 @@ export interface Target<V> {
    * @param args - Class constructor rest parameter.
    * @returns Linked instance.
    */
-  new(...args: any[]): V;
+  new (...args: any[]): V;
 
 }
 

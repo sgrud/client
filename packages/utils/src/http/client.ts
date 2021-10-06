@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-
 import { Observable } from 'rxjs';
-import { ajax, AjaxConfig, AjaxResponse } from 'rxjs/ajax';
+import { ajax, AjaxConfig as Request, AjaxResponse as Response } from 'rxjs/ajax';
 import { Linker } from '../linker/linker';
 import { Target } from '../linker/target';
 import { Singleton } from '../singleton';
@@ -25,7 +23,7 @@ export interface HttpHandler {
    * @typeParam T - Response type.
    * @returns Observable response.
    */
-  handle<T>(request: AjaxConfig): Observable<AjaxResponse<T>>;
+  handle<T>(request: Request): Observable<Response<T>>;
 
 }
 
@@ -57,7 +55,7 @@ export class HttpClient implements HttpHandler {
    *
    * @see {@link handle}
    */
-  public static delete<T>(url: string): Observable<AjaxResponse<T>> {
+  public static delete<T>(url: string): Observable<Response<T>> {
     return new this().handle<T>({ method: 'DELETE', url });
   }
 
@@ -78,7 +76,7 @@ export class HttpClient implements HttpHandler {
    *
    * @see {@link handle}
    */
-  public static get<T>(url: string): Observable<AjaxResponse<T>> {
+  public static get<T>(url: string): Observable<Response<T>> {
     return new this().handle<T>({ method: 'GET', url });
   }
 
@@ -99,7 +97,7 @@ export class HttpClient implements HttpHandler {
    *
    * @see {@link handle}
    */
-  public static head<T>(url: string): Observable<AjaxResponse<T>> {
+  public static head<T>(url: string): Observable<Response<T>> {
     return new this().handle<T>({ method: 'HEAD', url });
   }
 
@@ -123,7 +121,7 @@ export class HttpClient implements HttpHandler {
    *
    * @see {@link handle}
    */
-  public static patch<T>(url: string, body: any): Observable<AjaxResponse<T>> {
+  public static patch<T>(url: string, body: unknown): Observable<Response<T>> {
     return new this().handle<T>({ body, method: 'PATCH', url });
   }
 
@@ -147,7 +145,7 @@ export class HttpClient implements HttpHandler {
    *
    * @see {@link handle}
    */
-  public static post<T>(url: string, body: any): Observable<AjaxResponse<T>> {
+  public static post<T>(url: string, body: unknown): Observable<Response<T>> {
     return new this().handle<T>({ body, method: 'POST', url });
   }
 
@@ -171,7 +169,7 @@ export class HttpClient implements HttpHandler {
    *
    * @see {@link handle}
    */
-  public static put<T>(url: string, body: any): Observable<AjaxResponse<T>> {
+  public static put<T>(url: string, body: unknown): Observable<Response<T>> {
     return new this().handle<T>({ body, method: 'PUT', url });
   }
 
@@ -197,11 +195,11 @@ export class HttpClient implements HttpHandler {
    *
    * @see {@link HttpProxy}
    */
-  public handle<T>(request: AjaxConfig): Observable<AjaxResponse<T>> {
+  public handle<T>(request: Request): Observable<Response<T>> {
     const linker = new Linker<Target<HttpProxy>, HttpProxy>();
     const proxies = linker.getAll(HttpProxy as Target<HttpProxy>);
 
-    return (function handle(next: AjaxConfig): Observable<AjaxResponse<any>> {
+    return (function handle(next: Request): Observable<Response<any>> {
       return proxies.shift()?.proxy(next, { handle }) || ajax(next);
     })(request);
   }

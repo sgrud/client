@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { AjaxConfig, AjaxResponse } from 'rxjs/ajax';
+import { AjaxConfig as Request, AjaxResponse as Response } from 'rxjs/ajax';
 import { HttpHandler } from './client';
 
 /**
@@ -41,7 +41,7 @@ export abstract class HttpProxy {
    * whenever a request is fired through the {@link HttpClient}. The extending
    * class can either pass the `request` to the next `handler`, with or without
    * modifying it, or an interceptor can chose to completely handle a `request`
-   * by itself through returning an Observable of an AjaxResponse.
+   * by itself through returning an Observable.
    *
    * @param request - Request.
    * @param handler - Next handler.
@@ -49,8 +49,8 @@ export abstract class HttpProxy {
    * @returns Observable response.
    */
   public abstract proxy<T>(
-    request: AjaxConfig,
+    request: Request,
     handler: HttpHandler
-  ): Observable<AjaxResponse<T>>;
+  ): Observable<Response<T>>;
 
 }

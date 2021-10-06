@@ -1,5 +1,5 @@
 import { BehaviorSubject, filter, finalize, map, Observable, tap } from 'rxjs';
-import { AjaxConfig, AjaxResponse } from 'rxjs/ajax';
+import { AjaxConfig as Request, AjaxResponse as Response } from 'rxjs/ajax';
 import { Target } from '../linker/target';
 import { HttpHandler } from './client';
 import { HttpProxy } from './proxy';
@@ -28,7 +28,7 @@ export class HttpState extends HttpProxy {
    * Internal map containing all running requests. Updating this map should
    * always be accompanied by an emittance of the {@link changes}.
    */
-  private readonly running: Map<AjaxConfig, AjaxResponse<any>>;
+  private readonly running: Map<Request, Response<any>>;
 
   /**
    * Getter returning an Observable emitting an array of all active requests.
@@ -43,7 +43,7 @@ export class HttpState extends HttpProxy {
    * httpState.requests.subscribe(console.log);
    * ```
    */
-  public get requests(): Observable<AjaxResponse<any>[]> {
+  public get requests(): Observable<Response<any>[]> {
     return this.changes.pipe(map(() => Array.from(this.running.values())));
   }
 
@@ -55,7 +55,7 @@ export class HttpState extends HttpProxy {
     super();
 
     this.changes = new BehaviorSubject<this>(this);
-    this.running = new Map<AjaxConfig, AjaxResponse<any>>();
+    this.running = new Map<Request, Response<any>>();
   }
 
   /**
@@ -70,9 +70,9 @@ export class HttpState extends HttpProxy {
    * @returns Observable response.
    */
   public override proxy<T>(
-    request: AjaxConfig,
+    request: Request,
     handler: HttpHandler
-  ): Observable<AjaxResponse<T>> {
+  ): Observable<Response<T>> {
     const includeDownloadProgress = request.includeDownloadProgress;
     const includeUploadProgress = request.includeUploadProgress;
 

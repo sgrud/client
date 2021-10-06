@@ -17,6 +17,7 @@ describe('@sgrud/utils/typing/type-of', () => {
     TypeOf.promise,
     TypeOf.string,
     TypeOf.undefined,
+    TypeOf.url,
     TypeOf.window
   ];
 
@@ -33,6 +34,7 @@ describe('@sgrud/utils/typing/type-of', () => {
     Promise.resolve(),
     '',
     undefined,
+    { [Symbol.toStringTag]: 'URL' },
     { [Symbol.toStringTag]: 'Window' }
   ];
 
