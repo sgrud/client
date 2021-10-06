@@ -218,6 +218,23 @@ export abstract class TypeOf {
   }
 
   /**
+   * Type-check for `URL`.
+   *
+   * @param value - Value to type-check.
+   * @returns Whether `value` is of type `URL`.
+   *
+   * @example Type-check `null` for `URL`.
+   * ```ts
+   * import { TypeOf } from '@sgrud/utils';
+   *
+   * TypeOf.url(null); // false
+   * ```
+   */
+  public static url(value: unknown): value is URL {
+    return test('URL', value);
+  }
+
+  /**
    * Type-check for `Window`.
    *
    * @param value - Value to type-check.
