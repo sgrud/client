@@ -32,14 +32,12 @@ jobs:
           npm install --ignore-scripts
           npm install typedoc-github-wiki-theme typedoc-plugin-markdown
           npx typedoc --theme ./node_modules/typedoc-github-wiki-theme/dist
+          git -C docs --git-dir ../../wiki/.git add -A
 
       - name: Push wiki
         working-directory: ./wiki
         run: |
-          git rm -rf ./
-          git clean -fxd
-          cp -RT ../repo/docs/ ./
-          git diff --quiet && exit || git add -A
+          git diff --cached --quiet && exit
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git commit -m "${{github.event.head_commit.message}}"
