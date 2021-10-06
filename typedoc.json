@@ -15,7 +15,8 @@
   ],
   "sort": [
     "static-first",
-    "visibility"
+    "visibility",
+    "alphabetical"
   ],
   "validation": {
     "notExported": true,
