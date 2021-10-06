@@ -32,6 +32,8 @@ export type Assign<S, T> = {
  *
  * @param target - Target object to deep copy properties to.
  * @param sources - Source objects from which to deep copy properties.
+ * @typeParam T - Target type.
+ * @typeParam S - Source types.
  * @returns Target object.
  *
  * @example Deep copy nested properties.
