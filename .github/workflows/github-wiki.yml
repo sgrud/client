@@ -18,13 +18,13 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: ./repo
-          repository: ${{ github.repository }}
+          repository: ${{github.repository}}
 
       - name: Checkout wiki
         uses: actions/checkout@v2
         with:
           path: ./wiki
-          repository: ${{ github.repository }}.wiki
+          repository: ${{github.repository}}.wiki
 
       - name: Build docs
         working-directory: ./repo
@@ -40,5 +40,5 @@ jobs:
           git diff --cached --quiet && exit
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git commit -m "${{ github.event.head_commit.message }}"
+          head -n1 <<<"${{github.event.head_commit.message}}" | git commit -F-
           git push
