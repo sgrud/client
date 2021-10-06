@@ -9,7 +9,15 @@ import { Linker } from './linker';
  * @see {@link Target}
  */
 export interface Target<V> {
+
+  /**
+   * Enforced constructor contract.
+   *
+   * @param args - Class constructor rest parameter.
+   * @returns Linked instance.
+   */
   new(...args: any[]): V;
+
 }
 
 /**

@@ -30,8 +30,17 @@ export type ConduitHandle = `${string}.${string}.${string}`;
  * @see {@link ConduitHandler}
  */
 export interface ConduitValue<T> {
+
+  /**
+   * Emitting {@link ConduitHandle}.
+   */
   handle: ConduitHandle;
+
+  /**
+   * Emitted value.
+   */
   value: T;
+
 }
 
 /**
