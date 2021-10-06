@@ -108,7 +108,7 @@ export async function runtimify({
         if (Array.isArray(value)) {
           const main = value.find((i) => i.default)?.default;
           if (main) write(join(pkg[0], key), join(pkg[0], main));
-        } else if (typeof value === 'object' && value.default) {
+        } else if (typeof value === 'object' && value?.default) {
           write(join(pkg[0], key), join(pkg[0], value.default));
         }
       }
