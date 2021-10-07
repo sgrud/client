@@ -10,7 +10,7 @@ describe('@sgrud/utils/typing/assign', () => {
 
   describe.each(values)('assigning source %O', (source) => {
     describe.each(values)('to target %O', (target) => {
-      if (JSON.stringify(source) !== JSON.stringify(target)) {
+      if (values.indexOf(source) !== values.indexOf(target)) {
         const result = assign({ ...target }, { ...source });
 
         it('deep copies the source to the target', () => {
