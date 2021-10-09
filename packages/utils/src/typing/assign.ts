@@ -1,5 +1,5 @@
+import { Merge } from './merge';
 import { TypeOf } from './type-of';
-import { UnSec } from './un-sec';
 
 /**
  * Assigns the own property types of all of the enumerable own properties from a
@@ -52,7 +52,7 @@ export type Assign<S, T> = {
 export function assign<
   T extends Record<PropertyKey, any>,
   S extends Record<PropertyKey, any>[]
->(target: T, ...sources: [...S]): T & UnSec<S[number]> {
+>(target: T, ...sources: [...S]): T & Merge<S[number]> {
   for (const source of sources) {
     for (const key in source) {
       if (TypeOf.object(target[key]) && TypeOf.object(source[key])) {
@@ -63,5 +63,5 @@ export function assign<
     }
   }
 
-  return target as T & UnSec<S[number]>;
+  return target as T & Merge<S[number]>;
 }

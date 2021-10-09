@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-import { Remote, wrap } from 'comlink';
+import { wrap } from 'comlink';
 import { TypeOf } from '../typing/type-of';
 
 /**
@@ -40,7 +40,7 @@ export function Spawn(
     propertyKey: PropertyKey
   ): void {
     const worker = new workerFactory();
-    let remote: Remote<new (...args: any[]) => Worker> = wrap(worker);
+    let remote = wrap<typeof workerFactory>(worker);
 
     if (TypeOf.process(globalThis.process)) {
       const nodeEndpoint = require('comlink/dist/umd/node-adapter.min');

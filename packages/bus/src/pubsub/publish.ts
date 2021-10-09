@@ -68,7 +68,7 @@ export function Publish(
     prototype: Object,
     propertyKey: PropertyKey
   ): void {
-    if (TypeOf.string(source) && source) {
+    if (TypeOf.string(source)) {
       Object.defineProperties(prototype, {
         [source]: {
           enumerable: true,
@@ -108,7 +108,7 @@ export function Publish(
       });
 
       new ConduitHandler([
-        [handle, source as Observable<any>]
+        [handle, source]
       ]);
     }
   };

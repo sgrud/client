@@ -12,7 +12,7 @@ describe('@sgrud/utils/http/proxy', () => {
     ): Observable<AjaxResponse<T>> {
       if (request.url === 'one') {
         return of({
-          response: request.url as any
+          response: request.url as unknown as T
         } as AjaxResponse<T>);
       }
 

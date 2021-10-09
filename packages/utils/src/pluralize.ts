@@ -41,7 +41,7 @@ export function pluralize(singular: string): string {
 /**
  * Regex mapping of singular words to their regular plural forms.
  */
-const regulars: Record<string, string> = {
+const regulars = {
   '(quiz)$'                    : '$1zes',
   '^(ox)$'                     : '$1en',
   '([m|l])ouse$'               : '$1ice',
@@ -60,12 +60,12 @@ const regulars: Record<string, string> = {
   '(ax|test)is$'               : '$1es',
   '(us)$'                      : '$1es',
   '([^s]+)$'                   : '$1s'
-};
+} as Record<string, string>;
 
 /**
  * Mapping of singular words to their irregular plural forms.
  */
-const irregulars: Record<string, string> = {
+const irregulars = {
   child : 'children',
   foot  : 'feet',
   goose : 'geese',
@@ -74,12 +74,12 @@ const irregulars: Record<string, string> = {
   person: 'people',
   sex   : 'sexes',
   tooth : 'teeth'
-};
+} as Record<string, string>;
 
 /**
  * List of uncountable singular words.
  */
-const uncountables: string[] = [
+const uncountables = [
   'aircraft',
   'bison',
   'cod',

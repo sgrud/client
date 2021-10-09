@@ -5,7 +5,7 @@ import { Worker } from 'worker_threads';
 describe('@sgrud/utils/thread/spawn', () => {
 
   class Class {
-    @Spawn(Worker.bind(Worker, '(' + (() => {
+    @Spawn(Worker.bind<any, any>(Worker, '(' + (() => {
       /* eslint-disable */
       require('./dist/utils/index.js').Thread()(class {
         // @ts-expect-error
@@ -13,7 +13,7 @@ describe('@sgrud/utils/thread/spawn', () => {
         thirteen = 13;
       });
       /* eslint-enable */
-    }) + ')()', { eval: true }) as any)
+    }) + ')()', { eval: true }))
     public static readonly worker: Thread<{
       callable: (...args: any) => number;
       thirteen: number;

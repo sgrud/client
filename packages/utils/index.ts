@@ -38,5 +38,5 @@ export * from './src/thread/spawn';
 export * from './src/thread/thread';
 export * from './src/thread/transfer';
 export * from './src/typing/assign';
+export * from './src/typing/merge';
 export * from './src/typing/type-of';
-export * from './src/typing/un-sec';
