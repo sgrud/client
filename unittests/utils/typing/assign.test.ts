@@ -11,7 +11,12 @@ describe('@sgrud/utils/typing/assign', () => {
   describe.each(values)('assigning source %O', (source) => {
     describe.each(values)('to target %O', (target) => {
       if (values.indexOf(source) !== values.indexOf(target)) {
-        const result = assign({ ...target }, { ...source });
+        const mutate = { };
+        const result = assign(mutate, { ...target }, { ...source });
+
+        it('mutates the target', () => {
+          expect(mutate).toBe(result);
+        });
 
         it('deep copies the source to the target', () => {
           expect(result).toMatchObject(source);
@@ -22,7 +27,12 @@ describe('@sgrud/utils/typing/assign', () => {
   });
 
   describe('assigning multiple sources', () => {
-    const result = assign({ }, ...values);
+    const mutate = { };
+    const result = assign(mutate, ...values);
+
+    it('mutates the target', () => {
+      expect(mutate).toBe(result);
+    });
 
     it('deep copies all sources to the target', () => {
       for (const value of values) {
