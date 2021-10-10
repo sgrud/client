@@ -16,7 +16,7 @@ describe('@sgrud/utils/thread/transfer', () => {
         /* eslint-disable */
         observable = require('rxjs').of(1, 2, 3);
         subject = new (require('rxjs').BehaviorSubject)('behaviorSubject');
-        error = require('rxjs').throwError(() => new Error('message'));
+        error = require('rxjs').throwError(() => new Error());
         /* eslint-enable */
       });
     }) + ')()', { eval: true }))

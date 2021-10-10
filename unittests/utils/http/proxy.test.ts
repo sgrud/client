@@ -30,7 +30,7 @@ describe('@sgrud/utils/http/proxy', () => {
       request: AjaxConfig
     ): Observable<AjaxResponse<T>> {
       return of({
-        response: request.headers?.next
+        response: request.headers!.next
       } as AjaxResponse<T>);
     }
   }

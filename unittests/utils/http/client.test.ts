@@ -40,7 +40,7 @@ describe('@sgrud/utils/http/client', () => {
         method: 'HEAD',
         url: 'url'
       }).subscribe((response) => {
-        expect(response.response).toMatchObject(xhrMock.response);
+        expect(response.response).toBe(xhrMock.response);
         expect(xhrMock.open).toHaveBeenCalledWith('HEAD', 'url', true);
         expect(xhrMock.send).toHaveBeenCalledWith();
       });

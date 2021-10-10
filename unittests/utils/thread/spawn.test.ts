@@ -8,7 +8,7 @@ describe('@sgrud/utils/thread/spawn', () => {
     @Spawn(Worker.bind<any, any>(Worker, '(' + (() => {
       /* eslint-disable */
       require('./dist/utils/index.js').Thread()(class {
-        // @ts-expect-error
+        // @ts-expect-error missing annotation
         callable = (...args) => args.length;
         thirteen = 13;
       });

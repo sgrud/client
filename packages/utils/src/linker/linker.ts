@@ -82,8 +82,9 @@ export class Linker<K extends new () => V, V> extends Map<K, V> {
    */
   public getAll(target: K): V[] {
     const instances = [];
+    const values = this.values();
 
-    for (const instance of this.values()) {
+    for (const instance of values) {
       if (instance instanceof target) {
         instances.push(instance);
       }

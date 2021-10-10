@@ -205,6 +205,7 @@
     }
   },
   "eslintIgnore": [
+    "coverage",
     "dist",
     "docs",
     "jest.*",

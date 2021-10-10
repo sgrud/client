@@ -133,6 +133,7 @@ export async function postbuild({
   if (writes.length) {
     console.log('Replicating exported package.json');
     const [_, g, b] = ['\x1b[0m', '\x1b[32m', '\x1b[34m'];
+
     for (const [origin, output, content] of writes) {
       console.log(b, origin, g, '→', b, output, _);
       writeFileSync(output, content);
