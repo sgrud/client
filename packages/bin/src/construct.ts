@@ -147,7 +147,8 @@ export async function construct({
     entries,
     format,
     globals,
-    'pkg-main': true
+    'pkg-main': true,
+    workers: false
   }).then(({ output }) => {
     console.log(output);
   });
