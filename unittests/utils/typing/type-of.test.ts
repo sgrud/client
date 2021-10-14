@@ -52,10 +52,4 @@ describe('@sgrud/utils/typing/type-of', () => {
     });
   });
 
-  describe('calling the abstract constructor', () => {
-    it('throws an error', () => {
-      expect(() => new (TypeOf as any)()).toThrowError(TypeError);
-    });
-  });
-
 });
