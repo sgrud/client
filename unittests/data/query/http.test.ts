@@ -7,8 +7,8 @@ describe('@sgrud/data/query/http', () => {
     protected readonly [Symbol.toStringTag]: string = 'Class';
   }
 
-  new Linker([
-    [HttpQuery as Target<HttpQuery>, new HttpQuery('url')]
+  new Linker<Target<HttpQuery>, HttpQuery>([
+    [HttpQuery, new HttpQuery('url')]
   ]);
 
   const xhrMock = {
@@ -26,11 +26,11 @@ describe('@sgrud/data/query/http', () => {
   global.XMLHttpRequest = jest.fn().mockImplementation(() => xhrMock) as any;
 
   describe('targeting the HttpQuery', () => {
-    const linker = new Linker();
-    const pool = linker.getAll(HttpQuery as Target<HttpQuery>);
+    const linker = new Linker<Target<HttpQuery>, HttpQuery>();
+    const pool = linker.getAll(HttpQuery);
 
     it('appends the HttpQuery to the query pool', () => {
-      expect(pool).toContain(linker.get(HttpQuery as Target<HttpQuery>));
+      expect(pool).toContain(linker.get(HttpQuery));
     });
   });
 
@@ -55,20 +55,19 @@ describe('@sgrud/data/query/http', () => {
   });
 
   describe('re-targeting the HttpQuery', () => {
-    const linker = new Linker();
+    const linker = new Linker<Target<HttpQuery>, HttpQuery>();
     const query = 'mutation test';
     const request = JSON.stringify({ query, variables: { } });
 
     const update = () => linker.set(
-      HttpQuery as Target<HttpQuery>,
-      new HttpQuery('override', new Map([[Class, 50]]))
+      HttpQuery, new HttpQuery('override', new Map([[Class, 50]]))
     );
 
     it('overrides the HttpQuery in the query pool', () => {
       update();
 
-      const pool = linker.getAll(HttpQuery as Target<HttpQuery>);
-      expect(pool).toContain(linker.get(HttpQuery as Target<HttpQuery>));
+      const pool = linker.getAll(HttpQuery);
+      expect(pool).toContain(linker.get(HttpQuery));
     });
 
     it('overrides the HttpQuery in the query pool', (done) => {

@@ -57,7 +57,7 @@ describe('@sgrud/utils/http/state', () => {
   });
 
   describe('firing a request', () => {
-    const state = new Linker().get(HttpState) as HttpState;
+    const httpState = new Linker<typeof HttpState, HttpState>().get(HttpState);
     const test = jest.fn(([next]) => {
       switch (test.mock.calls.length) {
         case 1: expect(next.type).toBe('download_progress'); break;
@@ -66,7 +66,7 @@ describe('@sgrud/utils/http/state', () => {
     });
 
     it('makes the request state observable', (done) => {
-      const subscription = state.requests.pipe(
+      const subscription = httpState.requests.pipe(
         filter((next) => Boolean(next.length))
       ).subscribe(test);
 

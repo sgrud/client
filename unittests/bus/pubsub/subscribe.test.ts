@@ -4,12 +4,12 @@ import { Observable, of } from 'rxjs';
 describe('@sgrud/bus/pubsub/subscribe', () => {
 
   class ClassOne {
-    @Subscribe('sgrud.bus.test.one')
+    @Subscribe('sgrud.test.bus.one')
     public readonly conduit!: Observable<ConduitValue<number>>;
   }
 
   class ClassTwo {
-    @Subscribe('sgrud.bus.test', 'handle')
+    @Subscribe('sgrud.test.bus', 'handle')
     public readonly conduit!: Observable<ConduitValue<number>>;
     public constructor(public readonly handle: string) { }
   }
@@ -49,13 +49,13 @@ describe('@sgrud/bus/pubsub/subscribe', () => {
         handle,
         value
       }) => {
-        expect(handle).toBe('sgrud.bus.test.one');
+        expect(handle).toBe('sgrud.test.bus.one');
         expect(value).toBe(1);
         subscription.unsubscribe();
       });
 
       subscription.add(done);
-      handler.set('sgrud.bus.test.one', of(1));
+      handler.set('sgrud.test.bus.one', of(1));
     });
   });
 
@@ -68,13 +68,13 @@ describe('@sgrud/bus/pubsub/subscribe', () => {
         handle,
         value
       }) => {
-        expect(handle).toBe('sgrud.bus.test.two');
+        expect(handle).toBe('sgrud.test.bus.two');
         expect(value).toBe(2);
         subscription.unsubscribe();
       });
 
       subscription.add(done);
-      handler.set('sgrud.bus.test.two', of(2));
+      handler.set('sgrud.test.bus.two', of(2));
     });
   });
 

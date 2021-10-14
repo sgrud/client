@@ -3,145 +3,147 @@ import { auditTime, from, take } from 'rxjs';
 
 describe('@sgrud/data/relation/has-one', () => {
 
-  class Parent extends Model<Parent> {
-    @HasOne(() => Child) public child?: Child;
+  class Owner extends Model<Owner> {
+    @HasOne(() => Owned) public owned?: Owned;
     @Property(() => String) public property?: string;
     @HasOne(() => null!) public undefined?: null;
     @HasOne(() => null!, false) public unused?: null;
-    protected readonly [Symbol.toStringTag]: string = 'Parent';
+    protected readonly [Symbol.toStringTag]: string = 'Owner';
   }
 
-  class Child extends Model<Child> {
+  class Owned extends Model<Owned> {
     @Property(() => String) public property?: string;
-    protected readonly [Symbol.toStringTag]: string = 'Child';
+    protected readonly [Symbol.toStringTag]: string = 'Owned';
   }
 
   const values = [
-    { child: { property: 'child' } },
-    { property: 'parent' },
+    { owned: { property: 'owned' } },
+    { property: 'owner' },
     { undefined: undefined },
     { unused: undefined }
   ];
 
   describe('instantiating a model which has one model using parts', () => {
-    const model = new Parent(...values);
-    const validate = (value: Parent) => {
+    const owner = new Owner(...values);
+    const validate = (value: Owner) => {
       expect(value.property).toBe(values[1].property);
-      expect(value.child!.property).toBe(values[0].child!.property);
+      expect(value.owned!.property).toBe(values[0].owned!.property);
     };
 
     it('assigns all supplied parts to the model which has one model', () => {
-      validate(model);
+      validate(owner);
     });
   });
 
   describe('assigning parts to a model which has one model', () => {
-    const model = new Parent();
-    const validate = (value: Parent) => {
+    const owner = new Owner();
+    const validate = (value: Owner) => {
       expect(value.property).toBe(values[1].property);
-      expect(value.child!.property).toBe(values[0].child!.property);
+      expect(value.owned!.property).toBe(values[0].owned!.property);
     };
 
     it('emits the changed model which has one model', (done) => {
-      const subscription = from(model).pipe(
+      const subscription = from(owner).pipe(
         auditTime(250),
         take(1)
       ).subscribe(validate);
 
       subscription.add(done);
-      model.assign(...values).subscribe(validate);
+      owner.assign(...values).subscribe(validate);
     });
 
     it('assigns all supplied parts to the model which has one model', () => {
-      validate(model);
+      validate(owner);
     });
   });
 
   describe('assigning null-parts to a model which has one model', () => {
-    const model = new Parent();
-    const validate = (value: Parent) => {
+    const owner = new Owner();
+    const validate = (value: Owner) => {
       expect(value.property).toBeNull();
-      expect(value.child).toBeNull();
+      expect(value.owned).toBeNull();
     };
 
     it('emits the changed model which has one model', (done) => {
-      const subscription = from(model).pipe(
+      const subscription = from(owner).pipe(
         auditTime(250),
         take(1)
       ).subscribe(validate);
 
       subscription.add(done);
 
-      model.assign(...values.flatMap((value) => {
+      owner.assign(...values.flatMap((value) => {
         return Object.keys(value).map((key) => ({
           [key]: null
-        })) as Model.Shape<Parent>;
+        })) as Model.Shape<Owner>;
       })).subscribe(validate);
     });
 
     it('assigns all null-parts to the model which has one model', () => {
-      validate(model);
+      validate(owner);
     });
   });
 
   describe('clearing a model which has one model', () => {
-    const model = new Parent(...values);
-    const validate = (value: Parent) => {
+    const owner = new Owner(...values);
+    const validate = (value: Owner) => {
       expect(value.property).toBeUndefined();
-      expect(value.child).toBeUndefined();
+      expect(value.owned).toBeUndefined();
     };
 
     it('emits the changed model which has one model', (done) => {
-      const subscription = from(model).pipe(
+      const subscription = from(owner).pipe(
         auditTime(250),
         take(1)
       ).subscribe(validate);
 
       subscription.add(done);
-      model.clear().subscribe(validate);
+      owner.clear().subscribe(validate);
     });
 
     it('clears the model which has one model', () => {
-      validate(model);
+      validate(owner);
     });
   });
 
   describe('serializing a model which has one model', () => {
-    const model = new Parent(...values);
-    const validate = (value: Model.Shape<Parent>) => {
+    const owner = new Owner(...values);
+    const validate = (value: Model.Shape<Owner>) => {
       expect(value.property).toBe(values[1].property);
-      expect(value.child!.property).toBe(values[0].child!.property);
+      expect(value.owned!.property).toBe(values[0].owned!.property);
     };
 
     it('returns the serialized model which has one model', () => {
-      validate(model.serialize()!);
+      validate(owner.serialize()!);
     });
   });
 
   describe('treemapping a model which has one model', () => {
-    const model = new Parent(...values);
-    const validate = (value: Model.Graph<Parent>) => {
+    const owner = new Owner(...values);
+    const validate = (value: Model.Graph<Owner>) => {
       expect(value).toStrictEqual([
         'property',
-        { child: [
+        { owned: [
           'property'
         ] }
       ]);
     };
 
     it('returns the treemapped model which has one model', () => {
-      validate(model.treemap()!);
+      validate(owner.treemap()!);
     });
   });
 
   describe('unraveling a model which has one model', () => {
-    const model = new Parent(...values);
+    const owner = new Owner(...values);
     const validate = (value: string) => {
-      expect(value).toBe('{property child{property}}');
+      expect(value).toBe(
+        '{property owned{property}}'
+      );
     };
 
     it('returns the unraveled model which has one model', () => {
-      validate(Parent.unravel(model.treemap()!));
+      validate(Owner.unravel(owner.treemap()!));
     });
   });
 

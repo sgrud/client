@@ -146,7 +146,9 @@ describe('@sgrud/data/relation/property', () => {
   describe('unraveling a model containing properties', () => {
     const model = new Class(...values);
     const validate = (value: string) => {
-      expect(value).toBe('{bool date num str}');
+      expect(value).toBe(
+        '{bool date num str}'
+      );
     };
 
     it('returns the unraveled model containing properties', () => {

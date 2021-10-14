@@ -8,11 +8,11 @@ describe('@sgrud/bus/conduit/worker', () => {
     const subject = new Subject<string>();
 
     it('observes values emitted within its parent handle', (done) => {
-      const subscription = worker.get('sgrud.bus.test').subscribe(({
+      const subscription = worker.get('sgrud.test.bus').subscribe(({
         handle,
         value
       }) => {
-        expect(handle).toBe('sgrud.bus.test.subject');
+        expect(handle).toBe('sgrud.test.bus.subject');
         expect(value).toBe('done');
         subscription.unsubscribe();
       });
@@ -22,7 +22,7 @@ describe('@sgrud/bus/conduit/worker', () => {
         done();
       });
 
-      worker.set('sgrud.bus.test.subject', subject);
+      worker.set('sgrud.test.bus.subject', subject);
       subject.next('done');
     });
   });
@@ -32,20 +32,20 @@ describe('@sgrud/bus/conduit/worker', () => {
     const behaviorSubject = new BehaviorSubject<string>('default');
 
     it('observes values emitted within its parent handle', (done) => {
-      const subscriptionOne = worker.get('sgrud.bus.test').subscribe(({
+      const subscriptionOne = worker.get('sgrud.test.bus').subscribe(({
         handle,
         value
       }) => {
-        expect(handle).toBe('sgrud.bus.test.behaviorSubject');
+        expect(handle).toBe('sgrud.test.bus.behaviorSubject');
         expect(value).toBe(behaviorSubject.value);
         subscriptionOne.unsubscribe();
       });
 
-      const subscriptionTwo = worker.get('sgrud.bus.test').subscribe(({
+      const subscriptionTwo = worker.get('sgrud.test.bus').subscribe(({
         handle,
         value
       }) => {
-        expect(handle).toBe('sgrud.bus.test.behaviorSubject');
+        expect(handle).toBe('sgrud.test.bus.behaviorSubject');
         expect(value).toBe(behaviorSubject.value);
         if (value === 'done') subscriptionTwo.unsubscribe();
       });
@@ -55,7 +55,7 @@ describe('@sgrud/bus/conduit/worker', () => {
         done();
       });
 
-      worker.set('sgrud.bus.test.behaviorSubject', behaviorSubject);
+      worker.set('sgrud.test.bus.behaviorSubject', behaviorSubject);
       behaviorSubject.next('done');
     });
   });
@@ -65,7 +65,7 @@ describe('@sgrud/bus/conduit/worker', () => {
     const worker = new ConduitWorker();
 
     it('does not emit any values', (done) => {
-      const subscription = worker.get('sgrud.bus.test.nonexistent').pipe(
+      const subscription = worker.get('sgrud.test.bus.nonexistent').pipe(
         timeout(1),
         catchError((error) => of({
           handle: null,
@@ -85,7 +85,7 @@ describe('@sgrud/bus/conduit/worker', () => {
         done();
       });
 
-      worker.set('sgrud.bus.test.subject', subject);
+      worker.set('sgrud.test.bus.subject', subject);
       subject.next('done');
     });
   });

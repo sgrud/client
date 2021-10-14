@@ -36,7 +36,7 @@ describe('@sgrud/utils/http/proxy', () => {
   }
 
   describe('targeting HttpProxy subclasses', () => {
-    const linker = new Linker();
+    const linker = new Linker<Target<HttpProxy>, HttpProxy>();
     const proxies = linker.getAll(HttpProxy as Target<HttpProxy>);
 
     it('appends the targets to the proxy chain', () => {

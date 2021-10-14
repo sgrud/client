@@ -16,11 +16,11 @@ describe('@sgrud/bus/conduit/handler', () => {
     const subject = new Subject<string>();
 
     it('observes values emitted within its parent handle', (done) => {
-      const subscription = handler.get('sgrud.bus.test').subscribe(({
+      const subscription = handler.get('sgrud.test.bus').subscribe(({
         handle,
         value
       }) => {
-        expect(handle).toBe('sgrud.bus.test.subject');
+        expect(handle).toBe('sgrud.test.bus.subject');
         expect(value).toBe('done');
         subscription.unsubscribe();
       });
@@ -30,7 +30,7 @@ describe('@sgrud/bus/conduit/handler', () => {
         done();
       });
 
-      handler.set('sgrud.bus.test.subject', subject);
+      handler.set('sgrud.test.bus.subject', subject);
       setTimeout(() => subject.next('done'), 250);
     });
   });
@@ -40,20 +40,20 @@ describe('@sgrud/bus/conduit/handler', () => {
     const behaviorSubject = new BehaviorSubject<string>('default');
 
     it('observes values emitted within its parent handle', (done) => {
-      const subscriptionOne = handler.get('sgrud.bus.test').subscribe(({
+      const subscriptionOne = handler.get('sgrud.test.bus').subscribe(({
         handle,
         value
       }) => {
-        expect(handle).toBe('sgrud.bus.test.behaviorSubject');
+        expect(handle).toBe('sgrud.test.bus.behaviorSubject');
         expect(value).toBe(behaviorSubject.value);
         subscriptionOne.unsubscribe();
       });
 
-      const subscriptionTwo = handler.get('sgrud.bus.test').subscribe(({
+      const subscriptionTwo = handler.get('sgrud.test.bus').subscribe(({
         handle,
         value
       }) => {
-        expect(handle).toBe('sgrud.bus.test.behaviorSubject');
+        expect(handle).toBe('sgrud.test.bus.behaviorSubject');
         expect(value).toBe(behaviorSubject.value);
         if (value === 'done') subscriptionTwo.unsubscribe();
       });
@@ -63,7 +63,7 @@ describe('@sgrud/bus/conduit/handler', () => {
         done();
       });
 
-      handler.set('sgrud.bus.test.behaviorSubject', behaviorSubject);
+      handler.set('sgrud.test.bus.behaviorSubject', behaviorSubject);
       setTimeout(() => behaviorSubject.next('done'), 250);
     });
   });
@@ -73,7 +73,7 @@ describe('@sgrud/bus/conduit/handler', () => {
     const subject = new Subject<string>();
 
     it('does not emit any values', (done) => {
-      const subscription = handler.get('sgrud.bus.test.nonexistent').pipe(
+      const subscription = handler.get('sgrud.test.bus.nonexistent').pipe(
         timeout(250),
         catchError((error) => of({
           handle: null,
@@ -93,7 +93,7 @@ describe('@sgrud/bus/conduit/handler', () => {
         done();
       });
 
-      handler.set('sgrud.bus.test.subject', subject);
+      handler.set('sgrud.test.bus.subject', subject);
       setTimeout(() => subject.next('done'), 250);
     });
   });

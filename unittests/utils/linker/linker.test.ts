@@ -1,17 +1,17 @@
-import { Linker } from '@sgrud/utils';
+import { Linker, Target } from '@sgrud/utils';
 
 describe('@sgrud/utils/linker/linker', () => {
 
   class Service { }
 
   class ServiceOne extends Service {
-    public constructor(public param: string = 'one') {
+    public constructor(public readonly param: string = 'one') {
       super();
     }
   }
 
   class ServiceTwo extends Service {
-    public constructor(public param: string = 'two') {
+    public constructor(public readonly param: string = 'two') {
       super();
     }
   }
@@ -34,12 +34,10 @@ describe('@sgrud/utils/linker/linker', () => {
     });
   });
 
-  describe('preemptively inserting an instance', () => {
-    const arg = [ServiceTwo, new ServiceTwo('three')];
+  describe('programmatically inserting an instance', () => {
     const spy = jest.spyOn(Linker.prototype, 'set');
-    const linker = new Linker([
-      arg as [typeof ServiceTwo, ServiceTwo]
-    ]);
+    const arg = [ServiceTwo, new ServiceTwo('three')] as const;
+    const linker = new Linker<Target<ServiceTwo>, ServiceTwo>([arg]);
 
     it('links the target constructor to the inserted instance', () => {
       expect(linker.get(ServiceTwo)).toBeInstanceOf(ServiceTwo);

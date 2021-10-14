@@ -4,12 +4,12 @@ import { Subject } from 'rxjs';
 describe('@sgrud/bus/pubsub/publish', () => {
 
   class ClassOne {
-    @Publish('sgrud.bus.test.one')
+    @Publish('sgrud.test.bus.one')
     public readonly conduit!: Subject<number>;
   }
 
   class ClassTwo {
-    @Publish('sgrud.bus.test', 'handle')
+    @Publish('sgrud.test.bus', 'handle')
     public readonly conduit: Subject<number>;
     public handle?: string;
     public constructor(handle?: string) {
@@ -49,11 +49,11 @@ describe('@sgrud/bus/pubsub/publish', () => {
     const handler = new ConduitHandler();
 
     it('emits values through the supplied handle', (done) => {
-      const subscription = handler.get('sgrud.bus.test').subscribe(({
+      const subscription = handler.get('sgrud.test.bus').subscribe(({
         handle,
         value
       }) => {
-        expect(handle).toBe('sgrud.bus.test.one');
+        expect(handle).toBe('sgrud.test.bus.one');
         expect(value).toBe(1);
         subscription.unsubscribe();
       });
@@ -74,11 +74,11 @@ describe('@sgrud/bus/pubsub/publish', () => {
     classTwo.handle = 'two';
 
     it('emits values through the scoped handle', (done) => {
-      const subscription = handler.get('sgrud.bus.test').subscribe(({
+      const subscription = handler.get('sgrud.test.bus').subscribe(({
         handle,
         value
       }) => {
-        expect(handle).toBe('sgrud.bus.test.two');
+        expect(handle).toBe('sgrud.test.bus.two');
         expect(value).toBe(2);
         subscription.unsubscribe();
       });
