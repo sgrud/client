@@ -1,7 +1,7 @@
 import { TypeOf } from '@sgrud/utils';
 import { Model } from '../model/model';
 
-export const hasOne = Symbol('Model.HasOne');
+export const hasOne = Symbol('@sgrud/data/model/has-one');
 
 export function HasOne<T extends Model.Type<any>>(
   typeFactory: () => T,

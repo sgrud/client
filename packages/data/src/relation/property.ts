@@ -7,7 +7,7 @@ export type Property =
   typeof Number |
   typeof String;
 
-export const property = Symbol('Model.Property');
+export const property = Symbol('@sgrud/data/model/property');
 
 export function Property<T extends Property>(
   typeFactory: () => T,
