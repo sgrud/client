@@ -5,7 +5,6 @@
   "source": "./index.ts",
   "types": "./index.d.ts",
   "main": "../../dist/core/index.js",
-  "module": "../../dist/core/index.mjs",
   "exports": "../../dist/core/index.esm.js",
   "unpkg": "../../dist/core/index.umd.js",
   "dependencies": {

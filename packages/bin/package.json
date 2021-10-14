@@ -5,9 +5,6 @@
   "source": "./index.ts",
   "types": "./index.d.ts",
   "main": "../../dist/bin/index.js",
-  "module": "../../dist/bin/index.mjs",
-  "exports": "../../dist/bin/index.esm.js",
-  "unpkg": "../../dist/bin/index.umd.js",
   "amdNames": {
     "@sgrud/bin": null,
     "@sgrud/bus": null,

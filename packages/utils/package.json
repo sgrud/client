@@ -5,7 +5,6 @@
   "source": "./index.ts",
   "types": "./index.d.ts",
   "main": "../../dist/utils/index.js",
-  "module": "../../dist/utils/index.mjs",
   "exports": "../../dist/utils/index.esm.js",
   "unpkg": "../../dist/utils/index.umd.js",
   "amdNames": {

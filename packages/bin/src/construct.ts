@@ -13,7 +13,7 @@ cli.command('construct [...entries]')
   .example('construct --cwd ./project --format umd # Build ./project as umd')
   .option('--compress', 'Compress/minify build output', true)
   .option('--cwd', 'Use an alternative working directory', './')
-  .option('--format', 'Build specified formats', 'cjs,esm,modern,umd')
+  .option('--format', 'Build specified formats', 'commonjs,modern,umd')
   .action((_ = [], opts) => construct({ ...opts, entries: opts._.concat(_) }));
 
 /**
@@ -30,7 +30,7 @@ cli.command('construct [...entries]')
  * Options
  *   --compress    Compress/minify build output  (default true)
  *   --cwd         Use an alternative working directory  (default ./)
- *   --format      Build specified formats  (default cjs,esm,modern,umd)
+ *   --format      Build specified formats  (default commonjs,modern,umd)
  *   -h, --help    Displays this message
  *
  * Examples
@@ -64,7 +64,7 @@ export async function construct({
   compress = true,
   cwd = './',
   entries = undefined,
-  format = 'cjs,esm,modern,umd'
+  format = 'commonjs,modern,umd'
 }: {
 
   /**
@@ -91,7 +91,7 @@ export async function construct({
   /**
    * Build specified formats.
    *
-   * @defaultValue `'cjs,esm,modern,umd'`
+   * @defaultValue `'commonjs,modern,umd'`
    */
   format?: string;
 

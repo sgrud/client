@@ -37,7 +37,7 @@
     "install": "microbundle -f cjs --cwd ./packages/bin --target node",
     "postinstall": "node -e 'sgrud.bin.postbuild();' -r ./dist/bin",
     "prepare": "npm install -s --no-audit --no-save ./dist/bin",
-    "test": "eslint -f codeframe ./ && jest && typedoc"
+    "test": "eslint -f compact ./ && jest && typedoc"
   },
   "dependencies": {
     "@babel/plugin-transform-runtime": "7.15.8",
