@@ -261,7 +261,7 @@ export abstract class Model<M extends Model = any> {
                 keys.splice(m--, 1);
               } else {
                 const value = vars[keys[m]] instanceof Enum
-                  ? vars[keys[m]] as string
+                  ? vars[keys[m]].toString()
                   : JSON.stringify(vars[keys[m]]);
 
                 if (m > 0) result += ' ';

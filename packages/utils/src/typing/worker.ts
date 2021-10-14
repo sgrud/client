@@ -8,6 +8,6 @@
  * ```
  */
 declare module 'worker:*' {
-  const WorkerFactory: new (...args: any[]) => Worker;
   export default WorkerFactory;
+  const WorkerFactory: new (...args: any[]) => Worker;
 }

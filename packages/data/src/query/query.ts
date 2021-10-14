@@ -27,8 +27,8 @@ export namespace Query {
 
   export interface Expression<T extends Model> {
     conjunction?: {
-      operands: Expression<T>[];
       operator?: Conjunction;
+      operands: Expression<T>[];
     };
     entity?: {
       operator?: Operator;
