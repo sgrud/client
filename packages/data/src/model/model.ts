@@ -10,7 +10,7 @@ export namespace Model {
   /* eslint-disable @typescript-eslint/indent */
 
   export type Field<T extends Model> = string &
-    Exclude<keyof T, Exclude<keyof Model, 'id' | 'created' | 'modified'>>;
+    Exclude<keyof T, Exclude<keyof Model, 'uuid' | 'created' | 'modified'>>;
 
   export type Graph<T extends Model> = {
     [K in Field<T>]?:
@@ -168,8 +168,8 @@ export abstract class Model<M extends Model = any> {
   ): Model.Shape<T> | undefined {
     const data = { } as Model.Shape<T>;
 
-    if (shallow && model.id) {
-      data.id = this.valuate(model, 'id' as Model.Field<T>);
+    if (shallow && model.uuid) {
+      data.uuid = this.valuate(model, 'uuid' as Model.Field<T>);
     } else {
       for (const key in (this.prototype as Model)[property]) {
         if (!TypeOf.undefined(model[key as Model.Field<T>])) {
@@ -308,7 +308,7 @@ export abstract class Model<M extends Model = any> {
   protected abstract readonly [Symbol.toStringTag]: string;
 
   @Property(() => String)
-  public id?: string;
+  public uuid?: string;
 
   @Property(() => Date, false)
   public created?: Date;
@@ -394,7 +394,7 @@ export abstract class Model<M extends Model = any> {
   public delete<T extends Model = M>(
     this: T
   ): Observable<T> {
-    return this.static.deleteOne<T>(this.id!).pipe(
+    return this.static.deleteOne<T>(this.uuid!).pipe(
       switchMap(() => this.clear()), finalize(() => this.changes.complete())
     );
   }

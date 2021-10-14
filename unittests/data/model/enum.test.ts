@@ -51,7 +51,7 @@ describe('@sgrud/data/model/enum', () => {
     type Enumerated = Enumeration;
     const Enumerated = enumerate(Enumeration);
     const graph = [
-      'id',
+      'uuid',
       { enum: () => ({
         one: Enumerated.One,
         two: Enumerated.Two,
@@ -60,7 +60,9 @@ describe('@sgrud/data/model/enum', () => {
     ] as Model.Graph<Class>;
 
     it('returns the unraveled graph containing an enum', () => {
-      expect(Class.unravel(graph)).toBe('{id enum(one:ONE two:TWO){value}}');
+      expect(Class.unravel(graph)).toBe(
+        '{uuid enum(one:ONE two:TWO){value}}'
+      );
     });
   });
 

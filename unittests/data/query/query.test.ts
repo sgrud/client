@@ -86,8 +86,8 @@ describe('@sgrud/data/query/query', () => {
   describe('statically calling the deleteAll operation', () => {
     it('dispatches the operation through the prioritized query', (done) => {
       forkJoin([
-        ClassOne.deleteAll('id'),
-        ClassTwo.deleteAll('id')
+        ClassOne.deleteAll('uuid'),
+        ClassTwo.deleteAll('uuid')
       ]).subscribe(() => {
         expect(mocks[0].mock.calls[0][0]).toContain('mutation deleteAll');
         expect(mocks[1].mock.calls[0][0]).toContain('mutation deleteAll');
@@ -101,8 +101,8 @@ describe('@sgrud/data/query/query', () => {
   describe('statically calling the deleteOne operation', () => {
     it('dispatches the operation through the prioritized query', (done) => {
       forkJoin([
-        ClassOne.deleteOne('id'),
-        ClassTwo.deleteOne('id')
+        ClassOne.deleteOne('uuid'),
+        ClassTwo.deleteOne('uuid')
       ]).subscribe(() => {
         expect(mocks[0].mock.calls[0][0]).toContain('mutation deleteOne');
         expect(mocks[1].mock.calls[0][0]).toContain('mutation deleteOne');
