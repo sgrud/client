@@ -61,12 +61,14 @@ export abstract class Model<M extends Model = any> {
     const pool = linker.getAll(Query as Target<Query>);
     const type = operation.substr(0, operation.indexOf(' '));
 
-    if (!pool.length) {
-      return throwError(() => new RangeError());
-    } else for (const query of pool) {
+    for (const query of pool) {
       if (query.types.has(type as Query.Type)) {
         compatible[query.priority(this)] = query;
       }
+    }
+
+    if (!compatible.length) {
+      return throwError(() => new RangeError(`${type}:${new this().entity}`));
     }
 
     return compatible[compatible.length - 1].commit(
