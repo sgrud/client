@@ -1,5 +1,5 @@
 import { Model, Property } from '@sgrud/data';
-import { auditTime, take } from 'rxjs';
+import { auditTime, from, take } from 'rxjs';
 
 describe('@sgrud/data/relation/property', () => {
 
@@ -46,7 +46,7 @@ describe('@sgrud/data/relation/property', () => {
     };
 
     it('emits the changed model containing properties', (done) => {
-      const subscription = model.value.pipe(
+      const subscription = from(model).pipe(
         auditTime(250),
         take(1)
       ).subscribe(validate);
@@ -70,7 +70,7 @@ describe('@sgrud/data/relation/property', () => {
     };
 
     it('emits the changed model containing properties', (done) => {
-      const subscription = model.value.pipe(
+      const subscription = from(model).pipe(
         auditTime(250),
         take(1)
       ).subscribe(validate);
@@ -99,7 +99,7 @@ describe('@sgrud/data/relation/property', () => {
     };
 
     it('emits the changed model containing properties', (done) => {
-      const subscription = model.value.pipe(
+      const subscription = from(model).pipe(
         auditTime(250),
         take(1)
       ).subscribe(validate);

@@ -1,5 +1,5 @@
 import { assign, Linker, pluralize, Target, TypeOf } from '@sgrud/utils';
-import { BehaviorSubject, finalize, identity, map, Observable, of, OperatorFunction, switchMap, throwError } from 'rxjs';
+import { BehaviorSubject, finalize, identity, map, observable, Observable, of, OperatorFunction, Subscribable, switchMap, throwError } from 'rxjs';
 import { Query } from '../query/query';
 import { hasMany } from '../relation/has-many';
 import { hasOne } from '../relation/has-one';
@@ -326,8 +326,12 @@ export abstract class Model<M extends Model = any> {
 
   private readonly static: Model.Type<M>;
 
-  public get value(): Observable<M> {
-    return this.changes.asObservable();
+  public get [Symbol?.observable](): () => Subscribable<M> {
+    return () => this.changes.asObservable();
+  }
+
+  public get [observable](): () => Subscribable<M> {
+    return () => this.changes.asObservable();
   }
 
   private get entity(): string {

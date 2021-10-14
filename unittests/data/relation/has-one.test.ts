@@ -1,5 +1,5 @@
 import { HasOne, Model, Property } from '@sgrud/data';
-import { auditTime, take } from 'rxjs';
+import { auditTime, from, take } from 'rxjs';
 
 describe('@sgrud/data/relation/has-one', () => {
 
@@ -43,7 +43,7 @@ describe('@sgrud/data/relation/has-one', () => {
     };
 
     it('emits the changed model which has one model', (done) => {
-      const subscription = model.value.pipe(
+      const subscription = from(model).pipe(
         auditTime(250),
         take(1)
       ).subscribe(validate);
@@ -65,7 +65,7 @@ describe('@sgrud/data/relation/has-one', () => {
     };
 
     it('emits the changed model which has one model', (done) => {
-      const subscription = model.value.pipe(
+      const subscription = from(model).pipe(
         auditTime(250),
         take(1)
       ).subscribe(validate);
@@ -92,7 +92,7 @@ describe('@sgrud/data/relation/has-one', () => {
     };
 
     it('emits the changed model which has one model', (done) => {
-      const subscription = model.value.pipe(
+      const subscription = from(model).pipe(
         auditTime(250),
         take(1)
       ).subscribe(validate);
