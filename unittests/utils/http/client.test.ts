@@ -2,6 +2,11 @@ import { HttpClient } from '@sgrud/utils';
 
 describe('@sgrud/utils/http/client', () => {
 
+  const targets = [
+    HttpClient.prototype,
+    new HttpClient()
+  ];
+
   const methods = [
     HttpClient.delete.bind(HttpClient),
     HttpClient.get.bind(HttpClient),
@@ -34,9 +39,9 @@ describe('@sgrud/utils/http/client', () => {
   afterEach(() => xhrMock.addEventListener.mockClear());
   global.XMLHttpRequest = jest.fn().mockImplementation(() => xhrMock) as any;
 
-  describe('firing a custom request', () => {
+  describe.each(targets)('firing a custom request through %O', (target) => {
     it('dispatches a custom XHR', (done) => {
-      const subscription = new HttpClient().handle({
+      const subscription = target.handle({
         method: 'HEAD',
         url: 'url'
       }).subscribe((response) => {

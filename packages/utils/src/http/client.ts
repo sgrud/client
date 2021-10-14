@@ -56,7 +56,7 @@ export class HttpClient implements HttpHandler {
    * @see {@link handle}
    */
   public static delete<T>(url: string): Observable<Response<T>> {
-    return new this().handle<T>({ method: 'DELETE', url });
+    return this.prototype.handle<T>({ method: 'DELETE', url });
   }
 
   /**
@@ -77,7 +77,7 @@ export class HttpClient implements HttpHandler {
    * @see {@link handle}
    */
   public static get<T>(url: string): Observable<Response<T>> {
-    return new this().handle<T>({ method: 'GET', url });
+    return this.prototype.handle<T>({ method: 'GET', url });
   }
 
   /**
@@ -98,7 +98,7 @@ export class HttpClient implements HttpHandler {
    * @see {@link handle}
    */
   public static head<T>(url: string): Observable<Response<T>> {
-    return new this().handle<T>({ method: 'HEAD', url });
+    return this.prototype.handle<T>({ method: 'HEAD', url });
   }
 
   /**
@@ -122,7 +122,7 @@ export class HttpClient implements HttpHandler {
    * @see {@link handle}
    */
   public static patch<T>(url: string, body: unknown): Observable<Response<T>> {
-    return new this().handle<T>({ body, method: 'PATCH', url });
+    return this.prototype.handle<T>({ body, method: 'PATCH', url });
   }
 
   /**
@@ -146,7 +146,7 @@ export class HttpClient implements HttpHandler {
    * @see {@link handle}
    */
   public static post<T>(url: string, body: unknown): Observable<Response<T>> {
-    return new this().handle<T>({ body, method: 'POST', url });
+    return this.prototype.handle<T>({ body, method: 'POST', url });
   }
 
   /**
@@ -170,7 +170,7 @@ export class HttpClient implements HttpHandler {
    * @see {@link handle}
    */
   public static put<T>(url: string, body: unknown): Observable<Response<T>> {
-    return new this().handle<T>({ body, method: 'PUT', url });
+    return this.prototype.handle<T>({ body, method: 'PUT', url });
   }
 
   /**

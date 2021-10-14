@@ -27,7 +27,7 @@ describe('@sgrud/utils/http/state', () => {
     });
 
     it('does not consume the progress events', (done) => {
-      const subscription = new HttpClient().handle({
+      const subscription = HttpClient.prototype.handle({
         includeDownloadProgress: true,
         includeUploadProgress: true,
         method: 'GET',
