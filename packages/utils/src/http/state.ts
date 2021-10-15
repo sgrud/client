@@ -1,4 +1,4 @@
-import { BehaviorSubject, filter, finalize, map, Observable, tap } from 'rxjs';
+import { BehaviorSubject, filter, finalize, map, observable, Observable, Subscribable, tap } from 'rxjs';
 import { AjaxConfig as Request, AjaxResponse as Response } from 'rxjs/ajax';
 import { Target } from '../linker/target';
 import { HttpHandler } from './client';
@@ -6,9 +6,9 @@ import { HttpProxy } from './proxy';
 
 /**
  * Built-in {@link HttpProxy} intercepting all requests fired through the
- * {@link HttpClient}. This proxy provides an Observable, emitting an array of
- * all currently active {@link requests} every time a new request is fired or a
- * running request is completed.
+ * {@link HttpClient}. This proxy implements `Symbol.observable`, through which
+ * it emits an array of all currently active {@link [observable]} every time a
+ * new request is fired or a running request is completed.
  *
  * @decorator {@link Target}
  *
@@ -17,6 +17,24 @@ import { HttpProxy } from './proxy';
  */
 @Target()
 export class HttpState extends HttpProxy {
+
+  /**
+   * Symbol property describing a callback to a Subscribable emitting an array
+   * of all active requests. Using the returned Subscribable, e.g., a load
+   * indicator can easily be implemented.
+   *
+   * @returns Callback to a Subscribable.
+   *
+   * @example Subscribe to the currently active requests.
+   * ```ts
+   * import { HttpState, Linker } from '@sgrud/bus';
+   * import { from } from 'rxjs';
+   *
+   * const httpState = new Linker<typeof HttpState, HttpState>().get(HttpState);
+   * from(httpState).subscribe(console.log);
+   * ```
+   */
+  public readonly [Symbol.observable]: () => Subscribable<Response<any>[]>;
 
   /**
    * BehaviorSubject emitting every time a request is added to or deleted from
@@ -31,20 +49,12 @@ export class HttpState extends HttpProxy {
   private readonly running: Map<Request, Response<any>>;
 
   /**
-   * Getter returning an Observable emitting an array of all active requests.
-   * Utilizing the returned Observable, e.g., a load indicator can easily be
-   * implemented.
-   *
-   * @example Subscribe to the currently active requests.
-   * ```ts
-   * import { HttpState, Linker } from '@sgrud/bus';
-   *
-   * const httpState = new Linker<typeof HttpState, HttpState>().get(HttpState);
-   * httpState.requests.subscribe(console.log);
-   * ```
+   * `rxjs.observable` interop getter returning a callback to a Subscribable.
    */
-  public get requests(): Observable<Response<any>[]> {
-    return this.changes.pipe(map(() => Array.from(this.running.values())));
+  public get [observable](): () => Subscribable<Response<any>[]> {
+    return () => this.changes.pipe(map(() => {
+      return Array.from(this.running.values());
+    }));
   }
 
   /**
@@ -62,7 +72,7 @@ export class HttpState extends HttpProxy {
    * Overridden {@link HttpProxy} proxy method. Mutates the request to also emit
    * progress events while the request is running. These progress events will be
    * consumed by the HttpState interceptor and re-supplied via the Observable
-   * returned by the {@link requests} getter.
+   * returned by the {@link [observable]} getter.
    *
    * @param request - Request.
    * @param handler - Next handler.

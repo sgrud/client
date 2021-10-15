@@ -309,6 +309,8 @@ export abstract class Model<M extends Model = any> {
 
   protected abstract readonly [Symbol.toStringTag]: string;
 
+  public readonly [Symbol.observable]: () => Subscribable<M>;
+
   @Property(() => String)
   public uuid?: string;
 
@@ -327,10 +329,6 @@ export abstract class Model<M extends Model = any> {
   private [property]: Record<keyof M, () => unknown>;
 
   private readonly static: Model.Type<M>;
-
-  public get [Symbol?.observable](): () => Subscribable<M> {
-    return () => this.changes.asObservable();
-  }
 
   public get [observable](): () => Subscribable<M> {
     return () => this.changes.asObservable();

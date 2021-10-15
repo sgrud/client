@@ -1,5 +1,5 @@
 import { HttpClient, HttpState, Linker } from '@sgrud/utils';
-import { filter } from 'rxjs';
+import { filter, from } from 'rxjs';
 
 describe('@sgrud/utils/http/state', () => {
 
@@ -66,7 +66,7 @@ describe('@sgrud/utils/http/state', () => {
     });
 
     it('makes the request state observable', (done) => {
-      const subscription = httpState.requests.pipe(
+      const subscription = from(httpState).pipe(
         filter((next) => Boolean(next.length))
       ).subscribe(test);
 
