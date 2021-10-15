@@ -1,4 +1,4 @@
-import { assign, Linker, pluralize, Target, TypeOf } from '@sgrud/utils';
+import { assign, Linker, pluralize, Provider, TypeOf } from '@sgrud/utils';
 import { BehaviorSubject, finalize, identity, map, observable, Observable, of, OperatorFunction, Subscribable, switchMap, throwError } from 'rxjs';
 import { Query } from '../query/query';
 import { hasMany } from '../relation/has-many';
@@ -57,8 +57,8 @@ export abstract class Model<M extends Model = any> {
     variables: Record<string, unknown> = { }
   ): Observable<any> {
     const compatible = [];
-    const linker = new Linker<Target<Query>, Query>();
-    const pool = linker.getAll(Query as Target<Query>);
+    const linker = new Linker<Provider<Query>, Query>();
+    const pool = linker.getAll(Query as Provider<Query>);
     const type = operation.substr(0, operation.indexOf(' '));
 
     for (const query of pool) {

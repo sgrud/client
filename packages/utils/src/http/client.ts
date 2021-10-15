@@ -1,8 +1,8 @@
 import { Observable } from 'rxjs';
 import { ajax, AjaxConfig as Request, AjaxResponse as Response } from 'rxjs/ajax';
 import { Linker } from '../linker/linker';
-import { Target } from '../linker/target';
 import { Singleton } from '../singleton';
+import { Provider } from '../super/provider';
 import { HttpProxy } from './proxy';
 
 /**
@@ -196,8 +196,8 @@ export class HttpClient implements HttpHandler {
    * @see {@link HttpProxy}
    */
   public handle<T>(request: Request): Observable<Response<T>> {
-    const linker = new Linker<Target<HttpProxy>, HttpProxy>();
-    const proxies = linker.getAll(HttpProxy as Target<HttpProxy>);
+    const linker = new Linker<Provider<HttpProxy>, HttpProxy>();
+    const proxies = linker.getAll(HttpProxy as Provider<HttpProxy>);
 
     return (function handle(next: Request): Observable<Response<any>> {
       return proxies.shift()?.proxy(next, { handle }) || ajax(next);

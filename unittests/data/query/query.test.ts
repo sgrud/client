@@ -1,5 +1,5 @@
 import { Model, Query } from '@sgrud/data';
-import { Linker, Target } from '@sgrud/utils';
+import { Linker, Provider, Target } from '@sgrud/utils';
 import { forkJoin, Observable, of } from 'rxjs';
 
 describe('@sgrud/data/query/query', () => {
@@ -58,7 +58,7 @@ describe('@sgrud/data/query/query', () => {
 
   describe('targeting Query subclasses', () => {
     const linker = new Linker();
-    const pool = linker.getAll(Query as Target<Query>);
+    const pool = linker.getAll(Query as Provider<Query>);
 
     it('appends the targets to the query pool', () => {
       expect(pool).toContain(linker.get(QueryOne));

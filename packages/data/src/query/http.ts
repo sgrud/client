@@ -1,9 +1,10 @@
-import { HttpClient, TypeOf } from '@sgrud/utils';
+import { HttpClient, Provider, TypeOf } from '@sgrud/utils';
 import { Observable, pluck } from 'rxjs';
 import { Model } from '../model/model';
 import { Query } from './query';
 
-export class HttpQuery extends Query {
+export class HttpQuery
+  extends Provider<typeof Query>('sgrud.data.query.Query') {
 
   public override readonly types: Set<Query.Type> = new Set<Query.Type>([
     'mutation',

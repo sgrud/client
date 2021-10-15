@@ -1,3 +1,4 @@
+import { provide, Provide } from '@sgrud/utils';
 import { Observable } from 'rxjs';
 import { Model } from '../model/model';
 
@@ -48,7 +49,11 @@ export namespace Query {
 
 }
 
+@Provide<typeof Query>()
 export abstract class Query {
+
+  public static readonly [provide]:
+  'sgrud.data.query.Query' = 'sgrud.data.query.Query';
 
   public abstract readonly types: Set<Query.Type>;
 

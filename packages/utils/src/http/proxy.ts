@@ -1,5 +1,6 @@
 import { Observable } from 'rxjs';
 import { AjaxConfig as Request, AjaxResponse as Response } from 'rxjs/ajax';
+import { Provide, provide } from '../super/provide';
 import { HttpHandler } from './client';
 
 /**
@@ -34,7 +35,11 @@ import { HttpHandler } from './client';
  *
  * @see {@link HttpClient}
  */
+@Provide<typeof HttpProxy>()
 export abstract class HttpProxy {
+
+  public static readonly [provide]:
+  'sgrud.utils.http.HttpProxy' = 'sgrud.utils.http.HttpProxy';
 
   /**
    * The overridden proxy method of linked classes extending HttpProxy is called

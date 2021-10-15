@@ -1,6 +1,7 @@
 import { BehaviorSubject, filter, finalize, map, observable, Observable, Subscribable, tap } from 'rxjs';
 import { AjaxConfig as Request, AjaxResponse as Response } from 'rxjs/ajax';
 import { Target } from '../linker/target';
+import { Provider } from '../super/provider';
 import { HttpHandler } from './client';
 import { HttpProxy } from './proxy';
 
@@ -16,7 +17,8 @@ import { HttpProxy } from './proxy';
  * @see {@link HttpProxy}
  */
 @Target()
-export class HttpState extends HttpProxy {
+export class HttpState
+  extends Provider<typeof HttpProxy>('sgrud.utils.http.HttpProxy') {
 
   /**
    * Symbol property describing a callback to a Subscribable emitting an array
