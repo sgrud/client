@@ -8,6 +8,10 @@
  *   - {@link HttpClient}: a simple `rxjs/ajax`-based HTTP client
  *   - {@link HttpProxy}: abstract base class for proxies/interceptors
  *   - {@link HttpState}: built-in HTTP proxy collecting request progress
+ * - Super utilities:
+ *   - {@link Provide}: Provides the decorated constructor to extending classes
+ *   - {@link Provider}: Mixin-style functional provider of base classes
+ *   - {@link Registry}: extended `Map`, containing all providing constructors
  * - Dependency-linking utilities
  *   - {@link Linker}: extended `Map`, containing all linked instances
  *   - {@link Target}: class decorator linking the decorated constructor
