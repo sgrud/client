@@ -186,7 +186,7 @@ export class HttpClient implements HttpHandler {
    * ```ts
    * import { HttpClient } from '@sgrud/utils';
    *
-   * new HttpClient().handle({
+   * HttpClient.prototype.handle({
    *   method: 'GET',
    *   url: 'https://example.com',
    *   headers: { 'x-example': 'value' }

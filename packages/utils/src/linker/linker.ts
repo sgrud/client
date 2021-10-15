@@ -2,10 +2,10 @@ import { Singleton } from '../singleton';
 
 /**
  * Linker is the {@link Singleton} link map used by {@link Uplink} to lookup the
- * linked instances of targeted constructors. To preemptively insert some links,
- * the inherited `MapConstructor` or `Map.prototype.set` methods are available.
- * The former will insert all entries into this singleton link map, internally
- * calling the latter for each.
+ * linked instances of targeted constructors. To programmatically insert some
+ * links, the inherited `MapConstructor` or `Map.prototype.set` methods are
+ * available. The former will insert all entries into this singleton link map,
+ * internally calling the latter for each.
  *
  * @decorator {@link Singleton}
  * @typeParam K - Target constructor type.
@@ -50,7 +50,7 @@ export class Linker<K extends new () => V, V> extends Map<K, V> {
    * import { Linker } from '@sgrud/utils';
    * import { Service } from './service';
    *
-   * new Linker().get(Service);
+   * new Linker<typeof Service, Service>().get(Service);
    * ```
    */
   public override get(target: K): V {
