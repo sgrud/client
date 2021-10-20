@@ -1,4 +1,4 @@
-name: GitHub Wiki
+name: GitHub Pages
 
 on:
   workflow_dispatch:
@@ -14,28 +14,27 @@ jobs:
       - name: Install node
         uses: actions/setup-node@v2
 
-      - name: Checkout repo
+      - name: Checkout main
         uses: actions/checkout@v2
         with:
-          path: ./repo
-          repository: ${{github.repository}}
+          path: ./main
+          ref: main
 
-      - name: Checkout wiki
+      - name: Checkout docs
         uses: actions/checkout@v2
         with:
-          path: ./wiki
-          repository: ${{github.repository}}.wiki
+          path: ./docs
+          ref: docs
 
       - name: Build docs
-        working-directory: ./repo
+        working-directory: ./main
         run: |
           npm install --ignore-scripts
-          npm install typedoc-github-wiki-theme typedoc-plugin-markdown
-          npx typedoc --theme ./node_modules/typedoc-github-wiki-theme/dist
-          git -C docs --git-dir ../../wiki/.git add -A
+          npx typedoc --githubPages
+          git -C docs --git-dir ../../docs/.git add -A
 
-      - name: Push wiki
-        working-directory: ./wiki
+      - name: Push docs
+        working-directory: ./docs
         run: |
           git diff --cached --quiet && exit
           git config user.name "github-actions[bot]"
