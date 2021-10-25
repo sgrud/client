@@ -22,14 +22,13 @@ jobs:
         with:
           node-version: ${{matrix.node-version}}
 
-      - name: Checkout main
+      - name: Checkout source
         uses: actions/checkout@v2
         with:
-          path: ./main
-          ref: main
+          path: ./source
 
       - name: Run unittests
-        working-directory: ./main
+        working-directory: ./source
         run: |
           npm install
           npm run build

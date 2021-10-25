@@ -1,0 +1,43 @@
+name: SGRUD Pages
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  typedoc:
+    name: Typedoc
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install node
+        uses: actions/setup-node@v2
+
+      - name: Checkout source
+        uses: actions/checkout@v2
+        with:
+          path: ./source
+
+      - name: Checkout target
+        uses: actions/checkout@v2
+        with:
+          path: ./target
+          repository: sgrud/sgrud.github.io
+          ssh-key: ${{secrets.PAGES_DEPLOY_KEY}}
+
+      - name: Build source
+        working-directory: ./source
+        run: |
+          npm install --ignore-scripts
+          npx typedoc --githubPages --out docs/client
+          git -C docs --git-dir ../../target/.git add -A client
+
+      - name: Push target
+        working-directory: ./target
+        run: |
+          git diff --cached --quiet && exit
+          git config user.name github-actions[bot]
+          git config user.email github-actions[bot]@users.noreply.github.com
+          git commit -m ${{github.repository}}@${{github.sha}}
+          git push
