@@ -22,8 +22,7 @@
     "./packages/core",
     "./packages/data",
     "./packages/shell",
-    "./packages/state",
-    "./packages/utils"
+    "./packages/state"
   ],
   "scripts": {
     "build": "npm-run-all --parallel build:*",
@@ -32,7 +31,6 @@
     "build:data": "sgrud construct --cwd ./packages/data",
     "build:shell": "sgrud construct --cwd ./packages/shell",
     "build:state": "sgrud construct --cwd ./packages/state",
-    "build:utils": "sgrud construct --cwd ./packages/utils",
     "postbuild": "node -e 'sgrud.bin.postbuild();' -r ./dist/bin",
     "install": "microbundle -f cjs --cwd ./packages/bin --target node",
     "postinstall": "node -e 'sgrud.bin.postbuild();' -r ./dist/bin",
@@ -44,7 +42,7 @@
     "@babel/runtime": "7.15.4",
     "express": "4.17.1",
     "fs-extra": "10.0.0",
-    "microbundle": "0.14.0",
+    "microbundle": "0.14.1",
     "rollup-plugin-web-worker-loader": "1.6.1",
     "sade": "1.7.4",
     "tslib": "2.3.1"
@@ -59,11 +57,11 @@
     "comlink": "4.3.1",
     "eslint": "7.32.0",
     "eslint-plugin-tsdoc": "0.2.14",
-    "jest": "27.2.5",
+    "jest": "27.3.1",
     "npm-run-all": "4.1.5",
     "rxjs": "7.4.0",
-    "ts-jest": "27.0.5",
-    "typedoc": "0.22.5"
+    "ts-jest": "27.0.7",
+    "typedoc": "0.22.7"
   },
   "jest": {
     "preset": "ts-jest",

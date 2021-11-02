@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-import { Assign } from '@sgrud/utils';
+import { Assign } from '@sgrud/core';
 import { readFileSync } from 'fs-extra';
 import { Module } from 'module';
 import { resolve } from 'path';

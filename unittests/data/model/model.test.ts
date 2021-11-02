@@ -14,7 +14,7 @@ describe('@sgrud/data/model/model', () => {
   ];
 
   describe('statically committing an operation', () => {
-    it('throws an error because the query pool is empty', (done) => {
+    it('throws an error because no querier is available', (done) => {
       Class.commit('query test').pipe(catchError((error) => {
         expect(error).toBeInstanceOf(RangeError);
         done();
@@ -25,8 +25,8 @@ describe('@sgrud/data/model/model', () => {
   });
 
   describe('statically calling the deleteAll operation', () => {
-    it('throws an error because the query pool is empty', (done) => {
-      Class.deleteAll('uuid').pipe(catchError((error) => {
+    it('throws an error because no querier is available', (done) => {
+      Class.deleteAll(['uuid']).pipe(catchError((error) => {
         expect(error).toBeInstanceOf(RangeError);
         done();
 
@@ -36,7 +36,7 @@ describe('@sgrud/data/model/model', () => {
   });
 
   describe('statically calling the deleteOne operation', () => {
-    it('throws an error because the query pool is empty', (done) => {
+    it('throws an error because no querier is available', (done) => {
       Class.deleteOne('uuid').pipe(catchError((error) => {
         expect(error).toBeInstanceOf(RangeError);
         done();
@@ -47,7 +47,7 @@ describe('@sgrud/data/model/model', () => {
   });
 
   describe('statically calling the findAll operation', () => {
-    it('throws an error because the query pool is empty', (done) => {
+    it('throws an error because no querier is available', (done) => {
       Class.findAll({ }, []).pipe(catchError((error) => {
         expect(error).toBeInstanceOf(RangeError);
         done();
@@ -58,7 +58,7 @@ describe('@sgrud/data/model/model', () => {
   });
 
   describe('statically calling the findOne operation', () => {
-    it('throws an error because the query pool is empty', (done) => {
+    it('throws an error because no querier is available', (done) => {
       Class.findOne({ }, []).pipe(catchError((error) => {
         expect(error).toBeInstanceOf(RangeError);
         done();
@@ -71,7 +71,7 @@ describe('@sgrud/data/model/model', () => {
   describe('statically calling the saveAll operation', () => {
     const model = new Class(...values);
 
-    it('throws an error because the query pool is empty', (done) => {
+    it('throws an error because no querier is available', (done) => {
       Class.saveAll([model], []).pipe(catchError((error) => {
         expect(error).toBeInstanceOf(RangeError);
         done();
@@ -84,7 +84,7 @@ describe('@sgrud/data/model/model', () => {
   describe('statically calling the saveOne operation', () => {
     const model = new Class(...values);
 
-    it('throws an error because the query pool is empty', (done) => {
+    it('throws an error because no querier is available', (done) => {
       Class.saveOne(model, []).pipe(catchError((error) => {
         expect(error).toBeInstanceOf(RangeError);
         done();
@@ -136,10 +136,10 @@ describe('@sgrud/data/model/model', () => {
       { sub: [
         'uuid'
       ] },
-      { query: () => ({
+      { call: () => ({
         empty: undefined,
         param: null,
-        query: [
+        call: [
           'sub'
         ]
       }) }
@@ -147,7 +147,7 @@ describe('@sgrud/data/model/model', () => {
 
     it('returns the unraveled graph', () => {
       expect(Class.unravel(graph)).toBe(
-        '{uuid sub{uuid} query(param:null){sub}}'
+        '{uuid sub{uuid} call(param:null){sub}}'
       );
     });
   });
@@ -276,7 +276,7 @@ describe('@sgrud/data/model/model', () => {
       ).subscribe(validate);
 
       subscription.add(done);
-      model.clear('created', 'modified').subscribe(validate);
+      model.clear(['created', 'modified']).subscribe(validate);
     });
 
     it('clears the model partially', () => {
@@ -287,7 +287,7 @@ describe('@sgrud/data/model/model', () => {
   describe('committing an operation on an instance', () => {
     const model = new Class(...values);
 
-    it('throws an error because the query pool is empty', (done) => {
+    it('throws an error because no querier is available', (done) => {
       model.commit('query test').pipe(catchError((error) => {
         expect(error).toBeInstanceOf(RangeError);
         done();
@@ -300,7 +300,7 @@ describe('@sgrud/data/model/model', () => {
   describe('calling the delete operation on an instance', () => {
     const model = new Class(...values);
 
-    it('throws an error because the query pool is empty', (done) => {
+    it('throws an error because no querier is available', (done) => {
       model.delete().pipe(catchError((error) => {
         expect(error).toBeInstanceOf(RangeError);
         done();
@@ -313,7 +313,7 @@ describe('@sgrud/data/model/model', () => {
   describe('calling the find operation on an instance', () => {
     const model = new Class(...values);
 
-    it('throws an error because the query pool is empty', (done) => {
+    it('throws an error because no querier is available', (done) => {
       model.find([]).pipe(catchError((error) => {
         expect(error).toBeInstanceOf(RangeError);
         done();
@@ -326,7 +326,7 @@ describe('@sgrud/data/model/model', () => {
   describe('calling the save operation on an instance', () => {
     const model = new Class(...values);
 
-    it('throws an error because the query pool is empty', (done) => {
+    it('throws an error because no querier is available', (done) => {
       model.save().pipe(catchError((error) => {
         expect(error).toBeInstanceOf(RangeError);
         done();

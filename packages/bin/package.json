@@ -12,7 +12,6 @@
     "@sgrud/data": null,
     "@sgrud/shell": null,
     "@sgrud/state": null,
-    "@sgrud/utils": null,
     "tslib": "globalThis"
   },
   "bin": {
@@ -23,12 +22,12 @@
     "@babel/runtime": "7.15.4",
     "express": "4.17.1",
     "fs-extra": "10.0.0",
-    "microbundle": "0.14.0",
+    "microbundle": "0.14.1",
     "rollup-plugin-web-worker-loader": "1.6.1",
     "sade": "1.7.4",
     "tslib": "2.3.1"
   },
   "optionalDependencies": {
-    "@sgrud/utils": "latest"
+    "@sgrud/core": "latest"
   }
 }

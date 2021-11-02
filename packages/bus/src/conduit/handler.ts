@@ -1,4 +1,4 @@
-import { Singleton, Spawn, Thread } from '@sgrud/utils';
+import { Singleton, Spawn, Thread } from '@sgrud/core';
 import { from, Observable, switchMap } from 'rxjs';
 import ConduitWorkerThread from 'worker:./worker';
 import { ConduitWorker } from './worker';
@@ -9,7 +9,7 @@ import { ConduitWorker } from './worker';
  *
  * @example Library-wide ConduitHandle.
  * ```ts
- * import { ConduitHandle } from '@sgrud/bus';
+ * import type { ConduitHandle } from '@sgrud/bus';
  *
  * const sgrudHandle: ConduitHandle = 'io.github.sgrud';
  * ```
@@ -85,6 +85,7 @@ export class ConduitHandler {
    * @example Set the `'io.github.sgrud.example'` conduit.
    * ```ts
    * import { ConduitHandler } from '@sgrud/bus';
+   * import { of } from 'rxjs';
    *
    * new ConduitHandler([
    *   ['io.github.sgrud.example', of('published')]

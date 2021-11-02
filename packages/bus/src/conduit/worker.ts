@@ -1,4 +1,4 @@
-import { Thread } from '@sgrud/utils';
+import { Thread } from '@sgrud/core';
 import { BehaviorSubject, finalize, map, merge, Observable, shareReplay, switchMap } from 'rxjs';
 import { ConduitHandle, ConduitValue } from './handler';
 

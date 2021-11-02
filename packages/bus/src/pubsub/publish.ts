@@ -1,4 +1,4 @@
-import { TypeOf } from '@sgrud/utils';
+import { TypeOf } from '@sgrud/core';
 import { Observable, Subject } from 'rxjs';
 import { ConduitHandle, ConduitHandler } from '../conduit/handler';
 
@@ -27,11 +27,13 @@ import { ConduitHandle, ConduitHandler } from '../conduit/handler';
  * @example Publish the `'io.github.sgrud.example'` conduit.
  * ```ts
  * import { Publish } from '@sgrud/bus';
- * import { Subject } from 'rxjs';
+ * import type { Subject } from 'rxjs';
  *
  * export class Publisher {
+ *
  *   @Publish('io.github.sgrud.example')
  *   public readonly conduit!: Subject<any>;
+ *
  * }
  *
  * Publisher.prototype.conduit.complete();
@@ -43,9 +45,14 @@ import { ConduitHandle, ConduitHandler } from '../conduit/handler';
  * import { Subject } from 'rxjs';
  *
  * export class Publisher {
+ *
  *   @Publish('io.github.sgrud', 'scope')
  *   public readonly conduit: Subject<any> = new Subject<any>();
- *   public constructor(public readonly scope: string) { }
+ *
+ *   public constructor(
+ *     public readonly scope: string
+ *   ) { }
+ *
  * }
  *
  * const publisher = new Publisher('example');

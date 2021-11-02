@@ -7,8 +7,21 @@
   "main": "../../dist/core/index.js",
   "exports": "../../dist/core/index.esm.js",
   "unpkg": "../../dist/core/index.umd.js",
+  "amdNames": {
+    "@babel/runtime/helpers/assertThisInitialized": null,
+    "@babel/runtime/helpers/construct": null,
+    "@babel/runtime/helpers/createClass": null,
+    "@babel/runtime/helpers/createForOfIteratorHelperLoose": null,
+    "@babel/runtime/helpers/extends": null,
+    "@babel/runtime/helpers/inheritsLoose": null,
+    "@babel/runtime/helpers/wrapNativeSuper": null,
+    "comlink": "Comlink",
+    "rxjs/ajax": null
+  },
   "dependencies": {
     "@babel/runtime": "7.15.4",
+    "comlink": "4.3.1",
+    "rxjs": "7.4.0",
     "tslib": "2.3.1"
   }
 }

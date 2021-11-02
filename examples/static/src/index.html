@@ -11,12 +11,11 @@
 <script nomodule src="/node_modules/rxjs/dist/bundles/rxjs.umd.min.js"></script>
 <script nomodule src="/node_modules/tslib/tslib.js"></script>
 
-<script nomodule src="/node_modules/@sgrud/utils/index.umd.js"></script>
-<script nomodule src="/node_modules/@sgrud/state/index.umd.js"></script>
-<script nomodule src="/node_modules/@sgrud/shell/index.umd.js"></script>
-<script nomodule src="/node_modules/@sgrud/data/index.umd.js"></script>
 <script nomodule src="/node_modules/@sgrud/core/index.umd.js"></script>
 <script nomodule src="/node_modules/@sgrud/bus/index.umd.js"></script>
+<script nomodule src="/node_modules/@sgrud/data/index.umd.js"></script>
+<script nomodule src="/node_modules/@sgrud/shell/index.umd.js"></script>
+<script nomodule src="/node_modules/@sgrud/state/index.umd.js"></script>
 
 <script nomodule>
   console.log(sgrud);
@@ -33,7 +32,6 @@
       "@sgrud/data": "/node_modules/@sgrud/data/index.esm.js",
       "@sgrud/shell": "/node_modules/@sgrud/shell/index.esm.js",
       "@sgrud/state": "/node_modules/@sgrud/state/index.esm.js",
-      "@sgrud/utils": "/node_modules/@sgrud/utils/index.esm.js",
       "comlink": "/node_modules/comlink/dist/esm/comlink.min.js",
       "rxjs": "/node_modules/rxjs/dist/esm/index.js",
       "rxjs/ajax": "/node_modules/rxjs/dist/esm/ajax/index.js",
@@ -48,7 +46,6 @@
   import * as data from '@sgrud/data';
   import * as shell from '@sgrud/shell';
   import * as state from '@sgrud/state';
-  import * as utils from '@sgrud/utils';
 
-  console.log({ bus, core, data, shell, state, utils });
+  console.log({ bus, core, data, shell, state });
 </script>

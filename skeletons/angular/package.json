@@ -1,22 +1,23 @@
 {
   "name": "sgrud-skeleton-angular",
   "version": "0.0.0",
-  "browserslist": [],
   "main": "./dist/sgrud-skeleton-angular.min.js",
   "private": true,
   "scripts": {
     "build": "ng build",
     "postbuild": "sgrud postbuild"
   },
+  "browserslist": [
+  ],
   "devDependencies": {
     "@angular-builders/custom-webpack": "12.1.3",
-    "@angular/cli": "12.2.9",
-    "@angular/core": "12.2.9",
-    "@angular/elements": "12.2.9",
-    "@angular/platform-browser": "12.2.9",
-    "@angular/platform-browser-dynamic": "12.2.9",
+    "@angular/cli": "12.2.12",
+    "@angular/core": "12.2.12",
+    "@angular/elements": "12.2.12",
+    "@angular/platform-browser": "12.2.12",
+    "@angular/platform-browser-dynamic": "12.2.12",
     "@sgrud/bin": "../../dist/bin",
     "tslib": "2.3.1",
-    "typescript": "4.4.3"
+    "typescript": "4.4.4"
   }
 }

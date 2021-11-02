@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@babel/runtime": "7.15.4",
-    "preact": "10.5.14",
+    "preact": "10.5.15",
     "preact-custom-element": "4.2.1",
     "tslib": "2.3.1"
   },

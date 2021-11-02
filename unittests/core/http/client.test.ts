@@ -1,0 +1,82 @@
+import { HttpClient } from '@sgrud/core';
+
+describe('@sgrud/core/http/client', () => {
+
+  const targets = [
+    HttpClient.prototype,
+    new HttpClient()
+  ];
+
+  const methods = [
+    HttpClient.delete.bind(HttpClient),
+    HttpClient.get.bind(HttpClient),
+    HttpClient.head.bind(HttpClient),
+    HttpClient.patch.bind(HttpClient),
+    HttpClient.post.bind(HttpClient),
+    HttpClient.put.bind(HttpClient)
+  ];
+
+  const requests = [
+    'DELETE',
+    'GET',
+    'HEAD',
+    'PATCH',
+    'POST',
+    'PUT'
+  ];
+
+  const xhrMock = {
+    status: 200,
+    open: jest.fn(),
+    send: jest.fn(),
+    addEventListener: jest.fn(),
+    setRequestHeader: jest.fn(),
+    getAllResponseHeaders: jest.fn(),
+    upload: { addEventListener: jest.fn() },
+    response: { body: null }
+  };
+
+  afterEach(() => xhrMock.addEventListener.mockClear());
+  global.XMLHttpRequest = jest.fn().mockImplementation(() => xhrMock) as any;
+
+  describe.each(targets)('firing a custom request through %O', (target) => {
+    it('dispatches a custom XHR', (done) => {
+      const subscription = target.handle({
+        method: 'HEAD',
+        url: 'url'
+      }).subscribe((response) => {
+        expect(response.response).toBe(xhrMock.response);
+        expect(xhrMock.open).toHaveBeenCalledWith('HEAD', 'url', true);
+        expect(xhrMock.send).toHaveBeenCalledWith();
+      });
+
+      setTimeout(() => {
+        xhrMock.addEventListener.mock.calls.find(([call]) => {
+          return call === 'load';
+        })[1]({ type: 'load' });
+      });
+
+      subscription.add(done);
+    });
+  });
+
+  describe.each(methods)('firing a %O request', (method) => {
+    const request = requests[methods.indexOf(method)];
+
+    it('dispatches a XHR ' + request, (done) => {
+      const subscription = method('url', undefined).subscribe(() => {
+        expect(xhrMock.open).toHaveBeenCalledWith(request, 'url', true);
+        expect(xhrMock.send).toHaveBeenCalledWith();
+      });
+
+      setTimeout(() => {
+        xhrMock.addEventListener.mock.calls.find(([call]) => {
+          return call === 'load';
+        })[1]({ type: 'load' });
+      });
+
+      subscription.add(done);
+    });
+  });
+
+});

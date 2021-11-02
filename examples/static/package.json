@@ -14,10 +14,9 @@
     "@sgrud/data": "../../dist/data",
     "@sgrud/shell": "../../dist/shell",
     "@sgrud/state": "../../dist/state",
-    "@sgrud/utils": "../../dist/utils",
     "comlink": "4.3.1",
-    "core-js-bundle": "3.18.2",
-    "http-server": "13.0.2",
+    "core-js-bundle": "3.19.0",
+    "http-server": "14.0.0",
     "rxjs": "7.4.0",
     "tslib": "2.3.1"
   }

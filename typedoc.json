@@ -10,8 +10,7 @@
     "./packages/core/index.ts",
     "./packages/data/index.ts",
     "./packages/shell/index.ts",
-    "./packages/state/index.ts",
-    "./packages/utils/index.ts"
+    "./packages/state/index.ts"
   ],
   "sort": [
     "static-first",

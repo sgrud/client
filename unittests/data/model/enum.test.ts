@@ -66,4 +66,10 @@ describe('@sgrud/data/model/enum', () => {
     });
   });
 
+  describe('calling the abstract constructor', () => {
+    it('throws an error', () => {
+      expect(() => new (Enum as any)()).toThrowError(EvalError);
+    });
+  });
+
 });
