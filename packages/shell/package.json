@@ -8,7 +8,7 @@
   "exports": "../../dist/shell/index.esm.js",
   "unpkg": "../../dist/shell/index.umd.js",
   "dependencies": {
-    "@babel/runtime": "7.15.4",
+    "@babel/runtime": "7.16.0",
     "tslib": "2.3.1"
   }
 }

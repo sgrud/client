@@ -38,8 +38,8 @@
     "test": "eslint -f compact ./ && jest && typedoc"
   },
   "dependencies": {
-    "@babel/plugin-transform-runtime": "7.15.8",
-    "@babel/runtime": "7.15.4",
+    "@babel/plugin-transform-runtime": "7.16.0",
+    "@babel/runtime": "7.16.0",
     "express": "4.17.1",
     "fs-extra": "10.0.0",
     "microbundle": "0.14.1",
@@ -132,6 +132,7 @@
       "@typescript-eslint/no-namespace": "off",
       "@typescript-eslint/no-non-null-assertion": "off",
       "@typescript-eslint/no-shadow": "error",
+      "@typescript-eslint/no-unsafe-argument": "off",
       "@typescript-eslint/no-unsafe-assignment": "off",
       "@typescript-eslint/no-unsafe-call": "off",
       "@typescript-eslint/no-unsafe-member-access": "off",

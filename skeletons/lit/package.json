@@ -17,7 +17,7 @@
     "lit/decorators.js": "lit"
   },
   "dependencies": {
-    "@babel/runtime": "7.15.4",
+    "@babel/runtime": "7.16.0",
     "@lit/reactive-element": "1.0.1",
     "lit": "2.0.2",
     "lit-element": "3.0.1",

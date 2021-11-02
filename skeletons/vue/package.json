@@ -12,9 +12,9 @@
   },
   "devDependencies": {
     "@sgrud/bin": "../../dist/bin",
-    "@vue/cli-plugin-babel": "4.5.14",
-    "@vue/cli-plugin-typescript": "4.5.14",
-    "@vue/cli-service": "4.5.14",
+    "@vue/cli-plugin-babel": "4.5.15",
+    "@vue/cli-plugin-typescript": "4.5.15",
+    "@vue/cli-service": "4.5.15",
     "core-js": "3.19.0",
     "node-sass": "6.0.1",
     "sass-loader": "version-10",
