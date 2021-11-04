@@ -4,7 +4,7 @@ import { execSync } from 'child_process';
 import { createHash } from 'crypto';
 import { existsSync, readFileSync, writeFileSync } from 'fs-extra';
 import { dirname, join, normalize, relative, resolve, sep } from 'path';
-import { cli } from './cli';
+import { cli } from './.cli';
 
 cli.command('postbuild')
   .describe('Replicates exported package.json files in the SGRUD monorepo')

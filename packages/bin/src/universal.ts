@@ -1,6 +1,6 @@
 import express from 'express';
 import { join, resolve } from 'path';
-import { cli } from './cli';
+import { cli } from './.cli';
 
 cli.command('universal')
   .describe('Runs SGRUD in universal (SSR) mode using `puppeteer`')

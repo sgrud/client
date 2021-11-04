@@ -29,7 +29,7 @@
  * @packageDocumentation
  */
 
-import { cli } from './src/cli';
+import { cli } from './src/.cli';
 import { construct } from './src/construct';
 import { kickstart } from './src/kickstart';
 import { postbuild } from './src/postbuild';

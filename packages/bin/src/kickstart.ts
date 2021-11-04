@@ -3,7 +3,7 @@
 import { execSync } from 'child_process';
 import { copySync, existsSync, mkdirpSync } from 'fs-extra';
 import { join, resolve } from 'path';
-import { cli } from './cli';
+import { cli } from './.cli';
 
 cli.command('kickstart [library]')
   .describe('Kickstarts an angular, lit, preact or vue-based SGRUD project')

@@ -4,7 +4,7 @@ import { Assign } from '@sgrud/core';
 import { readFileSync } from 'fs-extra';
 import { Module } from 'module';
 import { resolve } from 'path';
-import { cli } from './cli';
+import { cli } from './.cli';
 
 cli.command('construct [...entries]')
   .describe('Builds a SGRUD-based project using `microbundle`')

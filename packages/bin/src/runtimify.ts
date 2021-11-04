@@ -2,7 +2,7 @@
 
 import { createWriteStream } from 'fs-extra';
 import { join, relative, resolve } from 'path';
-import { cli } from './cli';
+import { cli } from './.cli';
 
 cli.command('runtimify <...modules>')
   .describe('Extracts and bundles runtime helpers using `microbundle`')
