@@ -43,7 +43,7 @@ export interface Provider<V> {
  * @typeParam K - Magic string type.
  * @returns Providing constructor.
  *
- * @example
+ * @example Extend a provided class.
  * ```ts
  * import { Provider } from '@sgrud/core';
  * import type { Base } from 'example-module';
@@ -57,6 +57,9 @@ export interface Provider<V> {
  *
  * }
  * ```
+ *
+ * @see {@link Provide}
+ * @see {@link Registry}
  */
 export function Provider<
   V extends Provide<K, V>,

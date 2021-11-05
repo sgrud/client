@@ -23,13 +23,13 @@ describe('@sgrud/core/super/provider', () => {
   }
 
   describe('extending a provider by magic string', () => {
-    const instance = new Class('child');
-    const extending = new class extends Class { }('grandchild');
+    const instance = new Class('instance');
+    const extending = new class extends Class { }('extending');
     const unknown = new class { };
 
     it('calls the super constructor', () => {
-      expect(instance.classParam).toBe('child');
-      expect(instance.baseParam).toBe('child');
+      expect(instance.classParam).toBe('instance');
+      expect(instance.baseParam).toBe('instance');
       expect(instance.classSelf()).toBeInstanceOf(Class);
       expect(instance.baseSelf()).toBeInstanceOf(Base);
       expect(instance.self()).toBeInstanceOf(Class);
@@ -45,8 +45,8 @@ describe('@sgrud/core/super/provider', () => {
     });
 
     it('does not interfere with downstream inheritance', () => {
-      expect(extending.classParam).toBe('grandchild');
-      expect(extending.baseParam).toBe('grandchild');
+      expect(extending.classParam).toBe('extending');
+      expect(extending.baseParam).toBe('extending');
       expect(extending.classSelf()).toBeInstanceOf(Class);
       expect(extending.baseSelf()).toBeInstanceOf(Base);
       expect(extending.self()).toBeInstanceOf(Class);
