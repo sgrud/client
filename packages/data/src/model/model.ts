@@ -12,6 +12,8 @@ import { Enum } from './enum';
  * within this namespace are only applicable to classes extending the abstract
  * model base class, as their generic type argument is always constrained to
  * this abstract base class.
+ *
+ * @see {@link Model}
  */
 export namespace Model {
   /* eslint-disable @typescript-eslint/indent */
@@ -111,6 +113,8 @@ export namespace Model {
  * interfaces within this namespace are only applicable to classes extending the
  * abstract model base class, as their generic type argument is always
  * constrained to this abstract base class.
+ *
+ * @see {@link Model}
  */
 export namespace Model.Filter {
 

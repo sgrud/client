@@ -54,7 +54,6 @@ export namespace Querier {
  * import type { Model, Querier } from '@sgrud/data';
  * import { Provider, Target } from '@sgrud/core';
  * import type { Observable } from 'rxjs';
- * import { throwError } from 'rxjs';
  *
  * @Target<typeof ExampleQuerier>()
  * export class ExampleQuerier
@@ -68,7 +67,7 @@ export namespace Querier {
  *     operation: Querier.Operation,
  *     variables: Querier.Variables
  *   ): Observable<any> {
- *     return throwError(() => new Error('Stub!'))
+ *     throw new Error('Stub!');
  *   }
  *
  *   public override priority(model: Model.Type<any>): number {

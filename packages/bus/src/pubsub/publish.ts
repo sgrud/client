@@ -17,7 +17,7 @@ import { ConduitHandle, ConduitHandler } from '../conduit/handler';
  * decorated prototype property. If no `source` is supplied, a new Subject will
  * be created and implicitly supplied as `source`.
  *
- * Precautions should be taken to ensure completion of the supplied observable
+ * Precautions should be taken to ensure completion of the supplied Observable
  * source as otherwise memory leaks may occur due to dangling subscriptions.
  *
  * @param handle - Conduit handle.
@@ -32,7 +32,7 @@ import { ConduitHandle, ConduitHandler } from '../conduit/handler';
  * export class Publisher {
  *
  *   @Publish('io.github.sgrud.example')
- *   public readonly conduit!: Subject<any>;
+ *   private readonly conduit!: Subject<any>;
  *
  * }
  *
@@ -47,10 +47,10 @@ import { ConduitHandle, ConduitHandler } from '../conduit/handler';
  * export class Publisher {
  *
  *   @Publish('io.github.sgrud', 'scope')
- *   public readonly conduit: Subject<any> = new Subject<any>();
+ *   private readonly conduit: Subject<any> = new Subject<any>();
  *
  *   public constructor(
- *     public readonly scope: string
+ *     private readonly scope: string
  *   ) { }
  *
  * }
