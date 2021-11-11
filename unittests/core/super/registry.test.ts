@@ -21,7 +21,7 @@ describe('@sgrud/core/super/registry', () => {
     public self: () => this = () => this;
   }
 
-  describe('creating a new registry', () => {
+  describe('instantiating a registry', () => {
     const registry = new Registry();
 
     it('returns the singleton registry', () => {

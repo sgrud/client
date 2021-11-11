@@ -16,7 +16,7 @@ describe('@sgrud/core/utility/singleton', () => {
   })
   class ClassTwo extends Class { }
 
-  describe('creating a new instance', () => {
+  describe('instantiating a singleton', () => {
     const classOne = new ClassOne(2);
     const classTwo = new ClassTwo(3);
 

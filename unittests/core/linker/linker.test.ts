@@ -16,7 +16,7 @@ describe('@sgrud/core/linker/linker', () => {
     }
   }
 
-  describe('creating a new linker', () => {
+  describe('instantiating a linker', () => {
     const linker = new Linker();
 
     it('returns the singleton linker', () => {

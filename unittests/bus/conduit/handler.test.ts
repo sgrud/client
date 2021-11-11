@@ -3,7 +3,7 @@ import { BehaviorSubject, catchError, of, Subject, timeout } from 'rxjs';
 
 describe('@sgrud/bus/conduit/handler', () => {
 
-  describe('creating a new handler', () => {
+  describe('instantiating a handler', () => {
     const handler = new ConduitHandler();
 
     it('returns the singleton handler', () => {
