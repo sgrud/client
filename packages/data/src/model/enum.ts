@@ -12,11 +12,11 @@ export abstract class Enum extends globalThis.String {
   /**
    * Private abstract constructor (which should never be called).
    *
-   * @throws EvalError.
+   * @throws TypeError.
    */
   // @ts-expect-error missing super call
   private constructor() {
-    throw new EvalError();
+    throw new TypeError();
   }
 
 }

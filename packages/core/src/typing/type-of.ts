@@ -254,10 +254,10 @@ export abstract class TypeOf {
   /**
    * Private abstract constructor (which should never be called).
    *
-   * @throws EvalError.
+   * @throws TypeError.
    */
   private constructor() {
-    throw new EvalError();
+    throw new TypeError();
   }
 
 }

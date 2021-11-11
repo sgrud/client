@@ -39,7 +39,7 @@ describe('@sgrud/core/super/registry', () => {
     });
 
     it('throws if no constructor was registered for the magic string', () => {
-      expect(() => new unknown()).toThrowError(RangeError);
+      expect(() => new unknown()).toThrowError(ReferenceError);
     });
   });
 

@@ -16,7 +16,7 @@ describe('@sgrud/data/model/model', () => {
   describe('statically committing an operation', () => {
     it('throws an error because no querier is available', (done) => {
       Class.commit('query test').pipe(catchError((error) => {
-        expect(error).toBeInstanceOf(RangeError);
+        expect(error).toBeInstanceOf(ReferenceError);
         done();
 
         return NEVER;
@@ -27,7 +27,7 @@ describe('@sgrud/data/model/model', () => {
   describe('statically calling the deleteAll operation', () => {
     it('throws an error because no querier is available', (done) => {
       Class.deleteAll(['uuid']).pipe(catchError((error) => {
-        expect(error).toBeInstanceOf(RangeError);
+        expect(error).toBeInstanceOf(ReferenceError);
         done();
 
         return NEVER;
@@ -38,7 +38,7 @@ describe('@sgrud/data/model/model', () => {
   describe('statically calling the deleteOne operation', () => {
     it('throws an error because no querier is available', (done) => {
       Class.deleteOne('uuid').pipe(catchError((error) => {
-        expect(error).toBeInstanceOf(RangeError);
+        expect(error).toBeInstanceOf(ReferenceError);
         done();
 
         return NEVER;
@@ -49,7 +49,7 @@ describe('@sgrud/data/model/model', () => {
   describe('statically calling the findAll operation', () => {
     it('throws an error because no querier is available', (done) => {
       Class.findAll({ }, []).pipe(catchError((error) => {
-        expect(error).toBeInstanceOf(RangeError);
+        expect(error).toBeInstanceOf(ReferenceError);
         done();
 
         return NEVER;
@@ -60,7 +60,7 @@ describe('@sgrud/data/model/model', () => {
   describe('statically calling the findOne operation', () => {
     it('throws an error because no querier is available', (done) => {
       Class.findOne({ }, []).pipe(catchError((error) => {
-        expect(error).toBeInstanceOf(RangeError);
+        expect(error).toBeInstanceOf(ReferenceError);
         done();
 
         return NEVER;
@@ -73,7 +73,7 @@ describe('@sgrud/data/model/model', () => {
 
     it('throws an error because no querier is available', (done) => {
       Class.saveAll([model], []).pipe(catchError((error) => {
-        expect(error).toBeInstanceOf(RangeError);
+        expect(error).toBeInstanceOf(ReferenceError);
         done();
 
         return NEVER;
@@ -86,7 +86,7 @@ describe('@sgrud/data/model/model', () => {
 
     it('throws an error because no querier is available', (done) => {
       Class.saveOne(model, []).pipe(catchError((error) => {
-        expect(error).toBeInstanceOf(RangeError);
+        expect(error).toBeInstanceOf(ReferenceError);
         done();
 
         return NEVER;
@@ -289,7 +289,7 @@ describe('@sgrud/data/model/model', () => {
 
     it('throws an error because no querier is available', (done) => {
       model.commit('query test').pipe(catchError((error) => {
-        expect(error).toBeInstanceOf(RangeError);
+        expect(error).toBeInstanceOf(ReferenceError);
         done();
 
         return NEVER;
@@ -302,7 +302,7 @@ describe('@sgrud/data/model/model', () => {
 
     it('throws an error because no querier is available', (done) => {
       model.delete().pipe(catchError((error) => {
-        expect(error).toBeInstanceOf(RangeError);
+        expect(error).toBeInstanceOf(ReferenceError);
         done();
 
         return NEVER;
@@ -315,7 +315,7 @@ describe('@sgrud/data/model/model', () => {
 
     it('throws an error because no querier is available', (done) => {
       model.find([]).pipe(catchError((error) => {
-        expect(error).toBeInstanceOf(RangeError);
+        expect(error).toBeInstanceOf(ReferenceError);
         done();
 
         return NEVER;
@@ -328,7 +328,7 @@ describe('@sgrud/data/model/model', () => {
 
     it('throws an error because no querier is available', (done) => {
       model.save().pipe(catchError((error) => {
-        expect(error).toBeInstanceOf(RangeError);
+        expect(error).toBeInstanceOf(ReferenceError);
         done();
 
         return NEVER;

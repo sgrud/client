@@ -117,7 +117,7 @@ export class Registry<
    * as long as the actual extended constructor is not registered (and therefore
    * the intermediary class is still acting as inheritance cache), the extending
    * class cannot be instantiated, called etc. Doing so will result in a
-   * `RangeError` being thrown (as the actual constructor is out of range).
+   * ReferenceError being thrown.
    *
    * @param registration - Magic string.
    * @returns Providing constructor.
@@ -146,7 +146,7 @@ export class Registry<
             if (!this.cached.has(registration)) {
               cache = super.get(registration)!;
             } else if (args[0] !== 'prototype') {
-              throw new RangeError(registration);
+              throw new ReferenceError(registration);
             }
           }
 

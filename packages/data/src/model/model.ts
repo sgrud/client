@@ -339,7 +339,7 @@ export abstract class Model<M extends Model = any> {
    * @param variables - Variables within the `operation`.
    * @typeParam T - Extending model instance type.
    * @returns Observable of the commitment.
-   * @throws Observable of RangeError.
+   * @throws Observable of ReferenceError.
    *
    * @example Commit a `query`-type operation.
    * ```ts
@@ -374,7 +374,7 @@ export abstract class Model<M extends Model = any> {
 
     if (!compatible.length) {
       const { entity } = new this();
-      return throwError(() => new RangeError(`${type}:${entity}`));
+      return throwError(() => new ReferenceError(`${type}:${entity}`));
     }
 
     return compatible[compatible.length - 1].commit(
