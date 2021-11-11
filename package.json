@@ -67,6 +67,9 @@
     "preset": "ts-jest",
     "collectCoverage": true,
     "forceExit": true,
+    "collectCoverageFrom": [
+      "<rootDir>/dist/*/index.js"
+    ],
     "coverageReporters": [
       "text"
     ],
@@ -76,7 +79,8 @@
       }
     },
     "moduleNameMapper": {
-      "@sgrud/(.*)": "<rootDir>/dist/$1"
+      "@sgrud/(.*)": "<rootDir>/dist/$1",
+      ".mocks/(.*)": "<rootDir>/unittests/.mocks/$1"
     },
     "roots": [
       "<rootDir>/unittests"

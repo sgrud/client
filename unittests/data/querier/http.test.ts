@@ -1,3 +1,4 @@
+import xhr from '.mocks/xhr.mock';
 import { Linker, Target } from '@sgrud/core';
 import { HttpQuerier, Model } from '@sgrud/data';
 
@@ -10,20 +11,6 @@ describe('@sgrud/data/querier/http', () => {
   new Linker<Target<HttpQuerier>, HttpQuerier>([
     [HttpQuerier, new HttpQuerier('url')]
   ]);
-
-  const xhrMock = {
-    status: 200,
-    open: jest.fn(),
-    send: jest.fn(),
-    addEventListener: jest.fn(),
-    setRequestHeader: jest.fn(),
-    getAllResponseHeaders: jest.fn(),
-    upload: { addEventListener: jest.fn() },
-    response: { body: null }
-  };
-
-  afterEach(() => xhrMock.addEventListener.mockClear());
-  global.XMLHttpRequest = jest.fn().mockImplementation(() => xhrMock) as any;
 
   describe('targeting the HttpQuerier', () => {
     const linker = new Linker<Target<HttpQuerier>, HttpQuerier>();
@@ -40,17 +27,12 @@ describe('@sgrud/data/querier/http', () => {
 
     it('commits the operation through the HttpQuerier', (done) => {
       const subscription = Class.commit(operation).subscribe(() => {
-        expect(xhrMock.open).toHaveBeenCalledWith('POST', 'url', true);
-        expect(xhrMock.send).toHaveBeenCalledWith(request);
-      });
-
-      setTimeout(() => {
-        xhrMock.addEventListener.mock.calls.find(([call]) => {
-          return call === 'load';
-        })[1]({ type: 'load' });
+        expect(xhr.open).toHaveBeenCalledWith('POST', 'url', true);
+        expect(xhr.send).toHaveBeenCalledWith(request);
       });
 
       subscription.add(done);
+      xhr.trigger('load');
     });
   });
 
@@ -72,17 +54,12 @@ describe('@sgrud/data/querier/http', () => {
 
     it('overrides the previously targeted HttpQuerier', (done) => {
       const subscription = Class.commit(operation).subscribe(() => {
-        expect(xhrMock.open).toHaveBeenCalledWith('POST', 'override', true);
-        expect(xhrMock.send).toHaveBeenCalledWith(request);
-      });
-
-      setTimeout(() => {
-        xhrMock.addEventListener.mock.calls.find(([call]) => {
-          return call === 'load';
-        })[1]({ type: 'load' });
+        expect(xhr.open).toHaveBeenCalledWith('POST', 'override', true);
+        expect(xhr.send).toHaveBeenCalledWith(request);
       });
 
       subscription.add(done);
+      xhr.trigger('load');
     });
   });
 

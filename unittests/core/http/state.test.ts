@@ -1,21 +1,8 @@
+import xhr from '.mocks/xhr.mock';
 import { HttpClient, HttpState, Linker } from '@sgrud/core';
 import { filter, from } from 'rxjs';
 
 describe('@sgrud/core/http/state', () => {
-
-  const xhrMock = {
-    status: 200,
-    open: jest.fn(),
-    send: jest.fn(),
-    addEventListener: jest.fn(),
-    setRequestHeader: jest.fn(),
-    getAllResponseHeaders: jest.fn(),
-    upload: { addEventListener: jest.fn() },
-    response: { body: null }
-  };
-
-  afterEach(() => xhrMock.addEventListener.mockClear());
-  global.XMLHttpRequest = jest.fn().mockImplementation(() => xhrMock) as any;
 
   describe('firing a request', () => {
     const test = jest.fn((next) => {
@@ -34,25 +21,11 @@ describe('@sgrud/core/http/state', () => {
         url: 'url'
       }).subscribe(test);
 
-      setTimeout(() => {
-        xhrMock.addEventListener.mock.calls.find(([call]) => {
-          return call === 'progress';
-        })[1]({ type: 'progress' });
-
-        setTimeout(() => {
-          xhrMock.upload.addEventListener.mock.calls.find(([call]) => {
-            return call === 'progress';
-          })[1]({ type: 'progress' });
-
-          setTimeout(() => {
-            xhrMock.addEventListener.mock.calls.find(([call]) => {
-              return call === 'load';
-            })[1]({ type: 'load' });
-          });
-        });
-      });
-
       subscription.add(done);
+
+      xhr.trigger('progress');
+      xhr.trigger('progress', null, true);
+      xhr.trigger('load');
     });
   });
 
@@ -70,24 +43,15 @@ describe('@sgrud/core/http/state', () => {
         filter((next) => Boolean(next.length))
       ).subscribe(test);
 
-      setTimeout(() => {
-        xhrMock.addEventListener.mock.calls.find(([call]) => {
-          return call === 'progress';
-        })[1]({ type: 'progress' });
-
-        setTimeout(() => {
-          xhrMock.addEventListener.mock.calls.find(([call]) => {
-            return call === 'load';
-          })[1]({ type: 'load' });
-        });
-      });
-
       HttpClient.get('url').subscribe(() => {
         expect(test).toHaveBeenCalledTimes(2);
         subscription.unsubscribe();
       });
 
       subscription.add(done);
+
+      xhr.trigger('progress');
+      xhr.trigger('load');
     });
   });
 

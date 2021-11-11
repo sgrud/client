@@ -1,3 +1,4 @@
+import xhr from '.mocks/xhr.mock';
 import { HttpClient } from '@sgrud/core';
 
 describe('@sgrud/core/http/client', () => {
@@ -25,38 +26,19 @@ describe('@sgrud/core/http/client', () => {
     'PUT'
   ];
 
-  const xhrMock = {
-    status: 200,
-    open: jest.fn(),
-    send: jest.fn(),
-    addEventListener: jest.fn(),
-    setRequestHeader: jest.fn(),
-    getAllResponseHeaders: jest.fn(),
-    upload: { addEventListener: jest.fn() },
-    response: { body: null }
-  };
-
-  afterEach(() => xhrMock.addEventListener.mockClear());
-  global.XMLHttpRequest = jest.fn().mockImplementation(() => xhrMock) as any;
-
   describe.each(targets)('firing a custom request through %O', (target) => {
     it('dispatches a custom XHR', (done) => {
       const subscription = target.handle({
         method: 'HEAD',
         url: 'url'
       }).subscribe((response) => {
-        expect(response.response).toBe(xhrMock.response);
-        expect(xhrMock.open).toHaveBeenCalledWith('HEAD', 'url', true);
-        expect(xhrMock.send).toHaveBeenCalledWith();
-      });
-
-      setTimeout(() => {
-        xhrMock.addEventListener.mock.calls.find(([call]) => {
-          return call === 'load';
-        })[1]({ type: 'load' });
+        expect(response.response).toBe(xhr.response);
+        expect(xhr.open).toHaveBeenCalledWith('HEAD', 'url', true);
+        expect(xhr.send).toHaveBeenCalledWith();
       });
 
       subscription.add(done);
+      xhr.trigger('load');
     });
   });
 
@@ -65,17 +47,12 @@ describe('@sgrud/core/http/client', () => {
 
     it('dispatches a XHR ' + request, (done) => {
       const subscription = method('url', undefined).subscribe(() => {
-        expect(xhrMock.open).toHaveBeenCalledWith(request, 'url', true);
-        expect(xhrMock.send).toHaveBeenCalledWith();
-      });
-
-      setTimeout(() => {
-        xhrMock.addEventListener.mock.calls.find(([call]) => {
-          return call === 'load';
-        })[1]({ type: 'load' });
+        expect(xhr.open).toHaveBeenCalledWith(request, 'url', true);
+        expect(xhr.send).toHaveBeenCalledWith();
       });
 
       subscription.add(done);
+      xhr.trigger('load');
     });
   });
 

@@ -51,7 +51,7 @@ describe('@sgrud/data/querier/querier', () => {
     }
   }
 
-  beforeEach(() => {
+  afterEach(() => {
     mocks[0].mockClear();
     mocks[1].mockClear();
   });
