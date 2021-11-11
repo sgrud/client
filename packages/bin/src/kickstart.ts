@@ -68,7 +68,7 @@ export async function kickstart({
   library?: string;
 
 } = { }): Promise<void> {
-  const gitPath = join(cwd, 'node_modules', '.cache', 'sgrud');
+  const gitPath = join(cwd, 'node_modules', '.cache', '@sgrud', 'kickstart');
   const pkgJson = require(resolve(join(__dirname, 'package.json')));
 
   if (!existsSync(gitPath)) {
