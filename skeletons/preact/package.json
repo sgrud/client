@@ -8,8 +8,8 @@
   "private": true,
   "scripts": {
     "build": "sgrud construct --format modern,umd",
-    "install": "sgrud runtimify @babel/runtime:helpers",
-    "postbuild": "sgrud postbuild && cp ./src/index.html ./dist"
+    "postbuild": "sgrud postbuild && cp ./src/index.html ./dist",
+    "prepare": "sgrud runtimify @babel/runtime:helpers"
   },
   "amdNames": {
     "@babel/runtime/helpers/inheritsLoose": null,
@@ -25,5 +25,41 @@
     "@sgrud/bin": "../../dist/bin",
     "@types/preact-custom-element": "4.0.1",
     "node-sass": "6.0.1"
+  },
+  "webDependencies": {
+    "@babel/runtime": {
+      "exports": {
+        "@babel/runtime/helpers/": "./helpers/esm/"
+      },
+      "unpkg": [
+        "./runtimify.js"
+      ]
+    },
+    "preact": {
+      "exports": {
+        "preact": "./dist/preact.module.js",
+        "preact/jsx-runtime": "./jsx-runtime/dist/jsxRuntime.modern.js"
+      },
+      "unpkg": [
+        "./dist/preact.umd.js",
+        "./jsx-runtime/dist/jsxRuntime.umd.js"
+      ]
+    },
+    "preact-custom-element": {
+      "exports": {
+        "preact-custom-element": "./dist/preact-custom-element.esm.js"
+      },
+      "unpkg": [
+        "./dist/preact-custom-element.umd.js"
+      ]
+    },
+    "tslib": {
+      "exports": {
+        "tslib": "./tslib.es6.js"
+      },
+      "unpkg": [
+        "./tslib.js"
+      ]
+    }
   }
 }

@@ -1,4 +1,4 @@
-import { HttpClient, Provider, TypeOf } from '@sgrud/core';
+import { HttpClient, Kernel, Provider, TypeOf } from '@sgrud/core';
 import { Observable, pluck } from 'rxjs';
 import { Model } from '../model/model';
 import { Querier } from './querier';
@@ -48,7 +48,7 @@ export class HttpQuerier
    * @param prioritize - Dynamic or static prioritization.
    */
   public constructor(
-    private readonly endpoint: string,
+    private readonly endpoint: string = `${new Kernel().endpoint}/data`,
     private readonly prioritize: number | Map<Model.Type<any>, number> = 0
   ) {
     super();

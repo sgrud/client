@@ -1,7 +1,7 @@
 {
   "name": "sgrud-skeleton-angular",
   "version": "0.0.0",
-  "main": "./dist/sgrud-skeleton-angular.min.js",
+  "unpkg": "./dist/sgrud-skeleton-angular.min.js",
   "private": true,
   "scripts": {
     "build": "ng build",

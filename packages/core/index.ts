@@ -43,6 +43,7 @@
 export * from './src/http/client';
 export * from './src/http/proxy';
 export * from './src/http/state';
+export * from './src/kernel/kernel';
 export * from './src/linker/factor';
 export * from './src/linker/linker';
 export * from './src/linker/target';
