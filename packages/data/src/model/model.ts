@@ -1024,7 +1024,7 @@ export abstract class Model<M extends Model = any> {
    * instance-scoped {@link assign} method, as it takes all supplied `parts` and
    * assigns them to the instantiated and returned model. The constructor
    * furthermore wires some internal functionality, e.g., creates a new
-   * {@link changes} behavior subject which emits every mutation this model
+   * {@link changes} BehaviorSubject which emits every mutation this model
    * instance experiences.
    *
    * @param parts - Array of parts to assign.
@@ -1157,7 +1157,7 @@ export abstract class Model<M extends Model = any> {
    * while supplying the UUID of an instance of a class extending the abstract
    * model base class. Calling this method furthermore {@link clear}s the model
    * instance and finalizes its deletion by calling complete on the internal
-   * {@link changes} behavior subject of the model instance the delete method
+   * {@link changes} BehaviorSubject of the model instance the delete method
    * was called upon.
    *
    * @param this - Polymorphic this.

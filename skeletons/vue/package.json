@@ -1,5 +1,5 @@
 {
-  "name": "sgrud-skeleton-view",
+  "name": "sgrud-skeleton-vue",
   "version": "0.0.0",
   "main": "./dist/vue-component.min.js",
   "private": true,

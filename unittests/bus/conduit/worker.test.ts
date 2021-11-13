@@ -27,7 +27,7 @@ describe('@sgrud/bus/conduit/worker', () => {
     });
   });
 
-  describe('subscribing to a behavior subject conduit', () => {
+  describe('subscribing to a BehaviorSubject conduit', () => {
     const worker = new ConduitWorker();
     const behaviorSubject = new BehaviorSubject<string>('default');
 

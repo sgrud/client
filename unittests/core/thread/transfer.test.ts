@@ -25,8 +25,8 @@ describe('@sgrud/core/thread/transfer', () => {
     }>;
   }
 
-  describe('getting an observable', () => {
-    it('returns the promisified observable', (done) => {
+  describe('getting an Observable', () => {
+    it('returns the promisified Observable', (done) => {
       from(Class.worker).pipe(
         switchMap((worker: any) => Promise.resolve(worker.observable))
       ).subscribe({
@@ -38,8 +38,8 @@ describe('@sgrud/core/thread/transfer', () => {
     });
   });
 
-  describe('subscribing to an observable', () => {
-    it('observes values emitted by the observable', (done) => {
+  describe('subscribing to an Observable', () => {
+    it('observes values emitted by the Observable', (done) => {
       const test = jest.fn((number) => {
         expect(test).toHaveBeenCalledTimes(number);
       });
@@ -57,8 +57,8 @@ describe('@sgrud/core/thread/transfer', () => {
     });
   });
 
-  describe('subscribing to a behavior subject', () => {
-    it('observes values emitted by the behavior subject', (done) => {
+  describe('subscribing to a BehaviorSubject', () => {
+    it('observes values emitted by the BehaviorSubject', (done) => {
       from(Class.worker).pipe(
         switchMap((worker: any) => Promise.resolve(worker.subject)),
         switchMap((behaviorSubject: any) => behaviorSubject),

@@ -11,7 +11,7 @@ describe('@sgrud/bus/conduit/handler', () => {
     });
   });
 
-  describe('subscribing to a subject conduit', () => {
+  describe('subscribing to a Subject conduit', () => {
     const handler = new ConduitHandler();
     const subject = new Subject<string>();
 
@@ -35,7 +35,7 @@ describe('@sgrud/bus/conduit/handler', () => {
     });
   });
 
-  describe('subscribing to a behavior subject conduit', () => {
+  describe('subscribing to a BehaviorSubject conduit', () => {
     const handler = new ConduitHandler();
     const behaviorSubject = new BehaviorSubject<string>('default');
 
