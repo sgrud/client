@@ -16,7 +16,7 @@
     "preact/jsx-runtime": "jsxRuntime"
   },
   "dependencies": {
-    "@babel/runtime": "7.16.0",
+    "@babel/runtime": "7.16.3",
     "preact": "10.5.15",
     "preact-custom-element": "4.2.1",
     "tslib": "2.3.1"
