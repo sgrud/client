@@ -29,5 +29,8 @@
   },
   "optionalDependencies": {
     "@sgrud/core": "latest"
-  }
+  },
+  "files": [
+    "./README.md"
+  ]
 }

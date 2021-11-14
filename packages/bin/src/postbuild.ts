@@ -2,7 +2,7 @@
 
 import { execSync } from 'child_process';
 import { createHash } from 'crypto';
-import { existsSync, readFileSync, writeFileSync } from 'fs-extra';
+import { copyFileSync, existsSync, readFileSync, writeFileSync } from 'fs-extra';
 import { dirname, join, normalize, relative, resolve, sep } from 'path';
 import { cli } from './.cli';
 
@@ -66,6 +66,7 @@ export async function postbuild({
   const writes = [];
 
   for (const bundle of module.exports?.values?.() ?? ['.']) {
+    const assets = [];
     const origin = join(cwd, bundle, 'package.json');
     const source = require(resolve(origin));
     const target = { } as Record<string, string>;
@@ -79,6 +80,11 @@ export async function postbuild({
           if (existsSync(join(bundle, source[key]))) {
             target[key] = source[key];
           }
+          break;
+
+        case 'files':
+          assets.push(...source[key]);
+          delete source[key];
           break;
 
         case 'source':
@@ -125,18 +131,38 @@ export async function postbuild({
         target[key] = './' + relative(folder, join(bundle, target[key]));
       }
 
-      const content = JSON.stringify({ ...source, ...target, digest });
-      writes.push([origin, output, content]);
+      writes.push([
+        origin,
+        output,
+        JSON.stringify({
+          ...source,
+          ...target,
+          digest
+        })
+      ]);
+
+      for (const file of assets) {
+        writes.push([
+          join(cwd, bundle, file),
+          join(cwd, folder, file),
+          undefined
+        ] as const);
+      }
     }
   }
 
   if (writes.length) {
-    console.log('Replicating exported package.json');
+    console.log('Replicating exported package metadata');
     const [_, g, b] = ['\x1b[0m', '\x1b[32m', '\x1b[34m'];
 
     for (const [origin, output, content] of writes) {
       console.log(b, origin, g, '→', b, output, _);
-      writeFileSync(output, content);
+
+      if (content) {
+        writeFileSync(output, content);
+      } else {
+        copyFileSync(origin, output);
+      }
     }
   }
 }
