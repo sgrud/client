@@ -202,8 +202,8 @@ export class Kernel {
     this.loading = new Subject<Module>();
     this.shimmed = '';
 
-    const listing = document.querySelectorAll('script[type^="importmap"]');
-    const scripts = Array.from(listing) as HTMLScriptElement[];
+    const queried = document.querySelectorAll('script[type^="importmap"]');
+    const scripts = Array.from(queried) as HTMLScriptElement[];
 
     for (const script of scripts) {
       this.shimmed ||= script.type.toLowerCase().replace('importmap', '');
@@ -219,11 +219,11 @@ export class Kernel {
       }
     }
 
-    HttpClient.get<string[]>(`${endpoint}/insmod`).pipe(
+    HttpClient.get<Module>(`${endpoint}/insmod`).pipe(
       pluck('response'),
-      switchMap((names) => forkJoin(names.map((i) => this.resolve(i)))),
-      switchMap((modules) => forkJoin(modules.map((i) => this.insmod(i))))
-    ).pipe(ignoreElements()).subscribe(this.loading);
+      switchMap((response) => this.insmod(response)),
+      ignoreElements()
+    ).subscribe(this.loading);
   }
 
   /**
@@ -335,7 +335,7 @@ export class Kernel {
           src: `${this.nodeModules}/${module.name}/${module.unpkg}`,
           type: 'text/javascript'
         }));
-      } else {
+      } else if (this.loaders.size > 1) {
         return throwError(() => ReferenceError(module.name));
       }
 

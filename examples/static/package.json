@@ -3,21 +3,43 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "install": "sgrud runtimify @babel/runtime:helpers",
+    "install": "npm pack ../../dist/* ../../skeletons/*/dist",
+    "postinstall": "npm install --no-save *.tgz && rm *.tgz",
     "start": "http-server -e js -p 4000"
   },
   "dependencies": {
-    "@babel/runtime": "7.16.0",
-    "@sgrud/bin": "../../dist/bin",
-    "@sgrud/bus": "../../dist/bus",
-    "@sgrud/core": "../../dist/core",
-    "@sgrud/data": "../../dist/data",
-    "@sgrud/shell": "../../dist/shell",
-    "@sgrud/state": "../../dist/state",
-    "comlink": "4.3.1",
-    "core-js-bundle": "3.19.0",
-    "http-server": "14.0.0",
-    "rxjs": "7.4.0",
-    "tslib": "2.3.1"
+    "core-js-bundle": "3.19.1",
+    "es-module-shims": "1.3.1",
+    "http-server": "14.0.0"
+  },
+  "optionalDependencies": {
+    "@sgrud/bin": "*",
+    "@sgrud/bus": "*",
+    "@sgrud/core": "*",
+    "@sgrud/data": "*",
+    "@sgrud/shell": "*",
+    "@sgrud/state": "*",
+    "sgrud-skeleton-angular": "*",
+    "sgrud-skeleton-lit": "*",
+    "sgrud-skeleton-preact": "*",
+    "sgrud-skeleton-vue": "*"
+  },
+  "sgrudDependencies": {
+    "sgrud-skeleton-angular": {
+      "maxver": "0.0.0",
+      "minver": "0.0.0"
+    },
+    "sgrud-skeleton-lit": {
+      "maxver": "0.0.0",
+      "minver": "0.0.0"
+    },
+    "sgrud-skeleton-preact": {
+      "maxver": "0.0.0",
+      "minver": "0.0.0"
+    },
+    "sgrud-skeleton-vue": {
+      "maxver": "0.0.0",
+      "minver": "0.0.0"
+    }
   }
 }
