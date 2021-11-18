@@ -2,6 +2,7 @@ import { BehaviorSubject, filter, finalize, map, observable, Observable, Subscri
 import { AjaxConfig as Request, AjaxResponse as Response } from 'rxjs/ajax';
 import { Target } from '../linker/target';
 import { Provider } from '../super/provider';
+import { Singleton } from '../utility/singleton';
 import { HttpHandler } from './client';
 import { HttpProxy } from './proxy';
 
@@ -11,12 +12,14 @@ import { HttpProxy } from './proxy';
  * it emits an array of all currently open connections every time a new request
  * is fired or a running request is completed.
  *
+ * @decorator {@link Singleton}
  * @decorator {@link Target}
  *
  * @see {@link HttpClient}
  * @see {@link HttpProxy}
  */
 @Target<typeof HttpState>()
+@Singleton<typeof HttpState>()
 export class HttpState
   extends Provider<typeof HttpProxy>('sgrud.core.http.HttpProxy') {
 

@@ -1,8 +1,16 @@
 import xhr from '.mocks/xhr.mock';
-import { HttpClient, HttpState, Linker } from '@sgrud/core';
+import { HttpClient, HttpState } from '@sgrud/core';
 import { filter, from } from 'rxjs';
 
 describe('@sgrud/core/http/state', () => {
+
+  describe('instantiating a linker', () => {
+    const httpState = new HttpState();
+
+    it('returns the singleton linker', () => {
+      expect(httpState).toBe(new HttpState());
+    });
+  });
 
   describe('firing a request', () => {
     const test = jest.fn((next) => {
@@ -30,7 +38,7 @@ describe('@sgrud/core/http/state', () => {
   });
 
   describe('firing a request', () => {
-    const httpState = new Linker<typeof HttpState, HttpState>().get(HttpState);
+    const httpState = new HttpState();
     const test = jest.fn(([next]) => {
       switch (test.mock.calls.length) {
         case 1: expect(next.type).toBe('download_progress'); break;
