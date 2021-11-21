@@ -73,6 +73,15 @@ export async function postbuild({
 
     for (const key in source) {
       switch (key) {
+        case 'dependencies':
+        case 'devDependencies':
+          for (const dependency in source[key]) {
+            if (dependency.startsWith('.')) {
+              source[key][dependency] = 'latest';
+            }
+          }
+          break;
+
         case 'exports':
         case 'main':
         case 'module':
