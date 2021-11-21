@@ -130,6 +130,7 @@ export async function runtimify({
       entries: [out],
       external: 'none',
       format: 'umd',
+      generateTypes: false,
       name: filter.flatMap((i) => i.split(/\W/)).filter(Boolean).join('.'),
       output: out,
       'pkg-main': false
