@@ -18,10 +18,7 @@ describe('@sgrud/core/kernel/kernel', () => {
       unpkg: 'sha512-depmod-unpkg'
     },
     sgrudDependencies: {
-      submod: {
-        minver: '0.0.1',
-        maxver: '0.1.0'
-      }
+      submod: '*'
     },
     webDependencies: {
       webmod: {
@@ -46,12 +43,165 @@ describe('@sgrud/core/kernel/kernel', () => {
     }
   } as Module;
 
+  /**
+   * Exclusive [semver](https://semver.org) ranges/versions. Subset taken from:
+   * https://github.com/npm/node-semver/blob/main/test/fixtures/range-exclude.js
+   */
+  const excludes = [
+    ['^1.2.3+build', '2.0.0'],
+    ['^1.2.3+build', '1.2.0'],
+    ['^1.2.3', '1.2.3-pre'],
+    ['^1.2', '1.2.0-pre'],
+    ['>1.2', '1.3.0-beta'],
+    ['<=1.2.3', '1.2.3-beta'],
+    ['^1.2.3', '1.2.3-beta'],
+    ['0.7.x', '0.7.0-asdf'],
+    ['>=0.7.x', '0.7.0-asdf'],
+    ['<=0.7.x', '0.7.0-asdf'],
+    ['1.0.0', '1.0.1'],
+    ['>=1.0.0', '0.0.0'],
+    ['>=1.0.0', '0.0.1'],
+    ['>=1.0.0', '0.1.0'],
+    ['>1.0.0', '0.0.1'],
+    ['>1.0.0', '0.1.0'],
+    ['<=2.0.0', '3.0.0'],
+    ['<=2.0.0', '2.9999.9999'],
+    ['<=2.0.0', '2.2.9'],
+    ['<2.0.0', '2.9999.9999'],
+    ['<2.0.0', '2.2.9'],
+    ['>=0.1.97', '0.1.93'],
+    ['0.1.20 || 1.2.4', '1.2.3'],
+    ['>=0.2.3 || <0.0.1', '0.0.3'],
+    ['>=0.2.3 || <0.0.1', '0.2.2'],
+    ['2.x.x', '3.1.3'],
+    ['1.2.x', '1.3.3'],
+    ['1.2.x || 2.x', '3.1.3'],
+    ['1.2.x || 2.x', '1.1.3'],
+    ['2.*.*', '1.1.3'],
+    ['2.*.*', '3.1.3'],
+    ['1.2.*', '1.3.3'],
+    ['1.2.* || 2.*', '3.1.3'],
+    ['1.2.* || 2.*', '1.1.3'],
+    ['2', '1.1.2'],
+    ['2.3', '2.4.1'],
+    ['~0.0.1', '0.1.0-alpha'],
+    ['~0.0.1', '0.1.0'],
+    ['~2.4', '2.5.0'],
+    ['~2.4', '2.3.9'],
+    ['~1', '0.2.3'],
+    ['~1.0', '1.1.0'],
+    ['<1', '1.0.0'],
+    ['>=1.2', '1.1.1'],
+    ['~0.5.4-beta', '0.5.4-alpha'],
+    ['0.7.x', '0.8.2'],
+    ['>=0.7.x', '0.6.2'],
+    ['<0.7.x', '0.7.2'],
+    ['<1.2.3', '1.2.3-beta'],
+    ['1.2.3', '1.2.3-beta'],
+    ['>1.2', '1.2.8'],
+    ['^0.0.1', '0.0.2-alpha'],
+    ['^0.0.1', '0.0.2'],
+    ['^1.2.3', '2.0.0-alpha'],
+    ['^1.2.3', '1.2.2'],
+    ['^1.2', '1.1.9'],
+    ['^1.0.0', '2.0.0-rc1'],
+    ['1.1.x', '1.0.0-a'],
+    ['1.1.x', '1.1.0-a'],
+    ['1.1.x', '1.2.0-a'],
+    ['1.x', '1.0.0-a'],
+    ['1.x', '1.1.0-a'],
+    ['1.x', '1.2.0-a'],
+    ['>=1.0.0 <1.1.0', '1.1.0'],
+    ['>=1.0.0 <1.1.0', '1.1.0-pre'],
+    ['>=1.0.0 <1.1.0-pre', '1.1.0-pre']
+  ] as [string, string][];
+
+  /**
+   * Inclusive [semver](https://semver.org) ranges/versions. Subset taken from:
+   * https://github.com/npm/node-semver/blob/main/test/fixtures/range-include.js
+   */
+  const includes = [
+    ['^1.2.3+build', '1.2.3'],
+    ['^1.2.3+build', '1.3.0'],
+    ['1.0.0', '1.0.0'],
+    ['>=*', '0.2.4'],
+    ['', '1.0.0'],
+    ['>1.0.0', '1.1.0'],
+    ['<=2.0.0', '2.0.0'],
+    ['<=2.0.0', '1.9999.9999'],
+    ['<=2.0.0', '0.2.9'],
+    ['<2.0.0', '1.9999.9999'],
+    ['<2.0.0', '0.2.9'],
+    ['>=1.0.0', '1.0.0'],
+    ['>=1.0.0', '1.0.1'],
+    ['>=1.0.0', '1.1.0'],
+    ['>1.0.0', '1.0.1'],
+    ['>=0.1.97', '0.1.97'],
+    ['0.1.20 || 1.2.4', '1.2.4'],
+    ['>=0.2.3 || <0.0.1', '0.0.0'],
+    ['>=0.2.3 || <0.0.1', '0.2.3'],
+    ['>=0.2.3 || <0.0.1', '0.2.4'],
+    ['||', '1.3.4'],
+    ['2.x.x', '2.1.3'],
+    ['1.2.x', '1.2.3'],
+    ['1.2.x || 2.x', '2.1.3'],
+    ['1.2.x || 2.x', '1.2.3'],
+    ['x', '1.2.3'],
+    ['2.*.*', '2.1.3'],
+    ['1.2.*', '1.2.3'],
+    ['1.2.* || 2.*', '2.1.3'],
+    ['1.2.* || 2.*', '1.2.3'],
+    ['*', '1.2.3'],
+    ['2', '2.1.2'],
+    ['2.3', '2.3.1'],
+    ['~0.0.1', '0.0.1'],
+    ['~0.0.1', '0.0.2'],
+    ['~x', '0.0.9'],
+    ['~2', '2.0.9'],
+    ['~2.4', '2.4.0'],
+    ['~2.4', '2.4.5'],
+    ['~1', '1.2.3'],
+    ['~1.0', '1.0.2'],
+    ['~1.0.3', '1.0.12'],
+    ['>=1', '1.0.0'],
+    ['>= 1', '1.0.0'],
+    ['<1.2', '1.1.1'],
+    ['~0.5.4-pre', '0.5.5'],
+    ['~0.5.4-pre', '0.5.4'],
+    ['0.7.x', '0.7.2'],
+    ['<=0.7.x', '0.7.2'],
+    ['>=0.7.x', '0.7.2'],
+    ['<=0.7.x', '0.6.2'],
+    ['~1.2.1 >=1.2.3', '1.2.3'],
+    ['~1.2.1 =1.2.3', '1.2.3'],
+    ['~1.2.1 1.2.3', '1.2.3'],
+    ['~1.2.1 >=1.2.3 1.2.3', '1.2.3'],
+    ['~1.2.1 1.2.3 >=1.2.3', '1.2.3'],
+    ['>=1.2.1 1.2.3', '1.2.3'],
+    ['1.2.3 >=1.2.1', '1.2.3'],
+    ['>=1.2.3 >=1.2.1', '1.2.3'],
+    ['>=1.2.1 >=1.2.3', '1.2.3'],
+    ['>=1.2', '1.2.8'],
+    ['^1.2.3', '1.8.1'],
+    ['^0.1.2', '0.1.2'],
+    ['^0.1', '0.1.2'],
+    ['^0.0.1', '0.0.1'],
+    ['^1.2', '1.4.2'],
+    ['^1.2 ^1', '1.4.2'],
+    ['^1.2.3-alpha', '1.2.3-pre'],
+    ['^1.2.0-alpha', '1.2.0-pre'],
+    ['^0.0.1-alpha', '0.0.1-beta'],
+    ['^0.0.1-alpha', '0.0.1'],
+    ['^0.1.1-alpha', '0.1.1-beta'],
+    ['^x', '1.2.3'],
+    ['<=7.x', '7.9.9']
+  ] as [string, string][];
+
   describe('instantiating a kernel', () => {
     const kernel = new Kernel();
     const opened = [
       ['GET', 'baseHref/api/sgrud/v1/insmod', true],
-      ['GET', `${modules}/depmod/package.json`, true],
-      ['GET', `${modules}/submod/package.json`, true]
+      ['GET', `${modules}/${submod.name}/package.json`, true]
     ];
     const result = [
       expect.objectContaining({
@@ -62,8 +212,8 @@ describe('@sgrud/core/kernel/kernel', () => {
       expect.objectContaining({
         innerHTML: JSON.stringify({
           imports: {
-            webmod: modules + '/webmod/'
-              + depmod.webDependencies!.webmod.exports!.webmod
+            webmod: modules + '/' + Object.keys(depmod.webDependencies!).pop()
+               + '/' + depmod.webDependencies!.webmod.exports!.webmod
           }
         }),
         type: 'importmap'
@@ -73,7 +223,7 @@ describe('@sgrud/core/kernel/kernel', () => {
     it('calls insmod on the modules', (done) => {
       const subscription = from(kernel).subscribe((next) => {
         expect(next).toBe(xhr.response);
-        expect(xhr.send).toHaveBeenCalledTimes(3);
+        expect(xhr.send).toHaveBeenCalledTimes(2);
         expect(doc.querySelectorAll).toHaveBeenCalled();
 
         opened.forEach((n, i) => {
@@ -87,7 +237,6 @@ describe('@sgrud/core/kernel/kernel', () => {
 
       subscription.add(done);
 
-      xhr.trigger('load', ['depmod']);
       xhr.trigger('load', depmod);
       xhr.trigger('load', submod);
     });
@@ -107,8 +256,8 @@ describe('@sgrud/core/kernel/kernel', () => {
 
   describe('running in a legacy environment', () => {
     const kernel = new Kernel();
-    const module = { ...depmod, name: 'oldmod' } as Module;
-    const opened = ['GET', `${modules}/submod/package.json`, true];
+    const module = { ...depmod, name: 'oldmod' };
+    const opened = ['GET', `${modules}/${submod.name}/package.json`, true];
     const result = expect.objectContaining({
       integrity: module.digest!.unpkg,
       src: `${modules}/${module.name}/${module.unpkg!}`,
@@ -135,51 +284,28 @@ describe('@sgrud/core/kernel/kernel', () => {
     const module = { name: 'nonexistent' } as Module;
 
     it('throws an error', (done) => {
-      const subscription = kernel.insmod(module).pipe(
+      kernel.insmod(module).pipe(
         catchError((error) => of(error))
       ).subscribe((next) => {
         expect(next).toBeInstanceOf(ReferenceError);
+        done();
       });
-
-      subscription.add(done);
     });
   });
 
-  describe('loading an module with a too high version', () => {
+  describe.each(excludes)('"%s" is satisfied by "%s"', (semver, version) => {
     const kernel = new Kernel();
-    const module = { ...depmod, name: 'maxver' } as Module;
 
-    it('throws an error', (done) => {
-      module.sgrudDependencies!.submod!.maxver = '0.0.1';
-      module.sgrudDependencies!.submod!.minver = '0.0.1';
-
-      const subscription = kernel.insmod(module).pipe(
-        catchError((error) => of(error))
-      ).subscribe((next) => {
-        expect(next).toBeInstanceOf(RangeError);
-      });
-
-      subscription.add(done);
-      xhr.trigger('load', submod);
+    it('returns false', () => {
+      expect(kernel.satisfies(version, semver)).toBeFalsy();
     });
   });
 
-  describe('loading an module with a too low version', () => {
+  describe.each(includes)('"%s" is satisfied by "%s"', (semver, version) => {
     const kernel = new Kernel();
-    const module = { ...depmod, name: 'minver' } as Module;
 
-    it('throws an error', (done) => {
-      module.sgrudDependencies!.submod!.maxver = '0.1.0';
-      module.sgrudDependencies!.submod!.minver = '0.1.0';
-
-      const subscription = kernel.insmod(module).pipe(
-        catchError((error) => of(error))
-      ).subscribe((next) => {
-        expect(next).toBeInstanceOf(RangeError);
-      });
-
-      subscription.add(done);
-      xhr.trigger('load', submod);
+    it('returns true', () => {
+      expect(kernel.satisfies(version, semver)).toBeTruthy();
     });
   });
 

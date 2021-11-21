@@ -20,10 +20,7 @@ import { Singleton } from '../utility/singleton';
  *   exports: './module.exports.js',
  *   unpkg: './module.unpkg.js',
  *   sgrudDependencies: {
- *     sgrudDependency: {
- *       minver: '0.0.1',
- *       maxver: '0.1.0'
- *     }
+ *     sgrudDependency: '^0.0.1'
  *   },
  *   webDependencies: {
  *     webDependency: {
@@ -50,7 +47,7 @@ export interface Module {
   /**
    * Module version, formatted as [semver](https://semver.org).
    */
-  readonly version: `${number}.${number}.${number}`;
+  readonly version: string;
 
   /**
    * ESM module entrypoint.
@@ -72,10 +69,7 @@ export interface Module {
   /**
    * Optional SGRUD dependencies.
    */
-  readonly sgrudDependencies?: Record<string, {
-    maxver?: `${number}.${number}.${number}`;
-    minver?: `${number}.${number}.${number}`;
-  }>;
+  readonly sgrudDependencies?: Record<string, string>;
 
   /**
    * Optional runtime dependencies.
@@ -259,8 +253,20 @@ export class Kernel {
       this.loaders.set(module.name, loader);
 
       const chain = [] as Observable<any>[];
-      const depmod = { } as Required<Module>['webDependencies'][string];
+      const dependencies = { } as Required<Module>['webDependencies'][string];
       const { sgrudDependencies, webDependencies } = module;
+
+      if (sgrudDependencies) {
+        chain.push(forkJoin(Object.keys(sgrudDependencies).map((name) => {
+          return this.resolve(name).pipe(switchMap((dependency) => {
+            if (!this.satisfies(dependency.version, sgrudDependencies[name])) {
+              return throwError(() => new RangeError(dependency.name));
+            }
+
+            return this.insmod(dependency);
+          }));
+        })));
+      }
 
       for (const name in webDependencies) {
         const { exports, unpkg } = webDependencies[name];
@@ -270,49 +276,26 @@ export class Kernel {
             const src = `${this.nodeModules}/${name}/${exports[key]}`;
 
             if (!this.imports.has(key)) {
-              this.imports.set(key, (depmod.exports ??= { })[key] = src);
+              this.imports.set(key, (dependencies.exports ??= { })[key] = src);
             }
           }
         }
 
         if (unpkg) {
           for (const bundle of unpkg) {
-            (depmod.unpkg ??= []).push(`${this.nodeModules}/${name}/${bundle}`);
+            const src = `${this.nodeModules}/${name}/${bundle}`;
+
+            if (!dependencies.unpkg?.includes(src)) {
+              (dependencies.unpkg ??= []).push(src);
+            }
           }
         }
       }
 
-      if (sgrudDependencies) {
-        chain.push(forkJoin(Object.keys(sgrudDependencies).map((name) => {
-          return this.resolve(name).pipe(switchMap((dependency) => {
-            const { maxver, minver } = sgrudDependencies[name];
-            const { version } = dependency;
-
-            if (maxver && version.localeCompare(maxver, undefined, {
-              ignorePunctuation: true,
-              numeric: true,
-              sensitivity: 'base'
-            }) > 0) {
-              return throwError(() => new RangeError(dependency.name));
-            }
-
-            if (minver && version.localeCompare(minver, undefined, {
-              ignorePunctuation: true,
-              numeric: true,
-              sensitivity: 'base'
-            }) < 0) {
-              return throwError(() => new RangeError(dependency.name));
-            }
-
-            return this.insmod(dependency);
-          }));
-        })));
-      }
-
       if (!('sgrud' in globalThis) && module.exports) {
-        if (depmod.exports) {
+        if (dependencies.exports) {
           chain.push(this.script({
-            innerHTML: JSON.stringify({ imports: depmod.exports }),
+            innerHTML: JSON.stringify({ imports: dependencies.exports }),
             type: 'importmap' + this.shimmed
           }));
         }
@@ -323,8 +306,8 @@ export class Kernel {
           type: 'module' + this.shimmed
         }));
       } else if (module.unpkg) {
-        if (depmod.unpkg?.length) {
-          chain.push(forkJoin(depmod.unpkg.map((bundle) => this.script({
+        if (dependencies.unpkg?.length) {
+          chain.push(forkJoin(dependencies.unpkg.map((bundle) => this.script({
             src: bundle,
             type: 'text/javascript'
           }))));
@@ -402,13 +385,105 @@ export class Kernel {
         }
       });
 
-      if (!props.src) {
+      if (!props.src || (
+        this.shimmed && props.type?.endsWith(this.shimmed)
+      )) {
         setTimeout(script.onload);
       }
 
       document.head.appendChild(script);
       return () => script.remove();
     });
+  }
+
+  /**
+   * Best-effort [semver](https://semver.org) matcher. The supplied `version`
+   * will be tested against all supplied `ranges`.
+   *
+   * @param semver - Tested semantic version string.
+   * @param ranges - Ranges to test the `version` against.
+   * @returns Wether `semver` satisfies `ranges`.
+   *
+   * @example Test `'1.2.3'` against `'>2 <1 || ~1.2.*'`.
+   * ```ts
+   * import { Kernel } from '@sgrud/core';
+   *
+   * new Kernel().satisfies('1.2.3', '>2 <1 || ~1.2.*'); // true
+   * ```
+   */
+  public satisfies(semver: string, ranges: string): boolean {
+    const input = semver.replace(/\+.*$/, '').split(/[-.]/);
+    const paths = ranges.split(/\s*\|\|\s*/);
+
+    for (const path of paths) {
+      const parts = path.split(/\s+/);
+      let tests = [] as [string, string[]][];
+      let truth = true;
+
+      for (let part of parts) {
+        let mode = '===';
+        part = part.replace(/^[<>=~^]*/, (match) => {
+          if (match && !match.startsWith('=')) {
+            mode = match;
+          }
+
+          return '';
+        }).replace(/\.[X*]/gi, '');
+
+        if (/^[X~*^]*$/i.exec(part)) {
+          tests = [['>=', ['0', '0', '0', '0']]];
+          break;
+        }
+
+        let index;
+        const split = part.replace(/\+.*$/, '').split(/[-.]/);
+
+        if (mode === '^') {
+          index = Math.min(split.lastIndexOf('0') + 1, split.length - 1, 2);
+        } else if (mode === '~') {
+          index = Math.min(split.length - 1, 1);
+        } else {
+          tests.push([mode, split]);
+          continue;
+        }
+
+        const array = new Array(split.length - index).fill(0);
+        const match = split.slice(0, index + 1).concat(...array);
+        match[index] = (parseInt(match[index]) + 1).toString();
+        tests.push(['>=', split], ['<', match]);
+      }
+
+      for (const [mode, taken] of tests) {
+        const latest = input.find((i) => /[^\d]+/.exec(i));
+        const length = Math.min(input.length, taken.length);
+        const source = input.slice(0, length).join('.');
+        const target = taken.slice(0, length).join('.');
+
+        switch (mode) {
+          case '<':
+          case '<=':
+          case '>':
+          case '>=':
+          case '===':
+            break;
+
+          default:
+            truth = false;
+            continue;
+        }
+
+        truth &&= eval(source.localeCompare(target, undefined, {
+          numeric: true,
+          sensitivity: 'base'
+        }) + mode + 0) && (!latest || length === input.length);
+      }
+
+      if (truth) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
 }

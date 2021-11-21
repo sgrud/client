@@ -25,21 +25,9 @@
     "sgrud-skeleton-vue": "*"
   },
   "sgrudDependencies": {
-    "sgrud-skeleton-angular": {
-      "maxver": "0.0.0",
-      "minver": "0.0.0"
-    },
-    "sgrud-skeleton-lit": {
-      "maxver": "0.0.0",
-      "minver": "0.0.0"
-    },
-    "sgrud-skeleton-preact": {
-      "maxver": "0.0.0",
-      "minver": "0.0.0"
-    },
-    "sgrud-skeleton-vue": {
-      "maxver": "0.0.0",
-      "minver": "0.0.0"
-    }
+    "sgrud-skeleton-angular": "*",
+    "sgrud-skeleton-lit": "*",
+    "sgrud-skeleton-preact": "*",
+    "sgrud-skeleton-vue": "*"
   }
 }
