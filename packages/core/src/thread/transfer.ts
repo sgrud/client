@@ -59,8 +59,8 @@ transferHandlers.set('subscriber', {
 });
 
 if (TypeOf.process(globalThis.process)) {
-  const nodeEndpoint = require('comlink/dist/umd/node-adapter.min');
   const { MessageChannel } = require('worker_threads');
+  const nodeEndpoint = require('comlink/dist/umd/node-adapter.min');
 
   /**
    * NodeJS proxy transfer handler. This specific implementation of

@@ -42,8 +42,8 @@ export function Thread() {
     if (TypeOf.function(globalThis.importScripts)) {
       expose(constructor);
     } else if (TypeOf.process(globalThis.process)) {
-      const nodeEndpoint = require('comlink/dist/umd/node-adapter.min');
       const { isMainThread, parentPort } = require('worker_threads');
+      const nodeEndpoint = require('comlink/dist/umd/node-adapter.min');
 
       if (!isMainThread) {
         expose(constructor, nodeEndpoint(parentPort));
