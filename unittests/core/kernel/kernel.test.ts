@@ -293,6 +293,42 @@ describe('@sgrud/core/kernel/kernel', () => {
     });
   });
 
+  describe('loading an module with a too high version', () => {
+    const kernel = new Kernel();
+    const module = { ...depmod, name: 'maxver' } as Module;
+
+    it('throws an error', (done) => {
+      module.sgrudDependencies!.submod = '0.0.1';
+
+      const subscription = kernel.insmod(module).pipe(
+        catchError((error) => of(error))
+      ).subscribe((next) => {
+        expect(next).toBeInstanceOf(RangeError);
+      });
+
+      subscription.add(done);
+      xhr.trigger('load', submod);
+    });
+  });
+
+  describe('loading an module with a too low version', () => {
+    const kernel = new Kernel();
+    const module = { ...depmod, name: 'minver' } as Module;
+
+    it('throws an error', (done) => {
+      module.sgrudDependencies!.submod = '0.1.0';
+
+      const subscription = kernel.insmod(module).pipe(
+        catchError((error) => of(error))
+      ).subscribe((next) => {
+        expect(next).toBeInstanceOf(RangeError);
+      });
+
+      subscription.add(done);
+      xhr.trigger('load', submod);
+    });
+  });
+
   describe.each(excludes)('"%s" is satisfied by "%s"', (semver, version) => {
     const kernel = new Kernel();
 
