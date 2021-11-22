@@ -418,15 +418,12 @@ export class Kernel {
     for (const path of paths) {
       const parts = path.split(/\s+/);
       let tests = [] as [string, string[]][];
-      let truth = true;
+      let valid = true;
 
       for (let part of parts) {
-        let mode = '===';
+        let mode = '=';
         part = part.replace(/^[<>=~^]*/, (match) => {
-          if (match && !match.startsWith('=')) {
-            mode = match;
-          }
-
+          if (match) mode = match;
           return '';
         }).replace(/\.[X*]/gi, '');
 
@@ -458,27 +455,24 @@ export class Kernel {
         const length = Math.min(input.length, taken.length);
         const source = input.slice(0, length).join('.');
         const target = taken.slice(0, length).join('.');
-
-        switch (mode) {
-          case '<':
-          case '<=':
-          case '>':
-          case '>=':
-          case '===':
-            break;
-
-          default:
-            truth = false;
-            continue;
-        }
-
-        truth &&= eval(source.localeCompare(target, undefined, {
+        const weight = source.localeCompare(target, undefined, {
           numeric: true,
           sensitivity: 'base'
-        }) + mode + 0) && (!latest || length === input.length);
+        });
+
+        valid &&= (!latest || length === input.length);
+
+        switch (mode) {
+          case '<': valid &&= weight < 0; break;
+          case '<=': valid &&= weight <= 0; break;
+          case '>': valid &&= weight > 0; break;
+          case '>=': valid &&= weight >= 0; break;
+          case '=': valid &&= weight === 0; break;
+          default: valid = false; continue;
+        }
       }
 
-      if (truth) {
+      if (valid) {
         return true;
       }
     }
