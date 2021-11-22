@@ -2,7 +2,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 declare global {
   interface HTMLElementTagNameMap {
-    'vue-component': VueComponent;
+    'vue-component': Element & VueComponent;
   }
 }
 
