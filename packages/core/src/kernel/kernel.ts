@@ -444,14 +444,14 @@ export class Kernel {
           continue;
         }
 
-        const array = new Array(split.length - index).fill(0);
-        const match = split.slice(0, index + 1).concat(...array);
+        const empty = new Array(split.length - index).fill(0);
+        const match = split.slice(0, index + 1).concat(...empty);
         match[index] = (parseInt(match[index]) + 1).toString();
         tests.push(['>=', split], ['<', match]);
       }
 
       for (const [mode, taken] of tests) {
-        const latest = input.find((i) => /[^\d]+/.exec(i));
+        const latest = input.some((i) => /[^\d]+/.exec(i));
         const length = Math.min(input.length, taken.length);
         const source = input.slice(0, length).join('.');
         const target = taken.slice(0, length).join('.');
@@ -468,7 +468,11 @@ export class Kernel {
           case '>': valid &&= weight > 0; break;
           case '>=': valid &&= weight >= 0; break;
           case '=': valid &&= weight === 0; break;
-          default: valid = false; continue;
+          default: valid = false; break;
+        }
+
+        if (!valid) {
+          break;
         }
       }
 
