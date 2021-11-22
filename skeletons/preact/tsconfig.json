@@ -13,7 +13,8 @@
     "importHelpers": true,
     "inlineSources": true,
     "jsx": "react-jsx",
-    "jsxFragmentFactory": "fragment",
+    "jsxFactory": null,
+    "jsxFragmentFactory": null,
     "jsxImportSource": "preact",
     "sourceMap": true,
 
