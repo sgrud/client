@@ -1,4 +1,4 @@
-import { assign, Linker, pluralize, Provide, provide, Provider, TypeOf } from '@sgrud/core';
+import { assign, Linker, pluralize, Provide, provide, TypeOf } from '@sgrud/core';
 import { BehaviorSubject, finalize, identity, map, observable, Observable, of, OperatorFunction, Subscribable, switchMap, tap, throwError } from 'rxjs';
 import { Querier } from '../querier/querier';
 import { hasMany } from '../relation/has-many';
@@ -366,8 +366,8 @@ export abstract class Model<M extends Model = any> {
     variables: Querier.Variables = { }
   ): Observable<any> {
     const compatible = [];
-    const linker = new Linker<Provider<Querier>, Querier>();
-    const queriers = linker.getAll(Querier as Provider<Querier>);
+    const linker = new Linker<typeof Querier, Querier>();
+    const queriers = linker.getAll(Querier);
     const type = operation.slice(0, operation.indexOf(' '));
 
     for (const querier of queriers) {

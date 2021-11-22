@@ -1,4 +1,4 @@
-import { Linker, Provider, Target } from '@sgrud/core';
+import { Linker, Target } from '@sgrud/core';
 import { Model, Querier } from '@sgrud/data';
 import { forkJoin, Observable, of } from 'rxjs';
 
@@ -57,8 +57,8 @@ describe('@sgrud/data/querier/querier', () => {
   });
 
   describe('targeting Querier subclasses', () => {
-    const linker = new Linker();
-    const querier = linker.getAll(Querier as Provider<Querier>);
+    const linker = new Linker<typeof Querier, Querier>();
+    const querier = linker.getAll(Querier);
 
     it('appends the targets to the queriers', () => {
       expect(querier).toContain(linker.get(QuerierOne));

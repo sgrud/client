@@ -1,4 +1,4 @@
-import { Linker, Target } from '@sgrud/core';
+import { Linker } from '@sgrud/core';
 
 describe('@sgrud/core/linker/linker', () => {
 
@@ -37,7 +37,7 @@ describe('@sgrud/core/linker/linker', () => {
   describe('programmatically inserting an instance', () => {
     const spy = jest.spyOn(Linker.prototype, 'set');
     const arg = [ServiceTwo, new ServiceTwo('three')] as const;
-    const linker = new Linker<Target<ServiceTwo>, ServiceTwo>([arg]);
+    const linker = new Linker<typeof ServiceTwo, ServiceTwo>([arg]);
 
     it('links the target constructor to the inserted instance', () => {
       expect(linker.get(ServiceTwo)).toBeInstanceOf(ServiceTwo);

@@ -1,4 +1,4 @@
-import { HttpClient, HttpHandler, HttpProxy, Linker, Provider, Target } from '@sgrud/core';
+import { HttpClient, HttpHandler, HttpProxy, Linker, Target } from '@sgrud/core';
 import { map, Observable, of } from 'rxjs';
 import { AjaxConfig, AjaxResponse } from 'rxjs/ajax';
 
@@ -36,8 +36,8 @@ describe('@sgrud/core/http/proxy', () => {
   }
 
   describe('targeting HttpProxy subclasses', () => {
-    const linker = new Linker<Provider<HttpProxy>, HttpProxy>();
-    const proxies = linker.getAll(HttpProxy as Provider<HttpProxy>);
+    const linker = new Linker<typeof HttpProxy, HttpProxy>();
+    const proxies = linker.getAll(HttpProxy);
 
     it('appends the targets to the proxy chain', () => {
       expect(proxies).toContain(linker.get(ProxyOne));

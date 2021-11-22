@@ -33,7 +33,7 @@ import { Singleton } from '../utility/singleton';
 
   return self;
 })
-export class Linker<K extends new () => V, V> extends Map<K, V> {
+export class Linker<K extends abstract new () => V, V> extends Map<K, V> {
 
   /**
    * Overridden `Map.prototype.get` method. Looks up the linked instance based
@@ -57,7 +57,7 @@ export class Linker<K extends new () => V, V> extends Map<K, V> {
     let instance = super.get(target);
 
     if (!instance) {
-      instance = new target();
+      instance = new (target as unknown as new () => V)();
       this.set(target, instance);
     }
 
