@@ -7,8 +7,7 @@
     "build": "ng build",
     "postbuild": "sgrud postbuild"
   },
-  "browserslist": [
-  ],
+  "browserslist": [],
   "devDependencies": {
     "@angular-builders/custom-webpack": "13.0.0",
     "@angular/cli": "13.0.3",
