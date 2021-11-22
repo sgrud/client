@@ -368,7 +368,7 @@ export abstract class Model<M extends Model = any> {
     const compatible = [];
     const linker = new Linker<Provider<Querier>, Querier>();
     const queriers = linker.getAll(Querier as Provider<Querier>);
-    const type = operation.substr(0, operation.indexOf(' '));
+    const type = operation.slice(0, operation.indexOf(' '));
 
     for (const querier of queriers) {
       if (querier.types.has(type as Querier.Type)) {

@@ -89,7 +89,7 @@ export async function runtimify({
       const source = resolve(relative(pkg[0], file));
 
       if (name.startsWith(join(...pkg)) || pkg.some((i) => {
-        return i.startsWith('!') && !name.startsWith(join(pkg[0], i.substr(1)));
+        return i.startsWith('!') && !name.startsWith(join(pkg[0], i.slice(1)));
       })) {
         if (name === file) {
           stream.write(`export * from '${source}';\n`);

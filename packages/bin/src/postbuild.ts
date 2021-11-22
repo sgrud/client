@@ -112,7 +112,7 @@ export async function postbuild({
 
         case 'homepage':
           source[key] = [
-            module[key], 'tree', commit.substr(0, 7), normalize(bundle)
+            module[key], 'tree', commit.slice(0, 7), normalize(bundle)
           ].join(sep);
           break;
 
@@ -130,7 +130,7 @@ export async function postbuild({
       let i = 0; while (i < a.length && a[i] === b[i]) i++;
 
       const digest = { } as Record<string, string>;
-      const folder = join(bundle, a.substring(0, i));
+      const folder = join(bundle, a.slice(0, i));
       const output = join(cwd, folder, 'package.json');
       if (existsSync(output)) continue;
 
