@@ -1,6 +1,12 @@
 import { css, CSSResultGroup, html, LitElement, TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
+declare global {
+  interface HTMLElementTagNameMap {
+    'lit-component': LitComponent;
+  }
+}
+
 @customElement('lit-component')
 export default class LitComponent extends LitElement {
 
@@ -24,10 +30,12 @@ export default class LitComponent extends LitElement {
     `;
   }
 
-}
+  protected override createRenderRoot(): Element | ShadowRoot {
+    while (this.shadowRoot?.hasChildNodes()) {
+      this.shadowRoot.removeChild(this.shadowRoot.lastChild!);
+    }
 
-declare global {
-  interface HTMLElementTagNameMap {
-    'lit-component': LitComponent;
+    return super.createRenderRoot();
   }
+
 }

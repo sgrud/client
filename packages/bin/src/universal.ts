@@ -1,16 +1,19 @@
 import express from 'express';
-import { join, resolve } from 'path';
+import { existsSync, readFileSync } from 'fs-extra';
+import { extname, join } from 'path';
+import { launch } from 'puppeteer-core';
 import { cli } from './.cli';
 
-cli.command('universal')
+cli.command('universal [entry]')
   .describe('Runs SGRUD in universal (SSR) mode using `puppeteer`')
   .example('universal # Run with default options')
   .example('universal --host 0.0.0.0 # Listen on all IPs')
-  .example('universal -H 192.168.0.10 -p 8080 # Listen on 192.168.0.10:8080')
+  .example('universal -H 192.168.0.10 -p 4040 # Listen on 192.168.0.10:4040')
+  .option('--chrome', 'Chrome executable', '/usr/bin/chromium-browser')
   .option('--cwd', 'Use an alternative working directory', './')
   .option('-H, --host', 'Host to bind to', '127.0.0.1')
   .option('-p, --port', 'Port to bind to', '4000')
-  .action((opts) => universal({ ...opts }));
+  .action((entry, opts) => universal({ ...opts, entry }));
 
 /**
  * Runs SGRUD in universal (SSR) mode using
@@ -21,9 +24,10 @@ cli.command('universal')
  *   Runs SGRUD in universal (SSR) mode using `puppeteer`
  *
  * Usage
- *   $ sgrud universal [options]
+ *   $ sgrud universal [entry] [options]
  *
  * Options
+ *   --chrome      Chrome executable  (default /usr/bin/chromium-browser)
  *   --cwd         Use an alternative working directory  (default ./)
  *   -H, --host    Host to bind to  (default 127.0.0.1)
  *   -p, --port    Port to bind to  (default 4000)
@@ -32,7 +36,7 @@ cli.command('universal')
  * Examples
  *   $ sgrud universal # Run with default options
  *   $ sgrud universal --host 0.0.0.0 # Listen on all IPs
- *   $ sgrud universal -H 192.168.0.10 -p 8080 # Listen on 192.168.0.10:8080
+ *   $ sgrud universal -H 192.168.0.10 -p 4040 # Listen on 192.168.0.10:4040
  * ```
  *
  * @param options - Options object.
@@ -50,17 +54,26 @@ cli.command('universal')
  * sgrud.bin.universal({ host: '0.0.0.0' });
  * ```
  *
- * @example Listen on `192.168.0.10:8080`.
+ * @example Listen on `192.168.0.10:4040`.
  * ```js
  * require('@sgrud/bin');
- * sgrud.bin.universal({ host: '192.168.0.10', port: '8080' });
+ * sgrud.bin.universal({ host: '192.168.0.10', port: '4040' });
  * ```
  */
 export async function universal({
+  chrome = '/usr/bin/chromium-browser',
   cwd = './',
+  entry = 'index.html',
   host = '127.0.0.1',
   port = '4000'
 }: {
+
+  /**
+   * Chrome executable.
+   *
+   * @defaultValue `'/usr/bin/chromium-browser'`
+   */
+  chrome?: string;
 
   /**
    * Use an alternative working directory.
@@ -68,6 +81,13 @@ export async function universal({
    * @defaultValue `'./'`
    */
   cwd?: string;
+
+  /**
+   * HTML document (relative to `cwd`).
+   *
+   * @defaultValue `'index.html'`
+   */
+  entry?: string;
 
   /**
    * Host to bind to.
@@ -85,19 +105,95 @@ export async function universal({
 
 } = { }): Promise<void> {
   const server = express();
+  const source = readFileSync(join(cwd, entry));
 
-  server.get('*', (request, response) => {
-    response.send(`
-      <html>
-        <head>
-          <title>${request.url}</title>
-        </head>
-        <body>
-          <h1>Not Implemented!</h1>
-          <small>${resolve(join(process.cwd(), cwd))}</small>
-        </body>
-      </html>
-    `);
+  const prerender = new Map<string, Promise<string>>();
+  const puppeteer = await launch({
+    executablePath: chrome,
+    args: [
+      '--disable-setuid-sandbox',
+      '--no-sandbox'
+    ]
+  });
+
+  server.use('/', express.static(cwd, {
+    index: ['index.js'],
+    extensions: ['js'],
+    fallthrough: false
+  }));
+
+  server.use(async(
+    _: Record<string, any>,
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    let cache = prerender.get(req.url);
+
+    if (!cache || req.headers.pragma === 'no-cache') {
+      cache = puppeteer.newPage().then(async(page) => {
+        await page.setRequestInterception(true);
+
+        page.on('domcontentloaded', () => void page.evaluate(() => {
+          delete (Document.prototype as any).adoptedStyleSheets;
+        }));
+
+        page.on('request', (event) => {
+          const url = new URL(event.url());
+          const type = event.resourceType();
+
+          if (type === 'document') {
+            return void event.respond({
+              status: 200,
+              contentType: 'text/html',
+              body: source
+            });
+          } else if (
+            (type === 'fetch' && event.initiator().type === 'script') ||
+            (type === 'script' && url.protocol !== 'data:')
+          ) {
+            const target = join(cwd, url.pathname + (
+              extname(url.pathname) ? '' : '.js'
+            ));
+
+            if (existsSync(target)) {
+              return void event.respond({
+                status: 200,
+                contentType: 'application/javascript',
+                body: readFileSync(target)
+              });
+            }
+          } else if (
+            (type === 'script' && url.protocol === 'data:') ||
+            (type === 'xhr')
+          ) {
+            return void event.continue();
+          }
+
+          return void event.abort();
+        });
+
+        return page;
+      }).then(async(page) => {
+        const url = new URL(req.url, `${req.protocol}://${req.headers.host!}`);
+        await page.goto(url.href, { waitUntil: 'networkidle0' });
+
+        return page;
+      }).then(async(page) => {
+        const html = await page.$eval('html', (e: any) => e.getInnerHTML());
+        await page.close();
+
+        return html;
+      });
+
+      prerender.set(req.url, cache);
+    }
+
+    try {
+      return res.status(200).send(await cache);
+    } catch (error) {
+      return next(error);
+    }
   });
 
   server.listen(Number.parseInt(port), host, () => {

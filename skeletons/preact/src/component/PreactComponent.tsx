@@ -2,6 +2,12 @@ import { Component } from 'preact';
 import { JSXInternal } from 'preact/src/jsx';
 import styles from './PreactComponent.sass';
 
+declare global {
+  interface HTMLElementTagNameMap {
+    'preact-component': PreactComponent;
+  }
+}
+
 interface Props {
   name: string;
 }
