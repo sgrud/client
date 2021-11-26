@@ -425,7 +425,7 @@ export class Kernel {
         part = part.replace(/^[<>=~^]*/, (match) => {
           if (match) mode = match;
           return '';
-        }).replace(/\.[X*]/gi, '');
+        }).replace(/^V|\.[X*]/gi, '');
 
         if (/^[X~*^]*$/i.exec(part)) {
           tests = [['>=', ['0', '0', '0', '0']]];
@@ -437,7 +437,7 @@ export class Kernel {
 
         if (mode === '^') {
           index = Math.min(split.lastIndexOf('0') + 1, split.length - 1, 2);
-        } else if (mode === '~') {
+        } else if (mode === '~' || mode === '~>') {
           index = Math.min(split.length - 1, 1);
         } else {
           tests.push([mode, split]);
