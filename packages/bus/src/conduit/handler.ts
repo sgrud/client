@@ -34,12 +34,12 @@ export interface ConduitValue<T> {
   /**
    * Emitting {@link ConduitHandle}.
    */
-  handle: ConduitHandle;
+  readonly handle: ConduitHandle;
 
   /**
    * Emitted value.
    */
-  value: T;
+  readonly value: T;
 
 }
 
