@@ -8,12 +8,12 @@ describe('@sgrud/data/querier/http', () => {
     protected readonly [Symbol.toStringTag]: string = 'Class';
   }
 
-  new Linker<Target<HttpQuerier>, HttpQuerier>([
+  new Linker<Target<HttpQuerier>>([
     [HttpQuerier, new HttpQuerier('url')]
   ]);
 
   describe('targeting the HttpQuerier', () => {
-    const linker = new Linker<Target<HttpQuerier>, HttpQuerier>();
+    const linker = new Linker<Target<HttpQuerier>>();
     const queriers = linker.getAll(HttpQuerier);
 
     it('appends the HttpQuerier to the queriers', () => {
@@ -37,7 +37,7 @@ describe('@sgrud/data/querier/http', () => {
   });
 
   describe('re-targeting the HttpQuerier', () => {
-    const linker = new Linker<Target<HttpQuerier>, HttpQuerier>();
+    const linker = new Linker<Target<HttpQuerier>>();
     const operation = 'mutation test';
     const request = JSON.stringify({ query: operation, variables: { } });
 

@@ -17,7 +17,7 @@ import { Querier } from './querier';
  * import type { Target } from '@sgrud/core';
  * import { from } from 'rxjs';
  *
- * new Linker<typeof HttpQuerier, HttpQuerier>([
+ * new Linker<typeof HttpQuerier>([
  *   [HttpQuerier, new HttpQuerier('https://api.example.com')]
  * ]);
  * ```

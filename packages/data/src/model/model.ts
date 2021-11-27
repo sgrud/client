@@ -366,7 +366,7 @@ export abstract class Model<M extends Model = any> {
     variables: Querier.Variables = { }
   ): Observable<any> {
     const compatible = [];
-    const linker = new Linker<typeof Querier, Querier>();
+    const linker = new Linker<typeof Querier>();
     const queriers = linker.getAll(Querier);
     const type = operation.slice(0, operation.indexOf(' '));
 

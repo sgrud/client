@@ -16,7 +16,7 @@ import { Singleton } from '../utility/singleton';
  * import { Linker } from '@sgrud/core';
  * import { Service } from './service';
  *
- * new Linker<typeof Service, Service>([
+ * new Linker<typeof Service>([
  *   [Service, new Service('linked')]
  * ]);
  * ```
@@ -33,7 +33,10 @@ import { Singleton } from '../utility/singleton';
 
   return self;
 })
-export class Linker<K extends abstract new () => V, V> extends Map<K, V> {
+export class Linker<
+  K extends abstract new () => V,
+  V = InstanceType<K>
+>extends Map<K, V> {
 
   /**
    * Overridden `Map.prototype.get` method. Looks up the linked instance based
@@ -50,7 +53,7 @@ export class Linker<K extends abstract new () => V, V> extends Map<K, V> {
    * import { Linker } from '@sgrud/core';
    * import { Service } from './service';
    *
-   * new Linker<typeof Service, Service>().get(Service);
+   * new Linker<typeof Service>().get(Service);
    * ```
    */
   public override get(target: K): V {
@@ -77,7 +80,7 @@ export class Linker<K extends abstract new () => V, V> extends Map<K, V> {
    * import { Linker } from '@sgrud/core';
    * import { Service } from './service';
    *
-   * new Linker<typeof Service, Service>().getAll(Service);
+   * new Linker<typeof Service>().getAll(Service);
    * ```
    */
   public getAll(target: K): V[] {

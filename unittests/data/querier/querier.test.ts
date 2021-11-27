@@ -57,7 +57,7 @@ describe('@sgrud/data/querier/querier', () => {
   });
 
   describe('targeting Querier subclasses', () => {
-    const linker = new Linker<typeof Querier, Querier>();
+    const linker = new Linker<typeof Querier>();
     const querier = linker.getAll(Querier);
 
     it('appends the targets to the queriers', () => {

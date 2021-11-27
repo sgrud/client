@@ -36,7 +36,7 @@ export class HttpState
    * import { HttpState, Linker } from '@sgrud/core';
    * import { from } from 'rxjs';
    *
-   * const httpState = new Linker<typeof HttpState, HttpState>().get(HttpState);
+   * const httpState = new Linker<typeof HttpState>().get(HttpState);
    * from(httpState).subscribe(console.log);
    * ```
    */

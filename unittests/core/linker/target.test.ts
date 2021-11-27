@@ -12,7 +12,7 @@ describe('@sgrud/core/linker/target', () => {
   }
 
   describe('applying the decorator', () => {
-    const service = new Linker<Target<Service>, Service>().get(Service);
+    const service = new Linker<Target<Service>>().get(Service);
 
     it('creates the instance from provided constructor parameters', () => {
       expect(service.param).toBe('target');
@@ -20,7 +20,7 @@ describe('@sgrud/core/linker/target', () => {
 
     it('links the instance to the target constructor', () => {
       expect(service).toBeInstanceOf(Service);
-      expect(service).toBe(new Linker<Target<Service>, Service>().get(Service));
+      expect(service).toBe(new Linker<Target<Service>>().get(Service));
     });
   });
 
