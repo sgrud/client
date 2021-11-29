@@ -1,5 +1,3 @@
-/* eslint-disable valid-jsdoc */
-
 import { TypeOf } from '@sgrud/core';
 import { Model } from '../model/model';
 
@@ -24,6 +22,7 @@ export type Property =
  */
 export const property = Symbol('@sgrud/data/model/property');
 
+// eslint-disable-next-line valid-jsdoc
 /**
  * {@link Model} field decorator factory. Using this decorator, Models can be
  * enriched with primitive fields. The compatible primitives are the subset of

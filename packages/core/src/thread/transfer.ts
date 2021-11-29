@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable @typescript-eslint/unbound-method */
 
 import { expose, proxy, ProxyMarked, transferHandlers, wrap } from 'comlink';
 import { Observable, Observer, Subscribable, Subscriber } from 'rxjs';
@@ -70,6 +69,7 @@ if (TypeOf.process(globalThis.process)) {
    * @see https://github.com/GoogleChromeLabs/comlink/issues/313
    */
   transferHandlers.set('proxy', {
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     canHandle: transferHandlers.get('proxy')!.canHandle,
     deserialize: (value: unknown) => {
       return wrap(nodeEndpoint(value));

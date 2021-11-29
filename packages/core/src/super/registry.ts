@@ -43,7 +43,7 @@ export type Registration = `${string}.${string}.${string}`;
  * import { Registry } from '@sgrud/core';
  * import { Service } from './service';
  *
- * new Registry<Registration, Service>([
+ * new Registry<Registration, typeof Service>([
  *   ['sgrud.example.Service', Service]
  * ]);
  * ```

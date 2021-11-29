@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-interface */
 /* eslint-disable @typescript-eslint/no-var-requires */
 
 import { expose, Remote } from 'comlink';
@@ -13,6 +12,7 @@ import { TypeOf } from '../typing/type-of';
  *
  * @see {@link Thread}
  */
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Thread<T> extends Promise<Remote<T>> { }
 
 /**

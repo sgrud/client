@@ -28,13 +28,13 @@ export namespace Model {
     Exclude<keyof T, Exclude<keyof Model, 'uuid' | 'created' | 'modified'>>;
 
   /**
-   * Type alias referencing {@link Model.Filter.Parameters}.
+   * Type alias referencing {@link Params}.
    *
    * @typeParam T - Extending model instance type.
    *
-   * @see {@link Model.Filter.Parameters}
+   * @see {@link Params}
    */
-  export type Filter<T extends Model> = Model.Filter.Parameters<T>;
+  export type Filter<T extends Model> = Filter.Params<T>;
 
   /**
    * Mapped type to compile strongly typed graphs of classes extending the
@@ -144,9 +144,9 @@ export namespace Model.Filter {
 
   /**
    * Interface describing filter expressions which may be employed through the
-   * {@link Parameters} as part of a {@link Model.findAll} invocation. Filter
-   * expressions can either be the plain shape of an `entity` or compositions of
-   * multiple filter expressions, conjunct by one of the {@link Conjunction}s.
+   * {@link Params} as part of a {@link findAll} invocation. Filter expressions
+   * can either be the plain shape of an `entity` or compositions of multiple
+   * filter expressions, conjunct by one of the {@link Conjunction}s.
    *
    * @typeParam T - Extending model instance type.
    */
@@ -224,14 +224,14 @@ export namespace Model.Filter {
   }
 
   /**
-   * Interface describing the parameters of, e.g., the {@link Model.findAll}
-   * method. This is the most relevant interface within this namespace (and is
-   * therefore also referenced by the {@link Model.Filter} type alias), as it
-   * describes the input parameters of any filter operation.
+   * Interface describing the parameters of, e.g., the {@link findAll} method.
+   * This is the most relevant interface within this namespace (and is therefore
+   * also referenced by the {@link Filter} type alias), as it describes the
+   * input parameters of any filter operation.
    *
    * @typeParam T - Extending model instance type.
    */
-  export interface Parameters<T extends Model> {
+  export interface Params<T extends Model> {
 
     /**
      * Desired sorting direction of the requested data models. To specify which
@@ -1109,7 +1109,7 @@ export abstract class Model<M extends Model = any> {
   }
 
   /**
-   * Instance-scoped commit method. Internally calls {@link Model.commit} on the
+   * Instance-scoped commit method. Internally calls {@link commit} on the
    * this-context of an instance of a class extending the abstract model base
    * class and furthermore {@link assign}s the returned data to the model
    * instance the find method was called upon. When supplying a `mapping`, the
@@ -1153,12 +1153,12 @@ export abstract class Model<M extends Model = any> {
   }
 
   /**
-   * Instance-scoped delete method. Internally calls {@link Model.deleteOne}
-   * while supplying the UUID of an instance of a class extending the abstract
-   * model base class. Calling this method furthermore {@link clear}s the model
+   * Instance-scoped delete method. Internally calls {@link deleteOne} while
+   * supplying the UUID of an instance of a class extending the abstract model
+   * base class. Calling this method furthermore {@link clear}s the model
    * instance and finalizes its deletion by calling complete on the internal
-   * {@link changes} BehaviorSubject of the model instance the delete method
-   * was called upon.
+   * {@link changes} BehaviorSubject of the model instance the delete method was
+   * called upon.
    *
    * @param this - Polymorphic this.
    * @typeParam T - Extending model instance type.
@@ -1175,7 +1175,7 @@ export abstract class Model<M extends Model = any> {
    * model.delete().subscribe(console.log);
    * ```
    *
-   * @see {@link Model.deleteOne}
+   * @see {@link deleteOne}
    */
   public delete<T extends Model = M>(
     this: T
@@ -1186,7 +1186,7 @@ export abstract class Model<M extends Model = any> {
   }
 
   /**
-   * Instance-scoped find method. Internally calls {@link Model.findOne} on the
+   * Instance-scoped find method. Internally calls {@link findOne} on the
    * this-context of an instance of a class extending the abstract model base
    * class and furthermore {@link assign}s the returned data to the model
    * instance the find method was called upon.
@@ -1212,7 +1212,7 @@ export abstract class Model<M extends Model = any> {
    * ]).subscribe(console.log);
    * ```
    *
-   * @see {@link Model.findOne}
+   * @see {@link findOne}
    */
   public find<T extends Model = M>(
     this: T,
@@ -1225,7 +1225,7 @@ export abstract class Model<M extends Model = any> {
   }
 
   /**
-   * Instance-scoped save method. Internally calls {@link Model.saveOne} on the
+   * Instance-scoped save method. Internally calls {@link saveOne} on the
    * this-context of an instance of a class extending the abstract model base
    * class and furthermore {@link assign}s the returned data to the model
    * instance the save method was called upon.
@@ -1248,7 +1248,7 @@ export abstract class Model<M extends Model = any> {
    * ]).subscribe(console.log);
    * ```
    *
-   * @see {@link Model.saveOne}
+   * @see {@link saveOne}
    */
   public save<T extends Model = M>(
     this: T,
@@ -1260,9 +1260,9 @@ export abstract class Model<M extends Model = any> {
   }
 
   /**
-   * Instance-scoped serialize method. Internally calls {@link Model.serialize}
-   * on the this-context of an instance of a class extending the abstract model
-   * base class.
+   * Instance-scoped serialize method. Internally calls {@link serialize} on the
+   * this-context of an instance of a class extending the abstract model base
+   * class.
    *
    * @param this - Polymorphic this.
    * @param shallow - Whether to serialize shallowly.
@@ -1277,7 +1277,7 @@ export abstract class Model<M extends Model = any> {
    * console.log(model.serialize()); // { field: 'example' }
    * ```
    *
-   * @see {@link Model.serialize}
+   * @see {@link serialize}
    */
   public serialize<T extends Model = M>(
     this: T,
@@ -1287,9 +1287,9 @@ export abstract class Model<M extends Model = any> {
   }
 
   /**
-   * Instance-scoped treemap method. Internally calls {@link Model.treemap} on
-   * the this-context of an instance of a class extending the abstract model
-   * base class.
+   * Instance-scoped treemap method. Internally calls {@link treemap} on the
+   * this-context of an instance of a class extending the abstract model base
+   * class.
    *
    * @param this - Polymorphic this.
    * @param shallow - Whether to treemap shallowly.
@@ -1304,7 +1304,7 @@ export abstract class Model<M extends Model = any> {
    * console.log(model.treemap()); // ['field']
    * ```
    *
-   * @see {@link Model.treemap}
+   * @see {@link treemap}
    */
   public treemap<T extends Model = M>(
     this: T,

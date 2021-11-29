@@ -7,7 +7,7 @@
  *
  * @see {@link enumerate}
  */
-export abstract class Enum extends globalThis.String {
+export abstract class Enum extends String {
 
   /**
    * Private abstract constructor (which should never be called).
