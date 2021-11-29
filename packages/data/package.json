@@ -13,7 +13,8 @@
     "@babel/runtime/helpers/extends": null,
     "@babel/runtime/helpers/inheritsLoose": null,
     "@babel/runtime/helpers/objectWithoutPropertiesLoose": null,
-    "@babel/runtime/helpers/toPropertyKey": null
+    "@babel/runtime/helpers/toPropertyKey": null,
+    "@babel/runtime/helpers/wrapNativeSuper": null
   },
   "dependencies": {
     "@babel/runtime": "7.16.3",
