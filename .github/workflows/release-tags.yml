@@ -1,0 +1,111 @@
+name: Release Tags
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - v[0-9]+.[0-9]+.[0-9]+
+
+jobs:
+  prepare:
+    name: Prepare
+    runs-on: ubuntu-latest
+    outputs:
+      packages: ${{steps.select-packages.outputs.packages}}
+      upload_url: ${{steps.create-release.outputs.upload_url}}
+      version: ${{steps.select-version.outputs.version}}
+    steps:
+      - name: Install node
+        uses: actions/setup-node@v2
+
+      - name: Checkout source
+        uses: actions/checkout@v2
+        with:
+          path: ./source
+
+      - name: Validate source
+        working-directory: ./source
+        run: |
+          npm install --no-save semver
+          npx semver -r ${GITHUB_REF##*/v} $(
+            jq -r .version ./packages/*/package.json
+          ) >&-
+
+      - name: Build source
+        working-directory: ./source
+        run: |
+          npm install
+          npm run build
+
+      - name: Test source
+        working-directory: ./source
+        run: |
+          npm test
+
+      - name: Create release
+        id: create-release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+          release_name: Release ${{github.ref}}
+          tag_name: ${{github.ref}}
+
+      - name: Cache release
+        uses: actions/cache@v2
+        with:
+          key: ${{github.ref}}
+          path: ./source/dist
+
+      - name: Select version
+        id: select-version
+        run: |
+          echo ::set-output name=version::[\"${GITHUB_REF##*/v}\"]
+
+      - name: Select packages
+        id: select-packages
+        working-directory: ./source
+        run: |
+          npm install --no-save semver
+          echo ::set-output name=packages::$(jq -cn '$ARGS.positional' --args $(
+            for i in ./packages/*/package.json; do
+              npx semver -r ${GITHUB_REF##*/v} $(jq -r .version $i) >&-
+              test $? -eq 0 && jq -r .name $i | cut -d/ -f2
+            done
+          ))
+
+  release:
+    name: Release
+    needs:
+      - prepare
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: ${{fromJson(needs.prepare.outputs.packages)}}
+        version: ${{fromJson(needs.prepare.outputs.version)}}
+    steps:
+      - name: Install node
+        uses: actions/setup-node@v2
+
+      - name: Restore cache
+        uses: actions/cache@v2
+        with:
+          key: ${{github.ref}}
+          path: ./source/dist
+
+      - name: Publish release
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_PUBLISH_TOKEN}}
+          NPM_CONFIG_ACCESS: public
+        run: |
+          npm pack ./source/dist/${{matrix.package}}
+
+      - name: Upload assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+          asset_content_type: application/octet-stream
+          asset_name: sgrud-${{matrix.package}}-${{matrix.version}}.tgz
+          asset_path: ./sgrud-${{matrix.package}}-${{matrix.version}}.tgz
+          upload_url: ${{needs.prepare.outputs.upload_url}}
