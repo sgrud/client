@@ -2,7 +2,7 @@ import express from 'express';
 import { existsSync, readFileSync } from 'fs-extra';
 import { extname, join } from 'path';
 import { launch } from 'puppeteer-core';
-import { cli } from './.cli';
+import { cli, _b, _g, __ } from './.cli';
 
 cli.command('universal [entry]')
   .describe('Runs SGRUD in universal (SSR) mode using `puppeteer`')
@@ -197,7 +197,6 @@ export async function universal({
   });
 
   server.listen(Number.parseInt(port), host, () => {
-    const [_, g, b] = ['\x1b[0m', '\x1b[32m', '\x1b[34m'];
-    console.log(g, '→', b, `http://${host}:${port}`, _);
+    console.log(_g, '→', _b, `http://${host}:${port}`, __);
   });
 }
