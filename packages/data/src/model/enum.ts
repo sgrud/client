@@ -45,13 +45,13 @@ export abstract class Enum extends String {
  * @see {@link Model}
  */
 export function enumerate<T extends object>(enumerator: T): T {
-  const result = { } as Record<string, Enum>;
+  const enumeration = { } as Record<string, Enum>;
 
   for (const key in enumerator) {
     const value = new String(enumerator[key]);
     Object.setPrototypeOf(value, Enum.prototype);
-    result[key] = value;
+    enumeration[key] = value;
   }
 
-  return result as T;
+  return enumeration as T;
 }
