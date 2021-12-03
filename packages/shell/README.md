@@ -7,3 +7,4 @@
 ### References
 - [API documentation](https://sgrud.github.io/client/modules/shell)
 - [GIT repository](https://github.com/sgrud/client/blob/main/packages/shell)
+- [NPM listing](https://www.npmjs.com/package/@sgrud/shell)
