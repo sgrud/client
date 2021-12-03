@@ -13,7 +13,7 @@ jobs:
     outputs:
       packages: ${{steps.select-packages.outputs.packages}}
       upload_url: ${{steps.create-release.outputs.upload_url}}
-      version: ${{steps.select-version.outputs.version}}
+      versions: ${{steps.select-versions.outputs.versions}}
     steps:
       - name: Install node
         uses: actions/setup-node@v2
@@ -57,10 +57,10 @@ jobs:
           key: ${{github.ref}}
           path: ./source/dist
 
-      - name: Select version
-        id: select-version
+      - name: Select versions
+        id: select-versions
         run: |
-          echo ::set-output name=version::[\"${GITHUB_REF##*/v}\"]
+          echo ::set-output name=versions::[\"${GITHUB_REF##*/v}\"]
 
       - name: Select packages
         id: select-packages
@@ -82,7 +82,7 @@ jobs:
     strategy:
       matrix:
         package: ${{fromJson(needs.prepare.outputs.packages)}}
-        version: ${{fromJson(needs.prepare.outputs.version)}}
+        version: ${{fromJson(needs.prepare.outputs.versions)}}
     steps:
       - name: Install node
         uses: actions/setup-node@v2
@@ -99,6 +99,7 @@ jobs:
           NPM_CONFIG_ACCESS: public
         run: |
           npm pack ./source/dist/${{matrix.package}}
+          npm publish ./sgrud-${{matrix.package}}-${{matrix.version}}.tgz
 
       - name: Upload assets
         uses: actions/upload-release-asset@v1
