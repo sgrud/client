@@ -12,8 +12,8 @@
     "start": "sgrud universal -H 0.0.0.0 src/index.html"
   },
   "dependencies": {
-    "core-js-bundle": "3.19.1",
-    "es-module-shims": "1.3.2",
+    "core-js-bundle": "3.19.2",
+    "es-module-shims": "1.3.4",
     "npm-run-all": "4.1.5"
   },
   "optionalDependencies": {
