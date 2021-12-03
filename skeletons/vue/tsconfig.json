@@ -4,13 +4,15 @@
     "module": "esnext",
     "moduleResolution": "node",
 
+    "declaration": false,
+    "declarationDir": null,
     "downlevelIteration": true,
     "emitDecoratorMetadata": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "importHelpers": true,
     "inlineSources": true,
-    "jsx": "preserve",
+    "resolveJsonModule": true,
     "sourceMap": true,
 
     "forceConsistentCasingInFileNames": true,

@@ -16,6 +16,7 @@
     "jsxFactory": null,
     "jsxFragmentFactory": null,
     "jsxImportSource": "preact",
+    "resolveJsonModule": true,
     "sourceMap": true,
 
     "forceConsistentCasingInFileNames": true,

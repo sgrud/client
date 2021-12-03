@@ -1,9 +1,11 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "module": "es2020",
+    "module": "esnext",
     "moduleResolution": "node",
 
+    "declaration": false,
+    "declarationDir": null,
     "downlevelIteration": true,
     "emitDecoratorMetadata": true,
     "esModuleInterop": true,
@@ -24,7 +26,7 @@
 
     "lib": [
       "dom",
-      "es2018"
+      "esnext"
     ]
   },
 
