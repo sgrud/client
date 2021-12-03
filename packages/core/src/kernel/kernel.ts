@@ -1,5 +1,6 @@
 import { concat, finalize, forkJoin, ignoreElements, last, mapTo, observable, Observable, pluck, Subject, Subscribable, switchMap, throwError } from 'rxjs';
 import { HttpClient } from '../http/client';
+import { assign } from '../typing/assign';
 import { Singleton } from '../utility/singleton';
 
 /**
@@ -375,7 +376,7 @@ export class Kernel {
    */
   public script(props: Partial<HTMLScriptElement>): Observable<void> {
     return new Observable<void>((observer) => {
-      const script = Object.assign(document.createElement('script'), props, {
+      const script = assign(document.createElement('script'), props, {
         onerror: (error: any) => {
           observer.error(error);
         },
