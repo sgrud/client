@@ -80,7 +80,7 @@ export async function runtimify({
 
   for (const pkg of modules.map((i) => i.split(':'))) {
     process.chdir(join(cwd, 'node_modules', pkg[0]));
-    const { exports, module, type } = require(resolve('package.json'));
+    const { exports, main, module, type } = require(resolve('package.json'));
     const filter = pkg.filter((i) => !i.startsWith('!'));
     const stream = createWriteStream(out);
     stream.cork();
@@ -106,8 +106,8 @@ export async function runtimify({
     } else if (typeof exports === 'object') {
       for (const [key, value] of Object.entries<any>(exports)) {
         if (Array.isArray(value)) {
-          const main = value.find((i) => i.default)?.default;
-          if (main) write(join(pkg[0], key), join(pkg[0], main));
+          const entry = value.find((i) => i.default)?.default;
+          if (entry) write(join(pkg[0], key), join(pkg[0], entry));
         } else if (typeof value === 'object' && value?.default) {
           write(join(pkg[0], key), join(pkg[0], value.default));
         }
@@ -116,6 +116,8 @@ export async function runtimify({
       write(pkg[0], join(pkg[0], exports));
     } else if (module && type === 'module') {
       write(pkg[0], join(pkg[0], module));
+    } else if (main) {
+      write(pkg[0], join(pkg[0], main));
     }
 
     stream.end();
