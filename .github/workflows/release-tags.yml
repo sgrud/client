@@ -54,7 +54,7 @@ jobs:
       - name: Cache release
         uses: actions/cache@v2
         with:
-          key: ${{github.ref}}
+          key: ${{github.sha}}
           path: ./source/dist
 
       - name: Select versions
@@ -92,7 +92,7 @@ jobs:
       - name: Restore cache
         uses: actions/cache@v2
         with:
-          key: ${{github.ref}}
+          key: ${{github.sha}}
           path: ./source/dist
 
       - name: Publish release
