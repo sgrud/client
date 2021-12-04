@@ -110,7 +110,7 @@ export async function construct({
         extensions: ['.js'].concat(useTypescript ? '.ts' : []),
         external: [],
         pattern: /worker:(.+)/,
-        sourcemap: options.compress === false && options.sourcemap,
+        sourcemap: options.sourcemap && !options.compress,
       }),
     ]`
   ).replace(
@@ -126,7 +126,7 @@ export async function construct({
     ...current.amdNames,
     ...general.amdNames
   }).map(([key, value]) => {
-    return null === value
+    return value === null
       ? `${key}=${key.split(/\W/).filter(Boolean).join('.')}`
       : `${key}=${value}`;
   }).join(',');

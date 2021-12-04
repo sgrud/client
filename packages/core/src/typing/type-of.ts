@@ -270,5 +270,5 @@ export abstract class TypeOf {
  * @returns Whether `value` is `type`.
  */
 function test(type: string, value: unknown): boolean {
-  return `[object ${type}]` === Object.prototype.toString.call(value);
+  return Object.prototype.toString.call(value) === `[object ${type}]`;
 }

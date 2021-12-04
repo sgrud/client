@@ -386,9 +386,7 @@ export class Kernel {
         }
       });
 
-      if (!props.src || (
-        this.shimmed && props.type?.endsWith(this.shimmed)
-      )) {
+      if (!props.src || (this.shimmed && props.type?.endsWith(this.shimmed))) {
         setTimeout(script.onload);
       }
 
@@ -428,7 +426,7 @@ export class Kernel {
           return '';
         }).replace(/^V|\.[X*]/gi, '');
 
-        if (/^[X~*^]*$/i.exec(part)) {
+        if (part === 'latest' || /^[X~*^]*$/i.exec(part)) {
           tests = [['>=', ['0', '0', '0', '0']]];
           break;
         }
