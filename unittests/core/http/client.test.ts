@@ -1,7 +1,18 @@
-import xhr from '.mocks/xhr.mock';
 import { HttpClient } from '@sgrud/core';
+import express from 'express';
+import { Server } from 'http';
 
 describe('@sgrud/core/http/client', () => {
+
+  let server = null! as Server;
+  afterAll(() => server.close());
+  beforeAll(() => server = express()
+    .use('/', (_, r) => r.send())
+    .listen(58080));
+
+  const open = jest.spyOn(XMLHttpRequest.prototype, 'open');
+  const send = jest.spyOn(XMLHttpRequest.prototype, 'send');
+  afterEach(() => [open, send].forEach((i) => i.mockClear()));
 
   const targets = [
     HttpClient.prototype,
@@ -30,15 +41,13 @@ describe('@sgrud/core/http/client', () => {
     it('dispatches a custom XHR', (done) => {
       const subscription = target.handle({
         method: 'HEAD',
-        url: 'url'
-      }).subscribe((response) => {
-        expect(response.response).toBe(xhr.response);
-        expect(xhr.open).toHaveBeenCalledWith('HEAD', 'url', true);
-        expect(xhr.send).toHaveBeenCalledWith();
+        url: '/head'
+      }).subscribe(() => {
+        expect(open).toHaveBeenCalledWith('HEAD', '/head', true);
+        expect(send).toHaveBeenCalledWith();
       });
 
       subscription.add(done);
-      xhr.trigger('load');
     });
   });
 
@@ -46,13 +55,12 @@ describe('@sgrud/core/http/client', () => {
     const request = requests[methods.indexOf(method)];
 
     it('dispatches a XHR ' + request, (done) => {
-      const subscription = method('url', undefined).subscribe(() => {
-        expect(xhr.open).toHaveBeenCalledWith(request, 'url', true);
-        expect(xhr.send).toHaveBeenCalledWith();
+      const subscription = method('/path', undefined).subscribe(() => {
+        expect(open).toHaveBeenCalledWith(request, '/path', true);
+        expect(send).toHaveBeenCalledWith();
       });
 
       subscription.add(done);
-      xhr.trigger('load');
     });
   });
 

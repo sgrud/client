@@ -1,8 +1,16 @@
-import xhr from '.mocks/xhr.mock';
 import { HttpClient, HttpState } from '@sgrud/core';
+import { randomBytes } from 'crypto';
+import express from 'express';
+import { Server } from 'http';
 import { filter, from } from 'rxjs';
 
 describe('@sgrud/core/http/state', () => {
+
+  let server = null! as Server;
+  afterAll(() => server.close());
+  beforeAll(() => server = express()
+    .use('/', (_, r) => r.send(randomBytes(1024)))
+    .listen(58080));
 
   describe('instantiating a linker', () => {
     const httpState = new HttpState();
@@ -15,25 +23,25 @@ describe('@sgrud/core/http/state', () => {
   describe('firing a request', () => {
     const test = jest.fn((next) => {
       switch (test.mock.calls.length) {
-        case 1: expect(next.type).toBe('download_progress'); break;
-        case 2: expect(next.type).toBe('upload_progress'); break;
-        case 3: expect(next.type).toBe('download_load'); break;
+        case 1: expect(next.type).toBe('download_loadstart'); break;
+        case 2: expect(next.type).toBe('upload_loadstart'); break;
+        case 3: expect(next.type).toBe('upload_progress'); break;
+        case 4: expect(next.type).toBe('upload_load'); break;
+        case 5: expect(next.type).toBe('download_progress'); break;
+        case 6: expect(next.type).toBe('download_load'); break;
       }
     });
 
     it('does not consume the progress events', (done) => {
       const subscription = HttpClient.prototype.handle({
+        body: randomBytes(1024),
         includeDownloadProgress: true,
         includeUploadProgress: true,
-        method: 'GET',
-        url: 'url'
+        method: 'POST',
+        url: '/api'
       }).subscribe(test);
 
       subscription.add(done);
-
-      xhr.trigger('progress');
-      xhr.trigger('progress', null, true);
-      xhr.trigger('load');
     });
   });
 
@@ -41,8 +49,9 @@ describe('@sgrud/core/http/state', () => {
     const httpState = new HttpState();
     const test = jest.fn(([next]) => {
       switch (test.mock.calls.length) {
-        case 1: expect(next.type).toBe('download_progress'); break;
-        case 2: expect(next.type).toBe('download_load'); break;
+        case 1: expect(next.type).toBe('download_loadstart'); break;
+        case 2: expect(next.type).toBe('download_progress'); break;
+        case 3: expect(next.type).toBe('download_load'); break;
       }
     });
 
@@ -51,15 +60,12 @@ describe('@sgrud/core/http/state', () => {
         filter((next) => Boolean(next.length))
       ).subscribe(test);
 
-      HttpClient.get('url').subscribe(() => {
-        expect(test).toHaveBeenCalledTimes(2);
+      HttpClient.get('/api').subscribe(() => {
+        expect(test).toHaveBeenCalledTimes(3);
         subscription.unsubscribe();
       });
 
       subscription.add(done);
-
-      xhr.trigger('progress');
-      xhr.trigger('load');
     });
   });
 

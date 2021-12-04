@@ -39,8 +39,10 @@ describe('@sgrud/core/typing/type-of', () => {
   ];
 
   describe.each(methods)('applying method %O', (method) => {
+    const index = methods.indexOf(method);
+
     describe.each(values)('to value %O', (value) => {
-      if (methods.indexOf(method) === values.indexOf(value)) {
+      if (index === values.indexOf(value)) {
         it('returns true', () => {
           expect(method(value)).toBe(true);
         });

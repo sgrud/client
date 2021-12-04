@@ -69,6 +69,9 @@
     "preset": "ts-jest",
     "collectCoverage": true,
     "forceExit": true,
+    "maxWorkers": 1,
+    "testEnvironment": "jsdom",
+    "testURL": "http://127.0.0.1:58080",
     "collectCoverageFrom": [
       "<rootDir>/dist/*/index.js"
     ],
