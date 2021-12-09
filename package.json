@@ -173,6 +173,7 @@
       ],
       "arrow-parens": "error",
       "default-case-last": "error",
+      "eqeqeq": "error",
       "grouped-accessor-pairs": "error",
       "max-len": [
         "error",
