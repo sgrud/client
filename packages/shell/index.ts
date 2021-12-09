@@ -4,4 +4,4 @@
  * @packageDocumentation
  */
 
-console.error('Not Implemented!');
+export * from './src/router/router';

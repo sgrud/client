@@ -7,8 +7,12 @@
   "main": "../../dist/shell/index.js",
   "exports": "../../dist/shell/index.esm.js",
   "unpkg": "../../dist/shell/index.umd.js",
+  "amdNames": {
+    "@babel/runtime/helpers/createForOfIteratorHelperLoose": null
+  },
   "dependencies": {
     "@babel/runtime": "7.16.3",
+    "@sgrud/core": "latest",
     "tslib": "2.3.1"
   },
   "files": [
