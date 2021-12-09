@@ -4,7 +4,7 @@ import { execSync } from 'child_process';
 import { createHash } from 'crypto';
 import { copyFileSync, existsSync, readFileSync, writeFileSync } from 'fs-extra';
 import { dirname, join, normalize, relative, resolve, sep } from 'path';
-import { cli } from './.cli';
+import { cli, _b, _g, __ } from './.cli';
 
 cli.command('postbuild')
   .describe('Replicates exported package.json files in the SGRUD monorepo')
@@ -73,15 +73,6 @@ export async function postbuild({
 
     for (const key in source) {
       switch (key) {
-        case 'dependencies':
-        case 'devDependencies':
-          for (const dependency in source[key]) {
-            if (dependency.startsWith('.')) {
-              source[key][dependency] = 'latest';
-            }
-          }
-          break;
-
         case 'exports':
         case 'main':
         case 'module':
@@ -162,15 +153,14 @@ export async function postbuild({
 
   if (writes.length) {
     console.log('Replicating exported package metadata');
-    const [_, g, b] = ['\x1b[0m', '\x1b[32m', '\x1b[34m'];
 
-    for (const [origin, output, content] of writes) {
-      console.log(b, origin, g, '→', b, output, _);
+    for (const [source, target, content] of writes) {
+      console.log(_b, source, _g, '→', _b, target, __);
 
       if (content) {
-        writeFileSync(output, content);
+        writeFileSync(target, content);
       } else {
-        copyFileSync(origin, output);
+        copyFileSync(source, target);
       }
     }
   }

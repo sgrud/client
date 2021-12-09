@@ -84,8 +84,7 @@
       }
     },
     "moduleNameMapper": {
-      "@sgrud/(.*)": "<rootDir>/dist/$1",
-      ".mocks/(.*)": "<rootDir>/unittests/.mocks/$1"
+      "@sgrud/(.*)": "<rootDir>/dist/$1"
     },
     "roots": [
       "<rootDir>/unittests"
