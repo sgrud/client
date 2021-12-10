@@ -6,6 +6,11 @@ on:
     tags:
       - v[0-9]+.[0-9]+.[0-9]+
 
+env:
+  GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+  NODE_AUTH_TOKEN: ${{secrets.NPM_PUBLISH_TOKEN}}
+  NPM_CONFIG_ACCESS: public
+
 jobs:
   prepare:
     name: Prepare
@@ -45,8 +50,6 @@ jobs:
       - name: Create release
         id: create-release
         uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         with:
           release_name: Release ${{github.ref}}
           tag_name: ${{github.ref}}
@@ -96,17 +99,12 @@ jobs:
           path: ./source/dist
 
       - name: Publish release
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_PUBLISH_TOKEN}}
-          NPM_CONFIG_ACCESS: public
         run: |
           npm pack ./source/dist/${{matrix.package}}
           npm publish ./sgrud-${{matrix.package}}-${{matrix.version}}.tgz
 
       - name: Upload assets
         uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         with:
           asset_content_type: application/octet-stream
           asset_name: sgrud-${{matrix.package}}-${{matrix.version}}.tgz
