@@ -1,4 +1,4 @@
-import { concat, finalize, forkJoin, ignoreElements, last, mapTo, observable, Observable, pluck, Subject, Subscribable, switchMap, throwError } from 'rxjs';
+import { concat, defaultIfEmpty, forkJoin, ignoreElements, map, observable, Observable, ReplaySubject, Subscribable, switchMap, throwError } from 'rxjs';
 import { HttpClient } from '../http/client';
 import { assign } from '../typing/assign';
 import { Singleton } from '../utility/singleton';
@@ -89,7 +89,8 @@ export interface Module {
  * applications based on the SGRUD client library may be comprised of multiple,
  * optionally loaded {@link Module}s, which, depending on the application
  * structure and configuration, can be {@link insmod}ded initially, by supplying
- * their names through the corresponding API endpoint, or later on, manually.
+ * them as sgrudDepeldencies through the corresponding API endpoint, or later
+ * on, manually.
  *
  * @decorator {@link Singleton}
  */
@@ -98,7 +99,7 @@ export class Kernel {
 
   /**
    * Symbol property typed as callback to a Subscribable. The returned
-   * subscribable stream emits all the loaded modules.
+   * subscribable stream emits all the loaded modules (and never completes).
    *
    * @returns Callback to a Subscribable.
    *
@@ -120,22 +121,21 @@ export class Kernel {
   private readonly imports: Map<string, string>;
 
   /**
-   * Internal mapping of all via {@link insmod} loaded modules to a
-   * corresponding Subject. The Subject tracks the module loading process as
-   * such, that it emits the module definition once the respective module is
-   * fully (including dependencies etc.) loaded and then completes.
+   * Internal mapping of all {@link insmod}ded modules to a corresponding
+   * ReplaySubject. The ReplaySubject tracks the module loading process as such,
+   * that it emits the module definition once the respective module is fully
+   * loaded (including dependencies etc.) and then completes.
    */
-  private readonly loaders: Map<string, Subject<Module>>;
+  private readonly loaders: Map<string, ReplaySubject<Module>>;
 
   /**
-   * Internal Subject tracking the initial loading state of the Kernel. An
-   * Observable from this Subject may be retrieved by subscribing to the
-   * Subscribable returned by the `rxjs.observable` interop getter. The Subject
-   * (and therefore Observable) emits all module definitions which are initially
-   * supplied by their names and completes when all initially supplied models
-   * are loaded.
+   * Internal ReplaySubject tracking the loading state of the Kernel modules. An
+   * Observable from this ReplaySubject may be retrieved by subscribing to the
+   * Subscribable returned by the `rxjs.observable` interop getter. The actual
+   * ReplaySubject (and therefore Observable) emits all module definitions which
+   * are {@link insmod}ded throughout the lifespan of the Kernel.
    */
-  private readonly loading: Subject<Module>;
+  private readonly loading: ReplaySubject<Module>;
 
   /**
    * Internally used string to suffix the `importmap` and `module` types of HTML
@@ -193,8 +193,8 @@ export class Kernel {
 
   ) {
     this.imports = new Map<string, string>();
-    this.loaders = new Map<string, Subject<Module>>();
-    this.loading = new Subject<Module>();
+    this.loaders = new Map<string, ReplaySubject<Module>>();
+    this.loading = new ReplaySubject<Module>();
     this.shimmed = '';
 
     const queried = document.querySelectorAll('script[type^="importmap"]');
@@ -215,10 +215,8 @@ export class Kernel {
     }
 
     HttpClient.get<Module>(`${endpoint}/insmod`).pipe(
-      pluck('response'),
-      switchMap((response) => this.insmod(response)),
-      ignoreElements()
-    ).subscribe(this.loading);
+      switchMap(({ response }) => this.insmod(response))
+    ).subscribe();
   }
 
   /**
@@ -250,7 +248,7 @@ export class Kernel {
     let loader = this.loaders.get(module.name);
 
     if (!loader) {
-      loader = new Subject<Module>();
+      loader = new ReplaySubject<Module>(1);
       this.loaders.set(module.name, loader);
 
       const chain = [] as Observable<any>[];
@@ -323,9 +321,12 @@ export class Kernel {
         return throwError(() => ReferenceError(module.name));
       }
 
-      concat(...chain).pipe(last(), mapTo(module), finalize(() => {
+      concat(...chain).pipe(
+        ignoreElements(),
+        defaultIfEmpty(module)
+      ).subscribe(loader).add(() => {
         this.loading.next(module);
-      })).subscribe(loader);
+      });
     }
 
     return loader;
@@ -351,7 +352,7 @@ export class Kernel {
    */
   public resolve(name: string): Observable<Module> {
     const module = `${this.nodeModules}/${name}/package.json`;
-    return HttpClient.get<Module>(module).pipe(pluck('response'));
+    return HttpClient.get<Module>(module).pipe(map(({ response }) => response));
   }
 
   /**

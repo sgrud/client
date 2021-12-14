@@ -1,7 +1,7 @@
 import { Kernel, Module } from '@sgrud/core';
 import express from 'express';
 import { Server } from 'http';
-import { catchError, from, of } from 'rxjs';
+import { catchError, EMPTY, from, of, timeout } from 'rxjs';
 
 describe('@sgrud/core/kernel/kernel', () => {
 
@@ -253,6 +253,13 @@ describe('@sgrud/core/kernel/kernel', () => {
           }
         }),
         type: 'importmap'
+      }),
+      Object.assign(document.createElement('script'), {
+        src: location.origin
+          + '/node_modules/'
+          + depmod.name + '/'
+          + depmod.exports,
+        type: 'module'
       })
     ];
 
@@ -270,12 +277,21 @@ describe('@sgrud/core/kernel/kernel', () => {
     ];
 
     it('calls insmod on the modules', (done) => {
-      const subscription = from(new Kernel()).subscribe((next) => {
-        expect(next).toMatchObject(submod);
+      let counter = 0;
+
+      const subscription = from(kernel).pipe(
+        timeout(250),
+        catchError(() => EMPTY)
+      ).subscribe((next) => {
+        switch (counter++) {
+          case 0: expect(next).toMatchObject(submod); break;
+          case 1: expect(next).toMatchObject(depmod); break;
+        }
+
         expect(select).toHaveBeenCalled();
         expect(send).toHaveBeenCalledTimes(2);
 
-        appended.forEach((n, i) => {
+        appended.slice(0, counter + 1).forEach((n, i) => {
           expect(append).toHaveBeenNthCalledWith(++i, n);
         });
 
