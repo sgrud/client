@@ -1,4 +1,4 @@
-import { TypeOf } from '@sgrud/core';
+import { assign, TypeOf } from '@sgrud/core';
 import { Model } from '../model/model';
 
 /**
@@ -60,10 +60,9 @@ export function HasOne<T extends Model.Type<any>>(
     const key = '#' + field as Model.Field<M>;
 
     if (!transient) {
-      model[hasOne] = {
-        ...model[hasOne],
+      assign(model[hasOne] ??= { }, {
         [field]: typeFactory
-      };
+      });
     }
 
     Object.defineProperties(model, {
