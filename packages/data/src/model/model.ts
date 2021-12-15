@@ -506,7 +506,7 @@ export abstract class Model<M extends Model = any> {
     this: Model.Type<T>,
     filter: Model.Filter<T>,
     graph: Model.Graph<T>
-  ): Observable<{ result?: T[]; total?: number }> {
+  ): Observable<{ result: T[]; total: number }> {
     const { plural } = new this();
 
     return this.commit(`query findAll($filter: FilterSortPaginateInput!) {
@@ -515,8 +515,8 @@ export abstract class Model<M extends Model = any> {
         total
       }
     }`, { filter }).pipe(map((data) => {
-      const value = data[`get${plural}`] as { result?: T[]; total?: number };
-      value.result = value.result?.map((i) => new this(i));
+      const value = data[`get${plural}`] as { result: T[]; total: number };
+      value.result = value.result.map((i) => new this(i));
       return value;
     }));
   }
@@ -1181,7 +1181,8 @@ export abstract class Model<M extends Model = any> {
     this: T
   ): Observable<T> {
     return this.static.deleteOne<T>(this.uuid!).pipe(
-      switchMap(() => this.clear()), finalize(() => this.changes.complete())
+      switchMap(() => this.clear()),
+      finalize(() => this.changes.complete())
     );
   }
 

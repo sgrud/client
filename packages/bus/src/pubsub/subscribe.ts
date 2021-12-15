@@ -69,7 +69,7 @@ export function Subscribe(
     prototype: Object,
     propertyKey: PropertyKey
   ): void {
-    if (TypeOf.string(source) && source) {
+    if (TypeOf.string(source)) {
       Object.defineProperty(prototype, source, {
         enumerable: true,
         set: function(this: any, value: string): void {

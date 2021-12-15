@@ -1,5 +1,5 @@
 import { HttpClient, Kernel, Provider, TypeOf } from '@sgrud/core';
-import { Observable, pluck } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { Model } from '../model/model';
 import { Querier } from './querier';
 
@@ -72,7 +72,7 @@ export class HttpQuerier
     return HttpClient.post(this.endpoint, {
       query: operation,
       variables
-    }).pipe(pluck('response'));
+    }).pipe(map(({ response }) => response));
   }
 
   /**
