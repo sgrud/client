@@ -8,6 +8,7 @@ import { Model } from '../model/model';
  * @see {@link Property}
  */
 export type Property =
+  Model.Type<any> |
   typeof Boolean |
   typeof Date |
   typeof Number |
