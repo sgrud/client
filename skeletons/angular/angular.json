@@ -10,7 +10,7 @@
   "projects": {
     "sgrud-skeleton-angular": {
       "projectType": "application",
-      "root": ".",
+      "root": "./",
       "sourceRoot": "./src",
       "architect": {
         "build": {
