@@ -57,11 +57,7 @@ describe('@sgrud/core/kernel/kernel', () => {
     name: 'submod',
     version: '0.0.5',
     exports: './submod.esmod.js',
-    unpkg: './submod.unpkg.js',
-    digest: {
-      exports: 'sha512-submod-exports',
-      unpkg: 'sha512-submod-unpkg'
-    }
+    unpkg: './submod.unpkg.js'
   } as Module;
 
   /**
@@ -354,7 +350,9 @@ describe('@sgrud/core/kernel/kernel', () => {
     ];
 
     it('calls insmod on the legacy modules', (done) => {
-      (global as any).sgrud = null;
+      Object.assign(globalThis, {
+        sgrud: null
+      });
 
       const subscription = kernel.insmod(module).subscribe((next) => {
         expect(next).toMatchObject(module);

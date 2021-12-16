@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+
 import { ConduitWorker } from '@sgrud/bus';
 import { BehaviorSubject, catchError, of, Subject, timeout } from 'rxjs';
 
@@ -87,6 +89,35 @@ describe('@sgrud/bus/conduit/worker', () => {
 
       worker.set('sgrud.test.bus.subject', subject);
       subject.next('done');
+    });
+  });
+
+  describe('simulating a browser environment', () => {
+    const process = globalThis.process;
+
+    const createObjectURL = jest.fn((source: any) => {
+      const [symbol] = Object.getOwnPropertySymbols(source);
+      return (source[symbol]._buffer as Buffer).toString();
+    });
+
+    const Worker = jest.fn((source: string | URL) => {
+      const thread = require('worker_threads').Worker;
+      return new thread(source, { eval: true });
+    });
+
+    it('runs the browser-specific code branches', () => {
+      Object.defineProperty(globalThis, 'process', {
+        get: () => new Error().stack?.includes('dist/bus')
+          ? undefined
+          : process
+      });
+
+      globalThis.URL.createObjectURL = createObjectURL;
+      globalThis.Worker = Worker;
+
+      jest.isolateModules(() => require('@sgrud/bus'));
+      expect(createObjectURL).toHaveBeenCalled();
+      expect(Worker).toHaveBeenCalled();
     });
   });
 

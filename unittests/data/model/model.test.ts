@@ -159,6 +159,10 @@ describe('@sgrud/data/model/model', () => {
       modified: new Date()
     });
 
+    Object.assign(model['#modified' as keyof Model], {
+      getTimezoneOffset: () => 120
+    });
+
     it('returns the valuated properties', () => {
       expect(Class.valuate(model, 'uuid')).toBeUndefined();
     });
@@ -168,7 +172,7 @@ describe('@sgrud/data/model/model', () => {
     });
 
     it('returns the valuated ISO date strings', () => {
-      expect(Class.valuate(model, 'modified')).toContain('+');
+      expect(Class.valuate(model, 'modified')).toMatch(/-02:00$/);
     });
   });
 

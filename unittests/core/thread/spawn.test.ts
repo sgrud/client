@@ -15,7 +15,7 @@ describe('@sgrud/core/thread/spawn', () => {
       /* eslint-enable */
     }) + ')()', { eval: true }))
     public static readonly worker: Thread<{
-      callable: (...args: any) => number;
+      callable: (...args: any[]) => number;
       thirteen: number;
     }>;
   }
