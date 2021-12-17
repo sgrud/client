@@ -109,8 +109,8 @@ export class Router {
    * @returns Joined segment as string.
    */
   public join(segment: Router.Route.Segment): string {
-    while (segment.parent) segment = segment.parent;
     const parts = [] as string[];
+    segment = this.rewind(segment);
 
     do {
       const paths = segment.route.path.split('/').slice(1);
@@ -174,6 +174,15 @@ export class Router {
       return undefined;
     }
 
+    return segment;
+  }
+
+  /**
+   * @param segment - State to take segment from.
+   * @returns Rewound state segment.
+   */
+  public rewind(segment: Router.Route.Segment): Router.Route.Segment {
+    while (segment.parent) segment = segment.parent;
     return segment;
   }
 

@@ -25,7 +25,7 @@ export class ConduitWorker {
    * Internal map containing all established conduits. Updating this map should
    * always be accompanied by an emittance of the {@link changes}.
    */
-  private readonly conduits: Map<string, Observable<ConduitValue<any>>>;
+  private readonly conduits: Map<ConduitHandle, Observable<ConduitValue<any>>>;
 
   /**
    * Public ConduitWorker constructor. This constructor is called once when
@@ -35,7 +35,7 @@ export class ConduitWorker {
    */
   public constructor() {
     this.changes = new BehaviorSubject<this>(this);
-    this.conduits = new Map<string, Observable<ConduitValue<any>>>();
+    this.conduits = new Map<ConduitHandle, Observable<ConduitValue<any>>>();
   }
 
   /**
@@ -82,7 +82,7 @@ export class ConduitWorker {
         this.conduits.delete(handle);
         this.changes.next(this);
       }),
-      shareReplay()
+      shareReplay(1)
     ));
 
     this.changes.next(this);

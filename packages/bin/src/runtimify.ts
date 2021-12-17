@@ -92,11 +92,11 @@ export async function runtimify({
         return i.startsWith('!') && !name.startsWith(join(pkg[0], i.slice(1)));
       })) {
         if (name === file) {
-          stream.write(`export * from '${source}';\n`);
+          stream.write(`export * from '${source}';`);
         } else {
           const naming = relative(join(...filter), name);
           const target = naming ? `* as ${naming}` : '*';
-          stream.write(`export ${target} from '${source}';\n`);
+          stream.write(`export ${target} from '${source}';`);
         }
       }
     };
