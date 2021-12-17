@@ -29,8 +29,7 @@ export const hasOne = Symbol('@sgrud/data/model/has-one');
  * import { Provider } from '@sgrud/core';
  * import { OwnedModel } from './owned-model';
  *
- * export class ExampleModel {
- *   extends Provider<typeof Model>('sgrud.data.model.Model') {
+ * export class ExampleModel extends Model<ExampleModel> {
  *
  *   @HasOne(() => OwnedModel)
  *   public field?: OwnedModel;

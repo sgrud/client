@@ -1,4 +1,4 @@
-import { assign, Linker, pluralize, Provide, provide, TypeOf } from '@sgrud/core';
+import { assign, Linker, pluralize, TypeOf } from '@sgrud/core';
 import { BehaviorSubject, finalize, identity, map, observable, Observable, of, OperatorFunction, Subscribable, switchMap, tap, throwError } from 'rxjs';
 import { Querier } from '../querier/querier';
 import { hasMany } from '../relation/has-many';
@@ -290,6 +290,7 @@ export namespace Model.Filter {
 
 }
 
+// eslint-disable-next-line valid-jsdoc
 /**
  * Abstract base class to implement data models. By extending this abstract base
  * class while providing the enforced symbol property containing the singular
@@ -298,7 +299,6 @@ export namespace Model.Filter {
  * and instance-scoped polymorphic `this`, all inherited operations warrant type
  * safety and provide intellisense.
  *
- * @decorator {@link Provide}
  * @typeParam M - Extending model instance type.
  *
  * @example Extend the model base class.
@@ -307,8 +307,7 @@ export namespace Model.Filter {
  * import { Property } from '@sgrud/data';
  * import { Provider } from '@sgrud/core';
  *
- * export class ExampleModel
- *   extends Provider<typeof Model>('sgrud.data.model.Model') {
+ * export class ExampleModel extends Model<ExampleModel> {
  *
  *   @Property(() => String)
  *   public field: string?;
@@ -318,16 +317,7 @@ export namespace Model.Filter {
  * }
  * ```
  */
-@Provide<typeof Model>()
 export abstract class Model<M extends Model = any> {
-
-  /**
-   * Magic string by which this class is provided.
-   *
-   * @see {@link provide}
-   */
-  public static readonly [provide]:
-  'sgrud.data.model.Model' = 'sgrud.data.model.Model';
 
   /**
    * Static commit method. Calling this method on a class extending the abstract
@@ -907,8 +897,7 @@ export abstract class Model<M extends Model = any> {
    * import type { Model } from '@sgrud/data';
    * import { Provider } from '@sgrud/core';
    *
-   * export class ExampleModel
-   *   extends Provider<typeof Model>('sgrud.data.model.Model') {
+   * export class ExampleModel extends Model<ExampleModel> {
    *
    *   protected [Symbol.toStringTag]: string = 'ExampleModel';
    *

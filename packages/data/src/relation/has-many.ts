@@ -29,8 +29,7 @@ export const hasMany = Symbol('@sgrud/data/model/has-many');
  * import { Provider } from '@sgrud/core';
  * import { OwnedModel } from './owned-model';
  *
- * export class ExampleModel {
- *   extends Provider<typeof Model>('sgrud.data.model.Model') {
+ * export class ExampleModel extends Model<ExampleModel> {
  *
  *   @HasMany(() => OwnedModel)
  *   public field?: OwnedModel[];
