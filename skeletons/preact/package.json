@@ -7,25 +7,28 @@
   "unpkg": "./dist/sgrud-skeleton-preact.umd.js",
   "private": true,
   "scripts": {
+    "postinstall": "sgrud runtimify @babel/runtime:helpers",
     "build": "sgrud construct --format modern,umd",
-    "postbuild": "sgrud postbuild && cp ./src/index.html ./dist",
-    "prepare": "sgrud runtimify @babel/runtime:helpers"
+    "postbuild": "sgrud postbuild"
   },
   "amdNames": {
     "@babel/runtime/helpers/inheritsLoose": null,
     "preact/jsx-runtime": "jsxRuntime"
   },
+  "copy": [
+    "./src/index.html"
+  ],
   "dependencies": {
-    "@babel/runtime": "7.16.3",
+    "@babel/runtime": "7.16.7",
     "@sgrud/bin": "latest",
-    "preact": "10.6.2",
+    "preact": "10.6.4",
     "preact-custom-element": "4.2.1",
     "tslib": "2.3.1"
   },
   "devDependencies": {
     "@types/css-modules": "1.0.2",
     "@types/preact-custom-element": "4.0.1",
-    "node-sass": "6.0.1"
+    "node-sass": "7.0.1"
   },
   "webDependencies": {
     "@babel/runtime": {
@@ -39,7 +42,7 @@
     "preact": {
       "exports": {
         "preact": "./dist/preact.module.js",
-        "preact/jsx-runtime": "./jsx-runtime/dist/jsxRuntime.modern.js"
+        "preact/jsx-runtime": "./jsx-runtime/dist/jsxRuntime.module.js"
       },
       "unpkg": [
         "./dist/preact.umd.js",

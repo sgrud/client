@@ -7,22 +7,22 @@
   "unpkg": "./dist/sgrud-skeleton-lit.umd.js",
   "private": true,
   "scripts": {
+    "postinstall": "sgrud runtimify @babel/runtime:helpers",
     "build": "sgrud construct --format modern,umd",
-    "postbuild": "sgrud postbuild && cp ./src/index.html ./dist",
-    "prepare": "sgrud runtimify @babel/runtime:helpers lit:!static"
+    "postbuild": "sgrud postbuild"
   },
   "amdNames": {
     "@babel/runtime/helpers/inheritsLoose": null,
     "@babel/runtime/helpers/taggedTemplateLiteralLoose": null,
     "lit/decorators.js": "lit"
   },
+  "copy": [
+    "./src/index.html"
+  ],
   "dependencies": {
-    "@babel/runtime": "7.16.3",
-    "@lit/reactive-element": "1.0.2",
+    "@babel/runtime": "7.16.7",
     "@sgrud/bin": "latest",
-    "lit": "2.0.2",
-    "lit-element": "3.0.2",
-    "lit-html": "2.0.2",
+    "lit": "2.1.1",
     "tslib": "2.3.1"
   },
   "webDependencies": {
@@ -44,10 +44,7 @@
       "exports": {
         "lit": "./index.js",
         "lit/": "./"
-      },
-      "unpkg": [
-        "./runtimify.js"
-      ]
+      }
     },
     "lit-element": {
       "exports": {
