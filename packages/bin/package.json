@@ -17,6 +17,9 @@
   "bin": {
     "sgrud": "./index.js"
   },
+  "copy": [
+    "./README.md"
+  ],
   "dependencies": {
     "@babel/plugin-transform-runtime": "7.16.7",
     "@babel/runtime": "7.16.7",
@@ -27,8 +30,5 @@
     "rollup-plugin-web-worker-loader": "1.6.1",
     "sade": "1.8.1",
     "tslib": "2.3.1"
-  },
-  "files": [
-    "./README.md"
-  ]
+  }
 }

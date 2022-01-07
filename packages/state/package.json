@@ -7,11 +7,11 @@
   "main": "../../dist/state/index.js",
   "exports": "../../dist/state/index.esm.js",
   "unpkg": "../../dist/state/index.umd.js",
+  "copy": [
+    "./README.md"
+  ],
   "dependencies": {
     "@babel/runtime": "7.16.7",
     "tslib": "2.3.1"
-  },
-  "files": [
-    "./README.md"
-  ]
+  }
 }

@@ -3,7 +3,7 @@
 import { execSync } from 'child_process';
 import { createHash } from 'crypto';
 import { copyFileSync, existsSync, readFileSync, writeFileSync } from 'fs-extra';
-import { dirname, join, normalize, relative, resolve, sep } from 'path';
+import { basename, dirname, join, normalize, relative, resolve, sep } from 'path';
 import { cli, _b, _g, __ } from './.cli';
 
 cli.command('postbuild')
@@ -73,6 +73,11 @@ export async function postbuild({
 
     for (const key in source) {
       switch (key) {
+        case 'copy':
+          assets.push(...source[key]);
+          delete source[key];
+          break;
+
         case 'exports':
         case 'main':
         case 'module':
@@ -80,11 +85,6 @@ export async function postbuild({
           if (existsSync(join(bundle, source[key]))) {
             target[key] = source[key];
           }
-          break;
-
-        case 'files':
-          assets.push(...source[key]);
-          delete source[key];
           break;
 
         case 'source':
@@ -141,10 +141,10 @@ export async function postbuild({
         })
       ]);
 
-      for (const file of assets) {
+      for (const asset of assets) {
         writes.push([
-          join(cwd, bundle, file),
-          join(cwd, folder, file),
+          join(cwd, bundle, asset),
+          join(cwd, folder, basename(asset)),
           undefined
         ] as const);
       }
