@@ -18,18 +18,15 @@
     "sgrud": "./index.js"
   },
   "dependencies": {
-    "@babel/plugin-transform-runtime": "7.16.5",
-    "@babel/runtime": "7.16.5",
-    "express": "4.17.1",
+    "@babel/plugin-transform-runtime": "7.16.7",
+    "@babel/runtime": "7.16.7",
+    "express": "4.17.2",
     "fs-extra": "10.0.0",
     "microbundle": "0.14.2",
-    "puppeteer-core": "13.0.0",
+    "puppeteer-core": "13.0.1",
     "rollup-plugin-web-worker-loader": "1.6.1",
-    "sade": "1.7.4",
+    "sade": "1.8.1",
     "tslib": "2.3.1"
-  },
-  "optionalDependencies": {
-    "@sgrud/core": "latest"
   },
   "files": [
     "./README.md"
