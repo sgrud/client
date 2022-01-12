@@ -103,7 +103,7 @@ export class HttpState
         this.changes.next(this);
       }),
       filter(({ type }) => {
-        return Boolean(type.endsWith('_load') ||
+        return Boolean(type === 'download_load' ||
           (includeDownloadProgress && type.startsWith('download_')) ||
           (includeUploadProgress && type.startsWith('upload_')));
       }),
