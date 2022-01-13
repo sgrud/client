@@ -710,9 +710,9 @@ export abstract class Model<M extends Model = any> {
    * the fields which are declared and defined on the supplied `model`, or
    * undefined, if the supplied `model` does not contain any fields or values.
    * By treemapping `shallow`ly, only properties defined on the supplied `model`
-   * are included (which means, all one-to-one and one-to-many associations
-   * are ignored). Through this method, the graph for one specific model
-   * instance from the respective model repository can be retrieved.
+   * are included (which means, all one-to-one and one-to-many associations are
+   * ignored). Through this method, the graph for one specific model instance
+   * from the respective model repository can be retrieved.
    *
    * @param this - Static polymorphic this.
    * @param model - The model which is to be treemapped.

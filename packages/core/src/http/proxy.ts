@@ -18,8 +18,8 @@ import { HttpHandler } from './client';
  * ```ts
  * import type { HttpHandler, HttpProxy } from '@sgrud/core';
  * import { Provider, Target } from '@sgrud/core';
- * import type { AjaxConfig, AjaxResponse, Observable } from 'rxjs/ajax';
- * import { of } from 'rxjs';
+ * import type { AjaxConfig, AjaxResponse } from 'rxjs/ajax';
+ * import { Observable, of } from 'rxjs';
  * import { file } from './file';
  *
  * @Target<typeof FileProxy>()
