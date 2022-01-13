@@ -76,7 +76,7 @@ export function HasMany<T extends Model.Type<any>>(
         },
         set(this: M, value?: any[]): void {
           if (TypeOf.null(value)) {
-            (this[key] as unknown) = value;
+            (this[key] as unknown) = null;
           } else if (!TypeOf.undefined(value)) {
             (this[key] as unknown) = value.map((i) => new (typeFactory())(i));
           } else return;
