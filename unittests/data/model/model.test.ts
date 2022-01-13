@@ -8,7 +8,7 @@ describe('@sgrud/data/model/model', () => {
   }
 
   const values = [
-    { uuid: 'uuid' },
+    { id: 'id' },
     { created: new Date(0) },
     { modified: new Date() }
   ];
@@ -26,7 +26,7 @@ describe('@sgrud/data/model/model', () => {
 
   describe('statically calling the deleteAll operation', () => {
     it('throws an error because no querier is available', (done) => {
-      Class.deleteAll(['uuid']).pipe(catchError((error) => {
+      Class.deleteAll(['id']).pipe(catchError((error) => {
         expect(error).toBeInstanceOf(ReferenceError);
         done();
 
@@ -37,7 +37,7 @@ describe('@sgrud/data/model/model', () => {
 
   describe('statically calling the deleteOne operation', () => {
     it('throws an error because no querier is available', (done) => {
-      Class.deleteOne('uuid').pipe(catchError((error) => {
+      Class.deleteOne('id').pipe(catchError((error) => {
         expect(error).toBeInstanceOf(ReferenceError);
         done();
 
@@ -99,7 +99,7 @@ describe('@sgrud/data/model/model', () => {
 
     it('returns the serialized model', () => {
       expect(Class.serialize(model)).toStrictEqual({
-        uuid: values[0].uuid
+        id: values[0].id
       });
     });
   });
@@ -109,7 +109,7 @@ describe('@sgrud/data/model/model', () => {
 
     it('returns the serialized model', () => {
       expect(Class.serialize(model, true)).toStrictEqual({
-        uuid: values[0].uuid
+        id: values[0].id
       });
     });
   });
@@ -118,7 +118,7 @@ describe('@sgrud/data/model/model', () => {
     const model = new Class(...values);
 
     it('returns the treemapped model', () => {
-      expect(Class.treemap(model)).toStrictEqual(['uuid']);
+      expect(Class.treemap(model)).toStrictEqual(['id']);
     });
   });
 
@@ -126,15 +126,15 @@ describe('@sgrud/data/model/model', () => {
     const model = new Class(...values);
 
     it('returns the treemapped model', () => {
-      expect(Class.treemap(model, true)).toStrictEqual(['uuid']);
+      expect(Class.treemap(model, true)).toStrictEqual(['id']);
     });
   });
 
   describe('statically unraveling a graph', () => {
     const graph = [
-      'uuid',
+      'id',
       { sub: [
-        'uuid'
+        'id'
       ] },
       { call: () => ({
         empty: undefined,
@@ -147,14 +147,14 @@ describe('@sgrud/data/model/model', () => {
 
     it('returns the unraveled graph', () => {
       expect(Class.unravel(graph)).toBe(
-        '{uuid sub{uuid} call(param:null){sub}}'
+        '{id sub{id} call(param:null){sub}}'
       );
     });
   });
 
   describe('statically valuating model properties', () => {
     const model = new Class({
-      uuid: undefined,
+      id: undefined,
       created: null!,
       modified: new Date()
     });
@@ -164,7 +164,7 @@ describe('@sgrud/data/model/model', () => {
     });
 
     it('returns the valuated properties', () => {
-      expect(Class.valuate(model, 'uuid')).toBeUndefined();
+      expect(Class.valuate(model, 'id')).toBeUndefined();
     });
 
     it('returns the valuated null-properties', () => {
@@ -179,7 +179,7 @@ describe('@sgrud/data/model/model', () => {
   describe('instantiating a model using parts', () => {
     const model = new Class(...values);
     const validate = (value: Class) => {
-      expect(value.uuid).toBe(values[0].uuid);
+      expect(value.id).toBe(values[0].id);
       expect(value.created).toBe(values[1].created!.valueOf());
       expect(value.modified).toBe(values[2].modified!.valueOf());
     };
@@ -194,7 +194,7 @@ describe('@sgrud/data/model/model', () => {
   describe('assigning parts to a model', () => {
     const model = new Class();
     const validate = (value: Class) => {
-      expect(value.uuid).toBe(values[0].uuid);
+      expect(value.id).toBe(values[0].id);
       expect(value.created).toBe(values[1].created!.valueOf());
       expect(value.modified).toBe(values[2].modified!.valueOf());
     };
@@ -217,7 +217,7 @@ describe('@sgrud/data/model/model', () => {
   describe('assigning null-parts to a model', () => {
     const model = new Class();
     const validate = (value: Class) => {
-      expect(value.uuid).toBeNull();
+      expect(value.id).toBeNull();
       expect(value.created).toBeNull();
       expect(value.modified).toBeNull();
     };
@@ -245,7 +245,7 @@ describe('@sgrud/data/model/model', () => {
   describe('clearing a model', () => {
     const model = new Class(...values);
     const validate = (value: Class) => {
-      expect(value.uuid).toBeUndefined();
+      expect(value.id).toBeUndefined();
       expect(value.created).toBeUndefined();
       expect(value.modified).toBeUndefined();
     };
@@ -268,7 +268,7 @@ describe('@sgrud/data/model/model', () => {
   describe('clearing a model partially', () => {
     const model = new Class(...values);
     const validate = (value: Class) => {
-      expect(value.uuid).toBe(values[0].uuid);
+      expect(value.id).toBe(values[0].id);
       expect(value.created).toBeUndefined();
       expect(value.modified).toBeUndefined();
     };
@@ -345,7 +345,7 @@ describe('@sgrud/data/model/model', () => {
 
     it('returns the serialized model', () => {
       expect(model.serialize()).toStrictEqual({
-        uuid: values[0].uuid
+        id: values[0].id
       });
     });
   });
@@ -355,7 +355,7 @@ describe('@sgrud/data/model/model', () => {
 
     it('returns the serialized model', () => {
       expect(model.serialize(true)).toStrictEqual({
-        uuid: values[0].uuid
+        id: values[0].id
       });
     });
   });
@@ -364,7 +364,7 @@ describe('@sgrud/data/model/model', () => {
     const model = new Class(...values);
 
     it('returns the treemapped model', () => {
-      expect(model.treemap()).toStrictEqual(['uuid']);
+      expect(model.treemap()).toStrictEqual(['id']);
     });
   });
 
@@ -372,7 +372,7 @@ describe('@sgrud/data/model/model', () => {
     const model = new Class(...values);
 
     it('returns the treemapped model', () => {
-      expect(model.treemap(true)).toStrictEqual(['uuid']);
+      expect(model.treemap(true)).toStrictEqual(['id']);
     });
   });
 

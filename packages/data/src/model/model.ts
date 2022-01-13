@@ -25,7 +25,7 @@ export namespace Model {
    * @typeParam T - Extending model instance type.
    */
   export type Field<T extends Model> = string &
-    Exclude<keyof T, Exclude<keyof Model, 'uuid' | 'created' | 'modified'>>;
+    Exclude<keyof T, Exclude<keyof Model, 'id' | 'created' | 'modified'>>;
 
   /**
    * Type alias referencing {@link Params}.
@@ -408,7 +408,7 @@ export abstract class Model<M extends Model = any> {
     const { plural } = new this();
 
     return this.commit(`mutation deleteAll($uuids: [String]!) {
-      delete${plural}(uuids: $uuids)
+      delete${plural}(ids: $uuids)
     }`, { uuids });
   }
 
@@ -441,7 +441,7 @@ export abstract class Model<M extends Model = any> {
     const { entity } = new this();
 
     return this.commit(`mutation deleteOne($uuid: String!) {
-      delete${entity}(uuid: $uuid)
+      delete${entity}(id: $uuid)
     }`, { uuid });
   }
 
@@ -487,7 +487,7 @@ export abstract class Model<M extends Model = any> {
    *     }
    *   }
    * }, [
-   *   'uuid',
+   *   'id',
    *   'field'
    * ]).subscribe(console.log);
    * ```
@@ -500,7 +500,7 @@ export abstract class Model<M extends Model = any> {
     const { plural } = new this();
 
     return this.commit(`query findAll($filter: FilterSortPaginateInput!) {
-      get${plural}(filter: $filter) {
+      get${plural}(params: $filter) {
         result ${this.unravel(graph)}
         total
       }
@@ -531,9 +531,9 @@ export abstract class Model<M extends Model = any> {
    * import { ExampleModel } from './example-model';
    *
    * ExampleModel.findOne({
-   *   uuid: '2cfe7609-c4d9-4e4f-9a8b-ad72737db48a'
+   *   id: '2cfe7609-c4d9-4e4f-9a8b-ad72737db48a'
    * }, [
-   *   'uuid',
+   *   'id',
    *   'modified',
    *   'field'
    * ]).subscribe(console.log);
@@ -578,7 +578,7 @@ export abstract class Model<M extends Model = any> {
    *   new ExampleModel({ field: 'example_2' }),
    *   new ExampleModel({ field: 'example_3' })
    * ], [
-   *   'uuid',
+   *   'id',
    *   'modified',
    *   'field'
    * ]).subscribe(console.log);
@@ -619,7 +619,7 @@ export abstract class Model<M extends Model = any> {
    * import { ExampleModel } from './example-model';
    *
    * ExampleModel.saveOne(new ExampleModel({ field: 'example' }), [
-   *   'uuid',
+   *   'id',
    *   'modified',
    *   'field'
    * ]).subscribe(console.log);
@@ -673,8 +673,8 @@ export abstract class Model<M extends Model = any> {
   ): Model.Shape<T> | undefined {
     const data = { } as Model.Shape<T>;
 
-    if (shallow && model.uuid) {
-      data.uuid = this.valuate(model, 'uuid' as Model.Field<T>);
+    if (shallow && model.id) {
+      data.id = this.valuate(model, 'id' as Model.Field<T>);
     } else {
       for (const key in this.prototype[property]) {
         if (!TypeOf.undefined(model[key as Model.Field<T>])) {
@@ -784,12 +784,12 @@ export abstract class Model<M extends Model = any> {
    * import { ExampleModel } from './example-model';
    *
    * const unraveled = ExampleModel.unravel([
-   *   'uuid',
+   *   'id',
    *   'modified',
    *   'field'
    * ]);
    *
-   * console.log(unraveled); // '{uuid modified field}'
+   * console.log(unraveled); // '{id modified field}'
    * ```
    */
   public static unravel<T extends Model>(
@@ -927,7 +927,7 @@ export abstract class Model<M extends Model = any> {
    * Universally unique identifier of this model instance.
    */
   @Property(() => String)
-  public uuid?: string;
+  public id?: string;
 
   /**
    * Transient creation date of this model instance.
@@ -1158,7 +1158,7 @@ export abstract class Model<M extends Model = any> {
    * import { ExampleModel } from './example-model';
    *
    * const model = new ExampleModel({
-   *   uuid: '3068b30e-82cd-44c5-8912-db13724816fd'
+   *   id: '3068b30e-82cd-44c5-8912-db13724816fd'
    * });
    *
    * model.delete().subscribe(console.log);
@@ -1169,7 +1169,7 @@ export abstract class Model<M extends Model = any> {
   public delete<T extends Model = M>(
     this: T
   ): Observable<T> {
-    return this.static.deleteOne<T>(this.uuid!).pipe(
+    return this.static.deleteOne<T>(this.id!).pipe(
       switchMap(() => this.clear()),
       finalize(() => this.changes.complete())
     );
@@ -1192,11 +1192,11 @@ export abstract class Model<M extends Model = any> {
    * import { ExampleModel } from './example-model';
    *
    * const model = new ExampleModel({
-   *   uuid: '3068b30e-82cd-44c5-8912-db13724816fd'
+   *   id: '3068b30e-82cd-44c5-8912-db13724816fd'
    * });
    *
    * model.find([
-   *   'uuid',
+   *   'id',
    *   'modified',
    *   'field'
    * ]).subscribe(console.log);
@@ -1232,7 +1232,7 @@ export abstract class Model<M extends Model = any> {
    * const model = new ExampleModel({ field: 'example' });
    *
    * model.save([
-   *   'uuid',
+   *   'id',
    *   'modified',
    *   'field'
    * ]).subscribe(console.log);
