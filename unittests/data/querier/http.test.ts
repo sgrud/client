@@ -8,12 +8,16 @@ describe('@sgrud/data/querier/http', () => {
   let server = null! as Server;
   afterAll(() => server.close());
   beforeAll(() => server = express()
-    .use('/', (_, r) => r.send())
+    .use('/', (_, r) => r.send(response))
     .listen(58080));
 
   const open = jest.spyOn(XMLHttpRequest.prototype, 'open');
   const send = jest.spyOn(XMLHttpRequest.prototype, 'send');
   afterEach(() => [open, send].forEach((i) => i.mockClear()));
+
+  const response = {
+    data: null
+  };
 
   class Class extends Model<Class> {
     protected readonly [Symbol.toStringTag]: string = 'Class';

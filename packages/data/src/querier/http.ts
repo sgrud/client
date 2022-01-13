@@ -1,5 +1,5 @@
 import { HttpClient, Kernel, Provider, TypeOf } from '@sgrud/core';
-import { map, Observable } from 'rxjs';
+import { Observable, of, switchMap, throwError } from 'rxjs';
 import { Model } from '../model/model';
 import { Querier } from './querier';
 
@@ -69,10 +69,14 @@ export class HttpQuerier
     operation: Querier.Operation,
     variables: Querier.Variables
   ): Observable<any> {
-    return HttpClient.post(this.endpoint, {
+    return HttpClient.post<any>(this.endpoint, {
       query: operation,
       variables
-    }).pipe(map(({ response }) => response));
+    }).pipe(switchMap(({ response }) => {
+      return response.errors?.length
+        ? throwError(() => response.errors[0])
+        : of(response.data);
+    }));
   }
 
   /**
