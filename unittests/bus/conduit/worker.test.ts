@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
 import { ConduitWorker } from '@sgrud/bus';
-import { BehaviorSubject, catchError, of, Subject, timeout } from 'rxjs';
+import { BehaviorSubject, catchError, of, Subject, throwError, timeout } from 'rxjs';
 
 describe('@sgrud/bus/conduit/worker', () => {
 
@@ -77,7 +77,7 @@ describe('@sgrud/bus/conduit/worker', () => {
         handle,
         value
       }) => {
-        expect(handle).toBe(null);
+        expect(handle).toBeNull();
         expect(value).toBeInstanceOf(Error);
         subscription.unsubscribe();
       });
@@ -89,6 +89,30 @@ describe('@sgrud/bus/conduit/worker', () => {
 
       worker.set('sgrud.test.bus.subject', subject);
       subject.next('done');
+    });
+  });
+
+  describe('pushing an error through a conduit', () => {
+    const worker = new ConduitWorker();
+    const exception = throwError(() => null);
+
+    it('', (done) => {
+      const subscription = worker.get('sgrud.test.bus.error').pipe(
+        catchError((error) => of({
+          handle: null,
+          value: error
+        }))
+      ).subscribe(({
+        handle,
+        value
+      }) => {
+        expect(handle).toBeNull();
+        expect(value).toBeNull();
+        subscription.unsubscribe();
+      });
+
+      subscription.add(done);
+      worker.set('sgrud.test.bus.error', exception);
     });
   });
 

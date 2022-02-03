@@ -1,5 +1,5 @@
 import { ConduitHandler } from '@sgrud/bus';
-import { BehaviorSubject, catchError, of, Subject, timeout } from 'rxjs';
+import { BehaviorSubject, catchError, of, Subject, throwError, timeout } from 'rxjs';
 
 describe('@sgrud/bus/conduit/handler', () => {
 
@@ -83,7 +83,7 @@ describe('@sgrud/bus/conduit/handler', () => {
         handle,
         value
       }) => {
-        expect(handle).toBe(null);
+        expect(handle).toBeNull();
         expect(value).toBeInstanceOf(Error);
         subscription.unsubscribe();
       });
@@ -95,6 +95,30 @@ describe('@sgrud/bus/conduit/handler', () => {
 
       handler.set('sgrud.test.bus.subject', subject);
       setTimeout(() => subject.next('done'), 250);
+    });
+  });
+
+  describe('pushing an error through a conduit', () => {
+    const handler = new ConduitHandler();
+    const exception = throwError(() => null);
+
+    it('', (done) => {
+      const subscription = handler.get('sgrud.test.bus.error').pipe(
+        catchError((error) => of({
+          handle: null,
+          value: error
+        }))
+      ).subscribe(({
+        handle,
+        value
+      }) => {
+        expect(handle).toBeNull();
+        expect(value).toBeNull();
+        subscription.unsubscribe();
+      });
+
+      subscription.add(done);
+      handler.set('sgrud.test.bus.error', exception);
     });
   });
 
