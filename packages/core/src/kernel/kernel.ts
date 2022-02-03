@@ -387,7 +387,7 @@ export class Kernel {
         }
       });
 
-      if (!props.src || (this.shimmed && props.type?.endsWith(this.shimmed))) {
+      if (!props.src || this.shimmed && props.type?.endsWith(this.shimmed)) {
         setTimeout(script.onload);
       }
 

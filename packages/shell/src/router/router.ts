@@ -145,8 +145,7 @@ export class Router {
       if (parts[i] === paths[i]) {
         continue;
       } else if (
-        paths[i].startsWith(':') &&
-        (parts[i] || paths[i].endsWith('?'))
+        paths[i].startsWith(':') && (parts[i] || paths[i].endsWith('?'))
       ) {
         const key = paths[i].replace(/^:(.+?)\??$/, '$1');
         assign(segment.params, { [key]: parts[i] || undefined });

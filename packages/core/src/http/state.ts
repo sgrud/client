@@ -104,8 +104,8 @@ export class HttpState
       }),
       filter(({ type }) => {
         return Boolean(type === 'download_load' ||
-          (includeDownloadProgress && type.startsWith('download_')) ||
-          (includeUploadProgress && type.startsWith('upload_')));
+          includeDownloadProgress && type.startsWith('download_') ||
+          includeUploadProgress && type.startsWith('upload_'));
       }),
       finalize(() => {
         this.running.delete(request);
