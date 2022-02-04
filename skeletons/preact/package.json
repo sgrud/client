@@ -19,16 +19,16 @@
     "./src/index.html"
   ],
   "dependencies": {
-    "@babel/runtime": "7.16.7",
+    "@babel/runtime": "7.17.0",
     "@sgrud/bin": "latest",
-    "preact": "10.6.4",
+    "preact": "10.6.5",
     "preact-custom-element": "4.2.1",
     "tslib": "2.3.1"
   },
   "devDependencies": {
     "@types/css-modules": "1.0.2",
     "@types/preact-custom-element": "4.0.1",
-    "node-sass": "7.0.1"
+    "sass": "1.49.7"
   },
   "webDependencies": {
     "@babel/runtime": {

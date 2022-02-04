@@ -4,7 +4,7 @@
   "scripts": {
     "preinstall": "npm pack ../../skeletons/*/dist",
     "install": "npm install --no-save *.tgz && rm *.tgz",
-    "postinstall": "sgrud runtimify @babel/runtime:helpers",
+    "postinstall": "sgrud runtimify @babel/runtime:helpers lit:!static",
     "start": "sgrud universal -H 0.0.0.0 src/index.html"
   },
   "dependencies": {

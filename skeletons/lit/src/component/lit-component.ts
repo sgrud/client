@@ -1,5 +1,6 @@
-import { css, CSSResultGroup, html, LitElement, TemplateResult } from 'lit';
+import { CSSResultGroup, html, LitElement, TemplateResult, unsafeCSS } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import styles from './lit-component.sass';
 
 declare global {
   interface HTMLElementTagNameMap {
@@ -10,11 +11,7 @@ declare global {
 @customElement('lit-component')
 export default class LitComponent extends LitElement {
 
-  public static override styles: CSSResultGroup = css`
-    h1 {
-      font-style: italic;
-    }
-  `;
+  public static override styles: CSSResultGroup = unsafeCSS(styles);
 
   @property({
     type: String
