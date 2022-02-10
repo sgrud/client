@@ -72,7 +72,7 @@ export class HttpQuerier
       variables
     }).pipe(switchMap(({ response }) => {
       return response.errors?.length
-        ? throwError(() => response.errors[0])
+        ? throwError(() => new AggregateError(response.errors))
         : of(response.data);
     }));
   }
