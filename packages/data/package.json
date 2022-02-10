@@ -1,7 +1,7 @@
 {
   "name": "@sgrud/data",
   "amdName": "sgrud.data",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "source": "./index.ts",
   "types": "./index.d.ts",
   "main": "../../dist/data/index.js",
