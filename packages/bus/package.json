@@ -14,9 +14,9 @@
     "./README.md"
   ],
   "dependencies": {
-    "@babel/runtime": "^7.17.0",
+    "@babel/runtime": "^7.17.2",
     "@sgrud/core": "latest",
-    "rxjs": "^7.5.2",
+    "rxjs": "^7.5.4",
     "tslib": "^2.3.1"
   }
 }
