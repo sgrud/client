@@ -609,7 +609,7 @@ export abstract class Model<M extends Model = any> {
    * repository can be achieved.
    *
    * @param this - Static polymorphic this.
-   * @param model - The model which is to be saved.
+   * @param model - Model which is to be saved.
    * @param graph - Graph of fields to be included.
    * @typeParam T - Extending model instance type.
    * @returns Observable of the save operation.
@@ -652,7 +652,7 @@ export abstract class Model<M extends Model = any> {
    * respective model repository can be achieved.
    *
    * @param this - Static polymorphic this.
-   * @param model - The model which is to be serialized.
+   * @param model - Model which is to be serialized.
    * @param shallow - Whether to serialize shallowly.
    * @typeParam T - Extending model instance type.
    * @returns Shape of the model or undefined.
@@ -715,7 +715,7 @@ export abstract class Model<M extends Model = any> {
    * from the respective model repository can be retrieved.
    *
    * @param this - Static polymorphic this.
-   * @param model - The model which is to be treemapped.
+   * @param model - Model which is to be treemapped.
    * @param shallow - Whether to treemap shallowly.
    * @typeParam T - Extending model instance type.
    * @returns Graph of the model or undefined.
