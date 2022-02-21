@@ -686,16 +686,20 @@ export abstract class Model<M extends Model = any> {
 
     if (!shallow) {
       for (const key in this.prototype[hasMany]) {
-        if (!TypeOf.undefined(model[key as Model.Field<T>])) {
+        if (TypeOf.null(model[key as Model.Field<T>])) {
+          data[key as Model.Field<T>] = null!;
+        } else if (!TypeOf.undefined(model[key as Model.Field<T>])) {
           // @ts-expect-error type casting nightmare
-          data[key] = model[key]?.map((i) => i.serialize(shallow));
+          data[key] = model[key].map((i) => i.serialize(shallow));
         }
       }
 
       for (const key in this.prototype[hasOne]) {
-        if (!TypeOf.undefined(model[key as Model.Field<T>])) {
+        if (TypeOf.null(model[key as Model.Field<T>])) {
+          data[key as Model.Field<T>] = null!;
+        } else if (!TypeOf.undefined(model[key as Model.Field<T>])) {
           // @ts-expect-error type casting nightmare
-          data[key] = model[key]?.serialize(shallow);
+          data[key] = model[key].serialize(shallow);
         }
       }
     }

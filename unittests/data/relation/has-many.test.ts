@@ -77,7 +77,7 @@ describe('@sgrud/data/relation/has-many', () => {
       owner.assign(...values.flatMap((value) => {
         return Object.keys(value).map((key) => ({
           [key]: null
-        })) as Model.Shape<Owner>;
+        }));
       })).subscribe(validate);
     });
 
@@ -105,6 +105,22 @@ describe('@sgrud/data/relation/has-many', () => {
 
     it('clears the model which has many models', () => {
       validate(owner);
+    });
+  });
+
+  describe('serializing a model which has null-parts', () => {
+    const owner = new Owner(...values.flatMap((value) => {
+      return Object.keys(value).map((key) => ({
+        [key]: null
+      }));
+    }));
+    const validate = (value: Model.Shape<Owner>) => {
+      expect(value.property).toBeNull();
+      expect(value.owned).toBeNull();
+    };
+
+    it('returns the serialized model which has null-parts', () => {
+      validate(owner.serialize()!);
     });
   });
 

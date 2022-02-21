@@ -75,7 +75,7 @@ describe('@sgrud/data/relation/has-one', () => {
       owner.assign(...values.flatMap((value) => {
         return Object.keys(value).map((key) => ({
           [key]: null
-        })) as Model.Shape<Owner>;
+        }));
       })).subscribe(validate);
     });
 
@@ -114,6 +114,22 @@ describe('@sgrud/data/relation/has-one', () => {
     };
 
     it('returns the serialized model which has one model', () => {
+      validate(owner.serialize()!);
+    });
+  });
+
+  describe('serializing a model which has null-parts', () => {
+    const owner = new Owner(...values.flatMap((value) => {
+      return Object.keys(value).map((key) => ({
+        [key]: null
+      }));
+    }));
+    const validate = (value: Model.Shape<Owner>) => {
+      expect(value.property).toBe(null);
+      expect(value.owned).toBe(null);
+    };
+
+    it('returns the serialized model which has null-parts', () => {
       validate(owner.serialize()!);
     });
   });
