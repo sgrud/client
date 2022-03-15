@@ -17,7 +17,7 @@ cli.command('construct [...entries]')
   .action((_ = [], opts) => construct({ ...opts, entries: opts._.concat(_) }));
 
 /**
- * Builds a SGRUD-based project using
+ * Builds a [SGRUD](https://github.com/sgrud/client)-based project using
  * [microbundle](https://www.npmjs.com/package/microbundle).
  *
  * ```text

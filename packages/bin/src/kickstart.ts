@@ -6,20 +6,18 @@ import { join, resolve } from 'path';
 import { cli } from './.cli';
 
 cli.command('kickstart [library]')
-  .describe('Kickstarts an angular, lit, preact or vue-based SGRUD project')
+  .describe('Kickstarts a SGRUD-based project')
   .example('kickstart # Run with default options')
   .example('kickstart preact --cwd ./project # Kickstart preact in ./project')
   .option('--cwd', 'Use an alternative working directory', './')
   .action((library, opts) => kickstart({ ...opts, library }));
 
 /**
- * Kickstarts an [angular](https://angular.io), [lit](https://lit.dev),
- * [preact](https://preactjs.com) or [vue](https://vuejs.org)-based SGRUD
- * project.
+ * Kickstarts a [SGRUD](https://github.com/sgrud/client)-based project.
  *
  * ```text
  * Description
- *   Kickstarts an angular, lit, preact or vue-based SGRUD project
+ *   Kickstarts a SGRUD-based project
  *
  * Usage
  *   $ sgrud kickstart [library] [options]
@@ -39,18 +37,18 @@ cli.command('kickstart [library]')
  * @example Run with default options.
  * ```js
  * require('@sgrud/bin');
- * sgrud.bin.Kickstart();
+ * sgrud.bin.kickstart();
  * ```
  *
- * @example Kickstart vue in `./sgrud-vue`.
+ * @example Kickstart `preact` in `./project`.
  * ```js
  * require('@sgrud/bin');
- * sgrud.bin.Kickstart({ cwd: './sgrud-vue', library: 'vue' });
+ * sgrud.bin.kickstart({ cwd: './project', library: 'preact' });
  * ```
  */
 export async function kickstart({
   cwd = './',
-  library = 'lit'
+  library = 'fast'
 }: {
 
   /**
@@ -63,7 +61,7 @@ export async function kickstart({
   /**
    * Library which to base upon.
    *
-   * @defaultValue `'lit'`
+   * @defaultValue `'fast'`
    */
   library?: string;
 

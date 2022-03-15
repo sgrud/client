@@ -3,23 +3,23 @@
 import { execSync } from 'child_process';
 import { createHash } from 'crypto';
 import { copyFileSync, existsSync, readFileSync, writeFileSync } from 'fs-extra';
-import { basename, dirname, join, normalize, relative, resolve, sep } from 'path';
+import { basename, dirname, join, normalize, relative, resolve } from 'path';
 import { cli, _b, _g, __ } from './.cli';
 
 cli.command('postbuild')
-  .describe('Replicates exported package.json files in the SGRUD monorepo')
+  .describe('Replicates exported package metadata for SGRUD-based projects')
   .example('postbuild # Run with default options')
   .example('postbuild --cwd ./projects/sgrud # Run in ./projects/sgrud')
   .option('--cwd', 'Use an alternative working directory', './')
   .action((opts) => postbuild({ ...opts }));
 
 /**
- * Replicates exported `package.json` files in the
- * [SGRUD monorepo](https://github.com/sgrud/client).
+ * Replicates exported package metadata for
+ * [SGRUD](https://github.com/sgrud/client)-based projects.
  *
  * ```text
  * Description
- *   Replicates exported package.json files in the SGRUD monorepo
+ *   Replicates exported package metadata for SGRUD-based projects
  *
  * Usage
  *   $ sgrud postbuild [options]
@@ -65,7 +65,7 @@ export async function postbuild({
   const sha265 = createHash('sha256');
   const writes = [];
 
-  for (const bundle of module.exports?.values?.() ?? ['.']) {
+  for (const bundle of module.exports?.values?.() ?? ['./']) {
     const assets = [];
     const origin = join(cwd, bundle, 'package.json');
     const source = require(resolve(origin));
@@ -104,7 +104,7 @@ export async function postbuild({
         case 'homepage':
           source[key] = [
             module[key], 'tree', commit.slice(0, 7), normalize(bundle)
-          ].join(sep);
+          ].join('/');
           break;
 
         case 'repository':
