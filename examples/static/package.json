@@ -2,25 +2,18 @@
   "name": "sgrud-example-static",
   "private": true,
   "scripts": {
-    "preinstall": "npm pack ../../skeletons/*/dist",
-    "install": "npm install --no-save *.tgz && rm *.tgz",
-    "postinstall": "sgrud runtimify @babel/runtime:helpers lit:!static",
-    "start": "sgrud universal -H 0.0.0.0 src/index.html"
+    "preinstall": "npm pack ../../dist/* ../../skeletons/*/dist",
+    "install": "npm install --no-save ./*.tgz && rm ./*.tgz",
+    "start": "sgrud universal --host 0.0.0.0"
   },
   "dependencies": {
-    "@sgrud/bin": "latest",
-    "@sgrud/bus": "latest",
-    "@sgrud/core": "latest",
-    "@sgrud/data": "latest",
-    "@sgrud/shell": "latest",
-    "@sgrud/state": "latest",
-    "core-js-bundle": "3.20.0",
-    "es-module-shims": "1.4.1"
+    "core-js-bundle": "3.21.1",
+    "es-module-shims": "1.4.7"
   },
   "sgrudDependencies": {
     "sgrud-skeleton-angular": "latest",
+    "sgrud-skeleton-fast": "latest",
     "sgrud-skeleton-lit": "latest",
-    "sgrud-skeleton-preact": "latest",
-    "sgrud-skeleton-vue": "latest"
+    "sgrud-skeleton-preact": "latest"
   }
 }
