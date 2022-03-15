@@ -1,7 +1,7 @@
 {
   "name": "@sgrud/core",
   "amdName": "sgrud.core",
-  "version": "0.0.6",
+  "version": "0.0.8",
   "source": "./index.ts",
   "types": "./index.d.ts",
   "main": "../../dist/core/index.js",
