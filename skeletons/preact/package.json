@@ -7,7 +7,7 @@
   "unpkg": "./dist/sgrud-skeleton-preact.umd.js",
   "private": true,
   "scripts": {
-    "postinstall": "sgrud runtimify @babel/runtime:helpers",
+    "postinstall": "sgrud runtimify",
     "build": "sgrud construct --format modern,umd",
     "postbuild": "sgrud postbuild"
   },
@@ -18,17 +18,20 @@
   "copy": [
     "./src/index.html"
   ],
+  "runtimify": [
+    "@babel/runtime:helpers"
+  ],
   "dependencies": {
-    "@babel/runtime": "7.17.0",
+    "@babel/runtime": "7.17.7",
     "@sgrud/bin": "latest",
-    "preact": "10.6.5",
+    "preact": "10.6.6",
     "preact-custom-element": "4.2.1",
     "tslib": "2.3.1"
   },
   "devDependencies": {
     "@types/css-modules": "1.0.2",
     "@types/preact-custom-element": "4.0.1",
-    "sass": "1.49.7"
+    "sass": "1.49.9"
   },
   "webDependencies": {
     "@babel/runtime": {

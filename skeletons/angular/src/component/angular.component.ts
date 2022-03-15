@@ -10,7 +10,12 @@ declare global {
 }
 
 @Component({
-  templateUrl: './angular.component.html',
+  template: `
+    <div>
+      <h1>angular-component says hello {{ name }}</h1>
+      <div><slot></slot></div>
+    </div>
+  `,
   styleUrls: ['./angular.component.sass'],
   encapsulation: ViewEncapsulation.ShadowDom
 })
