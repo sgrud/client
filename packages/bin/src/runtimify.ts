@@ -4,24 +4,24 @@ import { createWriteStream } from 'fs-extra';
 import { join, relative, resolve } from 'path';
 import { cli } from './.cli';
 
-cli.command('runtimify <...modules>')
-  .describe('Extracts and bundles runtime helpers using `microbundle`')
-  .example('runtimify @babel/runtime:helpers # Runtimify `@babel/runtime`')
-  .example('runtimify lit # Runtimify `lit`')
+cli.command('runtimify [...modules]')
+  .describe('Creates UMD bundles for ES6 modules using `microbundle`')
+  .example('runtimify # Run with default options')
+  .example('runtimify @microsoft/fast # Runtimify `@microsoft/fast`')
   .option('--cwd', 'Use an alternative working directory', './')
   .option('-o, --out', 'Output file within package root', 'runtimify.js')
-  .action((_, opts) => runtimify({ ...opts, modules: opts._.concat(_) }));
+  .action((_ = [], opts) => runtimify({ ...opts, modules: opts._.concat(_) }));
 
 /**
- * Extracts and bundles runtime helpers using
+ * Creates UMD bundles for ES6 modules using
  * [microbundle](https://www.npmjs.com/package/microbundle).
  *
  * ```text
  * Description
- *   Extracts and bundles runtime helpers using `microbundle`
+ *   Creates UMD bundles for ES6 modules using `microbundle`
  *
  * Usage
- *   $ sgrud runtimify <...modules> [options]
+ *   $ sgrud runtimify [...modules] [options]
  *
  * Options
  *   --cwd         Use an alternative working directory  (default ./)
@@ -29,23 +29,23 @@ cli.command('runtimify <...modules>')
  *   -h, --help    Displays this message
  *
  * Examples
- *   $ sgrud runtimify @babel/runtime:helpers # Runtimify `@babel/runtime`
- *   $ sgrud runtimify lit:!static # Runtimify `lit`
+ *   $ sgrud runtimify # Run with default options
+ *   $ sgrud runtimify @microsoft/fast # Runtimify `@microsoft/fast`
  * ```
  *
  * @param options - Options object.
  * @returns Execution promise.
  *
- * @example Runtimify `@babel/runtime`.
+ * @example Run with default options.
  * ```js
  * require('@sgrud/bin');
- * sgrud.bin.runtimify({ modules: ['@babel/runtime:helpers'] });
+ * sgrud.bin.runtimify();
  * ```
  *
- * @example Runtimify `lit`.
+ * @example Runtimify `@microsoft/fast`.
  * ```js
  * require('@sgrud/bin');
- * sgrud.bin.runtimify({ modules: ['lit:!static'] });
+ * sgrud.bin.runtimify({ modules: ['@microsoft/fast'] });
  * ```
  */
 export async function runtimify({
@@ -78,8 +78,21 @@ export async function runtimify({
 } = { }): Promise<void> {
   cwd = resolve(cwd);
 
-  for (const pkg of modules.map((i) => i.split(':'))) {
-    process.chdir(join(cwd, 'node_modules', pkg[0]));
+  if (!modules.length) {
+    const pkg = require(resolve(join(cwd, 'package.json')));
+
+    if ('runtimify' in pkg) {
+      modules.push(...pkg.runtimify);
+    }
+  }
+
+  for (const pkg of [...new Set(modules)].map((i) => i.split(':'))) {
+    try {
+      process.chdir(join(cwd, 'node_modules', pkg[0]));
+    } catch {
+      process.chdir(join(process.env.INIT_CWD!, 'node_modules', pkg[0]));
+    }
+
     const { exports, main, module, type } = require(resolve('package.json'));
     const filter = pkg.filter((i) => !i.startsWith('!'));
     const stream = createWriteStream(out);
