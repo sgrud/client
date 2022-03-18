@@ -38,6 +38,7 @@
  *   - {@link TypeOf}: strict type-assertion and runtime type-checking utility
  * - Miscellaneous utilities
  *   - {@link Singleton}: class decorator enforcing the singleton pattern
+ *   - {@link assign}: deep assigns all properties from sources to a target
  *   - {@link pluralize}: pluralizes words of the English language
  *
  * @packageDocumentation
@@ -60,5 +61,6 @@ export * from './src/thread/transfer';
 export * from './src/typing/assign';
 export * from './src/typing/merge';
 export * from './src/typing/type-of';
+export * from './src/utility/assign';
 export * from './src/utility/pluralize';
 export * from './src/utility/singleton';

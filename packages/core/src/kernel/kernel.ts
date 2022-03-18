@@ -1,6 +1,6 @@
 import { concat, defaultIfEmpty, forkJoin, ignoreElements, map, observable, Observable, ReplaySubject, Subscribable, switchMap, throwError } from 'rxjs';
 import { HttpClient } from '../http/client';
-import { assign } from '../typing/assign';
+import { assign } from '../utility/assign';
 import { Singleton } from '../utility/singleton';
 import { semver } from './semver';
 
