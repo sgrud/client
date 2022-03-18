@@ -1,8 +1,15 @@
 import { concat, defaultIfEmpty, forkJoin, ignoreElements, map, observable, Observable, ReplaySubject, Subscribable, switchMap, throwError } from 'rxjs';
 import { HttpClient } from '../http/client';
+import { Mutable } from '../typing/mutable';
 import { assign } from '../utility/assign';
 import { Singleton } from '../utility/singleton';
 import { semver } from './semver';
+
+/**
+ * String literal helper type. Enforces any assigned string to adhere to the
+ * represent a browser-parsable digest hash.
+ */
+export type Digest = `sha${256 | 384 | 512}-${string}`;
 
 /**
  * Interface describing the shape of a module. This interface is aligned with
@@ -65,8 +72,10 @@ export interface Module {
    * Optional bundle digests. If hashes are supplied, they will be used to
    * verify the [subresource integrity](https://www.w3.org/TR/SRI) of the
    * respective bundles.
+   *
+   * @see {@link Digest}
    */
-  readonly digest?: Record<string, `sha${256 | 384 | 512}-${string}`>;
+  readonly digest?: Record<string, Digest>;
 
   /**
    * Optional SGRUD dependencies.
@@ -75,11 +84,27 @@ export interface Module {
 
   /**
    * Optional runtime dependencies.
+   *
+   * @see {@link WebDependency}
    */
-  readonly webDependencies?: Record<string, {
-    exports?: Record<string, string>;
-    unpkg?: string[];
-  }>;
+  readonly webDependencies?: Record<string, WebDependency>;
+
+}
+
+/**
+ * Interface describing a runtime dependency of a {@link Module}.
+ */
+export interface WebDependency {
+
+  /**
+   * Optional ESM runtime dependencies.
+   */
+  readonly exports?: Record<string, string>;
+
+  /**
+   * Optional UMD runtime dependencies.
+   */
+  readonly unpkg?: string[];
 
 }
 
@@ -90,7 +115,7 @@ export interface Module {
  * applications based on the SGRUD client library may be comprised of multiple,
  * optionally loaded {@link Module}s, which, depending on the application
  * structure and configuration, can be {@link insmod}ded initially, by supplying
- * them as sgrudDepeldencies through the corresponding API endpoint, or later
+ * them as sgrudDependencies through the corresponding API endpoint, or later
  * on, manually.
  *
  * @decorator {@link Singleton}
@@ -178,6 +203,10 @@ export class Kernel {
    * ```
    */
   public constructor(
+
+    /**
+     * Base href for building URLs.
+     */
     baseHref: string = location.origin,
 
     /**
@@ -253,7 +282,7 @@ export class Kernel {
       this.loaders.set(module.name, loader);
 
       const chain = [] as Observable<any>[];
-      const dependencies = { } as Required<Module>['webDependencies'][string];
+      const dependencies = { } as Mutable<WebDependency>;
       const { sgrudDependencies, webDependencies } = module;
 
       if (sgrudDependencies) {
