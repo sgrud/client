@@ -2,6 +2,7 @@ import { concat, defaultIfEmpty, forkJoin, ignoreElements, map, observable, Obse
 import { HttpClient } from '../http/client';
 import { assign } from '../typing/assign';
 import { Singleton } from '../utility/singleton';
+import { semver } from './semver';
 
 /**
  * Interface describing the shape of a module. This interface is aligned with
@@ -258,7 +259,7 @@ export class Kernel {
       if (sgrudDependencies) {
         chain.push(forkJoin(Object.keys(sgrudDependencies).map((name) => {
           return this.resolve(name).pipe(switchMap((dependency) => {
-            if (!this.satisfies(dependency.version, sgrudDependencies[name])) {
+            if (!semver(dependency.version, sgrudDependencies[name])) {
               return throwError(() => new RangeError(dependency.name));
             }
 
@@ -394,94 +395,6 @@ export class Kernel {
       document.head.appendChild(script);
       return () => script.remove();
     });
-  }
-
-  /**
-   * Best-effort [semver](https://semver.org) matcher. The supplied `version`
-   * will be tested against all supplied `ranges`.
-   *
-   * @param semver - Tested semantic version string.
-   * @param ranges - Ranges to test the `version` against.
-   * @returns Wether `semver` satisfies `ranges`.
-   *
-   * @example Test `'1.2.3'` against `'>2 <1 || ~1.2.*'`.
-   * ```ts
-   * import { Kernel } from '@sgrud/core';
-   *
-   * new Kernel().satisfies('1.2.3', '>2 <1 || ~1.2.*'); // true
-   * ```
-   */
-  public satisfies(semver: string, ranges: string): boolean {
-    const input = semver.replace(/\+.*$/, '').split(/[-.]/);
-    const paths = ranges.split(/\s*\|\|\s*/);
-
-    for (const path of paths) {
-      const parts = path.split(/\s+/);
-      let tests = [] as [string, string[]][];
-      let valid = true;
-
-      for (let part of parts) {
-        let mode = '=';
-        part = part.replace(/^[<>=~^]*/, (match) => {
-          if (match) mode = match;
-          return '';
-        }).replace(/^V|\.[X*]/gi, '');
-
-        if (part === 'latest' || /^[X~*^]*$/i.exec(part)) {
-          tests = [['>=', ['0', '0', '0', '0']]];
-          break;
-        }
-
-        let index;
-        const split = part.replace(/\+.*$/, '').split(/[-.]/);
-
-        if (mode === '^') {
-          index = Math.min(split.lastIndexOf('0') + 1, split.length - 1, 2);
-        } else if (mode === '~' || mode === '~>') {
-          index = Math.min(split.length - 1, 1);
-        } else {
-          tests.push([mode, split]);
-          continue;
-        }
-
-        const empty = new Array(split.length - index).fill(0);
-        const match = split.slice(0, index + 1).concat(...empty);
-        match[index] = (parseInt(match[index]) + 1).toString();
-        tests.push(['>=', split], ['<', match]);
-      }
-
-      for (const [mode, taken] of tests) {
-        const latest = input.some((i) => /[^\d]+/.exec(i));
-        const length = Math.min(input.length, taken.length);
-        const source = input.slice(0, length).join('.');
-        const target = taken.slice(0, length).join('.');
-        const weight = source.localeCompare(target, undefined, {
-          numeric: true,
-          sensitivity: 'base'
-        });
-
-        valid &&= (!latest || length === input.length);
-
-        switch (mode) {
-          case '<': valid &&= weight < 0; break;
-          case '<=': valid &&= weight <= 0; break;
-          case '>': valid &&= weight > 0; break;
-          case '>=': valid &&= weight >= 0; break;
-          case '=': valid &&= weight === 0; break;
-          default: valid = false; break;
-        }
-
-        if (!valid) {
-          break;
-        }
-      }
-
-      if (valid) {
-        return true;
-      }
-    }
-
-    return false;
   }
 
 }

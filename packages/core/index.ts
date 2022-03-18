@@ -14,6 +14,9 @@
  * The different functions and classes implemented within this module can be
  * roughly categorized into the following functional aspects.
  *
+ * - SGRUD Kernel
+ *   - {@link Kernel}: an essential dependency loader
+ *   - {@link semver}: best-effort `semver` matcher
  * - HTTP client
  *   - {@link HttpClient}: a simple `rxjs/ajax`-based HTTP client
  *   - {@link HttpProxy}: abstract base class for proxies/interceptors
@@ -44,6 +47,7 @@ export * from './src/http/client';
 export * from './src/http/proxy';
 export * from './src/http/state';
 export * from './src/kernel/kernel';
+export * from './src/kernel/semver';
 export * from './src/linker/factor';
 export * from './src/linker/linker';
 export * from './src/linker/target';
