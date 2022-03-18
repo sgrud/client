@@ -2,7 +2,7 @@
 
 import { expose, proxy, ProxyMarked, transferHandlers, wrap } from 'comlink';
 import { Observable, Observer, Subscribable, Subscriber } from 'rxjs';
-import { TypeOf } from '../typing/type-of';
+import { TypeOf } from '../utility/type-of';
 
 /**
  * Observable transfer handler. This specific implementation of

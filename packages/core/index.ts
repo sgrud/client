@@ -35,9 +35,9 @@
  * - Type helpers
  *   - {@link Assign}: assigns the own property types from a source to a target
  *   - {@link Merge}: type helper to convert union types to intersection types
- *   - {@link TypeOf}: strict type-assertion and runtime type-checking utility
  * - Miscellaneous utilities
  *   - {@link Singleton}: class decorator enforcing the singleton pattern
+ *   - {@link TypeOf}: strict type-assertion and runtime type-checking utility
  *   - {@link assign}: deep assigns all properties from sources to a target
  *   - {@link pluralize}: pluralizes words of the English language
  *
@@ -60,7 +60,7 @@ export * from './src/thread/thread';
 export * from './src/thread/transfer';
 export * from './src/typing/assign';
 export * from './src/typing/merge';
-export * from './src/typing/type-of';
 export * from './src/utility/assign';
 export * from './src/utility/pluralize';
 export * from './src/utility/singleton';
+export * from './src/utility/type-of';

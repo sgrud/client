@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
 import { wrap } from 'comlink';
-import { TypeOf } from '../typing/type-of';
+import { TypeOf } from '../utility/type-of';
 
 /**
  * Class property decorator factory. Spawns a worker process, wraps it with

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
 import { expose, Remote } from 'comlink';
-import { TypeOf } from '../typing/type-of';
+import { TypeOf } from '../utility/type-of';
 
 /**
  * Interface describing an exposed class in a remote context. Created by
