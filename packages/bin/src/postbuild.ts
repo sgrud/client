@@ -2,7 +2,7 @@
 
 import { execSync } from 'child_process';
 import { createHash } from 'crypto';
-import { copyFileSync, existsSync, readFileSync, writeFileSync } from 'fs-extra';
+import { copySync, existsSync, readFileSync, writeFileSync } from 'fs-extra';
 import { basename, dirname, join, normalize, relative, resolve } from 'path';
 import { cli, _b, _g, __ } from './.cli';
 
@@ -160,7 +160,7 @@ export async function postbuild({
       if (content) {
         writeFileSync(target, content);
       } else {
-        copyFileSync(source, target);
+        copySync(source, target);
       }
     }
   }
