@@ -18,7 +18,7 @@ describe('@sgrud/core/super/registry', () => {
       super(classParam);
     }
     public classSelf: () => this = () => this;
-    public self: () => this = () => this;
+    public override self: () => this = () => this;
   }
 
   describe('instantiating a registry', () => {

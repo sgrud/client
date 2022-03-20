@@ -19,7 +19,7 @@ describe('@sgrud/core/super/provider', () => {
       super(classParam);
     }
     public classSelf: () => this = () => this;
-    public self: () => this = () => this;
+    public override self: () => this = () => this;
   }
 
   describe('extending a provider by magic string', () => {
