@@ -96,7 +96,7 @@ describe('@sgrud/bus/conduit/worker', () => {
     const worker = new ConduitWorker();
     const exception = throwError(() => null);
 
-    it('', (done) => {
+    it('emits the error to the observer', (done) => {
       const subscription = worker.get('sgrud.test.bus.error').pipe(
         catchError((error) => of({
           handle: null,

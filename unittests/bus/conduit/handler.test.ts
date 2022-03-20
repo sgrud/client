@@ -102,7 +102,7 @@ describe('@sgrud/bus/conduit/handler', () => {
     const handler = new ConduitHandler();
     const exception = throwError(() => null);
 
-    it('', (done) => {
+    it('emits the error to the observer', (done) => {
       const subscription = handler.get('sgrud.test.bus.error').pipe(
         catchError((error) => of({
           handle: null,

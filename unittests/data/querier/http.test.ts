@@ -102,7 +102,7 @@ describe('@sgrud/data/querier/http', () => {
       HttpQuerier, new HttpQuerier('/exception', new Map())
     );
 
-    it('', (done) => {
+    it('emits the error to the observer', (done) => {
       update();
 
       const subscription = Class.commit(operation).pipe(

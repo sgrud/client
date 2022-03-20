@@ -229,7 +229,7 @@ describe('@sgrud/core/kernel/kernel', () => {
     });
   });
 
-  describe('', () => {
+  describe('firing the script onerror handler', () => {
     const kernel = new Kernel();
     const module = { ...submod, name: 'module' };
 
@@ -243,7 +243,7 @@ describe('@sgrud/core/kernel/kernel', () => {
       })
     ];
 
-    it('', (done) => {
+    it('emits the error to the observer', (done) => {
       const subscription = kernel.insmod(module).pipe(
         catchError((error) => of(error))
       ).subscribe((next) => {
