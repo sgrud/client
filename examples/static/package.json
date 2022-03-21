@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "core-js-bundle": "3.21.1",
-    "es-module-shims": "1.4.7"
+    "es-module-shims": "1.5.1"
   },
   "sgrudDependencies": {
     "sgrud-skeleton-angular": "latest",

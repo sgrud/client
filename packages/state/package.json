@@ -14,7 +14,7 @@
     "@babel/runtime:helpers.umd"
   ],
   "dependencies": {
-    "@babel/runtime": "^7.17.7",
+    "@babel/runtime": "^7.17.8",
     "@sgrud/core": "latest",
     "tslib": "^2.3.1"
   },

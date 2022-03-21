@@ -24,7 +24,7 @@
     "@microsoft/fast-element"
   ],
   "dependencies": {
-    "@babel/runtime": "7.17.7",
+    "@babel/runtime": "7.17.8",
     "@microsoft/fast-element": "1.8.0",
     "@sgrud/bin": "latest",
     "tslib": "2.3.1"

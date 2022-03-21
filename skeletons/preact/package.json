@@ -22,7 +22,7 @@
     "@babel/runtime:helpers"
   ],
   "dependencies": {
-    "@babel/runtime": "7.17.7",
+    "@babel/runtime": "7.17.8",
     "@sgrud/bin": "latest",
     "preact": "10.6.6",
     "preact-custom-element": "4.2.1",

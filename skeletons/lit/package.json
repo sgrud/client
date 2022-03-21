@@ -24,7 +24,7 @@
     "lit:!static"
   ],
   "dependencies": {
-    "@babel/runtime": "7.17.7",
+    "@babel/runtime": "7.17.8",
     "@sgrud/bin": "latest",
     "lit": "2.2.0",
     "tslib": "2.3.1"
