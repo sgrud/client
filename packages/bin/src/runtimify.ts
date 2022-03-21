@@ -9,7 +9,8 @@ cli.command('runtimify [...modules]')
   .example('runtimify # Run with default options')
   .example('runtimify @microsoft/fast # Runtimify `@microsoft/fast`')
   .option('--cwd', 'Use an alternative working directory', './')
-  .option('-o, --out', 'Output file within package root', 'runtimify.js')
+  .option('--format', 'Runtimify bundle format (umd or esm)', 'umd')
+  .option('--out', 'Output file within package root', 'runtimify.js')
   .action((_ = [], opts) => runtimify({ ...opts, modules: opts._.concat(_) }));
 
 /**
@@ -25,7 +26,8 @@ cli.command('runtimify [...modules]')
  *
  * Options
  *   --cwd         Use an alternative working directory  (default ./)
- *   -o, --out     Output file within package root  (default runtimify.js)
+ *   --format      Runtimify bundle format (umd or esm)  (default umd)
+ *   --out         Output file within package root  (default runtimify.js)
  *   -h, --help    Displays this message
  *
  * Examples
@@ -50,6 +52,7 @@ cli.command('runtimify [...modules]')
  */
 export async function runtimify({
   cwd = './',
+  format = 'umd',
   modules = [],
   out = 'runtimify.js'
 }: {
@@ -60,6 +63,13 @@ export async function runtimify({
    * @defaultValue `'./'`
    */
   cwd?: string;
+
+  /**
+   * Runtimify bundle format (umd or esm).
+   *
+   * @defaultValue `'umd'`
+   */
+  format?: string;
 
   /**
    * Modules to runtimify.
@@ -86,23 +96,28 @@ export async function runtimify({
     }
   }
 
-  for (const pkg of [...new Set(modules)].map((i) => i.split(':'))) {
+  for (const pkg of [...new Set(modules)]) {
+    const src = pkg.replace(/\.\w+$/, (match) => {
+      if (match) format = match.substring(1);
+      return '';
+    }).split(':');
+
     try {
-      process.chdir(join(cwd, 'node_modules', pkg[0]));
+      process.chdir(join(cwd, 'node_modules', src[0]));
     } catch {
-      process.chdir(join(process.env.INIT_CWD!, 'node_modules', pkg[0]));
+      process.chdir(join(process.env.INIT_CWD!, 'node_modules', src[0]));
     }
 
     const { exports, main, module, type } = require(resolve('package.json'));
-    const filter = pkg.filter((i) => !i.startsWith('!'));
+    const filter = src.filter((i) => !i.startsWith('!'));
     const stream = createWriteStream(out);
     stream.cork();
 
     const write = (name: string, file: string) => {
-      const source = resolve(relative(pkg[0], file));
+      const source = resolve(relative(src[0], file));
 
-      if (name.startsWith(join(...pkg)) || pkg.some((i) => {
-        return i.startsWith('!') && !name.startsWith(join(pkg[0], i.slice(1)));
+      if (name.startsWith(join(...src)) || src.some((i) => {
+        return i.startsWith('!') && !name.startsWith(join(src[0], i.slice(1)));
       })) {
         if (name === file) {
           stream.write(`export * from '${source}';`);
@@ -115,22 +130,22 @@ export async function runtimify({
     };
 
     if (Array.isArray(exports)) {
-      exports.map((i) => write(pkg[0], join(pkg[0], i)));
+      exports.map((i) => write(src[0], join(src[0], i)));
     } else if (typeof exports === 'object') {
       for (const [key, value] of Object.entries<any>(exports)) {
         if (Array.isArray(value)) {
           const entry = value.find((i) => i.default)?.default;
-          if (entry) write(join(pkg[0], key), join(pkg[0], entry));
+          if (entry) write(join(src[0], key), join(src[0], entry));
         } else if (typeof value === 'object' && value?.default) {
-          write(join(pkg[0], key), join(pkg[0], value.default));
+          write(join(src[0], key), join(src[0], value.default));
         }
       }
     } else if (typeof exports === 'string') {
-      write(pkg[0], join(pkg[0], exports));
+      write(src[0], join(src[0], exports));
     } else if (module && type === 'module') {
-      write(pkg[0], join(pkg[0], module));
+      write(src[0], join(src[0], module));
     } else if (main) {
-      write(pkg[0], join(pkg[0], main));
+      write(src[0], join(src[0], main));
     }
 
     stream.end();
@@ -144,11 +159,12 @@ export async function runtimify({
       cwd: process.cwd(),
       entries: [out],
       external: 'none',
-      format: 'umd',
+      format,
       generateTypes: false,
       name: filter.flatMap((i) => i.split(/\W/)).filter(Boolean).join('.'),
       output: out,
-      'pkg-main': false
+      'pkg-main': false,
+      workers: false
     }).then(({ output }) => {
       console.log(output);
     });
