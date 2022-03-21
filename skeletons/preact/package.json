@@ -19,7 +19,7 @@
     "./src/index.html"
   ],
   "runtimify": [
-    "@babel/runtime:helpers"
+    "@babel/runtime:helpers.umd"
   ],
   "dependencies": {
     "@babel/runtime": "7.17.8",

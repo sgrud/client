@@ -20,13 +20,13 @@
     "./src/index.html"
   ],
   "runtimify": [
-    "@babel/runtime:helpers",
-    "lit:!static"
+    "@babel/runtime:helpers.umd",
+    "lit:!static.umd"
   ],
   "dependencies": {
     "@babel/runtime": "7.17.8",
     "@sgrud/bin": "latest",
-    "lit": "2.2.0",
+    "lit": "2.2.1",
     "tslib": "2.3.1"
   },
   "devDependencies": {

@@ -2,14 +2,13 @@
 <meta charset="utf-8">
 <title>sgrud-skeleton-fast</title>
 
+<!-- DOM -->
+
 <fast-component name="universe">
   <small>Child says hello, too!</small>
 </fast-component>
 
-<script nomodule src="../node_modules/@babel/runtime/runtimify.js"></script>
-<script nomodule src="../node_modules/@microsoft/fast-element/runtimify.js"></script>
-<script nomodule src="../node_modules/tslib/tslib.js"></script>
-<script nomodule src="./sgrud-skeleton-fast.umd.js"></script>
+<!-- ESM -->
 
 <script type="importmap">
   {
@@ -21,3 +20,11 @@
   }
 </script>
 <script type="module" src="./sgrud-skeleton-fast.esm.js"></script>
+
+<!-- UMD -->
+
+<script nomodule src="../node_modules/@babel/runtime/runtimify.js"></script>
+<script nomodule src="../node_modules/@microsoft/fast-element/runtimify.js"></script>
+<script nomodule src="../node_modules/tslib/tslib.js"></script>
+
+<script nomodule src="./sgrud-skeleton-fast.umd.js"></script>

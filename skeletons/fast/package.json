@@ -20,8 +20,8 @@
     "./src/index.html"
   ],
   "runtimify": [
-    "@babel/runtime:helpers",
-    "@microsoft/fast-element"
+    "@babel/runtime:helpers.umd",
+    "@microsoft/fast-element.umd"
   ],
   "dependencies": {
     "@babel/runtime": "7.17.8",
