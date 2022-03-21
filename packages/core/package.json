@@ -18,13 +18,59 @@
     "comlink": "Comlink",
     "rxjs/ajax": null
   },
+  "copy": [
+    "./README.md"
+  ],
+  "runtimify": [
+    "@babel/runtime:helpers.umd"
+  ],
   "dependencies": {
     "@babel/runtime": "^7.17.7",
     "comlink": "^4.3.1",
     "rxjs": "^7.5.5",
     "tslib": "^2.3.1"
   },
-  "copy": [
-    "./README.md"
-  ]
+  "webDependencies": {
+    "@babel/runtime": {
+      "exports": {
+        "@babel/runtime/helpers/": "./helpers/esm/"
+      },
+      "unpkg": [
+        "./runtimify.js"
+      ]
+    },
+    "@sgrud/core": {
+      "exports": {
+        "@sgrud/core": "./index.esm.js"
+      },
+      "unpkg": [
+        "./index.umd.js"
+      ]
+    },
+    "comlink": {
+      "exports": {
+        "comlink": "./dist/esm/comlink.min.js"
+      },
+      "unpkg": [
+        "./dist/umd/comlink.min.js"
+      ]
+    },
+    "rxjs": {
+      "exports": {
+        "rxjs": "./dist/esm/index.js",
+        "rxjs/ajax": "./dist/esm/ajax/index.js"
+      },
+      "unpkg": [
+        "./dist/bundles/rxjs.umd.min.js"
+      ]
+    },
+    "tslib": {
+      "exports": {
+        "tslib": "./tslib.es6.js"
+      },
+      "unpkg": [
+        "./tslib.js"
+      ]
+    }
+  }
 }

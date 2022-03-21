@@ -13,9 +13,25 @@
   "copy": [
     "./README.md"
   ],
+  "runtimify": [
+    "@babel/runtime:helpers.umd"
+  ],
   "dependencies": {
     "@babel/runtime": "^7.17.7",
     "@sgrud/core": "latest",
     "tslib": "^2.3.1"
+  },
+  "sgrudDependencies": {
+    "@sgrud/core": "latest"
+  },
+  "webDependencies": {
+    "@sgrud/shell": {
+      "exports": {
+        "@sgrud/shell": "./index.esm.js"
+      },
+      "unpkg": [
+        "./index.umd.js"
+      ]
+    }
   }
 }
