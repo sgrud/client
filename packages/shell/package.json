@@ -8,17 +8,23 @@
   "exports": "../../dist/shell/index.esm.js",
   "unpkg": "../../dist/shell/index.umd.js",
   "amdNames": {
-    "@babel/runtime/helpers/createForOfIteratorHelperLoose": null
+    "@babel/runtime/helpers/createClass": null,
+    "@babel/runtime/helpers/createForOfIteratorHelperLoose": null,
+    "@babel/runtime/helpers/inheritsLoose": null,
+    "incremental-dom": "IncrementalDOM"
   },
   "copy": [
-    "./README.md"
+    "./README.md",
+    "./res/jsx-runtime"
   ],
   "runtimify": [
-    "@babel/runtime:helpers.umd"
+    "@babel/runtime:helpers.umd",
+    "incremental-dom.modern"
   ],
   "dependencies": {
     "@babel/runtime": "^7.17.8",
     "@sgrud/core": "latest",
+    "incremental-dom": "^0.7.0",
     "tslib": "^2.3.1"
   },
   "sgrudDependencies": {
@@ -27,10 +33,19 @@
   "webDependencies": {
     "@sgrud/shell": {
       "exports": {
-        "@sgrud/shell": "./index.esm.js"
+        "@sgrud/shell": "./index.esm.js",
+        "@sgrud/shell/jsx-runtime": "./index.esm.js"
       },
       "unpkg": [
         "./index.umd.js"
+      ]
+    },
+    "incremental-dom": {
+      "exports": {
+        "incremental-dom": "./runtimify.js"
+      },
+      "unpkg": [
+        "./dist/incremental-dom-min.js"
       ]
     }
   }
