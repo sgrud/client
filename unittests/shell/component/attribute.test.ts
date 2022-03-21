@@ -6,7 +6,7 @@ globalThis.HTMLElement = new Proxy(HTMLElement, {
   }
 });
 
-describe('@sgrud/shell/element/attribute', () => {
+describe('@sgrud/shell/component/attribute', () => {
 
   class TestClass extends HTMLElement {
     @Attribute() public attribute?: string;

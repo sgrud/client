@@ -6,7 +6,7 @@ globalThis.HTMLElement = new Proxy(HTMLElement, {
   }
 });
 
-describe('@sgrud/shell/element/component', () => {
+describe('@sgrud/shell/component/component', () => {
 
   @Component('class-one')
   class ClassOne extends HTMLElement { }

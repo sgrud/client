@@ -1,11 +1,10 @@
 import { TypeOf } from '@sgrud/core';
-import { elementClose, elementOpen, Key, text } from 'incremental-dom';
+import { elementClose, elementOpen, text } from 'incremental-dom';
 
 declare global {
 
   /**
-   * Intrinsic JSX namespace containing the list of {@link IntrinsicElements}
-   * and the JSX {@link Element} type.
+   * Intrinsic JSX namespace.
    *
    * @see https://www.typescriptlang.org/docs/handbook/jsx.html
    */
@@ -18,12 +17,12 @@ declare global {
     type Element = (() => Node)[];
 
     /**
-     * Intrinsic list of JSX elements. Uses the global `HTMLElementTagNameMap`
-     * while allowing to specify an element rendering key.
+     * Intrinsic list of known JSX elements, comprised of the global
+     * `HTMLElementTagNameMap`.
      */
     type IntrinsicElements = {
       [K in keyof HTMLElementTagNameMap]: Partial<HTMLElementTagNameMap[K]> & {
-        key?: Key;
+        key?: string | number | null;
       };
     };
 
@@ -35,12 +34,12 @@ declare global {
  * @param type - Element type.
  * @param props - Element properties.
  * @param ref - Element rendering key.
- * @returns Array of `incremental-dom` calls.
+ * @returns Array of bound calls.
  */
 export function createElement(
   type: keyof JSX.IntrinsicElements | Function,
   props?: Record<string, any>,
-  ref?: Key
+  ref?: string | number | null
 ): JSX.Element {
   if (TypeOf.function(type)) {
     return type(props);
@@ -48,7 +47,7 @@ export function createElement(
 
   const attributes = [];
   const children = [];
-  const elements = [];
+  const element = [];
 
   for (const key in props) {
     switch (key) {
@@ -70,30 +69,37 @@ export function createElement(
     }
   }
 
-  elements.push(elementOpen.bind(null, type, ref, null, ...attributes));
+  element.push(elementOpen.bind(null, type, ref, null, ...attributes));
 
   for (const child of children) {
     if (TypeOf.function(child)) {
-      elements.push(child);
+      element.push(child);
     } else {
-      elements.push(text.bind(null, child));
+      element.push(text.bind(null, child));
     }
   }
 
-  elements.push(elementClose.bind(null, type));
+  element.push(elementClose.bind(null, type));
 
-  return elements;
+  return element;
 }
 
 /**
  * @param props - Fragment properties.
- * @returns Array of `incremental-dom` calls.
+ * @returns Array of bound calls.
  */
 export function createFragment(props?: Record<string, any>): JSX.Element {
-  return props?.children ? [props.children].flat(Infinity).filter(Boolean) : [];
+  const fragment = [];
+
+  if (props?.children) {
+    fragment.push(...[props.children].flat(Infinity).filter(Boolean));
+  }
+
+  return fragment;
 }
 
 export {
+  JSX,
   createElement as jsx,
   createElement as jsxs,
   createFragment as Fragment

@@ -1,6 +1,6 @@
 import { Fragment, jsx } from '@sgrud/shell';
 
-describe('@sgrud/shell/element/jsx-runtime', () => {
+describe('@sgrud/shell/component/jsx-runtime', () => {
 
   describe('creating a jsx element', () => {
     const jsxElement = jsx('main', {

@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-export * from './src/element/attribute';
-export * from './src/element/component';
-export * from './src/element/jsx-runtime';
+export * from './src/component/attribute';
+export * from './src/component/component';
+export * from './src/component/jsx-runtime';
 export * from './src/router/router';

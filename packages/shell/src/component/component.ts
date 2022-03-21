@@ -1,4 +1,5 @@
-import { elementClose, elementOpen, patch, text } from 'incremental-dom';
+import { patch } from 'incremental-dom';
+import { createElement } from './jsx-runtime';
 
 /**
  * Interface describing the shape of a component.
@@ -107,22 +108,24 @@ export function Component<S extends keyof HTMLElementTagNameMap>(
         if (super.renderComponent) {
           super.renderComponent();
         } else if (this.shadowRoot) {
-          const { styles, template } = this;
+          const {
+            styles = [],
+            template = []
+          } = this;
+
+          if (!template.length) {
+            template.push(...createElement('slot'));
+          }
+
+          if (styles.length) {
+            template.push(...createElement('style', {
+              children: styles
+            }));
+          }
 
           patch(this.shadowRoot, () => {
-            if (styles) {
-              elementOpen('style');
-              text(styles.join(' '));
-              elementClose('style');
-            }
-
-            if (template) {
-              for (const factory of template) {
-                factory();
-              }
-            } else {
-              elementOpen('slot');
-              elementClose('slot');
+            for (const incrementalDom of template) {
+              incrementalDom();
             }
           });
         }
