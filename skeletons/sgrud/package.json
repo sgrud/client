@@ -1,0 +1,41 @@
+{
+  "name": "sgrud-skeleton-sgrud",
+  "amdName": "sgrud.skeleton.sgrud",
+  "version": "0.0.0",
+  "source": "./src/index.ts",
+  "exports": "./dist/sgrud-skeleton-sgrud.esm.js",
+  "unpkg": "./dist/sgrud-skeleton-sgrud.umd.js",
+  "private": true,
+  "scripts": {
+    "postinstall": "sgrud runtimify",
+    "build": "sgrud construct --format modern,umd",
+    "postbuild": "sgrud postbuild"
+  },
+  "amdNames": {
+    "@babel/runtime/helpers/createClass": null,
+    "@babel/runtime/helpers/extends": null,
+    "@babel/runtime/helpers/inheritsLoose": null,
+    "@babel/runtime/helpers/wrapNativeSuper": null,
+    "@sgrud/shell/jsx-runtime": "sgrud.shell"
+  },
+  "copy": [
+    "./src/index.html"
+  ],
+  "runtimify": [
+    "@babel/runtime:helpers.umd",
+    "incremental-dom.modern"
+  ],
+  "dependencies": {
+    "@babel/runtime": "7.17.8",
+    "@sgrud/bin": "latest",
+    "@sgrud/shell": "latest",
+    "tslib": "2.3.1"
+  },
+  "devDependencies": {
+    "@types/css-modules": "1.0.2",
+    "sass": "1.49.9"
+  },
+  "sgrudDependencies": {
+    "@sgrud/shell": "latest"
+  }
+}

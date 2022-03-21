@@ -48,7 +48,7 @@ cli.command('kickstart [library]')
  */
 export async function kickstart({
   cwd = './',
-  library = 'fast'
+  library = 'sgrud'
 }: {
 
   /**
@@ -61,7 +61,7 @@ export async function kickstart({
   /**
    * Library which to base upon.
    *
-   * @defaultValue `'fast'`
+   * @defaultValue `'sgrud'`
    */
   library?: string;
 
