@@ -30,7 +30,7 @@ jobs:
         working-directory: ./source
         run: |
           npm install --ignore-scripts
-          npx typedoc --githubPages --out docs/client
+          npx typedoc --out docs/client
           git -C docs --git-dir ../../target/.git add -A client
 
       - name: Push target
