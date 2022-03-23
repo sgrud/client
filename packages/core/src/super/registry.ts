@@ -151,7 +151,7 @@ export class Registry<
           }
 
           const reflection = Reflect[propertyKey as keyof typeof Reflect];
-          return (reflection as Function).apply(Reflect, [cache, ...args]);
+          return (reflection as Function).call(Reflect, cache, ...args);
         }
       }));
 
