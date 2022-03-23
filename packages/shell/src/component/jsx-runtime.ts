@@ -1,5 +1,5 @@
 import { TypeOf } from '@sgrud/core';
-import { elementClose, elementOpen, text } from 'incremental-dom';
+import { elementClose, elementOpen, Key, patch, text } from 'incremental-dom';
 
 declare global {
 
@@ -22,7 +22,7 @@ declare global {
      */
     type IntrinsicElements = {
       [K in keyof HTMLElementTagNameMap]: Partial<HTMLElementTagNameMap[K]> & {
-        key?: string | number | null;
+        key?: Key;
       };
     };
 
@@ -39,7 +39,7 @@ declare global {
 export function createElement(
   type: Function | keyof JSX.IntrinsicElements,
   props?: Record<string, any>,
-  ref?: string | number | null
+  ref?: Key
 ): JSX.Element {
   if (TypeOf.function(type)) {
     return type(props);
@@ -96,6 +96,22 @@ export function createFragment(props?: Record<string, any>): JSX.Element {
   }
 
   return fragment;
+}
+
+/**
+ * @param target - DOM element to render into.
+ * @param element - JSX element to be rendered.
+ * @returns Rendered `target` element.
+ */
+export function render(
+  target: Element | DocumentFragment,
+  element: JSX.Element
+): Node {
+  return patch(target, () => {
+    for (const incrementalDom of element) {
+      incrementalDom();
+    }
+  });
 }
 
 export {

@@ -16,7 +16,12 @@ export function Attribute(name?: string) {
     propertyKey: PropertyKey
   ): void {
     const key = name || propertyKey as string;
-    ((prototype as Mutable<Component>).observedAttributes ||= []).push(key);
+
+    if (prototype.observedAttributes) {
+      prototype.observedAttributes.push(key);
+    } else {
+      (prototype as Mutable<Component>).observedAttributes = [key];
+    }
 
     Object.defineProperty(prototype, propertyKey, {
       get(this: Component): string | null {

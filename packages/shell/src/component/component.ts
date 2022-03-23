@@ -1,5 +1,4 @@
-import { patch } from 'incremental-dom';
-import { createElement } from './jsx-runtime';
+import { createElement, render } from './jsx-runtime';
 
 /**
  * Interface describing the shape of a component.
@@ -90,7 +89,7 @@ export function Component<S extends keyof HTMLElementTagNameMap>(
       ): void {
         if (super.attributeChangedCallback) {
           super.attributeChangedCallback(name, prev, next);
-        } else {
+        } else if (this.shadowRoot) {
           this.renderComponent();
         }
       }
@@ -108,10 +107,7 @@ export function Component<S extends keyof HTMLElementTagNameMap>(
         if (super.renderComponent) {
           super.renderComponent();
         } else if (this.shadowRoot) {
-          const {
-            styles = [],
-            template = []
-          } = this;
+          const { styles = [], template = [] } = this;
 
           if (!template.length) {
             template.push(...createElement('slot'));
@@ -123,11 +119,7 @@ export function Component<S extends keyof HTMLElementTagNameMap>(
             }));
           }
 
-          patch(this.shadowRoot, () => {
-            for (const incrementalDom of template) {
-              incrementalDom();
-            }
-          });
+          render(this.shadowRoot, template);
         }
       }
 
