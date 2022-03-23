@@ -12,7 +12,7 @@ declare global {
 
     /**
      * Intrinsic JSX element type helper representing an array of bound
-     * `incremental-dom` calls.
+     * [incremental-dom](https://google.github.io/incremental-dom) calls.
      */
     type Element = (() => Node)[];
 
@@ -31,6 +31,13 @@ declare global {
 }
 
 /**
+ * JSX element factory. Provides `jsx-runtime`-compliant bindings to the
+ * [incremental-dom](https://google.github.io/incremental-dom) library. This
+ * factory function is meant to be implicitly imported by the transpiler and
+ * returns an array of bound `incremental-dom` function calls, representing the
+ * created JSX element. This array of bound functions can be rendered into an
+ * element attached to the DOM through the {@link render} function.
+ *
  * @param type - Element type.
  * @param props - Element properties.
  * @param ref - Element rendering key.
@@ -85,6 +92,9 @@ export function createElement(
 }
 
 /**
+ * JSX fragment factory. Provides a `jsx-runtime`-compliant helper function used
+ * by the transpiler to create JSX fragments.
+ *
  * @param props - Fragment properties.
  * @returns Array of bound calls.
  */
@@ -99,6 +109,11 @@ export function createFragment(props?: Record<string, any>): JSX.Element {
 }
 
 /**
+ * JSX rendering helper. This function is a wrapper around the `patch` function
+ * from the [incremental-dom](https://google.github.io/incremental-dom) library
+ * and renders a JSX element created through {@link createElement} into an
+ * element attached to the DOM.
+ *
  * @param target - DOM element to render into.
  * @param element - JSX element to be rendered.
  * @returns Rendered `target` element.

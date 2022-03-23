@@ -59,10 +59,41 @@ export interface Component extends HTMLElement {
 }
 
 /**
+ * Class decorator factory. Registers the decorated class as component with the
+ * `CustomElementRegistry`. This decorator should be used in conjunction with
+ * the {@link Attribute} prototype property decorator and will re-render, when a
+ * bound property changes. While any custom component which is registered by
+ * this decorator inherits basic rendering functionality, any overridden method
+ * will cancel out its `super` logic. This ensures for a minimal and transparent
+ * abstraction of the functionality the `CustomElementRegistry` provides, while
+ * allowing for full customization.
+ *
  * @param selector - Component tag name.
  * @param inherits - Extended tag name.
  * @typeParam S - Component tag type.
  * @returns Class decorator.
+ *
+ * @example Register a component.
+ * ```tsx
+ * import { Component } from '@sgrud/shell';
+ *
+ * @Component('example-component')
+ * export class ExampleComponent extends HTMLElement {
+ *
+ *   public readonly styles: string[] = [`
+ *     span {
+ *       font-style: italic;
+ *     }
+ *   `];
+ *
+ *   public get template(): JSX.Element {
+ *     return <span>Example component</span>;
+ *   }
+ *
+ * }
+ * ```
+ *
+ * @see {@link Attribute}
  */
 export function Component<S extends keyof HTMLElementTagNameMap>(
   selector: `${string}-${string}`,
