@@ -55,7 +55,7 @@ export function Attribute(name?: string) {
         return this.getAttribute(key);
       },
       set(this: Component, value: string): void {
-        if (this.shadowRoot || !this.hasAttribute(key)) {
+        if (this.readyState || !this.hasAttribute(key)) {
           this.setAttribute(key, value);
         }
       }

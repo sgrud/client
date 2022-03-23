@@ -14,6 +14,12 @@ export interface Component extends HTMLElement {
   readonly observedAttributes?: string[];
 
   /**
+   * Internal readiness indication. Initially resolves to `undefined` and will
+   * mirror the `isConnected` state, when ready.
+   */
+  readonly readyState?: boolean;
+
+  /**
    * Array of CSS strings, which should be included within the shadow dom of the
    * component.
    */
@@ -111,6 +117,14 @@ export function Component<S extends keyof HTMLElementTagNameMap>(
 
       public static get observedAttributes(): string[] {
         return this.prototype.observedAttributes || [];
+      }
+
+      public constructor() {
+        super();
+
+        Object.defineProperty(this, 'readyState', {
+          get: () => this.isConnected
+        });
       }
 
       public override attributeChangedCallback(

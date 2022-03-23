@@ -8,6 +8,7 @@
   "exports": "../../dist/shell/index.esm.js",
   "unpkg": "../../dist/shell/index.umd.js",
   "amdNames": {
+    "@babel/runtime/helpers/assertThisInitialized": null,
     "@babel/runtime/helpers/createClass": null,
     "@babel/runtime/helpers/createForOfIteratorHelperLoose": null,
     "@babel/runtime/helpers/inheritsLoose": null,
