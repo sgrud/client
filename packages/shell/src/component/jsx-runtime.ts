@@ -37,7 +37,7 @@ declare global {
  * @returns Array of bound calls.
  */
 export function createElement(
-  type: keyof JSX.IntrinsicElements | Function,
+  type: Function | keyof JSX.IntrinsicElements,
   props?: Record<string, any>,
   ref?: string | number | null
 ): JSX.Element {
