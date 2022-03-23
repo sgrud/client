@@ -1,4 +1,5 @@
 import { TypeOf } from '@sgrud/core';
+// @ts-expect-error https://github.com/TypeStrong/typedoc/pull/1891
 import { elementClose, elementOpen, Key, patch, text } from 'incremental-dom';
 
 declare global {
