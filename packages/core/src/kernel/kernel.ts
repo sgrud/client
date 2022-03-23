@@ -330,7 +330,7 @@ export class Kernel {
         }
 
         chain.push(this.script({
-          integrity: module.digest?.exports,
+          integrity: module.digest?.exports ?? '',
           src: `${this.nodeModules}/${module.name}/${module.exports}`,
           type: 'module' + this.shimmed
         }));
@@ -343,7 +343,7 @@ export class Kernel {
         }
 
         chain.push(this.script({
-          integrity: module.digest?.unpkg,
+          integrity: module.digest?.unpkg ?? '',
           src: `${this.nodeModules}/${module.name}/${module.unpkg}`,
           type: 'text/javascript'
         }));
