@@ -12,7 +12,7 @@ interface Props {
   name: string;
 }
 
-export default class PreactComponent extends Component<Props> {
+export class PreactComponent extends Component<Props> {
 
   public static override defaultProps: Props = {
     name: 'world'

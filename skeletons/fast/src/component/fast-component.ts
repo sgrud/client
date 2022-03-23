@@ -17,7 +17,7 @@ declare global {
     </div>
   `
 })
-export default class FastComponent extends FASTElement {
+export class FastComponent extends FASTElement {
 
   @attr
   public name: string = 'world';

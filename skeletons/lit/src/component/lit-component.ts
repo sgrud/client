@@ -9,7 +9,7 @@ declare global {
 }
 
 @customElement('lit-component')
-export default class LitComponent extends LitElement {
+export class LitComponent extends LitElement {
 
   public static override styles: CSSResultGroup = unsafeCSS(styles);
 
