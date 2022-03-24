@@ -72,7 +72,7 @@ export function Subscribe(
     if (TypeOf.string(source)) {
       Object.defineProperty(prototype, source, {
         enumerable: true,
-        set: function(this: any, value: string): void {
+        set(this: any, value: string): void {
           Object.defineProperties(this, {
             [source]: {
               enumerable: true,

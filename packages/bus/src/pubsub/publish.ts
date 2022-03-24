@@ -79,7 +79,7 @@ export function Publish(
       Object.defineProperties(prototype, {
         [source]: {
           enumerable: true,
-          set: function(this: any, value: string): void {
+          set(this: any, value: string): void {
             Object.defineProperty(this, source, {
               enumerable: true,
               value
@@ -94,7 +94,7 @@ export function Publish(
         },
         [propertyKey]: {
           enumerable: true,
-          set: function(this: any, value: Observable<any>): void {
+          set(this: any, value: Observable<any>): void {
             Object.defineProperty(this, propertyKey, {
               enumerable: true,
               value
