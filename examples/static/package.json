@@ -4,15 +4,11 @@
   "scripts": {
     "preinstall": "npm pack --silent ../../skeletons/*/dist",
     "install": "npm install --no-save ./*.tgz && rm ./*.tgz",
-    "start": "sgrud universal --host 0.0.0.0"
+    "start": "sgrud universal"
   },
   "dependencies": {
     "@sgrud/bin": "latest",
-    "@sgrud/bus": "latest",
     "@sgrud/core": "latest",
-    "@sgrud/data": "latest",
-    "@sgrud/shell": "latest",
-    "@sgrud/state": "latest",
     "es-module-shims": "1.5.1"
   },
   "sgrudDependencies": {
