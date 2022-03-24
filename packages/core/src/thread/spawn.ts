@@ -14,8 +14,8 @@ import { TypeOf } from '../utility/type-of';
  *
  * @example Spawn a WebWorker.
  * ```ts
- * import { Spawn } from '@sgrud/core';
  * import type { Thread } from '@sgrud/core';
+ * import { Spawn } from '@sgrud/core';
  * import WebWorkerThread from 'worker:./web-worker';
  * import { WebWorker } from './web-worker';
  *

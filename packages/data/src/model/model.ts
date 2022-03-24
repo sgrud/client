@@ -303,9 +303,7 @@ export namespace Model.Filter {
  *
  * @example Extend the model base class.
  * ```ts
- * import type { Model } from '@sgrud/data';
- * import { Property } from '@sgrud/data';
- * import { Provider } from '@sgrud/core';
+ * import { Model, Property } from '@sgrud/data';
  *
  * export class ExampleModel extends Model<ExampleModel> {
  *
@@ -898,8 +896,7 @@ export abstract class Model<M extends Model = any> {
    *
    * @example Provide a valid symbol property.
    * ```ts
-   * import type { Model } from '@sgrud/data';
-   * import { Provider } from '@sgrud/core';
+   * import { Model } from '@sgrud/data';
    *
    * export class ExampleModel extends Model<ExampleModel> {
    *

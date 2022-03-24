@@ -24,9 +24,7 @@ export const hasOne = Symbol('@sgrud/data/model/has-one');
  *
  * @example Model with a has one association.
  * ```ts
- * import { HasOne } from '@sgrud/data';
- * import type { Model } from '@sgrud/data';
- * import { Provider } from '@sgrud/core';
+ * import { HasOne, Model } from '@sgrud/data';
  * import { OwnedModel } from './owned-model';
  *
  * export class ExampleModel extends Model<ExampleModel> {

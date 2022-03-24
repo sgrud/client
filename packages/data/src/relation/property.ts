@@ -42,9 +42,7 @@ export const property = Symbol('@sgrud/data/model/property');
  *
  * @example Model with a string type field.
  * ```ts
- * import type { Model } from '@sgrud/data';
- * import { Property } from '@sgrud/data';
- * import { Provider } from '@sgrud/core';
+ * import { Model, Property } from '@sgrud/data';
  *
  * export class ExampleModel extends Model<ExampleModel> {
  *

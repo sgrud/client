@@ -36,7 +36,9 @@ export interface Target<V> {
  * @Target<typeof Service>('default')
  * export class Service {
  *
- *   public constructor(param: string) { }
+ *   public constructor(
+ *     public readonly param: string
+ *   ) { }
  *
  * }
  * ```
@@ -50,7 +52,7 @@ export interface Target<V> {
  * export class ServiceHandler {
  *
  *   @Factor<Target<Service>>(() => Service)
- *   private readonly service!: Service;
+ *   public readonly service!: Service;
  *
  * }
  * ```

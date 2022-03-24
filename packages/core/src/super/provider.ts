@@ -48,7 +48,7 @@ export interface Provider<V> {
  * import { Provider } from '@sgrud/core';
  * import type { Base } from 'example-module';
  *
- * class Class
+ * export class Class
  *   extends Provider<typeof Base>('org.example.Base') {
  *
  *   public constructor(...args: any[]) {

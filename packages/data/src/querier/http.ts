@@ -12,8 +12,8 @@ import { Querier } from './querier';
  *
  * @example Provide the HttpQuerier class to the Linker.
  * ```ts
- * import { HttpQuerier } from '@sgrud/data';
  * import { Linker } from '@sgrud/core';
+ * import { HttpQuerier } from '@sgrud/data';
  *
  * new Linker<typeof HttpQuerier>([
  *   [HttpQuerier, new HttpQuerier('https://api.example.com')]

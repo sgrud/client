@@ -21,8 +21,8 @@ import { ConduitHandle, ConduitHandler } from '../conduit/handler';
  *
  * @example Subscribe to the `'io.github.sgrud.example'` conduit.
  * ```ts
- * import { Subscribe } from '@sgrud/bus';
  * import type { ConduitValue } from '@sgrud/bus';
+ * import { Subscribe } from '@sgrud/bus';
  * import type { Observable } from 'rxjs';
  *
  * export class Subscriber {
@@ -35,17 +35,17 @@ import { ConduitHandle, ConduitHandler } from '../conduit/handler';
  *
  * @example Subscribe to the `'io.github.sgrud.example'` conduit.
  * ```ts
- * import { Subscribe } from '@sgrud/bus';
  * import type { ConduitValue } from '@sgrud/bus';
+ * import { Subscribe } from '@sgrud/bus';
  * import type { Observable } from 'rxjs';
  *
  * export class Subscriber {
  *
- *   @Subscribe('io.github.sgrud', 'source')
+ *   @Subscribe('io.github.sgrud', 'scope')
  *   public readonly conduit!: Observable<ConduitValue<any>>;
  *
  *   public constructor(
- *     public readonly source: string
+ *     public readonly scope: string
  *   ) { }
  *
  * }

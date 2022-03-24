@@ -24,9 +24,7 @@ export const hasMany = Symbol('@sgrud/data/model/has-many');
  *
  * @example Model with a has many association.
  * ```ts
- * import { HasMany } from '@sgrud/data';
- * import type { Model } from '@sgrud/data';
- * import { Provider } from '@sgrud/core';
+ * import { HasMany, Model } from '@sgrud/data';
  * import { OwnedModel } from './owned-model';
  *
  * export class ExampleModel extends Model<ExampleModel> {

@@ -18,8 +18,8 @@ import { HttpHandler } from './client';
  * ```ts
  * import type { HttpHandler, HttpProxy } from '@sgrud/core';
  * import { Provider, Target } from '@sgrud/core';
- * import type { AjaxConfig, AjaxResponse } from 'rxjs/ajax';
  * import { Observable, of } from 'rxjs';
+ * import { AjaxConfig as Request, AjaxResponse as Response } from 'rxjs/ajax';
  * import { file } from './file';
  *
  * @Target<typeof FileProxy>()
@@ -27,9 +27,9 @@ import { HttpHandler } from './client';
  *   extends Provider<typeof HttpProxy>('sgrud.core.http.HttpProxy') {
  *
  *   public override proxy<T>(
- *     request: AjaxConfig,
+ *     request: Request,
  *     handler: HttpHandler
- *   ): Observable<AjaxResponse<T>> {
+ *   ): Observable<Response<T>> {
  *     if (request.url.startsWith('file:')) {
  *       return of<T>(file);
  *     }

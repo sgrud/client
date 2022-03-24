@@ -32,7 +32,7 @@ import { ConduitHandle, ConduitHandler } from '../conduit/handler';
  * export class Publisher {
  *
  *   @Publish('io.github.sgrud.example')
- *   private readonly conduit!: Subject<any>;
+ *   public readonly conduit!: Subject<any>;
  *
  * }
  *
@@ -47,7 +47,7 @@ import { ConduitHandle, ConduitHandler } from '../conduit/handler';
  * export class Publisher {
  *
  *   @Publish('io.github.sgrud', 'scope')
- *   private readonly conduit: Subject<any> = new Subject<any>();
+ *   public readonly conduit: Subject<any> = new Subject<any>();
  *
  *   public constructor(
  *     private readonly scope: string
