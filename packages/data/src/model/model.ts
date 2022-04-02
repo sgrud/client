@@ -908,6 +908,27 @@ export abstract class Model<M extends Model = any> {
   protected abstract readonly [Symbol.toStringTag]: string;
 
   /**
+   * Symbol property used by the {@link HasOne} decorator.
+   *
+   * @see {@link HasOne}
+   */
+  public readonly [hasOne]: Record<keyof M, () => unknown>;
+
+  /**
+   * Symbol property used by the {@link HasMany} decorator.
+   *
+   * @see {@link HasMany}
+   */
+  public readonly [hasMany]: Record<keyof M, () => unknown>;
+
+  /**
+   * Symbol property used by the {@link Property} decorator.
+   *
+   * @see {@link Property}
+   */
+  public readonly [property]: Record<keyof M, () => unknown>;
+
+  /**
    * Symbol property typed as callback to a Subscribable. The returned
    * Subscribable emits every mutation this model instance experiences.
    *
@@ -947,27 +968,6 @@ export abstract class Model<M extends Model = any> {
    * mutation.
    */
   protected readonly changes: BehaviorSubject<M>;
-
-  /**
-   * Symbol property used by the {@link HasOne} decorator.
-   *
-   * @see {@link HasOne}
-   */
-  private [hasOne]: Record<keyof M, () => unknown>;
-
-  /**
-   * Symbol property used by the {@link HasMany} decorator.
-   *
-   * @see {@link HasMany}
-   */
-  private [hasMany]: Record<keyof M, () => unknown>;
-
-  /**
-   * Symbol property used by the {@link Property} decorator.
-   *
-   * @see {@link Property}
-   */
-  private [property]: Record<keyof M, () => unknown>;
 
   /**
    * Type-asserted alias for the static model context.

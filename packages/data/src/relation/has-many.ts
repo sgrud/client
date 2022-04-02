@@ -1,4 +1,4 @@
-import { assign, TypeOf } from '@sgrud/core';
+import { assign, Mutable, TypeOf } from '@sgrud/core';
 import { Model } from '../model/model';
 
 /**
@@ -57,7 +57,7 @@ export function HasMany<T extends Model.Type<any>>(
     const key = '#' + field as Model.Field<M>;
 
     if (!transient) {
-      assign(model[hasMany] ??= { }, {
+      assign((model as Mutable<M>)[hasMany] ??= { }, {
         [field]: typeFactory
       });
     }
