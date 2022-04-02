@@ -39,7 +39,8 @@ export function Factor<K extends new () => any>(
   ): void {
     Object.defineProperty(prototype, propertyKey, {
       enumerable: true,
-      get: () => new Linker().get(targetFactory())
+      get: () => new Linker().get(targetFactory()),
+      set: Function.prototype as (...args: any[]) => void
     });
   };
 
