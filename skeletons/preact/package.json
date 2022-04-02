@@ -24,14 +24,14 @@
   "dependencies": {
     "@babel/runtime": "7.17.8",
     "@sgrud/bin": "latest",
-    "preact": "10.6.6",
+    "preact": "10.7.0",
     "preact-custom-element": "4.2.1",
     "tslib": "2.3.1"
   },
   "devDependencies": {
     "@types/css-modules": "1.0.2",
     "@types/preact-custom-element": "4.0.1",
-    "sass": "1.49.9"
+    "sass": "1.49.11"
   },
   "webDependencies": {
     "@babel/runtime": {

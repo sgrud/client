@@ -31,7 +31,7 @@
   },
   "devDependencies": {
     "@types/css-modules": "1.0.2",
-    "sass": "1.49.9"
+    "sass": "1.49.11"
   },
   "webDependencies": {
     "@babel/runtime": {

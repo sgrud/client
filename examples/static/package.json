@@ -9,7 +9,7 @@
   "dependencies": {
     "@sgrud/bin": "latest",
     "@sgrud/core": "latest",
-    "es-module-shims": "1.5.1"
+    "es-module-shims": "1.5.2"
   },
   "sgrudDependencies": {
     "sgrud-skeleton-angular": "latest",
