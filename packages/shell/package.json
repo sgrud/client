@@ -16,7 +16,7 @@
   },
   "copy": [
     "./README.md",
-    "./res/jsx-runtime"
+    "./src/jsx-runtime"
   ],
   "runtimify": [
     "@babel/runtime:helpers.umd",
