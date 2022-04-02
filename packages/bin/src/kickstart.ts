@@ -2,7 +2,7 @@
 
 import { execSync } from 'child_process';
 import { copySync, existsSync, mkdirpSync } from 'fs-extra';
-import { join, resolve } from 'path';
+import { join } from 'path';
 import { cli } from './.cli';
 
 cli.command('kickstart [library]')
@@ -67,7 +67,7 @@ export async function kickstart({
 
 } = { }): Promise<void> {
   const gitPath = join(cwd, 'node_modules', '.cache', '@sgrud', 'kickstart');
-  const pkgJson = require(resolve(join(__dirname, 'package.json')));
+  const pkgJson = require(join(__dirname, 'package.json'));
 
   if (!existsSync(gitPath)) {
     mkdirpSync(gitPath);

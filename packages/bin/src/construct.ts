@@ -3,7 +3,7 @@
 import { Assign } from '@sgrud/core';
 import { readFileSync } from 'fs-extra';
 import { Module } from 'module';
-import { resolve } from 'path';
+import { join, resolve } from 'path';
 import { cli } from './.cli';
 
 cli.command('construct [...entries]')
@@ -98,7 +98,7 @@ export async function construct({
 } = { }): Promise<void> {
   const builder = require.resolve('microbundle');
   const current = require(resolve(cwd, 'package.json'));
-  const general = require(resolve(__dirname, 'package.json'));
+  const general = require(join(__dirname, 'package.json'));
   const helpers = current.dependencies['@babel/runtime'] as string;
   const patched = readFileSync(builder).toString().replace(
     'if (modern) cache = false;',
