@@ -972,7 +972,7 @@ export abstract class Model<M extends Model = any> {
   /**
    * Type-asserted alias for the static model context.
    */
-  private readonly static: Model.Type<M>;
+  protected readonly static: Model.Type<M>;
 
   /**
    * `rxjs.observable` interop getter returning a callback to a Subscribable.
@@ -986,7 +986,7 @@ export abstract class Model<M extends Model = any> {
    *
    * @returns Singular name of this model.
    */
-  private get entity(): string {
+  protected get entity(): string {
     return this.type.endsWith('Entity') ? this.type.slice(0, -6) : this.type;
   }
 
@@ -995,7 +995,7 @@ export abstract class Model<M extends Model = any> {
    *
    * @returns Pluralized name of this model.
    */
-  private get plural(): string {
+  protected get plural(): string {
     return pluralize(this.entity);
   }
 
@@ -1004,7 +1004,7 @@ export abstract class Model<M extends Model = any> {
    *
    * @returns Raw name of this model.
    */
-  private get type(): string {
+  protected get type(): string {
     return this[Symbol.toStringTag];
   }
 
