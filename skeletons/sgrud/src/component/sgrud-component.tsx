@@ -8,7 +8,7 @@ declare global {
 }
 
 @Component('sgrud-component')
-export class SgrudComponent extends HTMLElement {
+export class SgrudComponent extends HTMLElement implements Component {
 
   @Attribute()
   public name: string = 'world';

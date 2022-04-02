@@ -9,7 +9,7 @@ globalThis.HTMLElement = new Proxy(HTMLElement, {
 describe('@sgrud/shell/component/component', () => {
 
   @Component('class-one')
-  class ClassOne extends HTMLElement { }
+  class ClassOne extends HTMLElement implements Component { }
 
   @Component('class-two')
   class ClassTwo extends HTMLElement implements Component {
