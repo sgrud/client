@@ -139,8 +139,9 @@ export async function universal({
         }));
 
         page.on('request', (event) => {
-          const url = new URL(event.url());
+          const init = event.initiator().type;
           const type = event.resourceType();
+          const url = new URL(event.url());
 
           if (type === 'document') {
             return void event.respond({
@@ -163,10 +164,9 @@ export async function universal({
                 body: readFileSync(target)
               });
             }
-          } else if (
-            (type === 'script' && url.protocol === 'data:') ||
-            (type === 'xhr')
-          ) {
+          } else if (init === 'preflight' || type === 'xhr' || (
+            type === 'script' && url.protocol === 'data:'
+          )) {
             return void event.continue();
           }
 
