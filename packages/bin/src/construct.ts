@@ -82,7 +82,7 @@ export async function construct({
   cwd?: string;
 
   /**
-   * Entrypoints to build.
+   * Entry points to build.
    *
    * @defaultValue `package.json#source`
    */

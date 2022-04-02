@@ -36,7 +36,7 @@ import { Singleton } from '../utility/singleton';
 export class Linker<
   K extends abstract new () => V,
   V = InstanceType<K>
->extends Map<K, V> {
+> extends Map<K, V> {
 
   /**
    * Overridden `Map.prototype.get` method. Looks up the linked instance based

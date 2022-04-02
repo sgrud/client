@@ -59,12 +59,12 @@ export interface Module {
   readonly version: string;
 
   /**
-   * ESM module entrypoint.
+   * ESM module entry point.
    */
   readonly exports?: string;
 
   /**
-   * UMD module entrypoint.
+   * UMD module entry point.
    */
   readonly unpkg?: string;
 
