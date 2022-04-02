@@ -86,13 +86,25 @@ export async function runtimify({
   out?: string;
 
 } = { }): Promise<void> {
-  cwd = resolve(cwd);
+  if ((
+    cwd = resolve(cwd)
+  ).startsWith(join(process.env.INIT_CWD!, 'node_modules'))) {
+    cwd = process.env.INIT_CWD!;
+  }
 
   if (!modules.length) {
-    const pkg = require(resolve(join(cwd, 'package.json')));
+    const pkg = require(join(cwd, 'package.json'));
 
     if ('runtimify' in pkg) {
       modules.push(...pkg.runtimify);
+    }
+
+    for (const key in pkg.dependencies) {
+      const dep = require(join(cwd, 'node_modules', key, 'package.json'));
+
+      if ('runtimify' in dep) {
+        modules.push(...dep.runtimify);
+      }
     }
   }
 
@@ -102,12 +114,7 @@ export async function runtimify({
       return '';
     }).split(':');
 
-    try {
-      process.chdir(join(cwd, 'node_modules', src[0]));
-    } catch {
-      process.chdir(join(process.env.INIT_CWD!, 'node_modules', src[0]));
-    }
-
+    process.chdir(join(cwd, 'node_modules', src[0]));
     const { exports, main, module, type } = require(resolve('package.json'));
     const filter = src.filter((i) => !i.startsWith('!'));
     const stream = createWriteStream(out);
