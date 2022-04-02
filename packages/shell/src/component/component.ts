@@ -1,17 +1,27 @@
-import { createElement, render } from './jsx-runtime';
+import { createElement, render } from './runtime';
 
 /**
- * Interface describing the shape of a component.
- *
- * @see https://developer.mozilla.org/en-US/docs/Web/Web_Components
+ * Interface describing the shape of a custom component. Mostly adheres to the
+ * [specs](https://developer.mozilla.org/en-US/docs/Web/Web_Components) while
+ * providing rendering and change detection capabilities.
  */
 export interface Component extends HTMLElement {
 
   /**
    * Array of attribute names, which should be observed for changes, which will
    * trigger the {@link attributeChangedCallback}.
+   *
+   * @see {@link Attribute}
    */
   readonly observedAttributes?: string[];
+
+  /**
+   * Mapping of references to observed events, which, when emitted by the
+   * referenced node, trigger the {@link referenceChangedCallback}.
+   *
+   * @see {@link Reference}
+   */
+  readonly observedReferences?: Record<JSX.Key, (keyof HTMLElementEventMap)[]>;
 
   /**
    * Internal readiness indication. Initially resolves to `undefined` and will
@@ -27,7 +37,7 @@ export interface Component extends HTMLElement {
 
   /**
    * JSX representation of the component template. If no template is supplied, a
-   * slot element will be rendered.
+   * slot element will be rendered instead.
    */
   readonly template?: JSX.Element;
 
@@ -37,9 +47,9 @@ export interface Component extends HTMLElement {
   adoptedCallback?(): void;
 
   /**
-   * Called when one of the components attributes is added, removed or
-   * changed. Which attributes to watch depends on the contents of the
-   * {@link observedAttributes} array.
+   * Called when one of the components observed attributes is added, removed or
+   * changed. Which component attributes are observed depends on the contents of
+   * the {@link observedAttributes} array.
    *
    * @param name - Attribute name.
    * @param prev - Previous value.
@@ -58,7 +68,17 @@ export interface Component extends HTMLElement {
   disconnectedCallback?(): void;
 
   /**
-   * Called when the component should be (re-)rendered.
+   * Called when one of the components referenced and observed nodes emits an
+   * event. Which referenced nodes are observed for which events depends on the
+   * contents of the {@link observedReferences} mapping.
+   *
+   * @param name - Reference name.
+   * @param event - Emitted event.
+   */
+  referenceChangedCallback?(name: string, node: Node, event: Event): void;
+
+  /**
+   * Called when the component has changed and should be (re-)rendered.
    */
   renderComponent?(): void;
 
@@ -84,7 +104,7 @@ export interface Component extends HTMLElement {
  * import { Component } from '@sgrud/shell';
  *
  * @Component('example-component')
- * export class ExampleComponent extends HTMLElement {
+ * export class ExampleComponent extends HTMLElement implements Component {
  *
  *   public readonly styles: string[] = [`
  *     span {
@@ -100,6 +120,7 @@ export interface Component extends HTMLElement {
  * ```
  *
  * @see {@link Attribute}
+ * @see {@link Reference}
  */
 export function Component<S extends keyof HTMLElementTagNameMap>(
   selector: `${string}-${string}`,
@@ -122,9 +143,25 @@ export function Component<S extends keyof HTMLElementTagNameMap>(
       public constructor() {
         super();
 
+        if (!this.shadowRoot) {
+          this.attachShadow({ mode: 'open' });
+        }
+
         Object.defineProperty(this, 'readyState', {
           get: () => this.isConnected
         });
+      }
+
+      public override connectedCallback(): void {
+        super.connectedCallback
+          ? super.connectedCallback()
+          : this.renderComponent();
+      }
+
+      public override adoptedCallback(): void {
+        super.adoptedCallback
+          ? super.adoptedCallback()
+          : this.renderComponent();
       }
 
       public override attributeChangedCallback(
@@ -132,40 +169,35 @@ export function Component<S extends keyof HTMLElementTagNameMap>(
         prev?: string,
         next?: string
       ): void {
-        if (super.attributeChangedCallback) {
-          super.attributeChangedCallback(name, prev, next);
-        } else if (this.shadowRoot) {
-          this.renderComponent();
-        }
+        super.attributeChangedCallback
+          ? super.attributeChangedCallback(name, prev, next)
+          : this.renderComponent();
       }
 
-      public override connectedCallback(): void {
-        if (super.connectedCallback) {
-          super.connectedCallback();
-        } else if (!this.shadowRoot) {
-          this.attachShadow({ mode: 'open' });
-          this.renderComponent();
-        }
+      public override referenceChangedCallback(
+        name: string,
+        node: Node,
+        event: Event
+      ): void {
+        super.referenceChangedCallback
+          ? super.referenceChangedCallback(name, node, event)
+          : this.renderComponent();
       }
 
       public override renderComponent(): void {
-        if (super.renderComponent) {
-          super.renderComponent();
-        } else if (this.shadowRoot) {
-          const { styles = [], template = [] } = this;
+        const { styles = [], template = [] } = this;
 
-          if (!template.length) {
-            template.push(...createElement('slot'));
-          }
-
-          if (styles.length) {
-            template.push(...createElement('style', {
-              children: styles
-            }));
-          }
-
-          render(this.shadowRoot, template);
+        if (!template.length) {
+          template.push(...createElement('slot'));
         }
+
+        if (styles.length) {
+          template.push(...createElement('style', {
+            children: styles
+          }));
+        }
+
+        render(this.shadowRoot!, template);
       }
 
     }

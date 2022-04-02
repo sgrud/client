@@ -11,14 +11,14 @@ import { Component } from './component';
  * takes precedence.
  *
  * @param name - Component attribute name.
- * @returns Prototype property decorator.
+ * @returns Component property decorator.
  *
  * @example Decorate a property.
  * ```tsx
  * import { Attribute, Component } from '@sgrud/shell';
  *
  * @Component('example-component')
- * export class ExampleComponent extends HTMLElement {
+ * export class ExampleComponent extends HTMLElement implements Component {
  *
  *   @Attribute()
  *   public field?: string;
@@ -35,24 +35,19 @@ import { Component } from './component';
 export function Attribute(name?: string) {
 
   /**
-   * @param prototype - Prototype to be decorated.
-   * @param propertyKey - Prototype property to be decorated.
+   * @param component - Component prototype to be decorated.
+   * @param propertyKey - Component property to be decorated.
    */
   return function(
-    prototype: Component,
+    component: Component,
     propertyKey: PropertyKey
   ): void {
     const key = name || propertyKey as string;
+    ((component as Mutable<Component>).observedAttributes ??= []).push(key);
 
-    if (prototype.observedAttributes) {
-      prototype.observedAttributes.push(key);
-    } else {
-      (prototype as Mutable<Component>).observedAttributes = [key];
-    }
-
-    Object.defineProperty(prototype, propertyKey, {
-      get(this: Component): string | null {
-        return this.getAttribute(key);
+    Object.defineProperty(component, propertyKey, {
+      get(this: Component): string | undefined {
+        return this.getAttribute(key) ?? undefined;
       },
       set(this: Component, value: string): void {
         if (this.readyState || !this.hasAttribute(key)) {

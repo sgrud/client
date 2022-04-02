@@ -6,5 +6,6 @@
 
 export * from './src/component/attribute';
 export * from './src/component/component';
-export * from './src/component/jsx-runtime';
+export * from './src/component/reference';
+export * from './src/component/runtime';
 export * from './src/router/router';
