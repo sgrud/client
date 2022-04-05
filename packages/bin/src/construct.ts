@@ -99,7 +99,7 @@ export async function construct({
   const builder = require.resolve('microbundle');
   const current = require(resolve(cwd, 'package.json'));
   const general = require(join(__dirname, 'package.json'));
-  const helpers = current.dependencies['@babel/runtime'] as string;
+  const helpers = current.dependencies?.['@babel/runtime'];
   const patched = readFileSync(builder).toString().replace(
     'if (modern) cache = false;',
     'cache = false;'
@@ -117,7 +117,7 @@ export async function construct({
     /babelHelpers: 'bundled'/g,
     `babelHelpers: 'runtime', plugins: [
       ['@babel/plugin-transform-runtime', {
-        version: ${helpers ? `'${helpers}'` : 'undefined'}
+        version: ${helpers ? `'${helpers as string}'` : 'undefined'}
       }]
     ]`
   );
