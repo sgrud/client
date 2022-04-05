@@ -5,6 +5,22 @@ import { elementClose, elementOpen, getKey, patch, text } from 'incremental-dom'
 declare global {
 
   /**
+   * Global string literal helper type. Enforces any assigned string to be a
+   * `keyof HTMLElementTagNameMap`, while excluding all custom element tag
+   * names, i.e., `${string}-${string}` keys of `HTMLElementTagNameMap`.
+   */
+  type HTMLElementTagName =
+    Exclude<keyof HTMLElementTagNameMap, `${string}-${string}`>;
+
+  /**
+   * Global string literal helper type. Enforces any assigned string to be a
+   * `keyof HTMLElementTagNameMap`, while excluding built-in tag names, i.e.,
+   * `Extract`ing all `${string}-${string}` keys of `HTMLElementTagNameMap`.
+   */
+  type CustomElementTagName =
+    Extract<keyof HTMLElementTagNameMap, `${string}-${string}`>;
+
+  /**
    * Intrinsic JSX namespace.
    *
    * @see https://www.typescriptlang.org/docs/handbook/jsx.html
@@ -23,7 +39,19 @@ declare global {
      */
     type IntrinsicElements = {
       [K in keyof HTMLElementTagNameMap]: Partial<HTMLElementTagNameMap[K]> & {
-        key?: JSX.Key;
+
+        /**
+         * Intrinsic built-in element extension attribute.
+         */
+        readonly is?: K extends HTMLElementTagName
+          ? CustomElementTagName
+          : never;
+
+        /**
+         * Intrinsic element reference key attribute.
+         */
+        readonly key?: Key;
+
       };
     };
 
@@ -182,7 +210,10 @@ export function render(
 const resolved = new WeakMap<Element | DocumentFragment, Map<JSX.Key, Node>>();
 
 export {
+  CustomElementTagName,
+  HTMLElementTagName,
   JSX,
+
   createElement as jsx,
   createElement as jsxs,
   createFragment as Fragment
