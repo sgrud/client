@@ -1,3 +1,4 @@
+import { customElements } from './registry';
 import { createElement, render } from './runtime';
 
 /**
