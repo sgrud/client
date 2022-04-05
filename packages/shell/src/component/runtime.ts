@@ -74,6 +74,10 @@ export function createElement(
         attributes.push('class', props[key]);
         break;
 
+      case 'is':
+        type = customElements.get(props[key]) || type;
+        break;
+
       case 'key':
         ref ??= props[key];
         break;
