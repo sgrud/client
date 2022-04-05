@@ -17,6 +17,12 @@ import { Component } from './component';
  * ```tsx
  * import { Attribute, Component } from '@sgrud/shell';
  *
+ * declare global {
+ *   interface HTMLElementTagNameMap {
+ *     'example-component': ExampleComponent;
+ *   }
+ * }
+ *
  * @Component('example-component')
  * export class ExampleComponent extends HTMLElement implements Component {
  *
