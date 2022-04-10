@@ -122,9 +122,12 @@
         {
           "default": [
             "static-field",
+            "static-get",
             "static-method",
             "abstract-field",
             "instance-field",
+            "abstract-get",
+            "instance-get",
             "signature",
             "constructor",
             "abstract-method",
@@ -137,6 +140,14 @@
       "@typescript-eslint/no-namespace": "off",
       "@typescript-eslint/no-non-null-assertion": "off",
       "@typescript-eslint/no-shadow": "error",
+      "@typescript-eslint/no-this-alias": [
+        "error",
+        {
+          "allowedNames": [
+            "self"
+          ]
+        }
+      ],
       "@typescript-eslint/no-unsafe-argument": "off",
       "@typescript-eslint/no-unsafe-assignment": "off",
       "@typescript-eslint/no-unsafe-call": "off",
