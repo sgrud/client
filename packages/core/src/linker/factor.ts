@@ -34,12 +34,12 @@ export function Factor<K extends new () => any>(
    * @param propertyKey - Prototype property to be decorated.
    */
   return function(
-    prototype: Object,
+    prototype: object,
     propertyKey: PropertyKey
   ): void {
     Object.defineProperty(prototype, propertyKey, {
       enumerable: true,
-      get: () => new Linker().get(targetFactory()),
+      get: () => new Linker<K>().get(targetFactory()),
       set: Function.prototype as (...args: any[]) => void
     });
   };

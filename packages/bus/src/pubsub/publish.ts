@@ -72,7 +72,7 @@ export function Publish(
    * @param propertyKey - Prototype property to be decorated.
    */
   return function(
-    prototype: Object,
+    prototype: object,
     propertyKey: PropertyKey
   ): void {
     if (TypeOf.string(source)) {

@@ -70,7 +70,7 @@ export function Target<K extends new (...args: any[]) => any>(
   return function(
     constructor: K
   ): void {
-    new Linker([
+    new Linker<K>([
       [constructor, new constructor(...factoryArgs)]
     ]);
   };

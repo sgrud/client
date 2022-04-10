@@ -193,7 +193,7 @@ export class Registry<
       this.cached.delete(registration);
 
       Object.defineProperty(constructor, Symbol.hasInstance, {
-        value: (instance: any) => instance instanceof cache
+        value: (instance: unknown) => instance instanceof cache
       });
     }
 
