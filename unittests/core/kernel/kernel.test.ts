@@ -1,4 +1,4 @@
-import { Kernel, Module } from '@sgrud/core';
+import { Kernel } from '@sgrud/core';
 import express from 'express';
 import { Server } from 'http';
 import { catchError, EMPTY, from, of, timeout } from 'rxjs';
@@ -60,14 +60,14 @@ describe('@sgrud/core/kernel/kernel', () => {
         ]
       }
     }
-  } as Module;
+  } as Kernel.Module;
 
   const submod = {
     name: 'submod',
     version: '0.0.5',
     exports: './submod.esmod.js',
     unpkg: './submod.unpkg.js'
-  } as Module;
+  } as Kernel.Module;
 
   describe('instantiating a kernel', () => {
     const kernel = new Kernel();
@@ -267,7 +267,7 @@ describe('@sgrud/core/kernel/kernel', () => {
 
   describe('loading an faulty module', () => {
     const kernel = new Kernel();
-    const module = { name: 'nonexistent' } as Module;
+    const module = { name: 'nonexistent' } as Kernel.Module;
 
     it('throws an error', (done) => {
       const subscription = kernel.insmod(module).pipe(
@@ -282,7 +282,7 @@ describe('@sgrud/core/kernel/kernel', () => {
 
   describe('loading an module with a too high version', () => {
     const kernel = new Kernel();
-    const module = { ...depmod, name: 'maxver' } as Module;
+    const module = { ...depmod, name: 'maxver' } as Kernel.Module;
 
     it('throws an error', (done) => {
       module.sgrudDependencies!.submod = '0.1.0';
@@ -299,7 +299,7 @@ describe('@sgrud/core/kernel/kernel', () => {
 
   describe('loading an module with a too low version', () => {
     const kernel = new Kernel();
-    const module = { ...depmod, name: 'minver' } as Module;
+    const module = { ...depmod, name: 'minver' } as Kernel.Module;
 
     it('throws an error', (done) => {
       module.sgrudDependencies!.submod = '0.0.1';

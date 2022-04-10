@@ -6,105 +6,115 @@ import { Singleton } from '../utility/singleton';
 import { semver } from './semver';
 
 /**
- * String literal helper type. Enforces any assigned string to adhere to the
- * represent a browser-parsable digest hash.
- */
-export type Digest = `sha${256 | 384 | 512}-${string}`;
-
-/**
- * Interface describing the shape of a module. This interface is aligned with
- * some [package.json](https://nodejs.dev/learn/the-package-json-guide) fields.
- * It further specifies an optional {@link sgrudDependencies} mapping, as well
- * as an optional {@link webDependencies} mapping, which both are used by the
- * {@link Kernel} to determine SGRUD module dependencies and runtime (web)
- * dependencies.
- *
- * @example An example module definition.
- * ```ts
- * import type { Module } from '@sgrud/core';
- *
- * const module: Module = {
- *   name: 'module',
- *   version: '0.0.0',
- *   exports: './module.exports.js',
- *   unpkg: './module.unpkg.js',
- *   sgrudDependencies: {
- *     sgrudDependency: '^0.0.1'
- *   },
- *   webDependencies: {
- *     webDependency: {
- *       exports: {
- *         webDependency: './webDependency.exports.js'
- *       },
- *       unpkg: [
- *         './webDependency.unpkg.js'
- *       ]
- *     }
- *   }
- * };
- * ```
+ * Namespace containing types and interfaces to be used in conjunction with the
+ * singleton {@link Kernel} class.
  *
  * @see {@link Kernel}
  */
-export interface Module {
+export namespace Kernel {
 
   /**
-   * Name of the module.
+   * String literal helper type. Enforces any assigned string to adhere to the
+   * represent a browser-parsable digest hash.
    */
-  readonly name: string;
+  export type Digest = `sha${256 | 384 | 512}-${string}`;
 
   /**
-   * Module version, formatted as [semver](https://semver.org).
-   */
-  readonly version: string;
-
-  /**
-   * ESM module entry point.
-   */
-  readonly exports?: string;
-
-  /**
-   * UMD module entry point.
-   */
-  readonly unpkg?: string;
-
-  /**
-   * Optional bundle digests. If hashes are supplied, they will be used to
-   * verify the [subresource integrity](https://www.w3.org/TR/SRI) of the
-   * respective bundles.
+   * Interface describing the shape of a module. This interface is aligned with
+   * some [package.json](https://nodejs.dev/learn/the-package-json-guide)
+   * fields. It further specifies an optional {@link sgrudDependencies} mapping,
+   * as well as an optional {@link webDependencies} mapping, which both are used
+   * by the {@link Kernel} to determine SGRUD module dependencies and runtime
+   * (web) dependencies.
    *
-   * @see {@link Digest}
-   */
-  readonly digest?: Record<string, Digest>;
-
-  /**
-   * Optional SGRUD dependencies.
-   */
-  readonly sgrudDependencies?: Record<string, string>;
-
-  /**
-   * Optional runtime dependencies.
+   * @example An example module definition.
+   * ```ts
+   * import type { Kernel } from '@sgrud/core';
    *
-   * @see {@link WebDependency}
+   * const module: Kernel.Module = {
+   *   name: 'module',
+   *   version: '0.0.0',
+   *   exports: './module.exports.js',
+   *   unpkg: './module.unpkg.js',
+   *   sgrudDependencies: {
+   *     sgrudDependency: '^0.0.1'
+   *   },
+   *   webDependencies: {
+   *     webDependency: {
+   *       exports: {
+   *         webDependency: './webDependency.exports.js'
+   *       },
+   *       unpkg: [
+   *         './webDependency.unpkg.js'
+   *       ]
+   *     }
+   *   }
+   * };
+   * ```
+   *
+   * @see {@link Kernel}
    */
-  readonly webDependencies?: Record<string, WebDependency>;
+  export interface Module {
 
-}
+    /**
+     * Name of the module.
+     */
+    readonly name: string;
 
-/**
- * Interface describing a runtime dependency of a {@link Module}.
- */
-export interface WebDependency {
+    /**
+     * Module version, formatted as [semver](https://semver.org).
+     */
+    readonly version: string;
+
+    /**
+     * ESM module entry point.
+     */
+    readonly exports?: string;
+
+    /**
+     * UMD module entry point.
+     */
+    readonly unpkg?: string;
+
+    /**
+     * Optional bundle digests. If hashes are supplied, they will be used to
+     * verify the [subresource integrity](https://www.w3.org/TR/SRI) of the
+     * respective bundles.
+     *
+     * @see {@link Digest}
+     */
+    readonly digest?: Record<string, Digest>;
+
+    /**
+     * Optional SGRUD dependencies.
+     */
+    readonly sgrudDependencies?: Record<string, string>;
+
+    /**
+     * Optional runtime dependencies.
+     *
+     * @see {@link WebDependency}
+     */
+    readonly webDependencies?: Record<string, WebDependency>;
+
+  }
 
   /**
-   * Optional ESM runtime dependencies.
+   * Interface describing a runtime dependency of a {@link Module}.
    */
-  readonly exports?: Record<string, string>;
+  export interface WebDependency {
 
-  /**
-   * Optional UMD runtime dependencies.
-   */
-  readonly unpkg?: string[];
+    /**
+     * Optional ESM runtime dependencies.
+     */
+    readonly exports?: Record<string, string>;
+
+    /**
+     * Optional UMD runtime dependencies.
+     */
+    readonly unpkg?: string[];
+
+  }
 
 }
 
@@ -137,7 +147,7 @@ export class Kernel {
    * from(new Kernel()).subscribe(console.log);
    * ```
    */
-  public readonly [Symbol.observable]: () => Subscribable<Module>;
+  public readonly [Symbol.observable]: () => Subscribable<Kernel.Module>;
 
   /**
    * Internal mapping of all via importmap defined module identifiers to their
@@ -152,7 +162,7 @@ export class Kernel {
    * that it emits the module definition once the respective module is fully
    * loaded (including dependencies etc.) and then completes.
    */
-  private readonly loaders: Map<string, ReplaySubject<Module>>;
+  private readonly loaders: Map<string, ReplaySubject<Kernel.Module>>;
 
   /**
    * Internal ReplaySubject tracking the loading state of the Kernel modules. An
@@ -161,7 +171,7 @@ export class Kernel {
    * ReplaySubject (and therefore Observable) emits all module definitions which
    * are {@link insmod}ded throughout the lifespan of the Kernel.
    */
-  private readonly loading: ReplaySubject<Module>;
+  private readonly loading: ReplaySubject<Kernel.Module>;
 
   /**
    * Internally used string to suffix the `importmap` and `module` types of HTML
@@ -174,7 +184,7 @@ export class Kernel {
   /**
    * `rxjs.observable` interop getter returning a callback to a Subscribable.
    */
-  public get [observable](): () => Subscribable<Module> {
+  public get [observable](): () => Subscribable<Kernel.Module> {
     return () => this.loading.asObservable();
   }
 
@@ -223,8 +233,8 @@ export class Kernel {
 
   ) {
     this.imports = new Map<string, string>();
-    this.loaders = new Map<string, ReplaySubject<Module>>();
-    this.loading = new ReplaySubject<Module>();
+    this.loaders = new Map<string, ReplaySubject<Kernel.Module>>();
+    this.loading = new ReplaySubject<Kernel.Module>();
     this.shimmed = '';
 
     const queried = document.querySelectorAll('script[type^="importmap"]');
@@ -244,7 +254,7 @@ export class Kernel {
       }
     }
 
-    HttpClient.get<Module>(`${endpoint}/insmod`).pipe(
+    HttpClient.get<Kernel.Module>(`${endpoint}/insmod`).pipe(
       switchMap(({ response }) => this.insmod(response))
     ).subscribe();
   }
@@ -274,15 +284,15 @@ export class Kernel {
    *
    * @see {@link Module}
    */
-  public insmod(module: Module): Observable<Module> {
+  public insmod(module: Kernel.Module): Observable<Kernel.Module> {
     let loader = this.loaders.get(module.name);
 
     if (!loader) {
-      loader = new ReplaySubject<Module>(1);
+      loader = new ReplaySubject<Kernel.Module>(1);
       this.loaders.set(module.name, loader);
 
       const chain = [] as Observable<any>[];
-      const dependencies = { } as Mutable<WebDependency>;
+      const dependencies = { } as Mutable<Kernel.WebDependency>;
       const { sgrudDependencies, webDependencies } = module;
 
       if (sgrudDependencies) {
@@ -380,9 +390,12 @@ export class Kernel {
    *
    * @see {@link Module}
    */
-  public resolve(name: string): Observable<Module> {
+  public resolve(name: string): Observable<Kernel.Module> {
     const module = `${this.nodeModules}/${name}/package.json`;
-    return HttpClient.get<Module>(module).pipe(map(({ response }) => response));
+
+    return HttpClient.get<Kernel.Module>(module).pipe(
+      map(({ response }) => response)
+    );
   }
 
   /**
