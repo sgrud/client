@@ -22,16 +22,16 @@
     "@babel/runtime:helpers.umd"
   ],
   "dependencies": {
-    "@babel/runtime": "7.17.8",
+    "@babel/runtime": "7.17.9",
     "@sgrud/bin": "latest",
-    "preact": "10.7.0",
+    "preact": "10.7.1",
     "preact-custom-element": "4.2.1",
     "tslib": "2.3.1"
   },
   "devDependencies": {
     "@types/css-modules": "1.0.2",
     "@types/preact-custom-element": "4.0.1",
-    "sass": "1.49.11"
+    "sass": "1.50.0"
   },
   "webDependencies": {
     "@babel/runtime": {

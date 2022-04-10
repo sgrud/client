@@ -23,7 +23,7 @@
     "incremental-dom.esm"
   ],
   "dependencies": {
-    "@babel/runtime": "^7.17.8",
+    "@babel/runtime": "^7.17.9",
     "@sgrud/core": "latest",
     "incremental-dom": "^0.7.0",
     "tslib": "^2.3.1"

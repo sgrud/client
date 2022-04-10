@@ -25,7 +25,7 @@
     "@babel/runtime:helpers.umd"
   ],
   "dependencies": {
-    "@babel/runtime": "^7.17.8",
+    "@babel/runtime": "^7.17.9",
     "comlink": "^4.3.1",
     "rxjs": "^7.5.5",
     "tslib": "^2.3.1"
