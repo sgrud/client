@@ -37,10 +37,6 @@
     "paths": {
       "@sgrud/*": [
         "./packages/*"
-      ],
-      // https://github.com/TypeStrong/typedoc/pull/1891
-      "incremental-dom": [
-        "./node_modules/incremental-dom/dist/incremental-dom-cjs.js"
       ]
     }
   },
@@ -55,6 +51,11 @@
 
     "excludeExternals": true,
     "treatWarningsAsErrors": true,
+
+    "compilerOptions": {
+      "noUnusedLocals": false,
+      "noUnusedParameters": false
+    },
 
     "entryPoints": [
       "./packages/bin/index.ts",

@@ -1,5 +1,4 @@
 import { TypeOf } from '@sgrud/core';
-// @ts-expect-error https://github.com/TypeStrong/typedoc/pull/1891
 import { elementClose, elementOpen, getKey, patch, text } from 'incremental-dom';
 
 declare global {
@@ -61,6 +60,15 @@ declare global {
      * type.
      */
     type Key = string | number;
+
+  }
+
+  interface Node {
+
+    /**
+     * @see https://github.com/google/incremental-dom/pull/467
+     */
+    readonly namespaceURI: string | null;
 
   }
 
@@ -126,7 +134,7 @@ export function createElement(
     }
   }
 
-  element.push(elementClose.bind(null, type));
+  element.push(elementClose.bind(null, type as keyof JSX.IntrinsicElements));
 
   return element;
 }
