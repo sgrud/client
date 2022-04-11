@@ -204,7 +204,7 @@ export function Component<
         }
 
         if (styles.length) {
-          template.push(...createElement('style', {
+          template.unshift(...createElement('style', {
             children: styles
           }));
         }
