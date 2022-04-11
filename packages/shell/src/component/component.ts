@@ -48,7 +48,7 @@ export interface Component extends HTMLElement {
   adoptedCallback?(): void;
 
   /**
-   * Called when one of the components observed attributes is added, removed or
+   * Called when one of the component's observed attributes is added, removed or
    * changed. Which component attributes are observed depends on the contents of
    * the {@link observedAttributes} array.
    *
@@ -69,7 +69,7 @@ export interface Component extends HTMLElement {
   disconnectedCallback?(): void;
 
   /**
-   * Called when one of the components referenced and observed nodes emits an
+   * Called when one of the component's referenced and observed nodes emits an
    * event. Which referenced nodes are observed for which events depends on the
    * contents of the {@link observedReferences} mapping.
    *

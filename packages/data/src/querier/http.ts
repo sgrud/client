@@ -53,7 +53,7 @@ export class HttpQuerier
   }
 
   /**
-   * Overridden commit method of the {@link Querier} base class. When this
+   * Overridden `commit` method of the {@link Querier} base class. When this
    * {@link Model} querier is made available via the {@link Linker}, this
    * overridden method is called whenever this querier claims the highest
    * {@link priority} to commit an operation, depending on the {@link Model}

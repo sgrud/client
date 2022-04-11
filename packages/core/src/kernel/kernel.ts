@@ -400,8 +400,8 @@ export class Kernel {
 
   /**
    * Inserts a HTML script element and applies the supplied `props` to it. The
-   * returned Observable emits and completes when the elements onload handler is
-   * called. When no external resource is supplied through `props.src`, the
+   * returned Observable emits and completes when the element's onload handler
+   * is called. When no external resource is supplied through `props.src`, the
    * onload handler is asynchronously called. When the returned Observable
    * completes, the inserted HTML script element is removed.
    *

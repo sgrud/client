@@ -33,6 +33,8 @@ export abstract class Enum extends String {
  *
  * @example Enumerate an enum.
  * ```ts
+ * import { enumerate } from '@sgrud/data';
+ *
  * enum Enumeration {
  *   One = 'ONE',
  *   Two = 'TWO'
