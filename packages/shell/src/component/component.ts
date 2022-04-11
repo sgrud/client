@@ -164,15 +164,15 @@ export function Component<
         });
       }
 
-      public override connectedCallback(): void {
-        super.connectedCallback
-          ? super.connectedCallback()
-          : this.renderComponent();
-      }
-
       public override adoptedCallback(): void {
         super.adoptedCallback
           ? super.adoptedCallback()
+          : this.renderComponent();
+      }
+
+      public override connectedCallback(): void {
+        super.connectedCallback
+          ? super.connectedCallback()
           : this.renderComponent();
       }
 

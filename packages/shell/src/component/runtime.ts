@@ -5,19 +5,19 @@ declare global {
 
   /**
    * Global string literal helper type. Enforces any assigned string to be a
-   * `keyof HTMLElementTagNameMap`, while excluding all custom element tag
-   * names, i.e., `${string}-${string}` keys of `HTMLElementTagNameMap`.
-   */
-  type HTMLElementTagName =
-    Exclude<keyof HTMLElementTagNameMap, `${string}-${string}`>;
-
-  /**
-   * Global string literal helper type. Enforces any assigned string to be a
    * `keyof HTMLElementTagNameMap`, while excluding built-in tag names, i.e.,
    * `Extract`ing all `${string}-${string}` keys of `HTMLElementTagNameMap`.
    */
   type CustomElementTagName =
     Extract<keyof HTMLElementTagNameMap, `${string}-${string}`>;
+
+  /**
+   * Global string literal helper type. Enforces any assigned string to be a
+   * `keyof HTMLElementTagNameMap`, while excluding all custom element tag
+   * names, i.e., `${string}-${string}` keys of `HTMLElementTagNameMap`.
+   */
+  type HTMLElementTagName =
+    Exclude<keyof HTMLElementTagNameMap, `${string}-${string}`>;
 
   /**
    * Intrinsic JSX namespace.
@@ -174,7 +174,7 @@ export function createFragment(props?: Record<string, any>): JSX.Element {
  * @returns Resolved references.
  */
 export function references(
-  target: Element | DocumentFragment
+  target: DocumentFragment | Element
 ): Map<JSX.Key, Node> | undefined {
   return resolved.get(target);
 }
@@ -190,7 +190,7 @@ export function references(
  * @returns Rendered `target` element.
  */
 export function render(
-  target: Element | DocumentFragment,
+  target: DocumentFragment | Element,
   element: JSX.Element
 ): Node {
   return patch(target, () => {
@@ -215,7 +215,7 @@ export function render(
  * Internal weak mapping of all rendered nodes containing element references to
  * those references, mapped by their respective keys.
  */
-const resolved = new WeakMap<Element | DocumentFragment, Map<JSX.Key, Node>>();
+const resolved = new WeakMap<DocumentFragment | Element, Map<JSX.Key, Node>>();
 
 export {
   CustomElementTagName,
