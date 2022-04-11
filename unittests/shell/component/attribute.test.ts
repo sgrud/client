@@ -12,6 +12,7 @@ describe('@sgrud/shell/component/attribute', () => {
     @Attribute() public attribute?: string;
     @Attribute('data-attr') public data?: string;
     @Attribute() public preset?: string = undefined;
+    @Attribute() public unused?: undefined;
   }
 
   customElements.define('test-class', TestClass);
@@ -23,6 +24,7 @@ describe('@sgrud/shell/component/attribute', () => {
 
     it('mirrors the bound property to the attribute', () => {
       expect(testClass.attribute).toBe(testClass.getAttribute('attribute'));
+      expect(testClass.attribute).not.toBeUndefined();
     });
   });
 
@@ -32,6 +34,7 @@ describe('@sgrud/shell/component/attribute', () => {
 
     it('mirrors the bound property to the dataset', () => {
       expect(testClass.dataset.attr).toBe(testClass.getAttribute('data-attr'));
+      expect(testClass.dataset.attr).not.toBeUndefined();
     });
   });
 
@@ -41,6 +44,14 @@ describe('@sgrud/shell/component/attribute', () => {
     it('prefers the value passed to the attribute through the dom', () => {
       expect(testClass.preset).toBe(testClass.getAttribute('preset'));
       expect(testClass.preset).not.toBeUndefined();
+    });
+  });
+
+  describe('retrieving a bound property when no attribute is present', () => {
+    const testClass = document.body.firstChild as TestClass;
+
+    it('returns undefined', () => {
+      expect(testClass.unused).toBeUndefined();
     });
   });
 

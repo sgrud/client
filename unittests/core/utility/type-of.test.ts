@@ -25,7 +25,7 @@ describe('@sgrud/core/typing/type-of', () => {
     [],
     true,
     new Date(),
-    () => undefined,
+    Function.prototype,
     { [Symbol.toStringTag]: 'global' },
     null,
     0,

@@ -1,4 +1,12 @@
-import { Attribute, Component, jsx } from '@sgrud/shell';
+import { Attribute, Component, jsx, Reference, render } from '@sgrud/shell';
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'class-one': HTMLElement;
+    'class-two': HTMLElement;
+    'class-main': HTMLElement;
+  }
+}
 
 globalThis.HTMLElement = new Proxy(HTMLElement, {
   apply: (_, target, args) => {
@@ -9,26 +17,40 @@ globalThis.HTMLElement = new Proxy(HTMLElement, {
 describe('@sgrud/shell/component/component', () => {
 
   @Component('class-one')
-  class ClassOne extends HTMLElement implements Component { }
+  class ClassOne extends HTMLElement implements Component {
+    public constructor() {
+      super();
+      this.attachShadow({ mode: 'open' });
+    }
+  }
 
   @Component('class-two')
   class ClassTwo extends HTMLElement implements Component {
     @Attribute() public attribute?: string;
+    @Reference('key', ['change']) public reference?: HTMLDivElement = undefined;
     public readonly styles: string[] = [':host { color: green; }'];
-    public readonly template: JSX.Element = jsx('div');
+    public readonly template: JSX.Element = jsx('div', { key: 'key' });
   }
 
   @Component('class-main', 'main')
   class ClassMain extends HTMLElement implements Component {
     @Attribute() public attribute?: string;
-    public attributeChangedCallback(): void {
-      return;
-    }
+    @Reference('key', ['change']) public reference?: HTMLDivElement = undefined;
+    public readonly template: JSX.Element = jsx('div', { key: 'key' });
     public connectedCallback(): void {
-      return;
+      this.renderComponent();
+    }
+    public adoptedCallback(): void {
+      this.renderComponent();
+    }
+    public attributeChangedCallback(): void {
+      this.renderComponent();
+    }
+    public referenceChangedCallback(): void {
+      this.renderComponent();
     }
     public renderComponent(): void {
-      return;
+      render(this.shadowRoot!, this.template);
     }
   }
 
@@ -45,9 +67,11 @@ describe('@sgrud/shell/component/component', () => {
   describe('declaring a component with styles and template', () => {
     document.body.innerHTML = '<class-two></class-two>';
     const classTwo = document.body.firstChild as ClassTwo;
+    const doc = document.implementation.createHTMLDocument();
 
-    document.body.append(document.body.removeChild(classTwo));
+    doc.adoptNode(classTwo);
     classTwo.attribute = 'value';
+    classTwo.reference!.dispatchEvent(new Event('change'));
 
     it('renders the component styles and template', () => {
       expect(classTwo).toBeInstanceOf(ClassTwo);
@@ -60,9 +84,11 @@ describe('@sgrud/shell/component/component', () => {
   describe('declaring a component extending an element', () => {
     document.body.innerHTML = '<main is="class-main"></main>';
     const classMain = document.body.firstChild as ClassMain;
+    const doc = document.implementation.createHTMLDocument();
 
+    doc.adoptNode(classMain);
     classMain.attribute = 'value';
-    classMain.renderComponent();
+    classMain.reference!.dispatchEvent(new Event('change'));
 
     it('renders the extended element as the component', () => {
       expect(classMain).toBeInstanceOf(ClassMain);
