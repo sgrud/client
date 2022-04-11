@@ -1,3 +1,9 @@
+globalThis.HTMLElement = new Proxy(HTMLElement, {
+  apply: (_, target, args) => {
+    return Reflect.construct(HTMLElement, args, target.constructor);
+  }
+});
+
 import { Component, jsx, Reference } from '@sgrud/shell';
 
 declare global {
@@ -6,12 +12,6 @@ declare global {
     'class-two': HTMLElement;
   }
 }
-
-globalThis.HTMLElement = new Proxy(HTMLElement, {
-  apply: (_, target, args) => {
-    return Reflect.construct(HTMLElement, args, target.constructor);
-  }
-});
 
 describe('@sgrud/shell/component/reference', () => {
 
@@ -38,7 +38,7 @@ describe('@sgrud/shell/component/reference', () => {
     document.body.innerHTML = '<test-class></test-class>';
     const classOne = document.body.firstChild as TestClass;
 
-    it('mirrors the referenced template element to the bound property', () => {
+    it('returns undefined as no template exists', () => {
       expect(classOne.unused).toBeUndefined();
     });
   });

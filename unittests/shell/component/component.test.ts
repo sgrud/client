@@ -1,3 +1,9 @@
+globalThis.HTMLElement = new Proxy(HTMLElement, {
+  apply: (_, target, args) => {
+    return Reflect.construct(HTMLElement, args, target.constructor);
+  }
+});
+
 import { Attribute, Component, jsx, Reference, render } from '@sgrud/shell';
 
 declare global {
@@ -7,12 +13,6 @@ declare global {
     'class-main': HTMLElement;
   }
 }
-
-globalThis.HTMLElement = new Proxy(HTMLElement, {
-  apply: (_, target, args) => {
-    return Reflect.construct(HTMLElement, args, target.constructor);
-  }
-});
 
 describe('@sgrud/shell/component/component', () => {
 

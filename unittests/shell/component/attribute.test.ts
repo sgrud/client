@@ -1,10 +1,10 @@
-import { Attribute } from '@sgrud/shell';
-
 globalThis.HTMLElement = new Proxy(HTMLElement, {
   apply: (_, target, args) => {
     return Reflect.construct(HTMLElement, args, target.constructor);
   }
 });
+
+import { Attribute } from '@sgrud/shell';
 
 describe('@sgrud/shell/component/attribute', () => {
 
