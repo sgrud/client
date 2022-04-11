@@ -195,8 +195,7 @@ export class HttpClient implements HttpHandler {
    * @see {@link HttpProxy}
    */
   public handle<T>(request: Request): Observable<Response<T>> {
-    const linker = new Linker<typeof HttpProxy>();
-    const proxies = linker.getAll(HttpProxy);
+    const proxies = new Linker<typeof HttpProxy>().getAll(HttpProxy);
 
     return (function handle(next: Request): Observable<Response<any>> {
       return proxies.shift()?.proxy(next, { handle }) ?? ajax(next);

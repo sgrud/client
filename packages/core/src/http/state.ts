@@ -58,9 +58,9 @@ export class HttpState
    * `rxjs.observable` interop getter returning a callback to a Subscribable.
    */
   public get [observable](): () => Subscribable<Response<any>[]> {
-    return () => this.changes.pipe(map(() => {
-      return Array.from(this.running.values());
-    }));
+    return () => this.changes.pipe(
+      map(() => Array.from(this.running.values()))
+    );
   }
 
   /**
