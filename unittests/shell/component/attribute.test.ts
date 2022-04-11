@@ -11,7 +11,7 @@ describe('@sgrud/shell/component/attribute', () => {
   class TestClass extends HTMLElement {
     @Attribute() public attribute?: string;
     @Attribute('data-attr') public data?: string;
-    @Attribute() public preset?: string = undefined;
+    @Attribute() public preset?: string = null!;
     @Attribute() public unused?: undefined;
   }
 
@@ -24,7 +24,7 @@ describe('@sgrud/shell/component/attribute', () => {
 
     it('mirrors the bound property to the attribute', () => {
       expect(testClass.attribute).toBe(testClass.getAttribute('attribute'));
-      expect(testClass.attribute).not.toBeUndefined();
+      expect(testClass.attribute).not.toBeNull();
     });
   });
 

@@ -165,13 +165,13 @@ export function Component<
       }
 
       public override adoptedCallback(): void {
-        super.adoptedCallback
+        return super.adoptedCallback
           ? super.adoptedCallback()
           : this.renderComponent();
       }
 
       public override connectedCallback(): void {
-        super.connectedCallback
+        return super.connectedCallback
           ? super.connectedCallback()
           : this.renderComponent();
       }
@@ -181,7 +181,7 @@ export function Component<
         prev?: string,
         next?: string
       ): void {
-        super.attributeChangedCallback
+        return super.attributeChangedCallback
           ? super.attributeChangedCallback(name, prev, next)
           : this.renderComponent();
       }
@@ -191,7 +191,7 @@ export function Component<
         node: Node,
         event: Event
       ): void {
-        super.referenceChangedCallback
+        return super.referenceChangedCallback
           ? super.referenceChangedCallback(name, node, event)
           : this.renderComponent();
       }
