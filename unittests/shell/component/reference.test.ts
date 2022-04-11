@@ -16,20 +16,20 @@ declare global {
 describe('@sgrud/shell/component/reference', () => {
 
   class TestClass extends HTMLElement implements Component {
-    @Reference('unused') public unused?: HTMLDivElement = undefined;
+    @Reference('unused', ['change']) public unused?: HTMLDivElement;
   }
 
   @Component('class-one')
   class ClassOne extends HTMLElement implements Component {
-    @Reference('key') public reference?: HTMLDivElement = undefined;
-    @Reference('unused') public unused?: HTMLDivElement = undefined;
+    @Reference('key') public reference?: HTMLDivElement;
+    @Reference('unused') public unused?: HTMLDivElement;
     public readonly template: JSX.Element = jsx('div', { key: 'key' });
   }
 
   @Component('class-two')
   class ClassTwo extends HTMLElement implements Component {
-    @Reference('key', ['change']) public reference?: HTMLDivElement = undefined;
-    @Reference('unused', ['change']) public unused?: HTMLDivElement = undefined;
+    @Reference('key', ['change']) public reference?: HTMLDivElement;
+    @Reference('unused', ['change']) public unused?: HTMLDivElement;
     public readonly template: JSX.Element = jsx('div', { key: 'key' });
   }
 

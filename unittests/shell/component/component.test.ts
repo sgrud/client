@@ -27,7 +27,7 @@ describe('@sgrud/shell/component/component', () => {
   @Component('class-two')
   class ClassTwo extends HTMLElement implements Component {
     @Attribute() public attribute?: string;
-    @Reference('key', ['change']) public reference?: HTMLDivElement = undefined;
+    @Reference('key', ['change']) public reference?: HTMLDivElement;
     public readonly styles: string[] = [':host { color: green; }'];
     public readonly template: JSX.Element = jsx('div', { key: 'key' });
   }
@@ -35,7 +35,7 @@ describe('@sgrud/shell/component/component', () => {
   @Component('class-main', 'main')
   class ClassMain extends HTMLElement implements Component {
     @Attribute() public attribute?: string;
-    @Reference('key', ['change']) public reference?: HTMLDivElement = undefined;
+    @Reference('key', ['change']) public reference?: HTMLDivElement;
     public readonly template: JSX.Element = jsx('div', { key: 'key' });
     public connectedCallback(): void {
       this.renderComponent();

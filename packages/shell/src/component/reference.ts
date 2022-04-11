@@ -53,6 +53,9 @@ export function Reference(
     component: Component,
     propertyKey: PropertyKey
   ): void {
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    const connectedCallback = component.connectedCallback;
+
     if (observe?.length) {
       assign((component as Mutable<Component>).observedReferences ??= { }, {
         [ref]: observe
@@ -63,36 +66,42 @@ export function Reference(
       get(this: Component): Node | undefined {
         return references(this.shadowRoot!)?.get(ref);
       },
-      set(this: Component) {
-        if (this.observedReferences) {
-          const listeners = { } as Record<JSX.Key, (event: Event) => void>;
-          const renderComponent = this.renderComponent!.bind(this);
-          (this as Mutable<Component>).observedReferences = null!;
+      set: Function.prototype as (...args: any[]) => void
+    });
 
-          this.renderComponent = () => {
-            renderComponent();
-            const refs = references(this.shadowRoot!);
+    component.connectedCallback = function(this: Component): void {
+      if (this.observedReferences) {
+        (this as Mutable<Component>).observedReferences = undefined;
+        const listeners = { } as Record<JSX.Key, (event: Event) => void>;
+        const renderComponent = this.renderComponent?.bind(this);
 
-            if (refs) {
-              for (const key in component.observedReferences) {
-                const node = refs.get(key);
+        this.renderComponent = function(this: Component): void {
+          renderComponent?.();
+          const refs = references(this.shadowRoot!);
 
-                if (node) {
-                  for (const type of component.observedReferences[key]) {
-                    node.addEventListener(type, listeners[key] ??= (event) => {
-                      this.referenceChangedCallback!(key, node, event);
-                    }, {
-                      once: true,
-                      passive: true
-                    });
-                  }
+          if (refs) {
+            for (const key in component.observedReferences) {
+              const node = refs.get(key);
+
+              if (node) {
+                for (const type of component.observedReferences[key]) {
+                  node.addEventListener(type, listeners[key] ??= (event) => {
+                    this.referenceChangedCallback?.(key, node, event);
+                  }, {
+                    once: true,
+                    passive: true
+                  });
                 }
               }
             }
-          };
-        }
+          }
+        };
       }
-    });
+
+      return connectedCallback
+        ? connectedCallback.call(this)
+        : this.renderComponent?.();
+    };
   };
 
 }
