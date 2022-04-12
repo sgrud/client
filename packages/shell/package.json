@@ -12,6 +12,7 @@
     "@babel/runtime/helpers/createClass": null,
     "@babel/runtime/helpers/createForOfIteratorHelperLoose": null,
     "@babel/runtime/helpers/inheritsLoose": null,
+    "@babel/runtime/helpers/wrapNativeSuper": null,
     "incremental-dom": "IncrementalDOM"
   },
   "copy": [
@@ -26,6 +27,7 @@
     "@babel/runtime": "^7.17.9",
     "@sgrud/core": "latest",
     "incremental-dom": "^0.7.0",
+    "rxjs": "^7.5.5",
     "tslib": "^2.3.1"
   },
   "sgrudDependencies": {
