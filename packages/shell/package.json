@@ -1,7 +1,7 @@
 {
   "name": "@sgrud/shell",
   "amdName": "sgrud.shell",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "source": "./index.ts",
   "types": "./index.d.ts",
   "main": "../../dist/shell/index.js",
