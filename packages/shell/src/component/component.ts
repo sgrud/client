@@ -86,14 +86,14 @@ export interface Component extends HTMLElement {
 }
 
 /**
- * Class decorator factory. Registers the decorated class as component with the
- * `CustomElementRegistry`. This decorator should be used in conjunction with
- * the {@link Attribute} prototype property decorator and will re-render, when a
- * bound property changes. While any custom component which is registered by
- * this decorator inherits basic rendering functionality, any overridden method
- * will cancel out its `super` logic. This ensures for a minimal and transparent
- * abstraction of the functionality the `CustomElementRegistry` provides, while
- * allowing for full customization.
+ * Class decorator factory. Registers the decorated class as component through
+ * the {@link customElements} registry. Registered components can be used in
+ * conjunction with the {@link Attribute} and {@link Reference} prototype
+ * property decorators which will trigger the component to re-render, when one
+ * of the {@link observedAttributes} or {@link observedReferences} changes.
+ * While any custom component which is registered by this decorator is enriched
+ * with basic rendering functionality, any implemented method will cancel out
+ * its `super` logic.
  *
  * @param selector - Component tag name.
  * @param inherits - Extended tag name.
