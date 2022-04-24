@@ -9,6 +9,8 @@ import { Router } from './router';
  * be slotted within those. Furthermore a route may specify {@link context}ual
  * data and {@link children}.
  *
+ * @typeParam S - Route path string type.
+ *
  * @example Define a route.
  * ```ts
  * import type { Route } from '@sgrud/shell';
@@ -27,7 +29,7 @@ import { Router } from './router';
  *
  * @see {@link Router}
  */
-export interface Route {
+export interface Route<S extends string = string> {
 
   /**
    * Optional array of children for this route.
@@ -47,7 +49,7 @@ export interface Route {
   /**
    * Required route path.
    */
-  readonly path: string;
+  readonly path: S;
 
   /**
    * Optional mapping of slot names to slotted components.
@@ -93,9 +95,9 @@ export const route = Symbol('@sgrud/shell/router/route');
  *
  * @see {@link Router}
  */
-export function Route(config: Assign<{
+export function Route<S extends string>(config: Assign<{
   children?: (Route | typeof HTMLElement & { [route]?: Route })[];
-}, Omit<Route, 'component'>>) {
+}, Omit<Route<S>, 'component'>>) {
 
   /**
    * @param constructor - Class constructor to be decorated.

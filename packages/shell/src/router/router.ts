@@ -74,7 +74,7 @@ export namespace Router {
     /**
      * Route associated to this segment.
      */
-    readonly route: Route;
+    readonly route: Route<S>;
 
   }
 
