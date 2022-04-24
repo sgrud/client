@@ -80,9 +80,7 @@ export class RouterLink extends HTMLAnchorElement {
     const { hash, pathname, search } = this;
     event.preventDefault();
 
-    this.router.navigate(pathname + hash, search).subscribe((state) => {
-      history.pushState(state, '', this.router.rebase(state.path));
-    });
+    this.router.navigate(pathname + hash, search).subscribe();
   };
 
 }

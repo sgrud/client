@@ -300,9 +300,13 @@ export class Router extends Set<Route> implements Router.Task {
    * {@link RouterTask} and handles the rendering of the supplied `state`.
    *
    * @param state - Router state to handle.
+   * @param replace - Wether to replace the state.
    * @returns Observable of the handled state.
    */
-  public handle(state: Router.State): Observable<Router.State> {
+  public handle(
+    state: Router.State,
+    replace: boolean = false
+  ): Observable<Router.State> {
     return of(state).pipe(tap(() => {
       let segment = this.spool(state.segment, false);
       let template = [] as JSX.Element;
@@ -320,6 +324,12 @@ export class Router extends Set<Route> implements Router.Task {
           template = createElement(segment.route.component, params);
         }
       } while (segment = segment.parent!);
+
+      if (replace) {
+        history.replaceState(state, '', this.rebase(state.path));
+      } else {
+        history.pushState(state, '', this.rebase(state.path));
+      }
 
       render(this.outlet, template);
       this.changes.next(state);
@@ -473,11 +483,13 @@ export class Router extends Set<Route> implements Router.Task {
    *
    * @param target - Path or segment to navigate to.
    * @param search - Optional search parameters.
+   * @param replace - Wether to replace the state.
    * @returns Observable of the router state.
    */
   public navigate(
     target: string | Router.Segment,
-    search?: string
+    search?: string,
+    replace: boolean = false
   ): Observable<Router.State> {
     if (TypeOf.string(target)) {
       const url = new URL(target, location.origin);
@@ -493,7 +505,7 @@ export class Router extends Set<Route> implements Router.Task {
     }
 
     const prev = this.changes.value;
-    const task = this.handle.bind(this);
+    const task = (next: Router.State) => this.handle(next, replace);
     const tasks = new Linker<typeof RouterTask>().getAll(RouterTask);
 
     return (function handle(next: Router.State): Observable<Router.State> {

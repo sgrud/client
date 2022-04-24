@@ -58,9 +58,7 @@ export class RouterOutlet extends HTMLSlotElement {
 
     (function navigate(): void {
       if (router.size) {
-        router.navigate(pathname, search).subscribe((state) => {
-          history.replaceState(state, '', router.rebase(state.path));
-        });
+        router.navigate(pathname, search, true).subscribe();
       } else {
         setTimeout(navigate);
       }
