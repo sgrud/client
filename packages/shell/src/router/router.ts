@@ -268,16 +268,8 @@ export class Router extends Set<Route> implements Router.Task {
       throw new RangeError();
     }
 
-    const teardown = {
-      baseHref: this.baseHref,
-      hashBased: this.hashBased,
-      outlet: this.outlet
-    };
-
     this.bond = fromEvent<PopStateEvent>(window, 'popstate').pipe(
       filter((event) => event.state)
-    ).pipe(
-      finalize(() => assign(this, teardown))
     ).subscribe((event) => {
       const { search, segment } = event.state as Router.State;
       this.navigate(segment, search).subscribe();
@@ -584,6 +576,10 @@ export class Router extends Set<Route> implements Router.Task {
     if (this.bond.closed) {
       throw new RangeError();
     }
+
+    this.baseHref = '/';
+    this.hashBased = false;
+    this.outlet = document.body;
 
     this.bond.unsubscribe();
   }
