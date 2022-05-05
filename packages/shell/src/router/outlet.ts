@@ -4,7 +4,12 @@ import { Router } from './router';
 
 declare global {
   interface HTMLElementTagNameMap {
+
+    /**
+     * @see {@link RouterOutlet}
+     */
     'router-outlet': RouterOutlet;
+
   }
 }
 

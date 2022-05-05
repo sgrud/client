@@ -55,6 +55,7 @@ export abstract class RouterTask {
    * @param prev - Previously active state.
    * @param next - Next state to be activated.
    * @param handler - Next task handler.
+   * @returns Next handled state.
    */
   public abstract handle(
     prev: Router.State,
