@@ -272,7 +272,7 @@ describe('@sgrud/shell/router/router', () => {
     });
 
     it('throws an error when trying to bind again without unbinding', () => {
-      expect(() => router.bind()).toThrowError(RangeError);
+      expect(() => router.bind()).toThrowError(ReferenceError);
     });
   });
 
@@ -293,7 +293,7 @@ describe('@sgrud/shell/router/router', () => {
     });
 
     it('throws an error when trying to unbind again without binding', () => {
-      expect(() => router.unbind()).toThrowError(RangeError);
+      expect(() => router.unbind()).toThrowError(ReferenceError);
     });
   });
 

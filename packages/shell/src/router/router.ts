@@ -1,5 +1,5 @@
 import { assign, Linker, Mutable, Singleton, Target, TypeOf } from '@sgrud/core';
-import { BehaviorSubject, EMPTY, filter, finalize, fromEvent, observable, Observable, of, Subscribable, Subscription, tap, throwError } from 'rxjs';
+import { BehaviorSubject, observable, Observable, of, Subscribable, tap, throwError } from 'rxjs';
 import { createElement, render } from '../component/runtime';
 import { Route } from './route';
 import { RouterTask } from './task';
@@ -167,11 +167,6 @@ export class Router extends Set<Route> implements Router.Task {
   public readonly baseHref: string;
 
   /**
-   *
-   */
-  public readonly bond: Subscription;
-
-  /**
    * Wether to employ hash-based routing.
    */
   public readonly hashBased: boolean;
@@ -210,7 +205,6 @@ export class Router extends Set<Route> implements Router.Task {
     super();
 
     this.baseHref = '/';
-    this.bond = EMPTY.subscribe();
     this.hashBased = false;
     this.outlet = document.body;
 
@@ -264,16 +258,14 @@ export class Router extends Set<Route> implements Router.Task {
     baseHref: string = this.baseHref,
     hashBased: boolean = this.hashBased
   ): void {
-    if (!this.bond.closed) {
-      throw new RangeError();
+    if (window.onpopstate) {
+      throw new ReferenceError();
     }
 
-    this.bond = fromEvent<PopStateEvent>(window, 'popstate').pipe(
-      filter((event) => event.state)
-    ).subscribe((event) => {
+    window.onpopstate = (event) => {
       const { search, segment } = event.state as Router.State;
       this.navigate(segment, search).subscribe();
-    });
+    };
 
     if ((
       this.hashBased = !navigator.webdriver && hashBased
@@ -573,15 +565,15 @@ export class Router extends Set<Route> implements Router.Task {
   public unbind(
     this: Mutable<this>
   ): void {
-    if (this.bond.closed) {
-      throw new RangeError();
+    if (!window.onpopstate) {
+      throw new ReferenceError();
     }
 
     this.baseHref = '/';
     this.hashBased = false;
     this.outlet = document.body;
 
-    this.bond.unsubscribe();
+    window.onpopstate = null;
   }
 
 }
