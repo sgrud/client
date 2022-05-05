@@ -162,7 +162,7 @@ export namespace Model.Filter {
      * @see {@link Conjunction}
      * @see {@link Expression}
      */
-    conjunction?: {
+    readonly conjunction?: {
 
       /**
        * List of {@link Expression}s which are logically combined through an
@@ -172,7 +172,7 @@ export namespace Model.Filter {
        * @see {@link Expression}
        * @see {@link operator}
        */
-      operands: Expression<T>[];
+      readonly operands: Expression<T>[];
 
       /**
        * {@link Conjunction} operator used to logically combine all supplied
@@ -181,7 +181,7 @@ export namespace Model.Filter {
        * @see {@link Conjunction}
        * @see {@link operands}
        */
-      operator?: Conjunction;
+      readonly operator?: Conjunction;
 
     };
 
@@ -193,14 +193,14 @@ export namespace Model.Filter {
      *
      * @see {@link conjunction}
      */
-    entity?: {
+    readonly entity?: {
 
       /**
        * Filter {@link Operator} to use for matching.
        *
        * @see {@link Operator}
        */
-      operator?: Operator;
+      readonly operator?: Operator;
 
       /**
        * Property path from within the data model which to match against. The
@@ -209,7 +209,7 @@ export namespace Model.Filter {
        *
        * @see {@link value}
        */
-      path: Model.Path<T>;
+      readonly path: Model.Path<T>;
 
       /**
        * Property value to match data models against. The property path of this
@@ -217,7 +217,7 @@ export namespace Model.Filter {
        *
        * @see {@link path}
        */
-      value: unknown;
+      readonly value: unknown;
 
     };
 
@@ -240,7 +240,7 @@ export namespace Model.Filter {
      *
      * @see {@link sort}
      */
-    dir?: 'asc' | 'desc';
+    readonly dir?: 'asc' | 'desc';
 
     /**
      * {@link Expression} to evaluate results against. This expression may be a
@@ -248,7 +248,7 @@ export namespace Model.Filter {
      *
      * @see {@link Expression}
      */
-    expression?: Expression<T>;
+    readonly expression?: Expression<T>;
 
     /**
      * Page number, i.e., offset within the list of all results for a data model
@@ -257,7 +257,7 @@ export namespace Model.Filter {
      *
      * @see {@link size}
      */
-    page?: number;
+    readonly page?: number;
 
     /**
      * Free-text search field. This field overrides all {@link expression}s, as
@@ -266,7 +266,7 @@ export namespace Model.Filter {
      *
      * @see {@link expression}
      */
-    search?: string;
+    readonly search?: string;
 
     /**
      * Page size, i.e., number of results which should be included within the
@@ -275,7 +275,7 @@ export namespace Model.Filter {
      *
      * @see {@link page}
      */
-    size?: number;
+    readonly size?: number;
 
     /**
      * Property path used to determine the value which to sort the requested
@@ -284,7 +284,7 @@ export namespace Model.Filter {
      *
      * @see {@link dir}
      */
-    sort?: Path<T>;
+    readonly sort?: Path<T>;
 
   }
 

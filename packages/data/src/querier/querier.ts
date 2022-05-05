@@ -34,7 +34,7 @@ export namespace Querier {
    * be deeply nested.
    */
   export interface Variables {
-    [key: string]: Variables | unknown;
+    readonly [key: string]: Variables | unknown;
   }
 
 }
