@@ -136,6 +136,7 @@ export async function universal({
 
         page.on('domcontentloaded', () => void page.evaluate(() => {
           delete (Document.prototype as any).adoptedStyleSheets;
+          document.body.dataset.universal = Date.now().toString();
         }));
 
         page.on('request', (event) => {
