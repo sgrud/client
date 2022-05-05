@@ -1,5 +1,5 @@
 import { assign, Linker, Mutable, Singleton, Target, TypeOf } from '@sgrud/core';
-import { BehaviorSubject, observable, Observable, of, Subscribable, tap, throwError } from 'rxjs';
+import { BehaviorSubject, finalize, observable, Observable, of, Subscribable, throwError } from 'rxjs';
 import { createElement, render } from '../component/runtime';
 import { Route } from './route';
 import { RouterTask } from './task';
@@ -291,7 +291,7 @@ export class Router extends Set<Route> implements Router.Task {
     state: Router.State,
     replace: boolean = false
   ): Observable<Router.State> {
-    return of(state).pipe(tap(() => {
+    return of(state).pipe(finalize(() => {
       let segment = this.spool(state.segment, false);
       let template = [] as JSX.Element;
 

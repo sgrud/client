@@ -1,5 +1,5 @@
 import { assign, Linker, pluralize, TypeOf } from '@sgrud/core';
-import { BehaviorSubject, finalize, identity, map, observable, Observable, of, OperatorFunction, Subscribable, switchMap, tap, throwError } from 'rxjs';
+import { BehaviorSubject, finalize, identity, map, observable, Observable, of, OperatorFunction, Subscribable, switchMap, throwError } from 'rxjs';
 import { Querier } from '../querier/querier';
 import { hasMany } from '../relation/has-many';
 import { hasOne } from '../relation/has-one';
@@ -1049,7 +1049,7 @@ export abstract class Model<M extends Model = any> {
     ...parts: Model.Shape<T>[]
   ): Observable<T> {
     return of(assign(this, ...parts)).pipe(
-      tap(() => this.changes.next(this))
+      finalize(() => this.changes.next(this))
     );
   }
 
