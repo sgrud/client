@@ -6,8 +6,7 @@ import { Router } from './router';
  * Interface describing the shape of a route. A route must consist of at least a
  * {@link path} and may declare a {@link component}, which will be rendered when
  * the route is navigated to, as well as {@link slots} and components which will
- * be slotted within those. Furthermore a route may specify {@link context}ual
- * data and {@link children}.
+ * be slotted within those. Furthermore a route may specify {@link children}.
  *
  * @typeParam S - Route path string type.
  *
@@ -40,11 +39,6 @@ export interface Route<S extends string = string> {
    * Optional route component.
    */
   readonly component?: CustomElementTagName;
-
-  /**
-   * Optional route context.
-   */
-  readonly context?: Record<string, any>;
 
   /**
    * Required route path.
