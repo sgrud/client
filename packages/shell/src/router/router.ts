@@ -394,9 +394,9 @@ export class Router extends Set<Route> implements Router.Task {
    */
   public match(
     path: string,
-    routes?: Route[]
+    routes: Route[] = Array.from(this)
   ): Router.Segment | undefined {
-    loop: for (const route of routes || this) {
+    loop: for (const route of routes) {
       const parts = route.path.split('/');
       const paths = path.split('/');
       const segment = {
@@ -407,29 +407,40 @@ export class Router extends Set<Route> implements Router.Task {
       for (let i = 0; i < parts.length; i++) {
         if (parts[i] === paths[i]) {
           continue;
-        } else if (!parts[i] && route.children?.length) {
-          parts.splice(i, 1);
+        } else if (!i && !parts[i]) {
+          let index = routes.indexOf(route);
+
+          if (index || ++index < routes.length) {
+            const match = this.match(path, routes.slice(index));
+            if (match) return match;
+          }
+
+          parts.splice(i--, 1);
           continue;
         } else if (parts[i].startsWith(':')) {
           let key = parts[i].substring(1);
 
           if (parts[i].endsWith('?')) {
             key = key.substring(0, key.length - 1);
-            const left = [...paths.slice(0, i), parts[i], ...paths.splice(i)];
+            const left = paths.slice(0, i).concat(parts[i]);
+            left.push(...paths.slice(paths[i] ? i : i + 1));
             const match = this.match(left.join('/'), [route]);
 
             if (match) {
               return assign(match, {
-                path,
                 params: assign(match.params, {
                   [key]: undefined
-                })
+                }),
+                path
               });
             }
           }
 
           if (paths[i]) {
-            assign(segment.params, { [key]: paths[i] });
+            assign(segment.params, {
+              [key]: paths[i]
+            });
+
             continue;
           }
         }
@@ -448,6 +459,10 @@ export class Router extends Set<Route> implements Router.Task {
             })
           });
         }
+      }
+
+      if (parts.length < paths.length) {
+        continue loop;
       }
 
       return segment;
