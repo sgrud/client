@@ -46,7 +46,7 @@ export class RouterLink extends HTMLAnchorElement {
     super();
 
     if (this.hasAttribute('href')) {
-      this.attributeChangedCallback('', '', this.getAttribute('href')!);
+      this.attributeChangedCallback('href', null!, this.getAttribute('href')!);
     }
   }
 
