@@ -108,7 +108,7 @@ export async function runtimify({
     }
   }
 
-  for (const pkg of [...new Set(modules)]) {
+  for (const pkg of new Set(modules)) {
     const src = pkg.replace(/\.(esm|umd)+$/, (match) => {
       if (match) format = match.substring(1);
       return '';
