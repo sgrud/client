@@ -24,7 +24,7 @@ describe('@sgrud/shell/router/outlet', () => {
 
     it('renders the router outlet component', () => {
       new Router().add({ path: '' }) && jest.runAllTimers();
-      expect(spy).toHaveBeenCalledWith('/', '');
+      expect(spy).toHaveBeenCalledWith('/', '', true);
     });
   });
 

@@ -324,11 +324,11 @@ describe('@sgrud/shell/router/router', () => {
     const router = new Router();
 
     it('throws an URIError containing the unknown path', (done) => {
-      router.navigate('unknown/route').pipe(
+      router.navigate('route/unknown').pipe(
         catchError((error) => of(error))
       ).subscribe((error) => {
         expect(error).toBeInstanceOf(URIError);
-        expect(error.message).toBe('/unknown/route');
+        expect(error.message).toBe('/route/unknown');
         done();
       });
     });
