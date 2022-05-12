@@ -167,6 +167,13 @@
       ],
       "@typescript-eslint/require-await": "off",
       "@typescript-eslint/restrict-plus-operands": "off",
+      "@typescript-eslint/restrict-template-expressions": [
+        "error",
+        {
+          "allowAny": true,
+          "allowNumber": true
+        }
+      ],
       "@typescript-eslint/semi": "error",
       "@typescript-eslint/space-before-function-paren": [
         "error",
