@@ -11,10 +11,10 @@
   "devDependencies": {
     "@angular-builders/custom-webpack": "13.1.0",
     "@angular/cli": "13.3.5",
-    "@angular/core": "13.3.6",
-    "@angular/elements": "13.3.6",
-    "@angular/platform-browser": "13.3.6",
-    "@angular/platform-browser-dynamic": "13.3.6",
+    "@angular/core": "13.3.8",
+    "@angular/elements": "13.3.8",
+    "@angular/platform-browser": "13.3.8",
+    "@angular/platform-browser-dynamic": "13.3.8",
     "@sgrud/bin": "latest",
     "@types/estree": "0.0.51",
     "tslib": "2.4.0"
