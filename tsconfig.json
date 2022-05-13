@@ -18,7 +18,6 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "sourceMap": true,
-    "stripInternal": true,
 
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
