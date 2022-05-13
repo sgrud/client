@@ -258,8 +258,8 @@ export class Router extends Set<Route> implements Router.Task {
     baseHref: string = this.baseHref,
     hashBased: boolean = this.hashBased
   ): void {
-    if (window.onpopstate) {
-      throw new ReferenceError();
+    if (!TypeOf.window(globalThis.window) || window.onpopstate) {
+      throw new ReferenceError('window.onpopstate');
     }
 
     window.onpopstate = (event) => {
@@ -342,7 +342,7 @@ export class Router extends Set<Route> implements Router.Task {
 
         if (path.startsWith(':')) {
           const key = path.replace(/^:(.+?)\??$/, '$1');
-          path = (segment.params as any)[key];
+          path = segment.params[key as keyof typeof segment.params];
         }
 
         if (path) {
@@ -508,7 +508,7 @@ export class Router extends Set<Route> implements Router.Task {
     const tasks = new Linker<typeof RouterTask>().getAll(RouterTask);
 
     return (function handle(next: Router.State): Observable<Router.State> {
-      return tasks.shift()?.handle(prev, next, { handle }) ?? task(next);
+      return tasks.shift()?.handle(prev, next, { handle }) || task(next);
     })({
       path: this.join(target),
       search: search ?? '',
@@ -534,8 +534,8 @@ export class Router extends Set<Route> implements Router.Task {
         return path.replace(/^\/?/, this.baseHref.replace(/\/?$/, '/'));
       }
     } else {
-      let i = 0; while (i < path.length && path[i] === this.baseHref[i]) i++;
-      return path.substring(i);
+      let l = 0; while (l < path.length && path[l] === this.baseHref[l]) l++;
+      return path.substring(l);
     }
 
     return path;
@@ -580,8 +580,8 @@ export class Router extends Set<Route> implements Router.Task {
   public unbind(
     this: Mutable<this>
   ): void {
-    if (!window.onpopstate) {
-      throw new ReferenceError();
+    if (!TypeOf.window(globalThis.window) || !window.onpopstate) {
+      throw new ReferenceError('window.onpopstate');
     }
 
     this.baseHref = '/';

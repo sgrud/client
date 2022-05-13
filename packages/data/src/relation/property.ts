@@ -74,7 +74,7 @@ export function Property<T extends Property>(
     const key = '#' + field as Model.Field<M>;
 
     if (!transient) {
-      assign((model as Mutable<M>)[property] ??= { }, {
+      assign((model as Mutable<M>)[property] ||= { }, {
         [field]: typeFactory
       });
     }

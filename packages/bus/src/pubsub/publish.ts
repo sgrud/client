@@ -102,7 +102,7 @@ export function Publish(
 
             if (this[source]) {
               new ConduitHandler([
-                [`${handle}.${this[source] as string}`, value]
+                [`${handle}.${this[source]}`, value]
               ]);
             }
           }

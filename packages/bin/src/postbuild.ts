@@ -118,10 +118,10 @@ export async function postbuild({
     if (Object.keys(target).length) {
       const sorted = Object.values(target).sort();
       const [a, b] = [dirname(sorted[0]), dirname(sorted[sorted.length - 1])];
-      let i = 0; while (i < a.length && a[i] === b[i]) i++;
+      let l = 0; while (l < a.length && a[l] === b[l]) l++;
 
       const digest = { } as Record<string, string>;
-      const folder = join(bundle, a.slice(0, i));
+      const folder = join(bundle, a.slice(0, l));
       const output = join(cwd, folder, 'package.json');
       if (existsSync(output)) continue;
 

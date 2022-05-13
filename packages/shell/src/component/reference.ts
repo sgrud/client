@@ -57,7 +57,7 @@ export function Reference(
     const connectedCallback = component.connectedCallback;
 
     if (observe?.length) {
-      assign((component as Mutable<Component>).observedReferences ??= { }, {
+      assign((component as Mutable<Component>).observedReferences ||= { }, {
         [ref]: observe
       });
     }
@@ -85,7 +85,7 @@ export function Reference(
 
               if (node) {
                 for (const type of component.observedReferences[key]) {
-                  node.addEventListener(type, listeners[key] ??= (event) => {
+                  node.addEventListener(type, listeners[key] ||= (event) => {
                     this.referenceChangedCallback?.(key, node, event);
                   }, {
                     once: true,

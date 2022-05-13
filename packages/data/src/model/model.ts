@@ -799,9 +799,9 @@ export abstract class Model<M extends Model = any> {
   ): string {
     let result = '{';
 
-    for (let n = 0; n < graph.length; n++) {
-      if (n > 0) result += ' ';
-      let node = graph[n] as any;
+    for (let i = 0; i < graph.length; i++) {
+      if (i > 0) result += ' ';
+      let node = graph[i] as any;
 
       if (TypeOf.object(node)) {
         for (const key in node) {
@@ -814,16 +814,16 @@ export abstract class Model<M extends Model = any> {
             const keys = Object.keys(vars);
             result += key + '(';
 
-            for (let m = 0; m < keys.length; m++) {
-              if (TypeOf.undefined(vars[keys[m]])) {
-                keys.splice(m--, 1);
+            for (let j = 0; j < keys.length; j++) {
+              if (TypeOf.undefined(vars[keys[j]])) {
+                keys.splice(j--, 1);
               } else {
-                const value = vars[keys[m]] instanceof Enum
-                  ? vars[keys[m]].toString()
-                  : JSON.stringify(vars[keys[m]]);
+                const value = vars[keys[j]] instanceof Enum
+                  ? vars[keys[j]].toString()
+                  : JSON.stringify(vars[keys[j]]);
 
-                if (m > 0) result += ' ';
-                result += keys[m] + ':' + value;
+                if (j > 0) result += ' ';
+                result += keys[j] + ':' + value;
               }
             }
 

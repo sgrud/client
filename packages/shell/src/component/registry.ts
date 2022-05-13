@@ -30,7 +30,7 @@ const registry = new Proxy(customElements, {
         if (!name) {
           try {
             name = Reflect.construct(HTMLElement, [], constructor).localName;
-            elements.set(constructor, name as string);
+            elements.set(constructor, name!);
           } catch {
             return undefined;
           }

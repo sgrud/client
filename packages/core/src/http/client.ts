@@ -198,7 +198,7 @@ export class HttpClient implements HttpHandler {
     const proxies = new Linker<typeof HttpProxy>().getAll(HttpProxy);
 
     return (function handle(next: Request): Observable<Response<any>> {
-      return proxies.shift()?.proxy(next, { handle }) ?? ajax(next);
+      return proxies.shift()?.proxy(next, { handle }) || ajax(next);
     })(request);
   }
 

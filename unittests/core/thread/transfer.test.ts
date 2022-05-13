@@ -12,7 +12,7 @@ describe('@sgrud/core/thread/transfer', () => {
 
   class Class {
     @Spawn(Worker.bind(Worker, '(' + (() => {
-      require('./dist/core/index.js').Thread()(class {
+      require('./dist/core').Thread()(class {
         /* eslint-disable */
         observable = require('rxjs').of(1, 2, 3);
         subject = new (require('rxjs').BehaviorSubject)('behaviorSubject');

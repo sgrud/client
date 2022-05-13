@@ -1,19 +1,19 @@
 import { HttpClient, HttpHandler, HttpProxy, Linker, Target } from '@sgrud/core';
 import { map, Observable, of } from 'rxjs';
-import { AjaxConfig, AjaxResponse } from 'rxjs/ajax';
+import { AjaxConfig as Request, AjaxResponse as Response } from 'rxjs/ajax';
 
 describe('@sgrud/core/http/proxy', () => {
 
   @Target<typeof ProxyOne>()
   class ProxyOne extends HttpProxy {
     public override proxy<T>(
-      request: AjaxConfig,
+      request: Request,
       handler: HttpHandler
-    ): Observable<AjaxResponse<T>> {
+    ): Observable<Response<T>> {
       if (request.url === 'one') {
         return of({
           response: request.url as unknown as T
-        } as AjaxResponse<T>);
+        } as Response<T>);
       }
 
       return handler.handle<T>({
@@ -27,11 +27,11 @@ describe('@sgrud/core/http/proxy', () => {
   @Target<typeof ProxyTwo>()
   class ProxyTwo extends HttpProxy {
     public override proxy<T>(
-      request: AjaxConfig
-    ): Observable<AjaxResponse<T>> {
+      request: Request
+    ): Observable<Response<T>> {
       return of({
         response: request.headers!.next
-      } as AjaxResponse<T>);
+      } as Response<T>);
     }
   }
 

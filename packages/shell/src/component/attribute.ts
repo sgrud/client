@@ -49,7 +49,7 @@ export function Attribute(name?: string) {
     propertyKey: PropertyKey
   ): void {
     const key = name || propertyKey as string;
-    ((component as Mutable<Component>).observedAttributes ??= []).push(key);
+    ((component as Mutable<Component>).observedAttributes ||= []).push(key);
 
     Object.defineProperty(component, propertyKey, {
       get(this: Component): string | undefined {

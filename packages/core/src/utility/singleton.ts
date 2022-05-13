@@ -41,7 +41,7 @@ export function Singleton<T extends new (...args: any[]) => any>(
         return apply?.(
           self as InstanceType<T>,
           args as ConstructorParameters<T>
-        ) ?? self;
+        ) || self;
       }
 
     }

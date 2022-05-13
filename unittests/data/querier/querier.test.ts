@@ -26,7 +26,7 @@ describe('@sgrud/data/querier/querier', () => {
     public override commit(operation: Querier.Operation): Observable<any> {
       mocks[0](operation);
       const key = /(get|save)Class(One|Two)s/.exec(operation)?.[0];
-      return of({ [key ?? 'test']: { result: [{ }], total: 1 } });
+      return of({ [key || 'test']: { result: [{ }], total: 1 } });
     }
 
     public override priority(): number {
@@ -43,7 +43,7 @@ describe('@sgrud/data/querier/querier', () => {
     public override commit(operation: Querier.Operation): Observable<any> {
       mocks[1](operation);
       const key = /(get|save)Class(One|Two)s/.exec(operation)?.[0];
-      return of({ [key ?? 'test']: { result: [{ }], total: 1 } });
+      return of({ [key || 'test']: { result: [{ }], total: 1 } });
     }
 
     public override priority(model: Model.Type<any>): number {
