@@ -9,7 +9,7 @@ describe('@sgrud/data/relation/property', () => {
     @Property(() => Number) public num?: number;
     @Property(() => String) public str?: string;
     @Property(() => null!) public undefined?: null;
-    @Property(() => null!, false) public unused?: null;
+    @Property(() => null!, true) public unused?: null;
     protected readonly [Symbol.toStringTag]: string = 'Class';
   }
 

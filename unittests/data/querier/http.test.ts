@@ -9,6 +9,7 @@ describe('@sgrud/data/querier/http', () => {
   let server = null! as Server;
   afterAll(() => server.close());
   beforeAll(() => server = express()
+    .use('/api/sgrud/v1/insmod', (_, r) => r.send(depmod))
     .use('/exception', (_, r) => r.send(exception))
     .use('/', (_, r) => r.send(response))
     .listen(58080));
@@ -16,6 +17,10 @@ describe('@sgrud/data/querier/http', () => {
   const open = jest.spyOn(XMLHttpRequest.prototype, 'open');
   const send = jest.spyOn(XMLHttpRequest.prototype, 'send');
   afterEach(() => [open, send].forEach((i) => i.mockClear()));
+
+  const depmod = {
+    name: 'depmod'
+  };
 
   const exception = {
     errors: [
@@ -34,6 +39,26 @@ describe('@sgrud/data/querier/http', () => {
   new Linker<Target<HttpQuerier>>([
     [HttpQuerier, new HttpQuerier('/api')]
   ]);
+
+  describe('instantiating a HttpQuerier without arguments', () => {
+    const querier = new HttpQuerier();
+
+    const opened = [
+      [
+        'GET',
+        location.origin + '/api/sgrud/v1/insmod',
+        true
+      ]
+    ];
+
+    it('instanitates a kernel to retreive the api endpoint', () => {
+      expect(querier).toBeInstanceOf(HttpQuerier);
+
+      opened.forEach((n, i) => {
+        expect(open).toHaveBeenNthCalledWith(++i, ...n);
+      });
+    });
+  });
 
   describe('targeting the HttpQuerier', () => {
     const linker = new Linker<Target<HttpQuerier>>();

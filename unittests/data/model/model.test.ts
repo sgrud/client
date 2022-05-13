@@ -1,5 +1,5 @@
 import { Model } from '@sgrud/data';
-import { auditTime, catchError, from, NEVER, take } from 'rxjs';
+import { auditTime, catchError, from, identity, NEVER, take } from 'rxjs';
 
 describe('@sgrud/data/model/model', () => {
 
@@ -132,6 +132,7 @@ describe('@sgrud/data/model/model', () => {
 
   describe('statically unraveling a graph', () => {
     const graph = [
+      undefined,
       'id',
       { sub: [
         'id'
@@ -142,13 +143,12 @@ describe('@sgrud/data/model/model', () => {
         call: [
           'sub'
         ]
-      }) }
+      }) },
+      { empty: undefined }
     ] as Model.Graph<Class>;
 
     it('returns the unraveled graph', () => {
-      expect(Class.unravel(graph)).toBe(
-        '{id sub{id} call(param:null){sub}}'
-      );
+      expect(Class.unravel(graph)).toBe('{ id sub{id} call(param:null){sub} }');
     });
   });
 
@@ -301,6 +301,19 @@ describe('@sgrud/data/model/model', () => {
     });
   });
 
+  describe('committing an operation on an instance with variables', () => {
+    const model = new Class(...values);
+
+    it('throws an error because no querier is available', (done) => {
+      model.commit('query test', { }, identity).pipe(catchError((error) => {
+        expect(error).toBeInstanceOf(ReferenceError);
+        done();
+
+        return NEVER;
+      })).subscribe();
+    });
+  });
+
   describe('calling the delete operation on an instance', () => {
     const model = new Class(...values);
 
@@ -318,7 +331,7 @@ describe('@sgrud/data/model/model', () => {
     const model = new Class(...values);
 
     it('throws an error because no querier is available', (done) => {
-      model.find([]).pipe(catchError((error) => {
+      model.find([], { }).pipe(catchError((error) => {
         expect(error).toBeInstanceOf(ReferenceError);
         done();
 
@@ -331,7 +344,7 @@ describe('@sgrud/data/model/model', () => {
     const model = new Class(...values);
 
     it('throws an error because no querier is available', (done) => {
-      model.save().pipe(catchError((error) => {
+      model.save([]).pipe(catchError((error) => {
         expect(error).toBeInstanceOf(ReferenceError);
         done();
 

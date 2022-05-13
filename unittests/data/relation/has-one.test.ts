@@ -7,7 +7,7 @@ describe('@sgrud/data/relation/has-one', () => {
     @HasOne(() => Owned) public owned?: Owned;
     @Property(() => String) public property?: string;
     @HasOne(() => null!) public undefined?: null;
-    @HasOne(() => null!, false) public unused?: null;
+    @HasOne(() => null!, true) public unused?: null;
     protected readonly [Symbol.toStringTag]: string = 'Owner';
   }
 
