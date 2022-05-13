@@ -5,7 +5,7 @@
   "source": "./index.ts",
   "types": "./index.d.ts",
   "main": "../../dist/core/index.js",
-  "exports": "../../dist/core/index.esm.js",
+  "exports": "../../dist/core/index.modern.js",
   "unpkg": "../../dist/core/index.umd.js",
   "amdNames": {
     "@babel/runtime/helpers/assertThisInitialized": null,
@@ -41,7 +41,7 @@
     },
     "@sgrud/core": {
       "exports": {
-        "@sgrud/core": "./index.esm.js"
+        "@sgrud/core": "./index.modern.js"
       },
       "unpkg": [
         "./index.umd.js"
@@ -57,8 +57,8 @@
     },
     "rxjs": {
       "exports": {
-        "rxjs": "./dist/esm/index.js",
-        "rxjs/ajax": "./dist/esm/ajax/index.js"
+        "rxjs": "./dist/esm5/index.js",
+        "rxjs/ajax": "./dist/esm5/ajax/index.js"
       },
       "unpkg": [
         "./dist/bundles/rxjs.umd.min.js"

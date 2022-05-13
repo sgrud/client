@@ -3,7 +3,7 @@
   "amdName": "sgrud.skeleton.fast",
   "version": "0.0.0",
   "source": "./src/index.ts",
-  "exports": "./dist/sgrud-skeleton-fast.esm.js",
+  "exports": "./dist/sgrud-skeleton-fast.modern.js",
   "unpkg": "./dist/sgrud-skeleton-fast.umd.js",
   "private": true,
   "scripts": {

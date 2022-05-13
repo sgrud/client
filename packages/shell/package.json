@@ -5,7 +5,7 @@
   "source": "./index.ts",
   "types": "./index.d.ts",
   "main": "../../dist/shell/index.js",
-  "exports": "../../dist/shell/index.esm.js",
+  "exports": "../../dist/shell/index.modern.js",
   "unpkg": "../../dist/shell/index.umd.js",
   "amdNames": {
     "@babel/runtime/helpers/assertThisInitialized": null,
@@ -36,8 +36,8 @@
   "webDependencies": {
     "@sgrud/shell": {
       "exports": {
-        "@sgrud/shell": "./index.esm.js",
-        "@sgrud/shell/jsx-runtime": "./index.esm.js"
+        "@sgrud/shell": "./index.modern.js",
+        "@sgrud/shell/jsx-runtime": "./index.modern.js"
       },
       "unpkg": [
         "./index.umd.js"

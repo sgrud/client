@@ -5,7 +5,7 @@
   "source": "./index.ts",
   "types": "./index.d.ts",
   "main": "../../dist/state/index.js",
-  "exports": "../../dist/state/index.esm.js",
+  "exports": "../../dist/state/index.modern.js",
   "unpkg": "../../dist/state/index.umd.js",
   "copy": [
     "./README.md"
@@ -24,7 +24,7 @@
   "webDependencies": {
     "@sgrud/state": {
       "exports": {
-        "@sgrud/state": "./index.esm.js"
+        "@sgrud/state": "./index.modern.js"
       },
       "unpkg": [
         "./index.umd.js"

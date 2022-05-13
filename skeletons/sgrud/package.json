@@ -3,7 +3,7 @@
   "amdName": "sgrud.skeleton.sgrud",
   "version": "0.0.0",
   "source": "./src/index.ts",
-  "exports": "./dist/sgrud-skeleton-sgrud.esm.js",
+  "exports": "./dist/sgrud-skeleton-sgrud.modern.js",
   "unpkg": "./dist/sgrud-skeleton-sgrud.umd.js",
   "private": true,
   "scripts": {

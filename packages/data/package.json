@@ -5,7 +5,7 @@
   "source": "./index.ts",
   "types": "./index.d.ts",
   "main": "../../dist/data/index.js",
-  "exports": "../../dist/data/index.esm.js",
+  "exports": "../../dist/data/index.modern.js",
   "unpkg": "../../dist/data/index.umd.js",
   "amdNames": {
     "@babel/runtime/helpers/createClass": null,
@@ -34,7 +34,7 @@
   "webDependencies": {
     "@sgrud/data": {
       "exports": {
-        "@sgrud/data": "./index.esm.js"
+        "@sgrud/data": "./index.modern.js"
       },
       "unpkg": [
         "./index.umd.js"

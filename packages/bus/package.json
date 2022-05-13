@@ -5,7 +5,7 @@
   "source": "./index.ts",
   "types": "./index.d.ts",
   "main": "../../dist/bus/index.js",
-  "exports": "../../dist/bus/index.esm.js",
+  "exports": "../../dist/bus/index.modern.js",
   "unpkg": "../../dist/bus/index.umd.js",
   "amdNames": {
     "@babel/runtime/helpers/createForOfIteratorHelperLoose": null
@@ -28,7 +28,7 @@
   "webDependencies": {
     "@sgrud/bus": {
       "exports": {
-        "@sgrud/bus": "./index.esm.js"
+        "@sgrud/bus": "./index.modern.js"
       },
       "unpkg": [
         "./index.umd.js"

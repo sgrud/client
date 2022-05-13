@@ -2,7 +2,7 @@
   "name": "@sgrud/shell/jsx-runtime",
   "types": "../index.d.ts",
   "main": "../index.js",
-  "exports": "../index.esm.js",
+  "exports": "../index.modern.js",
   "unpkg": "../index.umd.js",
   "private": true
 }
