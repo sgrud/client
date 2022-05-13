@@ -91,6 +91,7 @@ export const route = Symbol('@sgrud/shell/router/route');
  */
 export function Route<S extends string>(config: Assign<{
   children?: (Route | typeof HTMLElement & { [route]?: Route })[];
+  parent?: Route | typeof HTMLElement & { [route]?: Route };
 }, Omit<Route<S>, 'component'>>) {
 
   /**
@@ -121,6 +122,18 @@ export function Route<S extends string>(config: Assign<{
       router.add(constructor[route] = assign(config as Route, {
         component: name
       }));
+
+      if (config.parent) {
+        const parent = TypeOf.function(config.parent)
+          ? config.parent[route]
+          : config.parent;
+
+        if (delete config.parent && parent) {
+          router.add(assign(parent, {
+            children: (parent.children || []).concat(constructor[route]!)
+          }));
+        }
+      }
     }
   };
 
