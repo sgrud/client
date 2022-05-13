@@ -56,14 +56,14 @@ export class RouterOutlet extends HTMLSlotElement {
   public constructor() {
     super();
 
-    const { pathname, search } = location;
+    const { hash, pathname, search } = location;
     const router = new Linker<typeof Router>().get(Router);
 
     router.bind(this, this.baseHref, this.hashBased);
 
     (function navigate(): void {
       if (router.size) {
-        router.navigate(pathname, search, true).subscribe();
+        router.navigate(pathname + hash, search, true).subscribe();
       } else {
         setTimeout(navigate);
       }

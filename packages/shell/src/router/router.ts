@@ -495,7 +495,7 @@ export class Router extends Set<Route> implements Router.Task {
       const { hash, pathname, search: params } = url;
 
       const match = this.match(this.rebase(pathname + hash, false));
-      if (!match) return throwError(() => new URIError(pathname));
+      if (!match) return throwError(() => new URIError(pathname + hash));
 
       target = match;
       search ??= params;
