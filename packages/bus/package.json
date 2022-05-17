@@ -1,6 +1,5 @@
 {
   "name": "@sgrud/bus",
-  "amdName": "sgrud.bus",
   "version": "0.0.11",
   "source": "./index.ts",
   "types": "./index.d.ts",
@@ -8,14 +7,20 @@
   "exports": "../../dist/bus/index.modern.js",
   "unpkg": "../../dist/bus/index.umd.js",
   "amdNames": {
-    "@babel/runtime/helpers/createForOfIteratorHelperLoose": null
+    "@babel/runtime/helpers/createForOfIteratorHelperLoose": null,
+    "@sgrud/bus": null,
+    "@sgrud/core": null,
+    "rxjs": null,
+    "tslib": "globalThis"
   },
-  "copy": [
-    "./README.md"
-  ],
-  "runtimify": [
-    "@babel/runtime:helpers.umd"
-  ],
+  "sgrud": {
+    "resources": [
+      "./README.md"
+    ],
+    "runtimify": [
+      "@babel/runtime:helpers.umd"
+    ]
+  },
   "dependencies": {
     "@babel/runtime": "^7.17.9",
     "@sgrud/core": "latest",
@@ -26,12 +31,28 @@
     "@sgrud/core": "latest"
   },
   "webDependencies": {
-    "@sgrud/bus": {
+    "@babel/runtime": {
       "exports": {
-        "@sgrud/bus": "./index.modern.js"
+        "@babel/runtime/helpers/": "./helpers/esm/"
       },
       "unpkg": [
-        "./index.umd.js"
+        "./runtimify.umd.js"
+      ]
+    },
+    "rxjs": {
+      "exports": {
+        "rxjs": "./dist/esm5/index.js"
+      },
+      "unpkg": [
+        "./dist/bundles/rxjs.umd.min.js"
+      ]
+    },
+    "tslib": {
+      "exports": {
+        "tslib": "./tslib.es6.js"
+      },
+      "unpkg": [
+        "./tslib.js"
       ]
     }
   }

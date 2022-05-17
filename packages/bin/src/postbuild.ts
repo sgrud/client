@@ -1,17 +1,18 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-import { execSync } from 'child_process';
 import { createHash } from 'crypto';
 import { copySync, existsSync, readFileSync, writeFileSync } from 'fs-extra';
 import { basename, dirname, join, normalize, relative, resolve } from 'path';
+import simpleGit from 'simple-git';
 import { cli, _b, _g, __ } from './.cli';
 
-cli.command('postbuild')
+cli.command('postbuild [...modules]')
   .describe('Replicates exported package metadata for SGRUD-based projects')
   .example('postbuild # Run with default options')
-  .example('postbuild --cwd ./projects/sgrud # Run in ./projects/sgrud')
-  .option('--cwd', 'Use an alternative working directory', './')
-  .action((opts) => postbuild({ ...opts }));
+  .example('postbuild ./project/module # Postbuild ./project/module')
+  .example('postbuild --prefix ./module # Run in ./module')
+  .option('--prefix', 'Use an alternative working directory', './')
+  .action((_ = [], opts) => postbuild({ ...opts, modules: opts._.concat(_) }));
 
 /**
  * Replicates exported package metadata for
@@ -22,15 +23,16 @@ cli.command('postbuild')
  *   Replicates exported package metadata for SGRUD-based projects
  *
  * Usage
- *   $ sgrud postbuild [options]
+ *   $ sgrud postbuild [...modules] [options]
  *
  * Options
- *   --cwd         Use an alternative working directory  (default ./)
+ *   --prefix      Use an alternative working directory  (default ./)
  *   -h, --help    Displays this message
  *
  * Examples
  *   $ sgrud postbuild # Run with default options
- *   $ sgrud postbuild --cwd ./projects/sgrud # Run in ./projects/sgrud
+ *   $ sgrud postbuild ./project/module # Postbuild ./project/module
+ *   $ sgrud postbuild --prefix ./module # Run in ./module
  * ```
  *
  * @param options - Options object.
@@ -42,39 +44,57 @@ cli.command('postbuild')
  * sgrud.bin.postbuild();
  * ```
  *
- * @example Run in `./projects/sgrud`.
+ * @example Postbuild `./project/module`.
  * ```js
  * require('@sgrud/bin');
- * sgrud.bin.postbuild({ cwd: './projects/sgrud' });
+ * sgrud.bin.postbuild({ modules: ['./project/module'] });
+ * ```
+ *
+ * @example Run in `./module`.
+ * ```js
+ * require('@sgrud/bin');
+ * sgrud.bin.postbuild({ prefix: './module' });
  * ```
  */
 export async function postbuild({
-  cwd = './'
+  modules = [],
+  prefix = './'
 }: {
+
+  /**
+   * Modules to build.
+   *
+   * @defaultValue `undefined`
+   */
+  modules?: string[];
 
   /**
    * Use an alternative working directory.
    *
    * @defaultValue `'./'`
    */
-  cwd?: string;
+  prefix?: string;
 
 } = { }): Promise<void> {
-  const commit = execSync('git rev-parse HEAD', { cwd }).toString().trim();
-  const module = require(resolve(cwd, 'package.json'));
+  const commit = await simpleGit(prefix).revparse('HEAD');
+  const module = require(resolve(prefix, 'package.json'));
   const sha265 = createHash('sha256');
   const writes = [];
 
-  for (const bundle of module.exports?.values?.() ?? ['./']) {
+  if (!modules.length) {
+    modules = module.sgrud?.postbuild || ['./'];
+  }
+
+  for (let i = 0; i < modules.length; i++) {
     const assets = [];
-    const origin = join(cwd, bundle, 'package.json');
+    const origin = join(prefix, modules[i], 'package.json');
     const source = require(resolve(origin));
     const target = { } as Record<string, string>;
 
     for (const key in source) {
       switch (key) {
-        case 'copy':
-          assets.push(...source[key]);
+        case 'amdNames':
+        case 'source':
           delete source[key];
           break;
 
@@ -82,36 +102,42 @@ export async function postbuild({
         case 'main':
         case 'module':
         case 'unpkg':
-          if (existsSync(join(bundle, source[key]))) {
+          if (existsSync(resolve(modules[i], source[key]))) {
             target[key] = source[key];
+          } else {
+            delete source[key];
           }
           break;
 
-        case 'source':
-          delete source[key];
+        case 'sgrud':
+          if (source[key].resources) {
+            assets.push(...source[key].resources);
+          }
           break;
       }
     }
 
-    for (const key in module) {
-      switch (key) {
-        case 'author':
-        case 'bugs':
-        case 'license':
-          source[key] = module[key];
-          break;
+    if (!source.private) {
+      for (const key in module) {
+        switch (key) {
+          case 'author':
+          case 'bugs':
+          case 'license':
+            source[key] = module[key];
+            break;
 
-        case 'homepage':
-          source[key] = [
-            module[key], 'tree', commit.slice(0, 7), normalize(bundle)
-          ].join('/');
-          break;
+          case 'homepage':
+            source[key] = [
+              module[key], 'tree', commit.slice(0, 7), normalize(modules[i])
+            ].join('/');
+            break;
 
-        case 'repository':
-          source[key] = module[key];
-          source[key].commit = commit;
-          source[key].directory = bundle;
-          break;
+          case 'repository':
+            source[key] = module[key];
+            source[key].commit = commit;
+            source[key].directory = modules[i];
+            break;
+        }
       }
     }
 
@@ -121,14 +147,14 @@ export async function postbuild({
       let l = 0; while (l < a.length && a[l] === b[l]) l++;
 
       const digest = { } as Record<string, string>;
-      const folder = join(bundle, a.slice(0, l));
-      const output = join(cwd, folder, 'package.json');
+      const folder = join(modules[i], a.slice(0, l));
+      const output = join(prefix, folder, 'package.json');
       if (existsSync(output)) continue;
 
       for (const key in target) {
-        const bytes = readFileSync(join(bundle, target[key]));
+        const bytes = readFileSync(resolve(modules[i], target[key]));
         digest[key] = 'sha256-' + sha265.copy().update(bytes).digest('base64');
-        target[key] = './' + relative(folder, join(bundle, target[key]));
+        target[key] = './' + relative(folder, resolve(modules[i], target[key]));
       }
 
       writes.push([
@@ -137,31 +163,36 @@ export async function postbuild({
         JSON.stringify({
           ...source,
           ...target,
-          digest
+          digest,
+          sgrud: source.sgrud?.runtimify?.length
+            ? { runtimify: source.sgrud.runtimify }
+            : undefined
         })
       ]);
 
       for (const asset of assets) {
         writes.push([
-          join(cwd, bundle, asset),
-          join(cwd, folder, basename(asset)),
+          join(prefix, modules[i], asset),
+          join(prefix, folder, basename(asset)),
           undefined
         ] as const);
       }
     }
+
+    if (source.sgrud?.postbuild?.length) {
+      for (const submodule of source.sgrud.postbuild) {
+        modules.splice(i + 1, 0, join(modules[i], submodule));
+      }
+    }
   }
 
-  if (writes.length) {
-    console.log('Replicating exported package metadata');
+  for (const [source, target, content] of writes) {
+    console.log(_b, source, _g, '→', _b, target, __);
 
-    for (const [source, target, content] of writes) {
-      console.log(_b, source, _g, '→', _b, target, __);
-
-      if (content) {
-        writeFileSync(target, content);
-      } else {
-        copySync(source, target);
-      }
+    if (content) {
+      writeFileSync(target, content);
+    } else {
+      copySync(source, target);
     }
   }
 }

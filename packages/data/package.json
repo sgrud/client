@@ -1,6 +1,5 @@
 {
   "name": "@sgrud/data",
-  "amdName": "sgrud.data",
   "version": "0.0.11",
   "source": "./index.ts",
   "types": "./index.d.ts",
@@ -14,14 +13,20 @@
     "@babel/runtime/helpers/inheritsLoose": null,
     "@babel/runtime/helpers/objectWithoutPropertiesLoose": null,
     "@babel/runtime/helpers/toPropertyKey": null,
-    "@babel/runtime/helpers/wrapNativeSuper": null
+    "@babel/runtime/helpers/wrapNativeSuper": null,
+    "@sgrud/core": null,
+    "@sgrud/data": null,
+    "rxjs": null,
+    "tslib": "globalThis"
   },
-  "copy": [
-    "./README.md"
-  ],
-  "runtimify": [
-    "@babel/runtime:helpers.umd"
-  ],
+  "sgrud": {
+    "resources": [
+      "./README.md"
+    ],
+    "runtimify": [
+      "@babel/runtime:helpers.umd"
+    ]
+  },
   "dependencies": {
     "@babel/runtime": "^7.17.9",
     "@sgrud/core": "latest",
@@ -32,12 +37,28 @@
     "@sgrud/core": "latest"
   },
   "webDependencies": {
-    "@sgrud/data": {
+    "@babel/runtime": {
       "exports": {
-        "@sgrud/data": "./index.modern.js"
+        "@babel/runtime/helpers/": "./helpers/esm/"
       },
       "unpkg": [
-        "./index.umd.js"
+        "./runtimify.umd.js"
+      ]
+    },
+    "rxjs": {
+      "exports": {
+        "rxjs": "./dist/esm5/index.js"
+      },
+      "unpkg": [
+        "./dist/bundles/rxjs.umd.min.js"
+      ]
+    },
+    "tslib": {
+      "exports": {
+        "tslib": "./tslib.es6.js"
+      },
+      "unpkg": [
+        "./tslib.js"
       ]
     }
   }

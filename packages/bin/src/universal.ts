@@ -1,6 +1,6 @@
 import express from 'express';
 import { existsSync, readFileSync } from 'fs-extra';
-import { extname, join } from 'path';
+import { extname, join, resolve } from 'path';
 import { launch } from 'puppeteer-core';
 import { cli, _b, _g, __ } from './.cli';
 
@@ -10,7 +10,7 @@ cli.command('universal [entry]')
   .example('universal --host 0.0.0.0 # Listen on all IPs')
   .example('universal -H 192.168.0.10 -p 4040 # Listen on 192.168.0.10:4040')
   .option('--chrome', 'Chrome executable', '/usr/bin/chromium-browser')
-  .option('--cwd', 'Use an alternative working directory', './')
+  .option('--prefix', 'Use an alternative working directory', './')
   .option('-H, --host', 'Host to bind to', '127.0.0.1')
   .option('-p, --port', 'Port to bind to', '4000')
   .action((entry, opts) => universal({ ...opts, entry }));
@@ -28,7 +28,7 @@ cli.command('universal [entry]')
  *
  * Options
  *   --chrome      Chrome executable  (default /usr/bin/chromium-browser)
- *   --cwd         Use an alternative working directory  (default ./)
+ *   --prefix      Use an alternative working directory  (default ./)
  *   -H, --host    Host to bind to  (default 127.0.0.1)
  *   -p, --port    Port to bind to  (default 4000)
  *   -h, --help    Displays this message
@@ -62,10 +62,10 @@ cli.command('universal [entry]')
  */
 export async function universal({
   chrome = '/usr/bin/chromium-browser',
-  cwd = './',
   entry = 'index.html',
   host = '127.0.0.1',
-  port = '4000'
+  port = '4000',
+  prefix = './'
 }: {
 
   /**
@@ -76,14 +76,7 @@ export async function universal({
   chrome?: string;
 
   /**
-   * Use an alternative working directory.
-   *
-   * @defaultValue `'./'`
-   */
-  cwd?: string;
-
-  /**
-   * HTML document (relative to `cwd`).
+   * HTML document (relative to `prefix`).
    *
    * @defaultValue `'index.html'`
    */
@@ -103,9 +96,16 @@ export async function universal({
    */
   port?: string;
 
+  /**
+   * Use an alternative working directory.
+   *
+   * @defaultValue `'./'`
+   */
+  prefix?: string;
+
 } = { }): Promise<void> {
   const server = express();
-  const source = readFileSync(join(cwd, entry));
+  const source = readFileSync(resolve(prefix, entry));
 
   const prerender = new Map<string, Promise<string>>();
   const puppeteer = await launch({
@@ -116,7 +116,7 @@ export async function universal({
     ]
   });
 
-  server.use('/', express.static(cwd, {
+  server.use('/', express.static(prefix, {
     index: ['index.js'],
     extensions: ['js'],
     fallthrough: false
@@ -154,7 +154,7 @@ export async function universal({
             (type === 'fetch' && event.initiator().type === 'script') ||
             (type === 'script' && url.protocol !== 'data:')
           ) {
-            const target = join(cwd, url.pathname + (
+            const target = join(prefix, url.pathname + (
               extname(url.pathname) ? '' : '.js'
             ));
 

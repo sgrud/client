@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-import { execSync } from 'child_process';
-import { copySync, existsSync, mkdirpSync } from 'fs-extra';
-import { join } from 'path';
-import { cli } from './.cli';
+import { removeSync } from 'fs-extra';
+import { join, resolve } from 'path';
+import simpleGit from 'simple-git';
+import { cli, _b, _g, __ } from './.cli';
 
 cli.command('kickstart [library]')
   .describe('Kickstarts a SGRUD-based project')
   .example('kickstart # Run with default options')
-  .example('kickstart preact --cwd ./project # Kickstart preact in ./project')
-  .option('--cwd', 'Use an alternative working directory', './')
+  .example('kickstart preact --prefix ./module # Kickstart preact in ./module')
+  .option('--prefix', 'Use an alternative working directory', './')
   .action((library, opts) => kickstart({ ...opts, library }));
 
 /**
@@ -23,12 +23,12 @@ cli.command('kickstart [library]')
  *   $ sgrud kickstart [library] [options]
  *
  * Options
- *   --cwd         Use an alternative working directory  (default ./)
+ *   --prefix      Use an alternative working directory  (default ./)
  *   -h, --help    Displays this message
  *
  * Examples
  *   $ sgrud kickstart # Run with default options
- *   $ sgrud kickstart preact --cwd ./project # Kickstart preact in ./project
+ *   $ sgrud kickstart preact --prefix ./module # Kickstart preact in ./module
  * ```
  *
  * @param options - Options object.
@@ -40,23 +40,16 @@ cli.command('kickstart [library]')
  * sgrud.bin.kickstart();
  * ```
  *
- * @example Kickstart `preact` in `./project`.
+ * @example Kickstart `preact` in `./module`.
  * ```js
  * require('@sgrud/bin');
- * sgrud.bin.kickstart({ cwd: './project', library: 'preact' });
+ * sgrud.bin.kickstart({ prefix: './module', library: 'preact' });
  * ```
  */
 export async function kickstart({
-  cwd = './',
-  library = 'sgrud'
+  library = 'sgrud',
+  prefix = './'
 }: {
-
-  /**
-   * Use an alternative working directory.
-   *
-   * @defaultValue `'./'`
-   */
-  cwd?: string;
 
   /**
    * Library which to base upon.
@@ -65,21 +58,28 @@ export async function kickstart({
    */
   library?: string;
 
+  /**
+   * Use an alternative working directory.
+   *
+   * @defaultValue `'./'`
+   */
+  prefix?: string;
+
 } = { }): Promise<void> {
-  const gitPath = join(cwd, 'node_modules', '.cache', '@sgrud', 'kickstart');
-  const pkgJson = require(join(__dirname, 'package.json'));
+  console.log(_g, 'kickstart', _b, `[${library}]`, _g, '→', _b, prefix, __);
+  const module = require(resolve(__dirname, 'package.json'));
+  prefix = resolve(prefix);
 
-  if (!existsSync(gitPath)) {
-    mkdirpSync(gitPath);
-    execSync(`git clone ${pkgJson.repository.url as string} ${gitPath}`);
-  } else {
-    execSync(`git -C ${gitPath} pull --force`);
-  }
+  await simpleGit().clone(
+    module.repository.url,
+    prefix
+  );
 
-  if (!existsSync(cwd)) {
-    mkdirpSync(cwd);
-  }
+  await simpleGit(prefix).raw([
+    'filter-branch',
+    '--subdirectory-filter',
+    join('skeletons', library)
+  ]);
 
-  copySync(join(gitPath, 'skeletons', library), cwd);
-  execSync(`npm --prefix ${cwd} install`);
+  removeSync(resolve(prefix, '.git'));
 }

@@ -220,9 +220,5 @@ const resolved = new WeakMap<DocumentFragment | Element, Map<JSX.Key, Node>>();
 export {
   CustomElementTagName,
   HTMLElementTagName,
-  JSX,
-
-  createElement as jsx,
-  createElement as jsxs,
-  createFragment as Fragment
+  JSX
 };

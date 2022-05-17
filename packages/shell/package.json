@@ -1,6 +1,5 @@
 {
   "name": "@sgrud/shell",
-  "amdName": "sgrud.shell",
   "version": "0.0.11",
   "source": "./index.ts",
   "types": "./index.d.ts",
@@ -13,16 +12,27 @@
     "@babel/runtime/helpers/createForOfIteratorHelperLoose": null,
     "@babel/runtime/helpers/inheritsLoose": null,
     "@babel/runtime/helpers/wrapNativeSuper": null,
-    "incremental-dom": "IncrementalDOM"
+    "@sgrud/core": null,
+    "@sgrud/shell": null,
+    "incremental-dom": "IncrementalDOM",
+    "rxjs": null,
+    "tslib": "globalThis"
   },
-  "copy": [
-    "./README.md",
-    "./src/jsx-runtime"
-  ],
-  "runtimify": [
-    "@babel/runtime:helpers.umd",
-    "incremental-dom.esm"
-  ],
+  "sgrud": {
+    "construct": [
+      "./src/jsx-runtime"
+    ],
+    "postbuild": [
+      "./src/jsx-runtime"
+    ],
+    "resources": [
+      "./README.md"
+    ],
+    "runtimify": [
+      "@babel/runtime:helpers.umd",
+      "incremental-dom.esm"
+    ]
+  },
   "dependencies": {
     "@babel/runtime": "^7.17.9",
     "@sgrud/core": "latest",
@@ -34,21 +44,36 @@
     "@sgrud/core": "latest"
   },
   "webDependencies": {
-    "@sgrud/shell": {
+    "@babel/runtime": {
       "exports": {
-        "@sgrud/shell": "./index.modern.js",
-        "@sgrud/shell/jsx-runtime": "./index.modern.js"
+        "@babel/runtime/helpers/": "./helpers/esm/"
       },
       "unpkg": [
-        "./index.umd.js"
+        "./runtimify.umd.js"
       ]
     },
     "incremental-dom": {
       "exports": {
-        "incremental-dom": "./runtimify.js"
+        "incremental-dom": "./runtimify.esm.js"
       },
       "unpkg": [
         "./dist/incremental-dom-min.js"
+      ]
+    },
+    "rxjs": {
+      "exports": {
+        "rxjs": "./dist/esm5/index.js"
+      },
+      "unpkg": [
+        "./dist/bundles/rxjs.umd.min.js"
+      ]
+    },
+    "tslib": {
+      "exports": {
+        "tslib": "./tslib.es6.js"
+      },
+      "unpkg": [
+        "./tslib.js"
       ]
     }
   }

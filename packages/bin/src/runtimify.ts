@@ -1,33 +1,36 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-import { createWriteStream } from 'fs-extra';
+import { Assign } from '@sgrud/core';
+import { createWriteStream, readFileSync } from 'fs-extra';
+import { Module } from 'module';
 import { join, relative, resolve } from 'path';
+import packageJson from '../package.json';
 import { cli } from './.cli';
 
 cli.command('runtimify [...modules]')
-  .describe('Creates UMD bundles for ES6 modules using `microbundle`')
+  .describe('Creates ESM or UMD bundles for ES6 modules using `microbundle`')
   .example('runtimify # Run with default options')
   .example('runtimify @microsoft/fast # Runtimify `@microsoft/fast`')
-  .option('--cwd', 'Use an alternative working directory', './')
   .option('--format', 'Runtimify bundle format (umd or esm)', 'umd')
-  .option('--out', 'Output file within package root', 'runtimify.js')
+  .option('--output', 'Output file in module root', 'runtimify.[format].js')
+  .option('--prefix', 'Use an alternative working directory', './')
   .action((_ = [], opts) => runtimify({ ...opts, modules: opts._.concat(_) }));
 
 /**
- * Creates UMD bundles for ES6 modules using
+ * Creates ESM or UMD bundles for ES6 modules using
  * [microbundle](https://www.npmjs.com/package/microbundle).
  *
  * ```text
  * Description
- *   Creates UMD bundles for ES6 modules using `microbundle`
+ *   Creates ESM or UMD bundles for ES6 modules using `microbundle`
  *
  * Usage
  *   $ sgrud runtimify [...modules] [options]
  *
  * Options
- *   --cwd         Use an alternative working directory  (default ./)
  *   --format      Runtimify bundle format (umd or esm)  (default umd)
- *   --out         Output file within package root  (default runtimify.js)
+ *   --output      Output file in module root  (default runtimify.[format].js)
+ *   --prefix      Use an alternative working directory  (default ./)
  *   -h, --help    Displays this message
  *
  * Examples
@@ -51,18 +54,11 @@ cli.command('runtimify [...modules]')
  * ```
  */
 export async function runtimify({
-  cwd = './',
   format = 'umd',
   modules = [],
-  out = 'runtimify.js'
+  output = 'runtimify.[format].js',
+  prefix = './'
 }: {
-
-  /**
-   * Use an alternative working directory.
-   *
-   * @defaultValue `'./'`
-   */
-  cwd?: string;
 
   /**
    * Runtimify bundle format (umd or esm).
@@ -79,54 +75,89 @@ export async function runtimify({
   modules?: string[];
 
   /**
-   * Output file within package root.
+   * Output file in module root.
    *
-   * @defaultValue `'runtimify.js'`
+   * @defaultValue `'runtimify.[format].js'`
    */
-  out?: string;
+  output?: string;
+
+  /**
+   * Use an alternative working directory.
+   *
+   * @defaultValue `'./'`
+   */
+  prefix?: string;
 
 } = { }): Promise<void> {
+  const bundler = require.resolve('microbundle');
+  const patched = readFileSync(bundler).toString().replace(
+    /babelHelpers: 'bundled'/g,
+    `babelHelpers: 'runtime', plugins: [
+      ['@babel/plugin-transform-runtime', {
+        version: '${packageJson.dependencies['@babel/runtime']}'
+      }]
+    ]`
+  );
+
+  const microbundle = new Module('microbundle', module) as Assign<{
+    _compile: (content: string, filename: string) => void;
+    exports: (options: object) => Promise<{ output: string }>;
+  }, InstanceType<typeof Module>>;
+
+  microbundle.filename = output;
+  microbundle.paths = module.paths;
+  microbundle._compile(patched, bundler);
+
   if ((
-    cwd = resolve(cwd)
-  ).startsWith(join(process.env.INIT_CWD!, 'node_modules'))) {
-    cwd = process.env.INIT_CWD!;
+    prefix = resolve(prefix)
+  ).startsWith(resolve(process.env.INIT_CWD!, 'node_modules'))) {
+    prefix = process.env.INIT_CWD!;
   }
 
   if (!modules.length) {
-    const pkg = require(join(cwd, 'package.json'));
+    const module = require(resolve(prefix, 'package.json'));
+    modules = module.sgrud?.runtimify || [];
+    const submodules = module.sgrudDependencies
+      ? Object.entries<string>(module.sgrudDependencies)
+      : [] as [string, string][];
 
-    if ('runtimify' in pkg) {
-      modules.push(...pkg.runtimify);
-    }
+    for (const [name, version] of submodules) {
+      const source = /^[./]/.exec(version)
+        ? require(resolve(join(prefix, version, 'package.json')))
+        : require(resolve(prefix, 'node_modules', name, 'package.json'));
 
-    for (const key in pkg.dependencies) {
-      const dep = require(join(cwd, 'node_modules', key, 'package.json'));
+      if (source.sgrud?.runtimify?.length) {
+        modules.push(...source.sgrud.runtimify);
+      }
 
-      if ('runtimify' in dep) {
-        modules.push(...dep.runtimify);
+      if (source.sgrudDependencies) {
+        submodules.push(...Object.entries<string>(source.sgrudDependencies));
       }
     }
   }
 
-  for (const pkg of new Set(modules)) {
-    const src = pkg.replace(/\.(esm|umd)+$/, (match) => {
-      if (match) format = match.substring(1);
+  for (const origin of new Set(modules)) {
+    const arr = origin.replace(/\.(esm|umd)+$/, (match) => {
+      format = match ? match.substring(1) : 'umd';
       return '';
     }).split(':');
 
-    process.chdir(join(cwd, 'node_modules', src[0]));
-    const { exports, main, module, type } = require(resolve('package.json'));
-    const filter = src.filter((i) => !i.startsWith('!'));
-    const stream = createWriteStream(out);
+    output = microbundle.filename.replace('[format]', format);
+    process.chdir(resolve(prefix, 'node_modules', arr[0]));
+
+    const filter = arr.filter((i) => !i.startsWith('!'));
+    const module = require(resolve('package.json'));
+    const stream = createWriteStream(output);
+
     stream.cork();
 
-    const write = (name: string, file: string) => {
-      const source = resolve(relative(src[0], file));
+    const write = (name: string, path: string) => {
+      const source = resolve(relative(arr[0], path));
 
-      if (name.startsWith(join(...src)) || src.some((i) => {
-        return i.startsWith('!') && !name.startsWith(join(src[0], i.slice(1)));
+      if (name.startsWith(join(...arr)) || arr.some((i) => {
+        return i.startsWith('!') && !name.startsWith(join(arr[0], i.slice(1)));
       })) {
-        if (name === file) {
+        if (name === path) {
           stream.write(`export * from '${source}';`);
         } else {
           const naming = relative(join(...filter), name);
@@ -136,44 +167,43 @@ export async function runtimify({
       }
     };
 
-    if (Array.isArray(exports)) {
-      exports.map((i) => write(src[0], join(src[0], i)));
-    } else if (typeof exports === 'object') {
-      for (const [key, value] of Object.entries<any>(exports)) {
+    if (Array.isArray(module.exports)) {
+      module.exports.map((i: string) => write(arr[0], join(arr[0], i)));
+    } else if (typeof module.exports === 'object') {
+      for (const [key, value] of Object.entries<any>(module.exports)) {
         if (Array.isArray(value)) {
           const entry = value.find((i) => i.default)?.default;
-          if (entry) write(join(src[0], key), join(src[0], entry));
+          if (entry) write(join(arr[0], key), join(arr[0], entry));
         } else if (typeof value === 'object' && value?.default) {
-          write(join(src[0], key), join(src[0], value.default));
+          write(join(arr[0], key), join(arr[0], value.default));
         }
       }
-    } else if (typeof exports === 'string') {
-      write(src[0], join(src[0], exports));
-    } else if (module && type === 'module') {
-      write(src[0], join(src[0], module));
-    } else if (main) {
-      write(src[0], join(src[0], main));
+    } else if (typeof module.exports === 'string') {
+      write(arr[0], join(arr[0], module.exports));
+    } else if (module.module && module.type === 'module') {
+      write(arr[0], join(arr[0], module.module));
+    } else if (module.main) {
+      write(arr[0], join(arr[0], module.main));
     }
 
     stream.end();
 
-    await (require('microbundle') as (opts: object) => Promise<{
-      output: string;
-    }>)({
-      compress: true,
+    await new Promise((done) => setTimeout(done, 5000));
+
+    await microbundle.exports({
       css: 'inline',
       'css-modules': false,
       cwd: process.cwd(),
-      entries: [out],
+      entries: [output],
       external: 'none',
       format,
       generateTypes: false,
       name: filter.flatMap((i) => i.split(/\W/)).filter(Boolean).join('.'),
-      output: out,
+      output,
       'pkg-main': false,
       workers: false
-    }).then(({ output }) => {
-      console.log(output);
+    }).then(({ output: result }) => {
+      console.log(result);
     });
   }
 }

@@ -1,6 +1,5 @@
 {
   "name": "@sgrud/core",
-  "amdName": "sgrud.core",
   "version": "0.0.11",
   "source": "./index.ts",
   "types": "./index.d.ts",
@@ -15,15 +14,20 @@
     "@babel/runtime/helpers/extends": null,
     "@babel/runtime/helpers/inheritsLoose": null,
     "@babel/runtime/helpers/wrapNativeSuper": null,
+    "@sgrud/core": null,
     "comlink": "Comlink",
-    "rxjs/ajax": null
+    "rxjs": null,
+    "rxjs/ajax": null,
+    "tslib": "globalThis"
   },
-  "copy": [
-    "./README.md"
-  ],
-  "runtimify": [
-    "@babel/runtime:helpers.umd"
-  ],
+  "sgrud": {
+    "resources": [
+      "./README.md"
+    ],
+    "runtimify": [
+      "@babel/runtime:helpers.umd"
+    ]
+  },
   "dependencies": {
     "@babel/runtime": "^7.17.9",
     "comlink": "^4.3.1",
@@ -36,15 +40,7 @@
         "@babel/runtime/helpers/": "./helpers/esm/"
       },
       "unpkg": [
-        "./runtimify.js"
-      ]
-    },
-    "@sgrud/core": {
-      "exports": {
-        "@sgrud/core": "./index.modern.js"
-      },
-      "unpkg": [
-        "./index.umd.js"
+        "./runtimify.umd.js"
       ]
     },
     "comlink": {

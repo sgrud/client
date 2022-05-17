@@ -1,27 +1,19 @@
 {
   "name": "@sgrud/bin",
-  "amdName": "sgrud.bin",
   "version": "0.0.11",
   "source": "./index.ts",
   "types": "./index.d.ts",
   "main": "../../dist/bin/index.js",
-  "amdNames": {
-    "@sgrud/bin": null,
-    "@sgrud/bus": null,
-    "@sgrud/core": null,
-    "@sgrud/data": null,
-    "@sgrud/shell": null,
-    "@sgrud/state": null,
-    "tslib": "globalThis"
-  },
   "bin": {
     "sgrud": "./index.js"
   },
-  "copy": [
-    "./README.md"
-  ],
+  "sgrud": {
+    "resources": [
+      "./README.md"
+    ]
+  },
   "dependencies": {
-    "@babel/plugin-transform-runtime": "^7.17.10",
+    "@babel/plugin-transform-runtime": "^7.17.12",
     "@babel/runtime": "7.17.9",
     "express": "^4.18.1",
     "fs-extra": "^10.1.0",
@@ -29,6 +21,7 @@
     "puppeteer-core": "^14.1.0",
     "rollup-plugin-web-worker-loader": "^1.6.1",
     "sade": "^1.8.1",
+    "simple-git": "^3.7.1",
     "tslib": "^2.4.0"
   }
 }

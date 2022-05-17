@@ -16,26 +16,29 @@
     "type": "git",
     "url": "https://github.com/sgrud/client"
   },
-  "exports": [
-    "./packages/bin",
-    "./packages/bus",
-    "./packages/core",
-    "./packages/data",
-    "./packages/shell",
-    "./packages/state"
-  ],
   "scripts": {
-    "build": "npm-run-all --parallel build:*",
-    "build:bus": "sgrud construct --cwd ./packages/bus",
-    "build:core": "sgrud construct --cwd ./packages/core",
-    "build:data": "sgrud construct --cwd ./packages/data",
-    "build:shell": "sgrud construct --cwd ./packages/shell",
-    "build:state": "sgrud construct --cwd ./packages/state",
-    "postbuild": "node -e 'sgrud.bin.postbuild();' -r ./dist/bin",
     "install": "microbundle -f cjs --cwd ./packages/bin --target node",
     "postinstall": "node -e 'sgrud.bin.postbuild();' -r ./dist/bin",
     "prepare": "npm install -s --no-audit --no-save ./dist/bin",
-    "test": "eslint -f compact ./ && jest && typedoc"
+    "build": "sgrud construct && sgrud postbuild",
+    "test": "eslint ./ && jest && typedoc"
+  },
+  "sgrud": {
+    "construct": [
+      "./packages/bus",
+      "./packages/core",
+      "./packages/data",
+      "./packages/shell",
+      "./packages/state"
+    ],
+    "postbuild": [
+      "./packages/bin",
+      "./packages/bus",
+      "./packages/core",
+      "./packages/data",
+      "./packages/shell",
+      "./packages/state"
+    ]
   },
   "dependencies": {
     "@babel/plugin-transform-runtime": "^7.17.10",
@@ -49,6 +52,7 @@
     "rollup-plugin-web-worker-loader": "^1.6.1",
     "rxjs": "^7.5.5",
     "sade": "^1.8.1",
+    "simple-git": "^3.7.1",
     "tslib": "^2.4.0"
   },
   "devDependencies": {

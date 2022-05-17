@@ -1,18 +1,23 @@
 {
   "name": "@sgrud/state",
-  "amdName": "sgrud.state",
   "version": "0.0.11",
   "source": "./index.ts",
   "types": "./index.d.ts",
   "main": "../../dist/state/index.js",
   "exports": "../../dist/state/index.modern.js",
   "unpkg": "../../dist/state/index.umd.js",
-  "copy": [
-    "./README.md"
-  ],
-  "runtimify": [
-    "@babel/runtime:helpers.umd"
-  ],
+  "amdNames": {
+    "@sgrud/state": null,
+    "tslib": "globalThis"
+  },
+  "sgrud": {
+    "resources": [
+      "./README.md"
+    ],
+    "runtimify": [
+      "@babel/runtime:helpers.umd"
+    ]
+  },
   "dependencies": {
     "@babel/runtime": "^7.17.9",
     "@sgrud/core": "latest",
@@ -22,12 +27,20 @@
     "@sgrud/core": "latest"
   },
   "webDependencies": {
-    "@sgrud/state": {
+    "@babel/runtime": {
       "exports": {
-        "@sgrud/state": "./index.modern.js"
+        "@babel/runtime/helpers/": "./helpers/esm/"
       },
       "unpkg": [
-        "./index.umd.js"
+        "./runtimify.umd.js"
+      ]
+    },
+    "tslib": {
+      "exports": {
+        "tslib": "./tslib.es6.js"
+      },
+      "unpkg": [
+        "./tslib.js"
       ]
     }
   }

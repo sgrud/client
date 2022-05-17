@@ -12,9 +12,9 @@
  *
  * Available Commands
  *   construct    Builds a SGRUD-based project using `microbundle`
- *   kickstart    Kickstarts an angular, lit, preact or vue-based SGRUD project
- *   postbuild    Replicates exported package.json files in the SGRUD monorepo
- *   runtimify    Extracts and bundles runtime helpers using `microbundle`
+ *   kickstart    Kickstarts a SGRUD-based project
+ *   postbuild    Replicates exported package metadata for SGRUD-based projects
+ *   runtimify    Creates ESM or UMD bundles for ES6 modules using `microbundle`
  *   universal    Runs SGRUD in universal (SSR) mode using `puppeteer`
  *
  * For more info, run any command with the `--help` flag
