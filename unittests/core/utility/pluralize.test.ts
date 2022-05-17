@@ -12,7 +12,7 @@ describe('@sgrud/core/utility/pluralize', () => {
   ];
 
   describe.each(table)('pluralizing %s', (singular, plural) => {
-    it(`returns ${plural}`, () => {
+    it('returns ' + plural, () => {
       expect(pluralize(singular)).toBe(plural);
     });
   });

@@ -4,7 +4,8 @@ globalThis.HTMLElement = new Proxy(HTMLElement, {
   }
 });
 
-import { Attribute, Component, jsx, Reference, render } from '@sgrud/shell';
+import { Attribute, Component, Reference, render } from '@sgrud/shell';
+import { jsxs } from '@sgrud/shell/jsx-runtime';
 
 declare global {
   interface HTMLElementTagNameMap {
@@ -29,14 +30,14 @@ describe('@sgrud/shell/component/component', () => {
     @Attribute() public attribute?: string;
     @Reference('key', ['change']) public reference?: HTMLDivElement;
     public readonly styles: string[] = [':host { color: green; }'];
-    public readonly template: JSX.Element = jsx('div', { key: 'key' });
+    public readonly template: JSX.Element = jsxs('div', { key: 'key' });
   }
 
   @Component('class-main', 'main')
   class ClassMain extends HTMLElement implements Component {
     @Attribute() public attribute?: string;
     @Reference('key', ['change']) public reference?: HTMLDivElement;
-    public readonly template: JSX.Element = jsx('div', { key: 'key' });
+    public readonly template: JSX.Element = jsxs('div', { key: 'key' });
     public connectedCallback(): void {
       this.renderComponent();
     }

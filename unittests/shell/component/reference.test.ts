@@ -4,7 +4,8 @@ globalThis.HTMLElement = new Proxy(HTMLElement, {
   }
 });
 
-import { Component, jsx, Reference } from '@sgrud/shell';
+import { Component, Reference } from '@sgrud/shell';
+import { jsx } from '@sgrud/shell/jsx-runtime';
 
 declare global {
   interface HTMLElementTagNameMap {
