@@ -1,28 +1,32 @@
 {
   "name": "sgrud-skeleton-lit",
-  "amdName": "sgrud.skeleton.lit",
+  "private": true,
   "version": "0.0.0",
   "source": "./src/index.ts",
   "exports": "./dist/sgrud-skeleton-lit.modern.js",
   "unpkg": "./dist/sgrud-skeleton-lit.umd.js",
-  "private": true,
   "scripts": {
     "postinstall": "sgrud runtimify",
-    "build": "sgrud construct --format modern,umd",
-    "postbuild": "sgrud postbuild"
+    "build": "sgrud construct --format modern,umd && sgrud postbuild",
+    "start": "sgrud universal ./dist/index.html"
   },
   "amdNames": {
     "@babel/runtime/helpers/inheritsLoose": null,
     "@babel/runtime/helpers/taggedTemplateLiteralLoose": null,
-    "lit/decorators.js": "lit"
+    "lit": null,
+    "lit/decorators.js": "lit",
+    "sgrud-skeleton-lit": null,
+    "tslib": "globalThis"
   },
-  "copy": [
-    "./src/index.html"
-  ],
-  "runtimify": [
-    "@babel/runtime:helpers.umd",
-    "lit:!static.umd"
-  ],
+  "sgrud": {
+    "resources": [
+      "./src/index.html"
+    ],
+    "runtimify": [
+      "@babel/runtime:helpers.umd",
+      "lit:!static.umd"
+    ]
+  },
   "dependencies": {
     "@babel/runtime": "7.17.9",
     "lit": "2.2.3",
@@ -39,7 +43,7 @@
         "@babel/runtime/helpers/": "./helpers/esm/"
       },
       "unpkg": [
-        "./runtimify.js"
+        "./runtimify.umd.js"
       ]
     },
     "@lit/reactive-element": {
@@ -54,7 +58,7 @@
         "lit/": "./"
       },
       "unpkg": [
-        "./runtimify.js"
+        "./runtimify.umd.js"
       ]
     },
     "lit-element": {

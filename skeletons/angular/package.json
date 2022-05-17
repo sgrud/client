@@ -1,11 +1,11 @@
 {
   "name": "sgrud-skeleton-angular",
+  "private": true,
   "version": "0.0.0",
   "unpkg": "./dist/sgrud-skeleton-angular.min.js",
-  "private": true,
   "scripts": {
-    "build": "ng build",
-    "postbuild": "sgrud postbuild"
+    "build": "ng build --deploy-url /dist/ && sgrud postbuild",
+    "start": "sgrud universal ./dist/index.html"
   },
   "browserslist": [],
   "devDependencies": {
