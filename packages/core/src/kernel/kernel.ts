@@ -241,16 +241,11 @@ export class Kernel {
     const scripts = Array.from(queried) as HTMLScriptElement[];
 
     for (const script of scripts) {
-      this.shimmed ||= script.type.toLowerCase().replace('importmap', '');
+      this.shimmed ||= script.type.replace('importmap', '');
+      const { imports } = JSON.parse(script.innerHTML);
 
-      if (script.type.toLowerCase().startsWith('importmap')) {
-        const { imports } = JSON.parse(script.innerHTML);
-
-        if (imports) {
-          for (const key in imports) {
-            this.imports.set(key, imports[key]);
-          }
-        }
+      for (const key in imports) {
+        this.imports.set(key, imports[key]);
       }
     }
 
