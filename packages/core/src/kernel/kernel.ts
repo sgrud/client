@@ -1,4 +1,4 @@
-import { concat, defaultIfEmpty, forkJoin, ignoreElements, map, observable, Observable, ReplaySubject, Subscribable, switchMap, throwError } from 'rxjs';
+import { concat, defaultIfEmpty, defer, forkJoin, ignoreElements, map, observable, Observable, of, ReplaySubject, Subscribable, switchMap, throwError } from 'rxjs';
 import { HttpClient } from '../http/client';
 import { Mutable } from '../typing/mutable';
 import { assign } from '../utility/assign';
@@ -250,7 +250,7 @@ export class Kernel {
     }
 
     HttpClient.get<Kernel.Module>(`${endpoint}/insmod`).pipe(
-      switchMap(({ response }) => this.insmod(response))
+      switchMap(({ response }) => this.insmod(response, undefined, true))
     ).subscribe();
   }
 
@@ -267,6 +267,8 @@ export class Kernel {
    * RangeError.
    *
    * @param module - Module definition.
+   * @param pathname - Optional module path.
+   * @param entryModule - Wether to run the module.
    * @returns Observable of the module loading.
    *
    * @example Insert a module by definition.
@@ -279,7 +281,11 @@ export class Kernel {
    *
    * @see {@link Module}
    */
-  public insmod(module: Kernel.Module): Observable<Kernel.Module> {
+  public insmod(
+    module: Kernel.Module,
+    pathname: string = `${this.nodeModules}/${module.name}`,
+    entryModule: boolean = false
+  ): Observable<Kernel.Module> {
     let loader = this.loaders.get(module.name);
 
     if (!loader) {
@@ -288,22 +294,33 @@ export class Kernel {
 
       const chain = [] as Observable<any>[];
       const dependencies = { } as Mutable<Kernel.WebDependency>;
-      const { sgrudDependencies, webDependencies } = module;
 
-      if (sgrudDependencies) {
-        chain.push(forkJoin(Object.keys(sgrudDependencies).map((name) => {
-          return this.resolve(name).pipe(switchMap((dependency) => {
-            if (!semver(dependency.version, sgrudDependencies[name])) {
+      if (module.sgrudDependencies) {
+        const entries = Object.entries(module.sgrudDependencies);
+
+        chain.push(forkJoin(entries.map(([name, version]) => {
+          const path = /^([./]|http)/.exec(version) ? version : undefined;
+
+          return this.resolve(name, path).pipe(switchMap((dependency) => {
+            if (!path && !semver(dependency.version, version)) {
               return throwError(() => new RangeError(dependency.name));
             }
 
-            return this.insmod(dependency);
+            entryModule &&= !module.exports && !module.unpkg;
+            return this.insmod(dependency, path, entryModule);
           }));
         })));
       }
 
-      for (const name in webDependencies) {
-        const { exports, unpkg } = webDependencies[name];
+      if (module.exports && !this.imports.has(module.name)) {
+        const src = `${pathname}/${module.exports}`;
+
+        dependencies.exports = { [module.name]: src };
+        this.imports.set(module.name, src);
+      }
+
+      for (const name in module.webDependencies) {
+        const { exports, unpkg } = module.webDependencies[name];
 
         if (exports) {
           for (const key in exports) {
@@ -334,12 +351,16 @@ export class Kernel {
           }));
         }
 
-        chain.push(this.script({
+        chain.push(this.verify({
+          href: `${pathname}/${module.exports}`,
           integrity: module.digest?.exports || '',
-          src: `${this.nodeModules}/${module.name}/${module.exports}`,
-          type: 'module' + this.shimmed
+          rel: 'modulepreload' + this.shimmed
         }));
-      } else if (module.unpkg) {
+
+        if (entryModule) {
+          chain.push(defer(() => import(module.name)));
+        }
+      } else if ((globalThis as any).sgrud && module.unpkg) {
         if (dependencies.unpkg?.length) {
           chain.push(forkJoin(dependencies.unpkg.map((bundle) => this.script({
             src: bundle,
@@ -349,7 +370,7 @@ export class Kernel {
 
         chain.push(this.script({
           integrity: module.digest?.unpkg || '',
-          src: `${this.nodeModules}/${module.name}/${module.unpkg}`,
+          src: `${pathname}/${module.unpkg}`,
           type: 'text/javascript'
         }));
       } else if (this.loaders.size > 1) {
@@ -374,6 +395,7 @@ export class Kernel {
    * returned Observable.
    *
    * @param name - Module name.
+   * @param pathname - Optional module path.
    * @returns Observable of the module definition.
    *
    * @example Resolve a module definition by name.
@@ -385,10 +407,15 @@ export class Kernel {
    *
    * @see {@link Module}
    */
-  public resolve(name: string): Observable<Kernel.Module> {
-    const module = `${this.nodeModules}/${name}/package.json`;
+  public resolve(
+    name: string,
+    pathname: string = `${this.nodeModules}/${name}`
+  ): Observable<Kernel.Module> {
+    if (this.loaders.has(name)) {
+      return this.loaders.get(name)!;
+    }
 
-    return HttpClient.get<Kernel.Module>(module).pipe(
+    return HttpClient.get<Kernel.Module>(`${pathname}/package.json`).pipe(
       map(({ response }) => response)
     );
   }
@@ -408,9 +435,9 @@ export class Kernel {
    * import { Kernel } from '@sgrud/core';
    *
    * new Kernel().script({
-   *   src: '/node_modules/module/index.esm.js',
-   *   type: 'module'
-   * }).subscribe(console.log);
+   *   src: '/node_modules/module/bundle.js',
+   *   type: 'text/javascript'
+   * }).subscribe();
    * ```
    */
   public script(props: Partial<HTMLScriptElement>): Observable<void> {
@@ -432,6 +459,30 @@ export class Kernel {
       document.head.appendChild(script);
       return () => script.remove();
     });
+  }
+
+  /**
+   * Inserts a HTML link element and applies the supplied `props` to it. This
+   * method should be used to verify a module before importing and evaluating
+   * it, by providing its [subresource integrity](https://www.w3.org/TR/SRI).
+   *
+   * @param props - Link element properties.
+   * @returns Deferred link appendage and removal.
+   *
+   * @example Insert a HTML link element.
+   * ```ts
+   * import { Kernel } from '@sgrud/core';
+   *
+   * new Kernel().verify({
+   *   href: '/node_modules/module/index.js',
+   *   integrity: 'sha256-[...]',
+   *   rel: 'modulepreload'
+   * }).subscribe();
+   * ```
+   */
+  public verify(props: Partial<HTMLLinkElement>): Observable<void> {
+    const link = assign(document.createElement('link'), props);
+    return defer(() => of(document.head.appendChild(link).remove()));
   }
 
 }
