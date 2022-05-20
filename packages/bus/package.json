@@ -1,6 +1,6 @@
 {
   "name": "@sgrud/bus",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "source": "./index.ts",
   "types": "./index.d.ts",
   "main": "../../dist/bus/index.js",
