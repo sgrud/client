@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
 import { createHash } from 'crypto';
-import { copySync, existsSync, readFileSync, writeFileSync } from 'fs-extra';
+import { copySync, existsSync, readFileSync, statSync, writeFileSync } from 'fs-extra';
 import { basename, dirname, join, normalize, relative, resolve } from 'path';
 import simpleGit from 'simple-git';
 import { cli, _b, _g, __ } from './.cli';
@@ -78,17 +78,18 @@ export async function postbuild({
 } = { }): Promise<void> {
   const commit = await simpleGit(prefix).revparse('HEAD');
   const module = require(resolve(prefix, 'package.json'));
-  const sha265 = createHash('sha256');
-  const writes = [];
+  const operations = [];
 
   if (!modules.length) {
-    modules = module.sgrud?.postbuild || ['./'];
+    modules = ['./'];
   }
 
   for (let i = 0; i < modules.length; i++) {
-    const assets = [];
-    const origin = join(prefix, modules[i], 'package.json');
-    const source = require(resolve(origin));
+    const operation = [join(prefix, modules[i], 'package.json')];
+    const resources = [];
+    const runtimify = [];
+
+    const source = require(resolve(operation[0]));
     const target = { } as Record<string, string>;
 
     for (const key in source) {
@@ -110,8 +111,16 @@ export async function postbuild({
           break;
 
         case 'sgrud':
-          if (source[key].resources) {
-            assets.push(...source[key].resources);
+          for (const sgrudKey in source[key]) {
+            switch (sgrudKey) {
+              case 'resources':
+                resources.push(...source[key][sgrudKey]);
+                break;
+
+              case 'runtimify':
+                runtimify.push(...source[key][sgrudKey]);
+                break;
+            }
           }
           break;
       }
@@ -142,52 +151,54 @@ export async function postbuild({
     }
 
     if (Object.keys(target).length) {
-      const sorted = Object.values(target).sort();
-      const [a, b] = [dirname(sorted[0]), dirname(sorted[sorted.length - 1])];
-      let l = 0; while (l < a.length && a[l] === b[l]) l++;
+      const sorted = Object.values(target).map(dirname).sort();
+      const [a, b] = [sorted[0], sorted[sorted.length - 1]];
+      let n = 0; while (n < a.length && a[n] === b[n]) n++;
 
-      const digest = { } as Record<string, string>;
-      const folder = join(modules[i], a.slice(0, l));
-      const output = join(prefix, folder, 'package.json');
-      if (existsSync(output)) continue;
+      const hashes = { } as Record<string, string>;
+      const path = join(modules[i], sorted[0].slice(0, n));
+      operation.push(join(prefix, path, 'package.json'));
 
       for (const key in target) {
-        const bytes = readFileSync(resolve(modules[i], target[key]));
-        digest[key] = 'sha256-' + sha265.copy().update(bytes).digest('base64');
-        target[key] = './' + relative(folder, resolve(modules[i], target[key]));
+        const file = resolve(modules[i], target[key]);
+        target[key] = './' + relative(path, file);
+
+        if (statSync(file).isFile()) {
+          const hash = createHash('sha256').update(readFileSync(file));
+          hashes[key] = 'sha256-' + hash.digest('base64');
+        }
       }
 
-      writes.push([
-        origin,
-        output,
-        JSON.stringify({
-          ...source,
-          ...target,
-          digest,
-          sgrud: source.sgrud?.runtimify?.length
-            ? { runtimify: source.sgrud.runtimify }
-            : undefined
-        })
-      ]);
+      operations.push(operation.concat(JSON.stringify({
+        ...source,
+        ...target,
+        digest: Object.keys(hashes).length ? hashes : undefined,
+        sgrud: runtimify.length ? { runtimify } : undefined
+      })));
 
-      for (const asset of assets) {
-        writes.push([
-          join(prefix, modules[i], asset),
-          join(prefix, folder, basename(asset)),
-          undefined
-        ] as const);
+      for (const resource of resources) {
+        operations.push([
+          join(prefix, modules[i], resource),
+          join(prefix, path, basename(resource))
+        ]);
       }
     }
 
     if (source.sgrud?.postbuild?.length) {
-      for (const submodule of source.sgrud.postbuild) {
-        modules.splice(i + 1, 0, join(modules[i], submodule));
+      for (let j = source.sgrud.postbuild.length - 1; j >= 0; j--) {
+        modules.splice(i + 1, 0, join(modules[i], source.sgrud.postbuild[j]));
       }
     }
   }
 
-  for (const [source, target, content] of writes) {
-    console.log(_b, source, _g, '→', _b, target, __);
+  for (const [source, target, content] of operations) {
+    console.log(
+      _g, '[postbuild]',
+      _b, source,
+      _g, '→',
+      _b, target,
+      __
+    );
 
     if (content) {
       writeFileSync(target, content);

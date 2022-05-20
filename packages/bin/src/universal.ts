@@ -104,10 +104,8 @@ export async function universal({
   prefix?: string;
 
 } = { }): Promise<void> {
-  const server = express();
-  const source = readFileSync(resolve(prefix, entry));
-
-  const prerender = new Map<string, Promise<string>>();
+  const app = express();
+  const caches = new Map<string, Promise<string>>();
   const puppeteer = await launch({
     executablePath: chrome,
     args: [
@@ -116,19 +114,19 @@ export async function universal({
     ]
   });
 
-  server.use('/', express.static(prefix, {
+  app.use('/', express.static(prefix, {
     index: ['index.js'],
     extensions: ['js'],
     fallthrough: false
   }));
 
-  server.use(async(
+  app.use(async(
     _: Record<string, any>,
     req: express.Request,
     res: express.Response,
     next: express.NextFunction
   ) => {
-    let cache = prerender.get(req.url);
+    let cache = caches.get(req.url);
 
     if (!cache || req.headers.pragma === 'no-cache') {
       cache = puppeteer.newPage().then(async(page) => {
@@ -140,7 +138,7 @@ export async function universal({
         }));
 
         page.on('request', (event) => {
-          const init = event.initiator().type;
+          const initiator = event.initiator().type;
           const type = event.resourceType();
           const url = new URL(event.url());
 
@@ -148,24 +146,27 @@ export async function universal({
             return void event.respond({
               status: 200,
               contentType: 'text/html',
-              body: source
+              body: readFileSync(resolve(prefix, entry))
             });
-          } else if (
-            (type === 'fetch' && event.initiator().type === 'script') ||
-            (type === 'script' && url.protocol !== 'data:')
-          ) {
-            const target = join(prefix, url.pathname + (
+          } else if ((
+            initiator === 'script' && type === 'fetch'
+          ) || (
+            type === 'script' && url.protocol !== 'data:'
+          )) {
+            const file = join(prefix, url.pathname + (
               extname(url.pathname) ? '' : '.js'
             ));
 
-            if (existsSync(target)) {
+            if (existsSync(file)) {
               return void event.respond({
                 status: 200,
                 contentType: 'application/javascript',
-                body: readFileSync(target)
+                body: readFileSync(file)
               });
             }
-          } else if (init === 'preflight' || type === 'xhr' || (
+          } else if ((
+            initiator === 'preflight' || type === 'xhr'
+          ) || (
             type === 'script' && url.protocol === 'data:'
           )) {
             return void event.continue();
@@ -187,7 +188,7 @@ export async function universal({
         return html;
       });
 
-      prerender.set(req.url, cache);
+      caches.set(req.url, cache);
     }
 
     try {
@@ -197,7 +198,13 @@ export async function universal({
     }
   });
 
-  server.listen(Number.parseInt(port), host, () => {
-    console.log(_g, '→', _b, `http://${host}:${port}`, __);
+  app.listen(Number.parseInt(port), host, () => {
+    console.log(
+      _g, '[universal]',
+      _b, entry,
+      _g, '→',
+      _b, `http://${host}:${port}`,
+      __
+    );
   });
 }

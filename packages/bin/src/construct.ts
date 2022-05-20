@@ -5,7 +5,7 @@ import { readFileSync } from 'fs-extra';
 import { Module } from 'module';
 import { join, resolve } from 'path';
 import packageJson from '../package.json';
-import { cli } from './.cli';
+import { cli, _b, _g, __ } from './.cli';
 
 cli.command('construct [...modules]')
   .describe('Builds a SGRUD-based project using `microbundle`')
@@ -129,41 +129,55 @@ export async function construct({
   microbundle._compile(patched, bundler);
 
   if (!modules.length) {
-    const module = require(resolve(prefix, 'package.json'));
-    modules = module.sgrud?.construct || ['./'];
+    modules = ['./'];
   }
 
   for (let i = 0; i < modules.length; i++) {
     const cwd = resolve(prefix, modules[i]);
-    const source = require(resolve(cwd, 'package.json'));
+    const module = require(resolve(cwd, 'package.json'));
 
-    const globals = Object.entries(source.amdNames).map(([key, value]) => {
-      return value === null
-        ? `${key}=${key.split(/\W/).filter(Boolean).join('.')}`
-        : `${key}=${value as string}`;
-    }).join(',');
+    if (module.source) {
+      let globals;
+      let name;
 
-    const name = source.amdNames[source.name] === null
-      ? source.name.split(/\W/).filter(Boolean).join('.')
-      : source.amdNames[source.name];
+      if (module.amdNames) {
+        globals = Object.entries(module.amdNames).map(([key, value]) => {
+          return value === null
+            ? `${key}=${key.split(/\W/).filter(Boolean).join('.')}`
+            : `${key}=${value as string}`;
+        }).join(',');
 
-    await microbundle.exports({
-      compress,
-      css: 'inline',
-      'css-modules': false,
-      cwd,
-      format,
-      globals,
-      name,
-      'pkg-main': true,
-      workers: false
-    }).then(({ output: result }) => {
-      console.log(result);
-    });
+        name = module.amdNames[module.name] === null
+          ? module.name.split(/\W/).filter(Boolean).join('.')
+          : module.amdNames[module.name];
+      }
 
-    if (source.sgrud?.construct?.length) {
-      for (const submodule of source.sgrud.construct) {
-        modules.splice(i + 1, 0, join(modules[i], submodule));
+      console.log(
+        _g, '[construct]',
+        _b, modules[i],
+        _g, '→',
+        _b, module.name,
+        __
+      );
+
+      await microbundle.exports({
+        compress,
+        css: 'inline',
+        'css-modules': false,
+        cwd,
+        format,
+        globals,
+        name,
+        'pkg-main': true,
+        workers: false
+      }).then(({ output: result }) => {
+        console.log(__, result, '\n');
+      });
+    }
+
+    if (module.sgrud?.construct?.length) {
+      for (let j = module.sgrud.construct.length - 1; j >= 0; j--) {
+        modules.splice(i + 1, 0, join(modules[i], module.sgrud.construct[j]));
       }
     }
   }

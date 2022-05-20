@@ -66,7 +66,14 @@ export async function kickstart({
   prefix?: string;
 
 } = { }): Promise<void> {
-  console.log(_g, 'kickstart', _b, `[${library}]`, _g, '→', _b, prefix, __);
+  console.log(
+    _g, '[kickstart]',
+    _b, library,
+    _g, '→',
+    _b, prefix,
+    __
+  );
+
   const module = require(resolve(__dirname, 'package.json'));
   prefix = resolve(prefix);
 
