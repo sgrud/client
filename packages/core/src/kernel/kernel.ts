@@ -223,13 +223,13 @@ export class Kernel {
      * The global SGRUD API endpoint. The Kernel will, e.g., request the list of
      * modules to be loaded (by their names) from `${endpoint}/insmod`.
      */
-    public readonly endpoint: string = `${baseHref}/api/sgrud/v1`,
+    public readonly endpoint: string = baseHref + '/api/sgrud/v1',
 
     /**
      * The global path to request Nodejs modules from. All JavaScript assets
      * belonging to modules installed via NPM should be located here.
      */
-    public readonly nodeModules: string = `${baseHref}/node_modules`
+    public readonly nodeModules: string = baseHref + '/node_modules'
 
   ) {
     this.imports = new Map<string, string>();

@@ -46,7 +46,7 @@ export class HttpQuerier
    * @param prioritize - Dynamic or static prioritization.
    */
   public constructor(
-    private readonly endpoint: string = `${new Kernel().endpoint}/data`,
+    private readonly endpoint: string = new Kernel().endpoint + '/data',
     private readonly prioritize: number | Map<Model.Type<any>, number> = 0
   ) {
     super();

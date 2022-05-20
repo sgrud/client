@@ -418,10 +418,10 @@ export class Router extends Set<Route> implements Router.Task {
           parts.splice(i--, 1);
           continue;
         } else if (parts[i].startsWith(':')) {
-          let key = parts[i].substring(1);
+          let key = parts[i].slice(1);
 
           if (parts[i].endsWith('?')) {
-            key = key.substring(0, key.length - 1);
+            key = key.slice(0, key.length - 1);
             const left = paths.slice(0, i).concat(parts[i]);
             left.push(...paths.slice(paths[i] ? i : i + 1));
             const match = this.match(left.join('/'), [route]);
@@ -534,8 +534,8 @@ export class Router extends Set<Route> implements Router.Task {
         return path.replace(/^\/?/, this.baseHref.replace(/\/?$/, '/'));
       }
     } else {
-      let l = 0; while (l < path.length && path[l] === this.baseHref[l]) l++;
-      return path.substring(l);
+      let n = 0; while (n < path.length && path[n] === this.baseHref[n]) n++;
+      return path.slice(n);
     }
 
     return path;
