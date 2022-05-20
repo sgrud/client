@@ -34,7 +34,7 @@
     ]
   },
   "dependencies": {
-    "@babel/runtime": "^7.17.9",
+    "@babel/runtime": "^7.18.0",
     "@sgrud/core": "latest",
     "incremental-dom": "^0.7.0",
     "rxjs": "^7.5.5",
