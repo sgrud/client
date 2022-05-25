@@ -147,17 +147,14 @@ export function createElement(
  * @returns Array of bound calls.
  */
 export function createFragment(props?: Record<string, any>): JSX.Element {
+  const children = [props?.children].flat(Infinity);
   const fragment = [];
 
-  if (props?.children?.length) {
-    const children = props.children.flat(Infinity);
-
-    for (const child of children) {
-      if (TypeOf.string(child) || TypeOf.number(child)) {
-        fragment.push(text.bind(null, child));
-      } else if (TypeOf.function(child)) {
-        fragment.push(child);
-      }
+  for (const child of children) {
+    if (TypeOf.string(child) || TypeOf.number(child)) {
+      fragment.push(text.bind(null, child));
+    } else if (TypeOf.function(child)) {
+      fragment.push(child);
     }
   }
 
