@@ -2,55 +2,75 @@ import { route, Route } from '@sgrud/shell';
 
 describe('@sgrud/shell/router/route', () => {
 
-  class ClassOne extends HTMLElement { }
-  class ClassTwo extends HTMLElement { }
-  class TestClass extends HTMLElement { }
+  class EntryClass extends HTMLElement { }
+  class ParentClass extends HTMLElement { }
   class ChildClass extends HTMLElement { }
+  class GrandchildClass extends HTMLElement { }
+  class UnboundClass extends HTMLElement { }
 
-  customElements.define('class-one', ClassOne);
-  customElements.define('test-class', TestClass);
+  customElements.define('entry-class', EntryClass);
+  customElements.define('parent-class', ParentClass);
   customElements.define('child-class', ChildClass);
+  customElements.define('grandchild-class', GrandchildClass);
 
-  Route({
-    path: 'one'
-  })(ClassOne);
+  const entry = {
+    parent: HTMLElement,
+    path: 'entry'
+  };
 
-  Route({
-    path: 'two'
-  })(ClassTwo);
-
-  Route({
-    path: 'test',
+  const parent = {
+    path: 'parent',
     children: [
       {
         path: ''
       },
-      ClassOne,
-      ClassTwo
+      EntryClass,
+      UnboundClass
     ]
-  })(TestClass);
+  };
 
-  Route({
-    path: 'child',
-    parent: TestClass
-  })(ChildClass);
+  const child = {
+    parent: ParentClass,
+    path: 'child'
+  };
+
+  const grandchild = {
+    parent: child,
+    path: 'grandchild'
+  };
+
+  const unbound = {
+    path: 'two'
+  };
 
   describe('applying the decorator', () => {
+    Route(entry)(EntryClass);
+    Route(parent)(ParentClass);
+    Route(child)(ChildClass);
+    Route(grandchild)(GrandchildClass);
+    Route(unbound)(UnboundClass);
+
     it('exposes the processed route on the constructor', () => {
-      expect((TestClass as { [route]?: Route })[route]).toMatchObject({
-        path: 'test',
-        component: 'test-class',
+      expect((ParentClass as { [route]?: Route })[route]).toMatchObject({
+        path: 'parent',
+        component: 'parent-class',
         children: [
           {
             path: ''
           },
           {
-            path: 'one',
-            component: 'class-one'
+            path: 'entry',
+            component: 'entry-class'
           },
           {
             path: 'child',
-            component: 'child-class'
+            component: 'child-class',
+            children: [
+              {
+                path: 'grandchild',
+                component: 'grandchild-class'
+              }
+            ]
           }
         ]
       });
