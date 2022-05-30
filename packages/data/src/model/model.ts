@@ -911,21 +911,21 @@ export abstract class Model<M extends Model = any> {
    *
    * @see {@link HasOne}
    */
-  public readonly [hasOne]: Record<keyof M, () => unknown>;
+  public readonly [hasOne]?: Record<keyof M, () => unknown>;
 
   /**
    * Symbol property used by the {@link HasMany} decorator.
    *
    * @see {@link HasMany}
    */
-  public readonly [hasMany]: Record<keyof M, () => unknown>;
+  public readonly [hasMany]?: Record<keyof M, () => unknown>;
 
   /**
    * Symbol property used by the {@link Property} decorator.
    *
    * @see {@link Property}
    */
-  public readonly [property]: Record<keyof M, () => unknown>;
+  public readonly [property]?: Record<keyof M, () => unknown>;
 
   /**
    * Symbol property typed as callback to a Subscribable. The returned
@@ -942,7 +942,7 @@ export abstract class Model<M extends Model = any> {
    * from(model).subscribe(console.log);
    * ```
    */
-  public readonly [Symbol.observable]: () => Subscribable<M>;
+  public readonly [Symbol.observable]!: () => Subscribable<M>;
 
   /**
    * Universally unique identifier of this model instance.

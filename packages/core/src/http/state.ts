@@ -40,7 +40,7 @@ export class HttpState
    * from(httpState).subscribe(console.log);
    * ```
    */
-  public readonly [Symbol.observable]: () => Subscribable<Response<any>[]>;
+  public readonly [Symbol.observable]!: () => Subscribable<Response<any>[]>;
 
   /**
    * BehaviorSubject emitting every time a request is added to or deleted from

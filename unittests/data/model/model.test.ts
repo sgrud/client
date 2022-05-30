@@ -159,7 +159,7 @@ describe('@sgrud/data/model/model', () => {
       modified: new Date()
     });
 
-    Object.assign(model['#modified' as keyof Model], {
+    Object.assign(model['#modified' as keyof Model]!, {
       getTimezoneOffset: () => 120
     });
 

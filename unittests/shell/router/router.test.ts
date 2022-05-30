@@ -374,14 +374,14 @@ describe('@sgrud/shell/router/router', () => {
 
     it('matches the empty parts of the tree', () => {
       const match = router.match('', [tree]);
-      expect(match!.route.component).toBe('root');
-      expect(match!.child!.route.component).toBe('empty');
+      expect(match?.route.component).toBe('root');
+      expect(match?.child?.route.component).toBe('empty');
     });
 
     it('matches the tree in-depth', () => {
       const match = router.match('route', [tree]);
-      expect(match!.route.component).toBe('root');
-      expect(match!.child!.route.component).toBe('route');
+      expect(match?.route.component).toBe('root');
+      expect(match?.child?.route.component).toBe('route');
     });
   });
 

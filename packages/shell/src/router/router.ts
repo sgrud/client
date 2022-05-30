@@ -159,7 +159,7 @@ export class Router extends Set<Route> implements Router.Task {
    * from(router).subscribe(console.log);
    * ```
    */
-  public readonly [Symbol.observable]: () => Subscribable<Router.State>;
+  public readonly [Symbol.observable]!: () => Subscribable<Router.State>;
 
   /**
    * Absolute base href for navigation.

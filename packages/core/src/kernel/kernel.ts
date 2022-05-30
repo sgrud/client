@@ -147,7 +147,7 @@ export class Kernel {
    * from(new Kernel()).subscribe(console.log);
    * ```
    */
-  public readonly [Symbol.observable]: () => Subscribable<Kernel.Module>;
+  public readonly [Symbol.observable]!: () => Subscribable<Kernel.Module>;
 
   /**
    * Internal mapping of all via importmap defined module identifiers to their
