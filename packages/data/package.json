@@ -1,6 +1,6 @@
 {
   "name": "@sgrud/data",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "source": "./index.ts",
   "types": "./index.d.ts",
   "main": "../../dist/data/index.js",
