@@ -1,0 +1,133 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking"
+  ],
+  "plugins": [
+    "@typescript-eslint",
+    "eslint-plugin-tsdoc"
+  ],
+  "rules": {
+    "@typescript-eslint/ban-types": "off",
+    "@typescript-eslint/brace-style": "error",
+    "@typescript-eslint/comma-dangle": "error",
+    "@typescript-eslint/dot-notation": "error",
+    "@typescript-eslint/explicit-member-accessibility": "error",
+    "@typescript-eslint/indent": [
+      "error",
+      2
+    ],
+    "@typescript-eslint/member-delimiter-style": "error",
+    "@typescript-eslint/member-ordering": [
+      "error",
+      {
+        "default": [
+          "static-field",
+          "static-get",
+          "static-method",
+          "abstract-field",
+          "instance-field",
+          "abstract-get",
+          "instance-get",
+          "signature",
+          "constructor",
+          "abstract-method",
+          "instance-method"
+        ]
+      }
+    ],
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-inferrable-types": "off",
+    "@typescript-eslint/no-namespace": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "@typescript-eslint/no-shadow": "error",
+    "@typescript-eslint/no-this-alias": [
+      "error",
+      {
+        "allowedNames": [
+          "self"
+        ]
+      }
+    ],
+    "@typescript-eslint/no-unsafe-argument": "off",
+    "@typescript-eslint/no-unsafe-assignment": "off",
+    "@typescript-eslint/no-unsafe-call": "off",
+    "@typescript-eslint/no-unsafe-member-access": "off",
+    "@typescript-eslint/no-unsafe-return": "off",
+    "@typescript-eslint/no-unused-vars": "error",
+    "@typescript-eslint/object-curly-spacing": [
+      "error",
+      "always"
+    ],
+    "@typescript-eslint/quotes": [
+      "error",
+      "single"
+    ],
+    "@typescript-eslint/require-await": "off",
+    "@typescript-eslint/restrict-plus-operands": "off",
+    "@typescript-eslint/restrict-template-expressions": [
+      "error",
+      {
+        "allowAny": true,
+        "allowNumber": true
+      }
+    ],
+    "@typescript-eslint/semi": "error",
+    "@typescript-eslint/space-before-function-paren": [
+      "error",
+      "never"
+    ],
+    "@typescript-eslint/type-annotation-spacing": "error",
+    "@typescript-eslint/typedef": [
+      "error",
+      {
+        "memberVariableDeclaration": true,
+        "parameter": true,
+        "propertyDeclaration": true
+      }
+    ],
+    "arrow-parens": "error",
+    "default-case-last": "error",
+    "eqeqeq": "error",
+    "grouped-accessor-pairs": "error",
+    "max-len": [
+      "error",
+      {
+        "ignorePattern": "^(export|import)",
+        "code": 80
+      }
+    ],
+    "no-case-declarations": "off",
+    "no-cond-assign": "off",
+    "no-multiple-empty-lines": [
+      "error",
+      {
+        "max": 1
+      }
+    ],
+    "no-trailing-spaces": "error",
+    "one-var": [
+      "error",
+      "never"
+    ],
+    "tsdoc/syntax": "error",
+    "valid-jsdoc": [
+      "error",
+      {
+        "prefer": {
+          "abstract": "virtual",
+          "arg": "param",
+          "argument": "param",
+          "return": "returns"
+        },
+        "requireParamDescription": true,
+        "requireParamType": false,
+        "requireReturn": false,
+        "requireReturnDescription": true,
+        "requireReturnType": false
+      }
+    ]
+  }
+}
