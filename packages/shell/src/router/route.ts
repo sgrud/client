@@ -70,6 +70,7 @@ export const route = Symbol('@sgrud/shell/router/route');
  * {@link Router}.
  *
  * @param config - Route configuration for this component.
+ * @typeParam S - Route path string type.
  * @returns Class decorator.
  *
  * @example Associate a route `config`uration to a component.
@@ -91,6 +92,7 @@ export const route = Symbol('@sgrud/shell/router/route');
  */
 export function Route<S extends string>(config: Assign<{
   children?: (Route | typeof HTMLElement & { [route]?: Route })[];
+  slots?: Record<string, CustomElementTagName | typeof HTMLElement>;
 }, Omit<Route<S>, 'component'>> & {
 
   /**
@@ -121,6 +123,20 @@ export function Route<S extends string>(config: Assign<{
             } else {
               config.children.splice(i, 1);
             }
+          }
+        }
+      }
+
+      for (const key in config.slots) {
+        const component = config.slots[key];
+
+        if (TypeOf.function(component)) {
+          const slot = customElements.getName(component);
+
+          if (slot) {
+            config.slots[key] = slot as CustomElementTagName;
+          } else {
+            delete config.slots[key];
           }
         }
       }
