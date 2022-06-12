@@ -24,8 +24,10 @@ export interface Target<V> {
  * Class decorator factory. Links the decorated target constructor to its
  * corresponding instance by applying the decorated constructor arguments.
  * Employ this helper to link target constructors with required arguments.
+ * Supplying a `target` constructor overrides it with the constructed instance.
  *
  * @param factoryArgs - Arguments for the target constructor.
+ * @param target - Target constructor override.
  * @typeParam K - Target constructor type.
  * @returns Class decorator.
  *
@@ -33,7 +35,7 @@ export interface Target<V> {
  * ```ts
  * import { Target } from '@sgrud/core';
  *
- * @Target<typeof Service>('default')
+ * @Target<typeof Service>(['default'])
  * export class Service {
  *
  *   public constructor(
@@ -61,7 +63,8 @@ export interface Target<V> {
  * @see {@link Linker}
  */
 export function Target<K extends new (...args: any[]) => any>(
-  ...factoryArgs: ConstructorParameters<K>
+  factoryArgs?: ConstructorParameters<K>,
+  target?: K
 ) {
 
   /**
@@ -71,7 +74,7 @@ export function Target<K extends new (...args: any[]) => any>(
     constructor: K
   ): void {
     new Linker<K>([
-      [constructor, new constructor(...factoryArgs)]
+      [target || constructor, new constructor(...factoryArgs || [])]
     ]);
   };
 

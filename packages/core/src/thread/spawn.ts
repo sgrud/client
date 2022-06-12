@@ -9,7 +9,8 @@ import { TypeOf } from '../utility/type-of';
  * the decorated class property.
  *
  * @param workerFactory - Worker constructor.
- * @param factoryArgs - Worker Constructor arguments.
+ * @param factoryArgs - Worker constructor arguments.
+ * @typeParam T - Worker constructor type.
  * @returns Class property decorator.
  *
  * @example Spawn a WebWorker.
@@ -29,9 +30,9 @@ import { TypeOf } from '../utility/type-of';
  *
  * @see {@link Thread}
  */
-export function Spawn(
-  workerFactory: new (...args: any[]) => Worker,
-  ...factoryArgs: any[]
+export function Spawn<T extends new (...args: any[]) => Worker>(
+  workerFactory: T,
+  factoryArgs?: ConstructorParameters<T>
 ) {
 
   /**
@@ -52,7 +53,7 @@ export function Spawn(
 
     Object.defineProperty(constructor, propertyKey, {
       enumerable: true,
-      value: new remote(...factoryArgs)
+      value: new remote(...factoryArgs || [])
     });
   };
 
