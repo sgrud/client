@@ -41,17 +41,17 @@ import { Component } from './component';
 export function Attribute(name?: string) {
 
   /**
-   * @param component - Component prototype to be decorated.
+   * @param prototype - Component prototype to be decorated.
    * @param propertyKey - Component property to be decorated.
    */
   return function(
-    component: Component,
+    prototype: Component,
     propertyKey: PropertyKey
   ): void {
     const key = name || propertyKey as string;
-    ((component as Mutable<Component>).observedAttributes ||= []).push(key);
+    ((prototype as Mutable<Component>).observedAttributes ||= []).push(key);
 
-    Object.defineProperty(component, propertyKey, {
+    Object.defineProperty(prototype, propertyKey, {
       get(this: Component): string | undefined {
         return this.getAttribute(key) ?? undefined;
       },

@@ -46,30 +46,30 @@ export function Reference(
 ) {
 
   /**
-   * @param component - Component prototype to be decorated.
+   * @param prototype - Component prototype to be decorated.
    * @param propertyKey - Component property to be decorated.
    */
   return function(
-    component: Component,
+    prototype: Component,
     propertyKey: PropertyKey
   ): void {
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    const connectedCallback = component.connectedCallback;
+    const connectedCallback = prototype.connectedCallback;
 
     if (observe?.length) {
-      assign((component as Mutable<Component>).observedReferences ||= { }, {
+      assign((prototype as Mutable<Component>).observedReferences ||= { }, {
         [ref]: observe
       });
     }
 
-    Object.defineProperty(component, propertyKey, {
+    Object.defineProperty(prototype, propertyKey, {
       get(this: Component): Node | undefined {
         return references(this.shadowRoot!)?.get(ref);
       },
       set: Function.prototype as (...args: any[]) => void
     });
 
-    component.connectedCallback = function(this: Component): void {
+    prototype.connectedCallback = function(this: Component): void {
       if (this.observedReferences) {
         (this as Mutable<Component>).observedReferences = undefined;
         const listeners = { } as Record<JSX.Key, (event: Event) => void>;
@@ -80,11 +80,11 @@ export function Reference(
           const refs = references(this.shadowRoot!);
 
           if (refs) {
-            for (const key in component.observedReferences) {
+            for (const key in prototype.observedReferences) {
               const node = refs.get(key);
 
               if (node) {
-                for (const type of component.observedReferences[key]) {
+                for (const type of prototype.observedReferences[key]) {
                   node.addEventListener(type, listeners[key] ||= (event) => {
                     this.referenceChangedCallback?.(key, node, event);
                   }, {
