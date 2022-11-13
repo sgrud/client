@@ -4,9 +4,9 @@
   "version": "0.0.0",
   "main": "./index.json",
   "peerDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.27.1",
-    "@typescript-eslint/parser": "^5.27.1",
-    "eslint": "^8.17.0",
-    "eslint-plugin-tsdoc": "^0.2.16"
+    "@typescript-eslint/eslint-plugin": "^5.42.1",
+    "@typescript-eslint/parser": "^5.42.1",
+    "eslint": "^8.27.0",
+    "eslint-plugin-tsdoc": "^0.2.17"
   }
 }

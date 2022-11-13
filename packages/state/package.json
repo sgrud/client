@@ -19,9 +19,9 @@
     ]
   },
   "dependencies": {
-    "@babel/runtime": "^7.18.3",
+    "@babel/runtime": "^7.20.1",
     "@sgrud/core": "latest",
-    "tslib": "^2.4.0"
+    "tslib": "^2.4.1"
   },
   "sgrudDependencies": {
     "@sgrud/core": "latest"
