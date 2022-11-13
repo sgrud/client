@@ -84,19 +84,18 @@ export async function kickstart({
     __
   );
 
-  const module = require(resolve(__dirname, 'package.json'));
-  prefix = resolve(prefix);
+  const packageJson = require(resolve(__dirname, 'package.json'));
 
   await simpleGit().clone(
-    module.repository.url,
-    prefix
+    packageJson.repository.url.replace(/\/client$/, '/skeletons'),
+    prefix = resolve(prefix)
   );
 
   await simpleGit(prefix).raw([
     'filter-branch',
     '--subdirectory-filter',
-    join('skeletons', library)
+    library
   ]);
 
-  removeSync(resolve(prefix, '.git'));
+  removeSync(join(prefix, '.git'));
 }
