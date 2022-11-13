@@ -1,7 +1,7 @@
 {
   "name": "@sgrud/shell/jsx-runtime",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.15",
   "source": "./index.d.ts",
   "types": "./index.d.ts",
   "main": "../../../../dist/shell/jsx-runtime/index.js",
