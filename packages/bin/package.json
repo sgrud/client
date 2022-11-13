@@ -9,7 +9,7 @@
   },
   "sgrud": {
     "resources": [
-      "./res/eslint-config",
+      "./res",
       "./README.md"
     ]
   },

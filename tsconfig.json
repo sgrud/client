@@ -52,7 +52,6 @@
     "treatWarningsAsErrors": true,
 
     "compilerOptions": {
-      "noUnusedLocals": false,
       "noUnusedParameters": false
     },
 
@@ -63,6 +62,11 @@
       "./packages/data/index.ts",
       "./packages/shell/index.ts",
       "./packages/state/index.ts"
+    ],
+
+    "plugin": [
+      "typedoc-plugin-mdn-links",
+      "@sgrud/typedoc-plugin"
     ],
 
     "sort": [

@@ -69,30 +69,6 @@
     "typedoc": "^0.23.20",
     "typedoc-plugin-mdn-links": "^2.0.0"
   },
-  "jest": {
-    "preset": "ts-jest",
-    "collectCoverage": true,
-    "forceExit": true,
-    "maxWorkers": 1,
-    "testEnvironment": "jest-environment-jsdom",
-    "coverageReporters": [
-      "text"
-    ],
-    "globals": {
-      "ts-jest": {
-        "tsconfig": "<rootDir>/unittests/tsconfig.json"
-      }
-    },
-    "moduleNameMapper": {
-      "@sgrud/(.*)": "<rootDir>/dist/$1"
-    },
-    "roots": [
-      "<rootDir>/unittests"
-    ],
-    "testEnvironmentOptions": {
-      "url": "http://127.0.0.1:58080"
-    }
-  },
   "eslintConfig": {
     "extends": "@sgrud/eslint-config",
     "parserOptions": {
@@ -105,11 +81,31 @@
     }
   },
   "eslintIgnore": [
-    "coverage",
-    "dist",
-    "docs",
-    "jest.*",
-    "rollup.*",
-    "webpack.*"
-  ]
+    "/coverage",
+    "/dist",
+    "/docs"
+  ],
+  "jest": {
+    "forceExit": true,
+    "maxWorkers": 1,
+    "preset": "ts-jest",
+    "testEnvironment": "jest-environment-jsdom",
+    "moduleNameMapper": {
+      "@sgrud/(.*)": "<rootDir>/dist/$1"
+    },
+    "roots": [
+      "<rootDir>/unittests"
+    ],
+    "testEnvironmentOptions": {
+      "url": "http://127.0.0.1:58080"
+    },
+    "transform": {
+      "^.+\\.tsx?$": [
+        "ts-jest",
+        {
+          "tsconfig": "<rootDir>/unittests/tsconfig.json"
+        }
+      ]
+    }
+  }
 }
