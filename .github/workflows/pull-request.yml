@@ -10,20 +10,14 @@ jobs:
   unittests:
     name: Unittests
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version:
-          - 12.x
-          - 14.x
-          - 16.x
     steps:
       - name: Install node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: ${{matrix.node-version}}
+          node-version: 16.x
 
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: ./source
 

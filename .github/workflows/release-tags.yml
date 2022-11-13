@@ -21,10 +21,12 @@ jobs:
       versions: ${{steps.select-versions.outputs.versions}}
     steps:
       - name: Install node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
 
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: ./source
 
@@ -55,7 +57,7 @@ jobs:
           tag_name: ${{github.ref}}
 
       - name: Cache release
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           key: ${{github.sha}}
           path: ./source/dist
@@ -88,12 +90,12 @@ jobs:
         version: ${{fromJson(needs.prepare.outputs.versions)}}
     steps:
       - name: Install node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           registry-url: https://registry.npmjs.org
 
       - name: Restore cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           key: ${{github.sha}}
           path: ./source/dist
