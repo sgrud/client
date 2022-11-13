@@ -1,5 +1,5 @@
 import { assign, Linker, Mutable, Singleton, Target, TypeOf } from '@sgrud/core';
-import { BehaviorSubject, finalize, observable, Observable, of, Subscribable, throwError } from 'rxjs';
+import { BehaviorSubject, defer, observable, Observable, of, onErrorResumeNext, Subscribable, throwError, throwIfEmpty } from 'rxjs';
 import { createElement, render } from '../component/runtime';
 import { Route } from './route';
 import { RouterTask } from './task';
@@ -366,7 +366,7 @@ export class Router extends Set<Route> implements Router.Task {
     state: Router.State,
     replace: boolean = false
   ): Observable<Router.State> {
-    return of(state).pipe(finalize(() => {
+    return defer(() => {
       let segment = this.spool(state.segment, false);
       let template = [] as JSX.Element;
 
@@ -384,15 +384,17 @@ export class Router extends Set<Route> implements Router.Task {
         }
       } while (segment = segment.parent!);
 
+      render(this.outlet, template);
+
       if (replace) {
         history.replaceState(state, '', this.rebase(state.path));
       } else {
         history.pushState(state, '', this.rebase(state.path));
       }
 
-      render(this.outlet, template);
       this.changes.next(state);
-    }));
+      return of(state);
+    });
   }
 
   /**
@@ -574,22 +576,39 @@ export class Router extends Set<Route> implements Router.Task {
     search?: string,
     replace: boolean = false
   ): Observable<Router.State> {
+    const prev = this.changes.value;
+    const task = (next: Router.State) => this.handle(next, replace);
+    const tasks = new Linker<typeof RouterTask>().getAll(RouterTask);
+
     if (TypeOf.string(target)) {
       const url = new URL(target, location.origin);
-      const { hash, pathname, search: params } = url;
+      const { hash, pathname: path, search: params } = url;
+      const match = this.match(this.rebase(path + hash, false));
 
-      const match = this.match(this.rebase(pathname + hash, false));
-      if (!match) return throwError(() => new URIError(pathname + hash));
+      if (!match) {
+        const error = () => new URIError(path + hash);
+        const handle = () => throwError(error);
+        const next = {
+          path: path + hash,
+          search: params,
+          segment: {
+            params: { },
+            route: {
+              path: path + hash
+            }
+          }
+        };
+
+        return onErrorResumeNext(tasks.map((handler) => {
+          return handler.handle(prev, next, { handle });
+        })).pipe(throwIfEmpty(error));
+      }
 
       target = match;
       search ??= params;
     } else {
       target = this.spool(target);
     }
-
-    const prev = this.changes.value;
-    const task = (next: Router.State) => this.handle(next, replace);
-    const tasks = new Linker<typeof RouterTask>().getAll(RouterTask);
 
     return (function handle(next: Router.State): Observable<Router.State> {
       return tasks.shift()?.handle(prev, next, { handle }) || task(next);
