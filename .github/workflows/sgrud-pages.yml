@@ -29,9 +29,9 @@ jobs:
       - name: Build source
         working-directory: ./source
         run: |
-          npm install --ignore-scripts
-          npx typedoc --out docs/client
-          git -C docs --git-dir ../../target/.git add -A client
+          npm install
+          npx typedoc --out ./client
+          git --git-dir ../../target/.git add -A ./client
 
       - name: Push target
         working-directory: ./target
