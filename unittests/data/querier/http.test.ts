@@ -6,13 +6,13 @@ import { catchError, of } from 'rxjs';
 
 describe('@sgrud/data/querier/http', () => {
 
-  let server = null! as Server;
+  let server: Server;
   afterAll(() => server.close());
   beforeAll(() => server = express()
     .use('/api/sgrud/v1/insmod', (_, r) => r.send(depmod))
     .use('/exception', (_, r) => r.send(exception))
     .use('/', (_, r) => r.send(response))
-    .listen(58080));
+    .listen(location.port));
 
   const open = jest.spyOn(XMLHttpRequest.prototype, 'open');
   const send = jest.spyOn(XMLHttpRequest.prototype, 'send');
@@ -71,13 +71,14 @@ describe('@sgrud/data/querier/http', () => {
 
   describe('statically committing an operation through the HttpQuerier', () => {
     const operation = 'query test';
+    const variables = { query: 'test' };
     const request = JSON.stringify({
       query: operation,
-      variables: { }
+      variables
     });
 
     it('commits the operation through the HttpQuerier', (done) => {
-      const subscription = Class.commit(operation).subscribe(() => {
+      const subscription = Class.commit(operation, variables).subscribe(() => {
         expect(open).toHaveBeenCalledWith('POST', '/api', true);
         expect(send).toHaveBeenCalledWith(request);
       });
@@ -89,9 +90,10 @@ describe('@sgrud/data/querier/http', () => {
   describe('re-targeting the HttpQuerier', () => {
     const linker = new Linker<Target<HttpQuerier>>();
     const operation = 'mutation test';
+    const variables = { mutation: 'test' };
     const request = JSON.stringify({
       query: operation,
-      variables: { }
+      variables
     });
 
     const update = () => linker.set(
@@ -99,14 +101,14 @@ describe('@sgrud/data/querier/http', () => {
     );
 
     it('overrides the previously targeted HttpQuerier', () => {
-      update();
+      expect(update()).toBe(linker);
 
       const querier = linker.getAll(HttpQuerier);
       expect(querier).toContain(linker.get(HttpQuerier));
     });
 
     it('overrides the previously targeted HttpQuerier', (done) => {
-      const subscription = Class.commit(operation).subscribe(() => {
+      const subscription = Class.commit(operation, variables).subscribe(() => {
         expect(open).toHaveBeenCalledWith('POST', '/path', true);
         expect(send).toHaveBeenCalledWith(request);
       });
@@ -119,8 +121,7 @@ describe('@sgrud/data/querier/http', () => {
     const linker = new Linker<Target<HttpQuerier>>();
     const operation = 'query exception';
     const request = JSON.stringify({
-      query: operation,
-      variables: { }
+      query: operation
     });
 
     const update = () => linker.set(
@@ -128,7 +129,7 @@ describe('@sgrud/data/querier/http', () => {
     );
 
     it('emits the error to the observer', (done) => {
-      update();
+      expect(update()).toBe(linker);
 
       const subscription = Class.commit(operation).pipe(
         catchError((error) => of(error))

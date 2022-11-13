@@ -1,5 +1,5 @@
 import { Model, Property } from '@sgrud/data';
-import { auditTime, from, take } from 'rxjs';
+import { auditTime, first, from } from 'rxjs';
 
 describe('@sgrud/data/relation/property', () => {
 
@@ -8,7 +8,7 @@ describe('@sgrud/data/relation/property', () => {
     @Property(() => Date) public date?: Date;
     @Property(() => Number) public num?: number;
     @Property(() => String) public str?: string;
-    @Property(() => null!) public undefined?: null;
+    @Property(() => null!) public unset?: null;
     @Property(() => null!, true) public unused?: null;
     protected readonly [Symbol.toStringTag]: string = 'Class';
   }
@@ -18,7 +18,7 @@ describe('@sgrud/data/relation/property', () => {
     { date: new Date() },
     { num: 0 },
     { str: 'string' },
-    { undefined: undefined },
+    { unset: undefined },
     { unused: undefined }
   ];
 
@@ -48,7 +48,7 @@ describe('@sgrud/data/relation/property', () => {
     it('emits the changed model containing properties', (done) => {
       const subscription = from(model).pipe(
         auditTime(250),
-        take(1)
+        first()
       ).subscribe(validate);
 
       subscription.add(done);
@@ -72,7 +72,7 @@ describe('@sgrud/data/relation/property', () => {
     it('emits the changed model containing properties', (done) => {
       const subscription = from(model).pipe(
         auditTime(250),
-        take(1)
+        first()
       ).subscribe(validate);
 
       subscription.add(done);
@@ -101,7 +101,7 @@ describe('@sgrud/data/relation/property', () => {
     it('emits the changed model containing properties', (done) => {
       const subscription = from(model).pipe(
         auditTime(250),
-        take(1)
+        first()
       ).subscribe(validate);
 
       subscription.add(done);

@@ -4,11 +4,11 @@ import { Server } from 'http';
 
 describe('@sgrud/core/http/client', () => {
 
-  let server = null! as Server;
+  let server: Server;
   afterAll(() => server.close());
   beforeAll(() => server = express()
     .use('/', (_, r) => r.send())
-    .listen(58080));
+    .listen(location.port));
 
   const open = jest.spyOn(XMLHttpRequest.prototype, 'open');
   const send = jest.spyOn(XMLHttpRequest.prototype, 'send');

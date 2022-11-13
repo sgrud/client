@@ -9,35 +9,35 @@ import { jsx } from '@sgrud/shell/jsx-runtime';
 
 declare global {
   interface HTMLElementTagNameMap {
-    'class-one': HTMLElement;
-    'class-two': HTMLElement;
+    'element-one': HTMLElement;
+    'element-two': HTMLElement;
   }
 }
 
 describe('@sgrud/shell/component/reference', () => {
 
-  class TestClass extends HTMLElement implements Component {
+  class Element extends HTMLElement implements Component {
     @Reference('unused', ['change']) public unused?: HTMLDivElement;
   }
 
-  @Component('class-one')
-  class ClassOne extends HTMLElement implements Component {
+  @Component('element-one')
+  class ElementOne extends HTMLElement implements Component {
     @Reference('key') public reference?: HTMLDivElement;
     @Reference('unused') public unused?: HTMLDivElement;
     public readonly template: JSX.Element = jsx('div', { key: 'key' });
   }
 
-  @Component('class-two')
-  class ClassTwo extends HTMLElement implements Component {
+  @Component('element-two')
+  class ElementTwo extends HTMLElement implements Component {
     @Reference('key', ['change']) public reference?: HTMLDivElement;
     @Reference('unused', ['change']) public unused?: HTMLDivElement;
     public readonly template: JSX.Element = jsx('div', { key: 'key' });
   }
 
   describe('binding a property on a component without template', () => {
-    customElements.define('test-class', TestClass);
-    document.body.innerHTML = '<test-class></test-class>';
-    const classOne = document.body.firstChild as TestClass;
+    customElements.define('element-tag', Element);
+    document.body.innerHTML = '<element-tag></element-tag>';
+    const classOne = document.querySelector('element-tag') as Element;
 
     it('returns undefined as no template exists', () => {
       expect(classOne.unused).toBeUndefined();
@@ -45,8 +45,8 @@ describe('@sgrud/shell/component/reference', () => {
   });
 
   describe('binding a property to a template reference', () => {
-    document.body.innerHTML = '<class-one></class-one>';
-    const classOne = document.body.firstChild as ClassOne;
+    document.body.innerHTML = '<element-one></element-one>';
+    const classOne = document.querySelector('element-one') as ElementOne;
 
     it('mirrors the referenced template element to the bound property', () => {
       expect(classOne.reference).toBeInstanceOf(HTMLDivElement);
@@ -55,8 +55,8 @@ describe('@sgrud/shell/component/reference', () => {
   });
 
   describe('observing events of a bound template reference', () => {
-    document.body.innerHTML = '<class-two></class-two>';
-    const classTwo = document.body.firstChild as ClassTwo;
+    document.body.innerHTML = '<element-two></element-two>';
+    const classTwo = document.querySelector('element-two') as ElementTwo;
     const spy = jest.spyOn(classTwo as Component, 'referenceChangedCallback');
 
     const event = new Event('change');

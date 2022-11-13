@@ -1,28 +1,28 @@
-import { ConduitHandler, ConduitValue, Subscribe } from '@sgrud/bus';
+import { BusHandler, BusValue, Subscribe } from '@sgrud/bus';
 import { Observable, of } from 'rxjs';
 
-describe('@sgrud/bus/pubsub/subscribe', () => {
+describe('@sgrud/bus/handler/subscribe', () => {
 
   class ClassOne {
     @Subscribe('sgrud.test.bus.one')
-    public readonly conduit!: Observable<ConduitValue<number>>;
+    public readonly bus!: Observable<BusValue<number>>;
   }
 
   class ClassTwo {
     @Subscribe('sgrud.test.bus', 'handle')
-    public readonly conduit!: Observable<ConduitValue<number>>;
+    public readonly bus!: Observable<BusValue<number>>;
     public constructor(public readonly handle: string) { }
   }
 
   describe('applying the decorator', () => {
     const classOne = new ClassOne();
     const write = () => Object.assign(classOne, {
-      conduit: new Observable<ConduitValue<number>>()
+      bus: new Observable<BusValue<number>>()
     });
 
-    it('freezes the conduit on the prototype', () => {
-      expect(classOne.conduit).toBeInstanceOf(Observable);
-      expect(classOne.conduit).toBe(new ClassOne().conduit);
+    it('freezes the bus on the prototype', () => {
+      expect(classOne.bus).toBeInstanceOf(Observable);
+      expect(classOne.bus).toBe(new ClassOne().bus);
       expect(write).toThrowError(TypeError);
     });
   });
@@ -30,22 +30,22 @@ describe('@sgrud/bus/pubsub/subscribe', () => {
   describe('applying the scoped decorator', () => {
     const classTwo = new ClassTwo('two');
     const write = () => Object.assign(classTwo, {
-      conduit: new Observable<ConduitValue<number>>()
+      bus: new Observable<BusValue<number>>()
     });
 
-    it('freezes the conduit on the instance', () => {
-      expect(classTwo.conduit).toBeInstanceOf(Observable);
-      expect(classTwo.conduit).not.toBe(new ClassTwo('two').conduit);
+    it('freezes the bus on the instance', () => {
+      expect(classTwo.bus).toBeInstanceOf(Observable);
+      expect(classTwo.bus).not.toBe(new ClassTwo('two').bus);
       expect(write).toThrowError(TypeError);
     });
   });
 
   describe('subscribing to the decorated prototype property', () => {
     const classOne = new ClassOne();
-    const handler = new ConduitHandler();
+    const handler = new BusHandler();
 
     it('observes values emitted by the supplied handle', (done) => {
-      const subscription = classOne.conduit.subscribe(({
+      const subscription = classOne.bus.subscribe(({
         handle,
         value
       }) => {
@@ -61,10 +61,10 @@ describe('@sgrud/bus/pubsub/subscribe', () => {
 
   describe('subscribing to the decorated instance property', () => {
     const classTwo = new ClassTwo('two');
-    const handler = new ConduitHandler();
+    const handler = new BusHandler();
 
     it('observes values emitted by the scoped handle', (done) => {
-      const subscription = classTwo.conduit.subscribe(({
+      const subscription = classTwo.bus.subscribe(({
         handle,
         value
       }) => {

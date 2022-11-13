@@ -1,18 +1,18 @@
-import { ConduitHandler } from '@sgrud/bus';
+import { BusHandler } from '@sgrud/bus';
 import { BehaviorSubject, catchError, of, Subject, throwError, timeout } from 'rxjs';
 
-describe('@sgrud/bus/conduit/handler', () => {
+describe('@sgrud/bus/handler/handler', () => {
 
   describe('instantiating a handler', () => {
-    const handler = new ConduitHandler();
+    const handler = new BusHandler();
 
     it('returns the singleton handler', () => {
-      expect(handler).toBe(new ConduitHandler());
+      expect(handler).toBe(new BusHandler());
     });
   });
 
-  describe('subscribing to a Subject conduit', () => {
-    const handler = new ConduitHandler();
+  describe('subscribing to a Subject bus', () => {
+    const handler = new BusHandler();
     const subject = new Subject<string>();
 
     it('observes values emitted within its parent handle', (done) => {
@@ -35,8 +35,8 @@ describe('@sgrud/bus/conduit/handler', () => {
     });
   });
 
-  describe('subscribing to a BehaviorSubject conduit', () => {
-    const handler = new ConduitHandler();
+  describe('subscribing to a BehaviorSubject bus', () => {
+    const handler = new BusHandler();
     const behaviorSubject = new BehaviorSubject<string>('default');
 
     it('observes values emitted within its parent handle', (done) => {
@@ -68,8 +68,8 @@ describe('@sgrud/bus/conduit/handler', () => {
     });
   });
 
-  describe('subscribing to an empty conduit', () => {
-    const handler = new ConduitHandler();
+  describe('subscribing to an empty bus', () => {
+    const handler = new BusHandler();
     const subject = new Subject<string>();
 
     it('does not emit any values', (done) => {
@@ -98,8 +98,8 @@ describe('@sgrud/bus/conduit/handler', () => {
     });
   });
 
-  describe('pushing an error through a conduit', () => {
-    const handler = new ConduitHandler();
+  describe('pushing an error through a bus', () => {
+    const handler = new BusHandler();
     const exception = throwError(() => null);
 
     it('emits the error to the observer', (done) => {

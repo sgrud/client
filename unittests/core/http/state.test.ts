@@ -6,11 +6,11 @@ import { filter, from } from 'rxjs';
 
 describe('@sgrud/core/http/state', () => {
 
-  let server = null! as Server;
+  let server: Server;
   afterAll(() => server.close());
   beforeAll(() => server = express()
     .use('/', (_, r) => r.send(randomBytes(1024)))
-    .listen(58080));
+    .listen(location.port));
 
   describe('instantiating a linker', () => {
     const httpState = new HttpState();

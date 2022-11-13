@@ -2,27 +2,27 @@ import { customElements } from '@sgrud/shell';
 
 describe('@sgrud/shell/component/registry', () => {
 
-  class ClassOne extends HTMLElement { }
-  class ClassTwo extends HTMLElement { }
+  class ElementOne extends HTMLElement { }
+  class ElementTwo extends HTMLElement { }
 
-  customElements.define('class-one', ClassOne);
-  globalThis.customElements.define('class-two', ClassTwo);
+  customElements.define('element-one', ElementOne);
+  globalThis.customElements.define('element-two', ElementTwo);
 
   describe('registering a custom component with the proxied registry', () => {
     it('registers the custom component with the native registry', () => {
-      expect(customElements.get('class-one')).toBe(ClassOne);
+      expect(customElements.get('element-one')).toBe(ElementOne);
     });
   });
 
   describe('getting the name of a registered custom component', () => {
     it('returns the name of the custom component', () => {
-      expect(customElements.getName(ClassOne)).toBe('class-one');
+      expect(customElements.getName(ElementOne)).toBe('element-one');
     });
   });
 
   describe('getting the name of a natively registered custom component', () => {
     it('returns the name of the custom component', () => {
-      expect(customElements.getName(ClassTwo)).toBe('class-two');
+      expect(customElements.getName(ElementTwo)).toBe('element-two');
     });
   });
 

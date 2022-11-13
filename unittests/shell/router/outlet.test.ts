@@ -12,7 +12,7 @@ describe('@sgrud/shell/router/outlet', () => {
   document.body.innerHTML = '<slot is="router-outlet">';
 
   describe('inserting a router outlet into the dom', () => {
-    const routerOutlet = document.body.firstChild as RouterOutlet;
+    const routerOutlet = document.querySelector('slot[is]') as RouterOutlet;
 
     it('renders the router outlet component', () => {
       expect(routerOutlet).toBeInstanceOf(RouterOutlet);

@@ -338,7 +338,9 @@ describe('@sgrud/shell/router/router', () => {
     const router = new Router();
 
     it('emits the next states', (done) => {
-      const subscription = from(router).pipe(skip(1)).subscribe((next) => {
+      const subscription = from(router).pipe(
+        skip(1)
+      ).subscribe((next) => {
         expect(next).toBe(router.state);
         expect(next.path).toBe('route/child');
         subscription.unsubscribe();

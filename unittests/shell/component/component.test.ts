@@ -9,32 +9,32 @@ import { jsxs } from '@sgrud/shell/jsx-runtime';
 
 declare global {
   interface HTMLElementTagNameMap {
-    'class-one': HTMLElement;
-    'class-two': HTMLElement;
-    'class-main': HTMLElement;
+    'element-one': HTMLElement;
+    'element-two': HTMLElement;
+    'main-element': HTMLElement;
   }
 }
 
 describe('@sgrud/shell/component/component', () => {
 
-  @Component('class-one')
-  class ClassOne extends HTMLElement implements Component {
+  @Component('element-one')
+  class ElementOne extends HTMLElement implements Component {
     public constructor() {
       super();
       this.attachShadow({ mode: 'open' });
     }
   }
 
-  @Component('class-two')
-  class ClassTwo extends HTMLElement implements Component {
+  @Component('element-two')
+  class ElementTwo extends HTMLElement implements Component {
     @Attribute() public attribute?: string;
     @Reference('key', ['change']) public reference?: HTMLDivElement;
     public readonly styles: string[] = [':host { color: green; }'];
     public readonly template: JSX.Element = jsxs('div', { key: 'key' });
   }
 
-  @Component('class-main', 'main')
-  class ClassMain extends HTMLElement implements Component {
+  @Component('main-element', 'main')
+  class MainElement extends HTMLElement implements Component {
     @Attribute() public attribute?: string;
     @Reference('key', ['change']) public reference?: HTMLDivElement;
     public readonly template: JSX.Element = jsxs('div', { key: 'key' });
@@ -56,18 +56,18 @@ describe('@sgrud/shell/component/component', () => {
   }
 
   describe('declaring a component without styles and template', () => {
-    document.body.innerHTML = '<class-one></class-one>';
-    const classOne = document.body.firstChild as ClassOne;
+    document.body.innerHTML = '<element-one></element-one>';
+    const classOne = document.querySelector('element-one') as ElementOne;
 
     it('renders a slot element', () => {
-      expect(classOne).toBeInstanceOf(ClassOne);
+      expect(classOne).toBeInstanceOf(ElementOne);
       expect(classOne.shadowRoot?.innerHTML).toBe('<slot></slot>');
     });
   });
 
   describe('declaring a component with styles and template', () => {
-    document.body.innerHTML = '<class-two></class-two>';
-    const classTwo = document.body.firstChild as ClassTwo;
+    document.body.innerHTML = '<element-two></element-two>';
+    const classTwo = document.querySelector('element-two') as ElementTwo;
     const doc = document.implementation.createHTMLDocument();
 
     doc.adoptNode(classTwo);
@@ -75,7 +75,7 @@ describe('@sgrud/shell/component/component', () => {
     classTwo.reference!.dispatchEvent(new Event('change'));
 
     it('renders the component styles and template', () => {
-      expect(classTwo).toBeInstanceOf(ClassTwo);
+      expect(classTwo).toBeInstanceOf(ElementTwo);
       expect(classTwo.attribute).toBe(classTwo.getAttribute('attribute'));
       expect(classTwo.shadowRoot?.innerHTML).toContain(classTwo.styles[0]);
       expect(classTwo.shadowRoot?.innerHTML).toContain('<div></div>');
@@ -83,8 +83,8 @@ describe('@sgrud/shell/component/component', () => {
   });
 
   describe('declaring a component extending an element', () => {
-    document.body.innerHTML = '<main is="class-main"></main>';
-    const classMain = document.body.firstChild as ClassMain;
+    document.body.innerHTML = '<main is="main-element"></main>';
+    const classMain = document.querySelector('main[is]') as MainElement;
     const doc = document.implementation.createHTMLDocument();
 
     doc.adoptNode(classMain);
@@ -92,10 +92,10 @@ describe('@sgrud/shell/component/component', () => {
     classMain.reference!.dispatchEvent(new Event('change'));
 
     it('renders the extended element as the component', () => {
-      expect(classMain).toBeInstanceOf(ClassMain);
+      expect(classMain).toBeInstanceOf(MainElement);
       expect(classMain.attribute).toBe(classMain.getAttribute('attribute'));
       expect(classMain.outerHTML).toContain('attribute="value"');
-      expect(classMain.outerHTML).toContain('is="class-main"');
+      expect(classMain.outerHTML).toContain('is="main-element"');
     });
   });
 

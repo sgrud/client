@@ -1,5 +1,5 @@
 import { Model } from '@sgrud/data';
-import { auditTime, catchError, from, identity, NEVER, take } from 'rxjs';
+import { auditTime, catchError, first, from, identity, NEVER } from 'rxjs';
 
 describe('@sgrud/data/model/model', () => {
 
@@ -202,7 +202,7 @@ describe('@sgrud/data/model/model', () => {
     it('emits the changed model', (done) => {
       const subscription = from(model).pipe(
         auditTime(250),
-        take(1)
+        first()
       ).subscribe(validate);
 
       subscription.add(done);
@@ -225,7 +225,7 @@ describe('@sgrud/data/model/model', () => {
     it('emits the changed model', (done) => {
       const subscription = from(model).pipe(
         auditTime(250),
-        take(1)
+        first()
       ).subscribe(validate);
 
       subscription.add(done);
@@ -253,7 +253,7 @@ describe('@sgrud/data/model/model', () => {
     it('emits the changed model', (done) => {
       const subscription = from(model).pipe(
         auditTime(250),
-        take(1)
+        first()
       ).subscribe(validate);
 
       subscription.add(done);
@@ -276,7 +276,7 @@ describe('@sgrud/data/model/model', () => {
     it('emits the changed model', (done) => {
       const subscription = from(model).pipe(
         auditTime(250),
-        take(1)
+        first()
       ).subscribe(validate);
 
       subscription.add(done);

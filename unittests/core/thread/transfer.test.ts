@@ -7,12 +7,25 @@
 describe('@sgrud/core/thread/transfer', () => {
 
   const { Spawn } = require('@sgrud/core');
-  const { from, Observable, switchMap, take } = require('rxjs');
+  const { first, from, Observable, switchMap } = require('rxjs');
   const { Worker } = require('worker_threads');
 
   class Class {
-    @Spawn(Worker.bind(Worker, '(' + (() => {
-      require('./dist/core').Thread()(class {
+    @Spawn(new Worker('(' + (() => {
+      const Module = require('module');
+      const { _resolveFilename } = Module;
+
+      // @ts-expect-error implicit any
+      // eslint-disable-next-line @typescript-eslint/typedef
+      Module._resolveFilename = function(request, parent) {
+        if (request.startsWith('@sgrud/')) {
+          return require.resolve(request.replace('@sgrud', './dist'));
+        }
+
+        return _resolveFilename(request, parent);
+      };
+
+      require('@sgrud/core').Thread()(class {
         /* eslint-disable */
         observable = require('rxjs').of(1, 2, 3);
         subject = new (require('rxjs').BehaviorSubject)('behaviorSubject');
@@ -20,9 +33,7 @@ describe('@sgrud/core/thread/transfer', () => {
         /* eslint-enable */
       });
     }) + ')()', { eval: true }))
-    public static readonly worker: import('@sgrud/core').Thread<{
-      observable: import('rxjs').Observable<number>;
-    }>;
+    public static readonly worker: import('@sgrud/core').Thread<unknown>;
   }
 
   describe('getting an Observable', () => {
@@ -62,9 +73,9 @@ describe('@sgrud/core/thread/transfer', () => {
       from(Class.worker).pipe(
         switchMap((worker: any) => Promise.resolve(worker.subject)),
         switchMap((behaviorSubject: any) => behaviorSubject),
-        take(1)
+        first()
       ).subscribe({
-        next: (next: number) => {
+        next: (next: string) => {
           expect(next).toBe('behaviorSubject');
           done();
         }

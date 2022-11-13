@@ -1,6 +1,6 @@
 import { assign } from '@sgrud/core';
 
-describe('@sgrud/core/typing/assign', () => {
+describe('@sgrud/core/utility/assign', () => {
 
   const values = Object.freeze([
     Object.freeze({ 0: Object.freeze({ 1: Object.freeze({ 0: 1 }) }), 1: 1 }),

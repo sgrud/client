@@ -13,7 +13,7 @@ describe('@sgrud/shell/router/link', () => {
   document.body.innerHTML = '<a href="/test" is="router-link">/base/test</a>';
 
   describe('inserting a router link into the dom', () => {
-    const routerLink = document.body.firstChild as RouterLink;
+    const routerLink = document.querySelector('a[is]') as RouterLink;
 
     it('renders the router link component', () => {
       expect(routerLink).toBeInstanceOf(RouterLink);
@@ -22,7 +22,7 @@ describe('@sgrud/shell/router/link', () => {
   });
 
   describe('dispatching a click event on a router link', () => {
-    const routerLink = document.body.firstChild as RouterLink;
+    const routerLink = document.querySelector('a[is]') as RouterLink;
     const spy = jest.spyOn(Router.prototype, 'navigate');
 
     it('invokes the navigate function on the router', () => {
@@ -32,7 +32,7 @@ describe('@sgrud/shell/router/link', () => {
   });
 
   describe('changing the href attribute on a router link', () => {
-    const routerLink = document.body.firstChild as RouterLink;
+    const routerLink = document.querySelector('a[is]') as RouterLink;
 
     it('rebases the new href attribute against the router base href', () => {
       routerLink.href = '/done';

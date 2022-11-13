@@ -1,12 +1,12 @@
 import { HasOne, Model, Property } from '@sgrud/data';
-import { auditTime, from, take } from 'rxjs';
+import { auditTime, first, from } from 'rxjs';
 
 describe('@sgrud/data/relation/has-one', () => {
 
   class Owner extends Model<Owner> {
     @HasOne(() => Owned) public owned?: Owned;
     @Property(() => String) public property?: string;
-    @HasOne(() => null!) public undefined?: null;
+    @HasOne(() => null!) public unset?: null;
     @HasOne(() => null!, true) public unused?: null;
     protected readonly [Symbol.toStringTag]: string = 'Owner';
   }
@@ -19,7 +19,7 @@ describe('@sgrud/data/relation/has-one', () => {
   const values = [
     { owned: { property: 'owned' } },
     { property: 'owner' },
-    { undefined: undefined },
+    { unset: undefined },
     { unused: undefined }
   ];
 
@@ -45,7 +45,7 @@ describe('@sgrud/data/relation/has-one', () => {
     it('emits the changed model which has one model', (done) => {
       const subscription = from(owner).pipe(
         auditTime(250),
-        take(1)
+        first()
       ).subscribe(validate);
 
       subscription.add(done);
@@ -67,7 +67,7 @@ describe('@sgrud/data/relation/has-one', () => {
     it('emits the changed model which has one model', (done) => {
       const subscription = from(owner).pipe(
         auditTime(250),
-        take(1)
+        first()
       ).subscribe(validate);
 
       subscription.add(done);
@@ -94,7 +94,7 @@ describe('@sgrud/data/relation/has-one', () => {
     it('emits the changed model which has one model', (done) => {
       const subscription = from(owner).pipe(
         auditTime(250),
-        take(1)
+        first()
       ).subscribe(validate);
 
       subscription.add(done);

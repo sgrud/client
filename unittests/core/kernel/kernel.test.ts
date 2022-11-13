@@ -4,10 +4,8 @@ import { Server } from 'http';
 import { catchError, EMPTY, from, of, timeout } from 'rxjs';
 
 declare global {
-  namespace globalThis {
-    // eslint-disable-next-line no-var
-    var sgrud: boolean | undefined;
-  }
+  // eslint-disable-next-line no-var
+  var sgrud: unknown;
 }
 
 describe('@sgrud/core/kernel/kernel', () => {
@@ -17,14 +15,14 @@ describe('@sgrud/core/kernel/kernel', () => {
   jest.mock('usrmod.esmod', () => usrmod.esmod, { virtual: true });
   jest.mock('usrmod.unpkg', () => usrmod.esmod, { virtual: true });
 
-  let server = null! as Server;
+  let server: Server;
   afterAll(() => server.close());
   beforeAll(() => server = express()
     .use('/api/sgrud/v1/insmod', (_, r) => r.send(depmod))
     .use('/node_modules/dirmod/package.json', (_, r) => r.send(dirmod))
     .use('/node_modules/submod/package.json', (_, r) => r.send(submod))
     .use('/', (_, r) => r.send())
-    .listen(58080));
+    .listen(location.port));
 
   const append = jest.spyOn(document.head, 'appendChild');
   const select = jest.spyOn(document, 'querySelectorAll');
@@ -287,7 +285,7 @@ describe('@sgrud/core/kernel/kernel', () => {
     ];
 
     it('calls insmod on the legacy modules', (done) => {
-      globalThis.sgrud = true;
+      globalThis.sgrud = true as any;
 
       const subscription = kernel.insmod(module).subscribe((next) => {
         expect(next).toMatchObject(module);
@@ -303,7 +301,7 @@ describe('@sgrud/core/kernel/kernel', () => {
 
       subscription.add(() => {
         clearInterval(interval);
-        delete globalThis.sgrud;
+        globalThis.sgrud = null!;
         done();
       });
     });
@@ -314,7 +312,7 @@ describe('@sgrud/core/kernel/kernel', () => {
     const module = usrmod[key as keyof typeof usrmod];
 
     it('inserts the module', (done) => {
-      globalThis.sgrud = key === 'unpkg';
+      globalThis.sgrud = (key === 'unpkg') as any;
 
       const subscription = kernel.insmod(
         module,
@@ -330,7 +328,7 @@ describe('@sgrud/core/kernel/kernel', () => {
 
       subscription.add(() => {
         clearInterval(interval);
-        delete globalThis.sgrud;
+        globalThis.sgrud = null!;
         done();
       });
     });
@@ -402,7 +400,7 @@ describe('@sgrud/core/kernel/kernel', () => {
     ];
 
     it('emits the error to the observer', (done) => {
-      globalThis.sgrud = true;
+      globalThis.sgrud = true as any;
 
       const subscription = kernel.insmod(module).pipe(
         catchError((error) => of(error))
@@ -420,7 +418,7 @@ describe('@sgrud/core/kernel/kernel', () => {
 
       subscription.add(() => {
         clearInterval(interval);
-        delete globalThis.sgrud;
+        globalThis.sgrud = null!;
         done();
       });
     });

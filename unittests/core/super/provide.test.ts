@@ -4,7 +4,8 @@ describe('@sgrud/core/super/provide', () => {
 
   @Provide<typeof Class>()
   abstract class Class {
-    public static readonly [provide]: 'sgrud.test.Class' = 'sgrud.test.Class';
+    public static readonly [provide]:
+    'sgrud.test.Class' = 'sgrud.test.Class' as const;
   }
 
   describe('applying the decorator and enforced symbol', () => {

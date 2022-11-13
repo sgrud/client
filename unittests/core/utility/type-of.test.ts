@@ -1,24 +1,23 @@
-/* eslint-disable @typescript-eslint/unbound-method */
-
 import { TypeOf } from '@sgrud/core';
 
-describe('@sgrud/core/typing/type-of', () => {
+describe('@sgrud/core/utility/type-of', () => {
 
   const methods = [
-    TypeOf.array,
-    TypeOf.boolean,
-    TypeOf.date,
-    TypeOf.function,
-    TypeOf.global,
-    TypeOf.null,
-    TypeOf.number,
-    TypeOf.object,
-    TypeOf.process,
-    TypeOf.promise,
-    TypeOf.string,
-    TypeOf.undefined,
-    TypeOf.url,
-    TypeOf.window
+    TypeOf.array.bind(TypeOf),
+    TypeOf.boolean.bind(TypeOf),
+    TypeOf.date.bind(TypeOf),
+    TypeOf.function.bind(TypeOf),
+    TypeOf.global.bind(TypeOf),
+    TypeOf.null.bind(TypeOf),
+    TypeOf.number.bind(TypeOf),
+    TypeOf.object.bind(TypeOf),
+    TypeOf.process.bind(TypeOf),
+    TypeOf.promise.bind(TypeOf),
+    TypeOf.regex.bind(TypeOf),
+    TypeOf.string.bind(TypeOf),
+    TypeOf.undefined.bind(TypeOf),
+    TypeOf.url.bind(TypeOf),
+    TypeOf.window.bind(TypeOf)
   ];
 
   const values = [
@@ -31,10 +30,11 @@ describe('@sgrud/core/typing/type-of', () => {
     0,
     { },
     Object.create(process),
-    Promise.resolve(),
+    Object.create(Promise.resolve()),
+    /-/,
     '',
     undefined,
-    { [Symbol.toStringTag]: 'URL' },
+    new URL('url://'),
     { [Symbol.toStringTag]: 'Window' }
   ];
 

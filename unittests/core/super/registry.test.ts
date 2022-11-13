@@ -2,8 +2,11 @@ import { provide, Provider, Registration, Registry } from '@sgrud/core';
 
 describe('@sgrud/core/super/registry', () => {
 
+  new Registry();
+
   abstract class Base {
-    public static readonly [provide]: 'sgrud.test.Base' = 'sgrud.test.Base';
+    public static readonly [provide]:
+    'sgrud.test.Base' = 'sgrud.test.Base' as const;
     public constructor(
       public readonly baseParam: string = baseParam
     ) { }
