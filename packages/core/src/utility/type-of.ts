@@ -29,7 +29,7 @@ export abstract class TypeOf {
    * ```
    */
   public static array(value: unknown): value is Array<any> {
-    return test('Array', value);
+    return this.test('Array', value);
   }
 
   /**
@@ -47,7 +47,7 @@ export abstract class TypeOf {
    * ```
    */
   public static boolean(value: unknown): value is boolean {
-    return test('Boolean', value);
+    return this.test('Boolean', value);
   }
 
   /**
@@ -65,7 +65,7 @@ export abstract class TypeOf {
    * ```
    */
   public static date(value: unknown): value is Date {
-    return test('Date', value);
+    return this.test('Date', value);
   }
 
   /**
@@ -83,7 +83,7 @@ export abstract class TypeOf {
    * ```
    */
   public static function(value: unknown): value is Function {
-    return test('Function', value);
+    return this.test('Function', value);
   }
 
   /**
@@ -101,7 +101,7 @@ export abstract class TypeOf {
    * ```
    */
   public static global(value: unknown): value is typeof globalThis {
-    return test('global', value);
+    return this.test('global', value);
   }
 
   /**
@@ -119,7 +119,7 @@ export abstract class TypeOf {
    * ```
    */
   public static null(value: unknown): value is null {
-    return test('Null', value);
+    return this.test('Null', value);
   }
 
   /**
@@ -137,7 +137,7 @@ export abstract class TypeOf {
    * ```
    */
   public static number(value: unknown): value is number {
-    return test('Number', value);
+    return this.test('Number', value);
   }
 
   /**
@@ -155,7 +155,7 @@ export abstract class TypeOf {
    * ```
    */
   public static object(value: unknown): value is object {
-    return test('Object', value);
+    return this.test('Object', value);
   }
 
   /**
@@ -173,7 +173,7 @@ export abstract class TypeOf {
    * ```
    */
   public static process(value: unknown): value is NodeJS.Process {
-    return test('process', value);
+    return this.test('process', value);
   }
 
   /**
@@ -191,7 +191,25 @@ export abstract class TypeOf {
    * ```
    */
   public static promise(value: unknown): value is Promise<any> {
-    return test('Promise', value);
+    return this.test('Promise', value);
+  }
+
+  /**
+   * Type-check `value` for `RegExp`.
+   *
+   * @param value - Value to type-check.
+   * @returns Whether `value` is of type `RegExp`.
+   *
+   * @example
+   * Type-check `null` for `RegExp`:
+   * ```ts
+   * import { TypeOf } from '@sgrud/core';
+   *
+   * TypeOf.regex(null); // false
+   * ```
+   */
+  public static regex(value: unknown): value is RegExp {
+    return this.test('RegExp', value);
   }
 
   /**
@@ -209,7 +227,7 @@ export abstract class TypeOf {
    * ```
    */
   public static string(value: unknown): value is string {
-    return test('String', value);
+    return this.test('String', value);
   }
 
   /**
@@ -227,7 +245,7 @@ export abstract class TypeOf {
    * ```
    */
   public static undefined(value: unknown): value is undefined {
-    return test('Undefined', value);
+    return this.test('Undefined', value);
   }
 
   /**
@@ -245,7 +263,7 @@ export abstract class TypeOf {
    * ```
    */
   public static url(value: unknown): value is URL {
-    return test('URL', value);
+    return this.test('URL', value);
   }
 
   /**
@@ -263,7 +281,18 @@ export abstract class TypeOf {
    * ```
    */
   public static window(value: unknown): value is Window {
-    return test('Window', value);
+    return this.test('Window', value);
+  }
+
+  /**
+   * Type-check `value` for `type`.
+   *
+   * @param type - Type to check for.
+   * @param value - Value to type-check.
+   * @returns Whether `value` is `type`.
+   */
+  private static test(type: string, value: unknown): boolean {
+    return Object.prototype.toString.call(value) === `[object ${type}]`;
   }
 
   /**
@@ -275,15 +304,4 @@ export abstract class TypeOf {
     throw new TypeError();
   }
 
-}
-
-/**
- * Type-check `value` for `type`.
- *
- * @param type - Type to check.
- * @param value - Value to check.
- * @returns Whether `value` is `type`.
- */
-function test(type: string, value: unknown): boolean {
-  return Object.prototype.toString.call(value) === `[object ${type}]`;
 }
