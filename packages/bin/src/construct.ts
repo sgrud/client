@@ -112,19 +112,6 @@ export async function construct({
 } = { }): Promise<void> {
   const bundler = require.resolve('microbundle');
   const patched = readFileSync(bundler).toString().replace(
-    'if (modern) cache = false;',
-    'cache = false;'
-  ).replace(
-    'plugins: []',
-    `plugins: [
-      require('rollup-plugin-web-worker-loader')({
-        extensions: ['.js'].concat(useTypescript ? '.ts' : []),
-        external: [],
-        pattern: /worker:(.+)/,
-        sourcemap: options.sourcemap && !options.compress,
-      }),
-    ]`
-  ).replace(
     /babelHelpers: 'bundled'/g,
     `babelHelpers: 'runtime', plugins: [
       ['@babel/plugin-transform-runtime', {

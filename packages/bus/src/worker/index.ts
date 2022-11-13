@@ -1,6 +1,6 @@
-import { Thread } from '@sgrud/core';
+import { BusHandle, BusValue } from '@sgrud/bus';
+import { Singleton, Thread } from '@sgrud/core';
 import { BehaviorSubject, finalize, map, merge, Observable, shareReplay, switchMap } from 'rxjs';
-import { ConduitHandle, ConduitValue } from './handler';
 
 /**
  * The **BusWorker** is a [Worker][] process, [Spawn][]ed by the [BusHandler][]
@@ -19,13 +19,14 @@ import { ConduitHandle, ConduitValue } from './handler';
  * @see [BusHandler][]
  */
 @Thread()
-export class ConduitWorker {
+@Singleton<typeof BusWorker>()
+export class BusWorker {
 
   /**
    * Internal mapping containing all established **busses**. Updating this
    * mapping should always be accompanied by an emittance of *changes*.
    */
-  private readonly changes: BehaviorSubject<this>;
+  private readonly busses: Map<BusHandle, Observable<BusValue<any>>>;
 
   /**
    * [BehaviorSubject][] emitting every time a bus is added or deleted from the
@@ -36,7 +37,7 @@ export class ConduitWorker {
    * [BehaviorSubject]: https://rxjs.dev/api/index/class/BehaviorSubject
    * [Subscription]: https://rxjs.dev/api/index/class/Subscription
    */
-  private readonly conduits: Map<ConduitHandle, Observable<ConduitValue<any>>>;
+  private readonly changes: BehaviorSubject<this>;
 
   /**
    * Public **constructor**. This **constructor** is called once when the
@@ -50,8 +51,8 @@ export class ConduitWorker {
    * [Worker]: https://developer.mozilla.org/docs/Web/API/Worker/Worker
    */
   public constructor() {
+    this.busses = new Map<BusHandle, Observable<BusValue<any>>>();
     this.changes = new BehaviorSubject<this>(this);
-    this.conduits = new Map<ConduitHandle, Observable<ConduitValue<any>>>();
   }
 
   /**
@@ -68,17 +69,17 @@ export class ConduitWorker {
    * @returns [Observable][] bus for `handle`.
 
    */
-  public get(handle: ConduitHandle): Observable<ConduitValue<any>> {
+  public get(handle: BusHandle): Observable<BusValue<any>> {
     return this.changes.pipe(switchMap(() => {
-      const conduits = [];
+      const busses = [];
 
-      for (const [key, value] of this.conduits) {
+      for (const [key, value] of this.busses) {
         if (key.startsWith(handle)) {
-          conduits.push(value);
+          busses.push(value);
         }
       }
 
-      return merge(...conduits);
+      return merge(...busses);
     }));
   }
 
@@ -95,17 +96,17 @@ export class ConduitWorker {
    * @param handle - [BusHandle][] to **set**.
    * @param bus - [Observable][] bus for `handle`.
    */
-  public set(handle: ConduitHandle, conduit: Observable<any>): void {
-    this.conduits.set(handle, conduit.pipe(
+  public set(handle: BusHandle, bus: Observable<any>): void {
+    this.busses.set(handle, bus.pipe(
       map((value) => ({
         handle,
         value
       })),
       finalize(() => {
-        this.conduits.delete(handle);
+        this.busses.delete(handle);
         this.changes.next(this);
       }),
-      shareReplay(1)
+      shareReplay()
     ));
 
     this.changes.next(this);

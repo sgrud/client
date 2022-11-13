@@ -15,7 +15,6 @@
  * @packageDocumentation
  */
 
-export * from './src/conduit/handler';
-export * from './src/conduit/worker';
-export * from './src/pubsub/publish';
-export * from './src/pubsub/subscribe';
+export * from './src/handler/handler';
+export * from './src/handler/publish';
+export * from './src/handler/subscribe';

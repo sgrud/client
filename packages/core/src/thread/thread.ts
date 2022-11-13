@@ -15,8 +15,7 @@ import { TypeOf } from '../utility/type-of';
  *
  * @see [Thread][]
  */
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface Thread<T> extends Promise<Remote<T>> { }
+export type Thread<T> = Promise<Remote<T>>;
 
 /**
  * Class decorator factory. Exposes an instance of the decorated class as
@@ -41,23 +40,26 @@ export interface Thread<T> extends Promise<Remote<T>> { }
  */
 export function Thread() {
 
+  // eslint-disable-next-line valid-jsdoc
   /**
    * @param constructor - Class constructor to be decorated.
    * @throws ReferenceError.
    */
   return function(
-    constructor: new (...args: any[]) => any
+    constructor: new () => any
   ): void {
     if (TypeOf.function(globalThis.importScripts)) {
-      expose(constructor);
+      return expose(new constructor());
     } else if (TypeOf.process(globalThis.process)) {
       const { isMainThread, parentPort } = require('worker_threads');
-      const nodeEndpoint = require('comlink/dist/umd/node-adapter.min');
 
       if (!isMainThread) {
-        expose(constructor, nodeEndpoint(parentPort));
+        const nodeAdapter = require('comlink/dist/umd/node-adapter');
+        return expose(new constructor(), nodeAdapter(parentPort));
       }
     }
+
+    throw new ReferenceError(constructor.name);
   };
 
 }

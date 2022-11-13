@@ -1,7 +1,7 @@
 import { Singleton, Spawn, Thread } from '@sgrud/core';
 import { from, Observable, switchMap } from 'rxjs';
-import ConduitWorkerThread from 'worker:./worker';
-import { ConduitWorker } from './worker';
+import { BusWorker } from '../worker';
+import packageJson from '../worker/package.json';
 
 /**
  * The **BusHandle** is a string literal helper type which enforces any assigned
@@ -32,7 +32,7 @@ import { ConduitWorker } from './worker';
  *
  * @see [BusHandler][]
  */
-export type ConduitHandle = `${string}.${string}.${string}`;
+export type BusHandle = `${string}.${string}.${string}`;
 
 /**
  * The **BusValue** is an interface describing the shape of all values emitted
@@ -58,14 +58,14 @@ export type ConduitHandle = `${string}.${string}.${string}`;
  *
  * @see [BusHandler][]
  */
-export interface ConduitValue<T> {
+export interface BusValue<T> {
 
   /**
    * Emitting [BusHandle][].
    *
    * [BusHandle]: https://sgrud.github.io/client/types/bus.BusHandle
    */
-  readonly handle: ConduitHandle;
+  readonly handle: BusHandle;
 
   /**
    * Emitted `value`.
@@ -108,7 +108,7 @@ export interface ConduitValue<T> {
  *
  * @see [BusWorker][]
  */
-@Singleton<typeof ConduitHandler>((self, [tuples]) => {
+@Singleton<typeof BusHandler>((self, [tuples]) => {
   if (tuples) {
     for (const [key, value] of tuples) {
       self.set(key, value);
@@ -117,7 +117,7 @@ export interface ConduitValue<T> {
 
   return self;
 })
-export class ConduitHandler {
+export class BusHandler {
 
   /**
    * [Spawn][]ed **worker** process and main bus workhorse. The underlying
@@ -132,8 +132,8 @@ export class ConduitHandler {
    *
    * @decorator [Spawn][]
    */
-  @Spawn(ConduitWorkerThread)
-  private static readonly worker: Thread<ConduitWorker>;
+  @Spawn(packageJson.name)
+  public readonly worker!: Thread<BusWorker>;
 
   /**
    * Public **constructor**. As this class is a transparent [Singleton][],
@@ -155,7 +155,7 @@ export class ConduitHandler {
    * ]);
    * ```
    */
-  public constructor(tuples?: [ConduitHandle, Observable<any>][]) {
+  public constructor(tuples?: [BusHandle, Observable<any>][]) {
     if (tuples) {
       for (const [key, value] of tuples) {
         this.set(key, value);
@@ -189,8 +189,8 @@ export class ConduitHandler {
    * busHandler.get('io.github.sgrud.example').subscribe(console.log);
    * ```
    */
-  public get<T>(handle: ConduitHandle): Observable<ConduitValue<T>> {
-    return from(ConduitHandler.worker).pipe(
+  public get<T>(handle: BusHandle): Observable<BusValue<T>> {
+    return from(this.worker).pipe(
       switchMap((worker) => worker.get(handle)),
       switchMap((value) => value)
     );
@@ -222,10 +222,12 @@ export class ConduitHandler {
    * busHandler.set('io.github.sgrud.example', of('published'));
    * ```
    */
-  public set<T>(handle: ConduitHandle, conduit: Observable<T>): void {
-    from(ConduitHandler.worker).pipe(
-      switchMap((worker) => worker.set(handle, conduit))
+  public set<T>(handle: BusHandle, bus: Observable<T>): void {
+    from(this.worker).pipe(
+      switchMap((worker) => worker.set(handle, bus))
     ).subscribe();
   }
 
 }
+
+export type { BusWorker };

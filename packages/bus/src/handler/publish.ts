@@ -1,6 +1,5 @@
-import { TypeOf } from '@sgrud/core';
 import { Observable, Subject } from 'rxjs';
-import { ConduitHandle, ConduitHandler } from '../conduit/handler';
+import { BusHandle, BusHandler } from './handler';
 
 /**
  * Prototype property decorator factory. This decorator **publish**es the
@@ -75,8 +74,8 @@ import { ConduitHandle, ConduitHandler } from '../conduit/handler';
  * @see [Subscribe][]
  */
 export function Publish(
-  handle: ConduitHandle,
-  source: string | Observable<any> = new Subject<any>()
+  handle: BusHandle,
+  source: Observable<any> | PropertyKey = new Subject<any>()
 ) {
 
   /**
@@ -87,7 +86,16 @@ export function Publish(
     prototype: object,
     propertyKey: PropertyKey
   ): void {
-    if (TypeOf.string(source)) {
+    if (source instanceof Observable) {
+      Object.defineProperty(prototype, propertyKey, {
+        enumerable: true,
+        value: source
+      });
+
+      new BusHandler([
+        [handle, source]
+      ]);
+    } else {
       Object.defineProperties(prototype, {
         [source]: {
           enumerable: true,
@@ -98,7 +106,7 @@ export function Publish(
             });
 
             if (this[propertyKey]) {
-              new ConduitHandler([
+              new BusHandler([
                 [`${handle}.${value}`, this[propertyKey]]
               ]);
             }
@@ -113,22 +121,13 @@ export function Publish(
             });
 
             if (this[source]) {
-              new ConduitHandler([
+              new BusHandler([
                 [`${handle}.${this[source]}`, value]
               ]);
             }
           }
         }
       });
-    } else {
-      Object.defineProperty(prototype, propertyKey, {
-        enumerable: true,
-        value: source
-      });
-
-      new ConduitHandler([
-        [handle, source]
-      ]);
     }
   };
 

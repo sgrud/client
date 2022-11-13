@@ -1,5 +1,4 @@
-import { TypeOf } from '@sgrud/core';
-import { ConduitHandle, ConduitHandler } from '../conduit/handler';
+import { BusHandle, BusHandler } from './handler';
 
 /**
  * Prototype property decorator factory. This decorator **subscribe**s to an
@@ -66,10 +65,7 @@ import { ConduitHandle, ConduitHandler } from '../conduit/handler';
  * @see [BusHandler][]
  * @see [Publish][]
  */
-export function Subscribe(
-  handle: ConduitHandle,
-  source?: string
-) {
+export function Subscribe(handle: BusHandle, source?: PropertyKey) {
 
   /**
    * @param prototype - Prototype to be decorated.
@@ -79,7 +75,7 @@ export function Subscribe(
     prototype: object,
     propertyKey: PropertyKey
   ): void {
-    if (TypeOf.string(source)) {
+    if (source) {
       Object.defineProperty(prototype, source, {
         enumerable: true,
         set(this: any, value: string): void {
@@ -90,7 +86,7 @@ export function Subscribe(
             },
             [propertyKey]: {
               enumerable: true,
-              value: new ConduitHandler().get(`${handle}.${value}`)
+              value: new BusHandler().get(`${handle}.${value}`)
             }
           });
         }
@@ -98,7 +94,7 @@ export function Subscribe(
     } else {
       Object.defineProperty(prototype, propertyKey, {
         enumerable: true,
-        value: new ConduitHandler().get(handle)
+        value: new BusHandler().get(handle)
       });
     }
   };

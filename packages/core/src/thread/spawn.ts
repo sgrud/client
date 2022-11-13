@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-import { wrap } from 'comlink';
+import { Endpoint, wrap } from 'comlink';
+import { NodeEndpoint } from 'comlink/dist/umd/node-adapter';
+import { firstValueFrom } from 'rxjs';
+import { Kernel } from '../kernel/kernel';
 import { TypeOf } from '../utility/type-of';
 
 /**
@@ -33,9 +36,9 @@ import { TypeOf } from '../utility/type-of';
  *
  * @see [Thread][]
  */
-export function Spawn<T extends new (...args: any[]) => Worker>(
-  workerFactory: T,
-  factoryArgs?: ConstructorParameters<T>
+export function Spawn(
+  worker: string | Endpoint | NodeEndpoint,
+  source?: string
 ) {
 
   /**
@@ -44,20 +47,43 @@ export function Spawn<T extends new (...args: any[]) => Worker>(
    * @throws ReferenceError.
    */
   return function(
-    constructor: new (...args: any[]) => any,
+    prototype: object,
     propertyKey: PropertyKey
   ): void {
-    const worker = new workerFactory();
-    let remote = wrap<typeof workerFactory>(worker);
+    let thread;
 
-    if (TypeOf.process(globalThis.process)) {
-      const nodeEndpoint = require('comlink/dist/umd/node-adapter.min');
-      remote = wrap(nodeEndpoint(worker));
-    }
-
-    Object.defineProperty(constructor, propertyKey, {
+    Object.defineProperty(prototype, propertyKey, {
       enumerable: true,
-      value: new remote(...factoryArgs || [])
+      get: () => thread ||= (async() => {
+        if (TypeOf.process(globalThis.process)) {
+          if (TypeOf.string(worker)) {
+            const { Worker } = require('worker_threads');
+            worker = new Worker(require.resolve(worker));
+          }
+
+          const nodeAdapter = require('comlink/dist/umd/node-adapter');
+          worker = nodeAdapter(worker);
+        } else if (TypeOf.string(worker)) {
+          const kernel = new Kernel();
+          source ||= `${kernel.nodeModules}/${worker}`;
+          const module = await firstValueFrom(kernel.resolve(worker, source));
+
+          if (!globalThis.sgrud && module.exports) {
+            worker = new Worker(`${source}/${module.exports}`, {
+              type: 'module'
+            });
+          } else if (globalThis.sgrud && module.unpkg) {
+            worker = new Worker(`${source}/${module.unpkg}`, {
+              type: 'classic'
+            });
+          } else {
+            throw new ReferenceError(module.name);
+          }
+        }
+
+        return wrap(worker as Endpoint);
+      })(),
+      set: Function.prototype as (...args: any[]) => void
     });
   };
 
