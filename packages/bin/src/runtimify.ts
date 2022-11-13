@@ -8,7 +8,7 @@ import packageJson from '../package.json';
 import { cli, _b, _g, __ } from './.cli';
 
 cli.command('runtimify [...modules]')
-  .describe('Creates ESM or UMD bundles for ES6 modules using `microbundle`')
+  .describe('Creates ESM or UMD bundles for node modules using `microbundle`')
   .example('runtimify # Run with default options')
   .example('runtimify @microsoft/fast # Runtimify `@microsoft/fast`')
   .option('--format', 'Runtimify bundle format (umd or esm)', 'umd')
@@ -17,12 +17,11 @@ cli.command('runtimify [...modules]')
   .action((_ = [], opts) => runtimify({ ...opts, modules: opts._.concat(_) }));
 
 /**
- * Creates ESM or UMD bundles for ES6 modules using
- * [microbundle](https://www.npmjs.com/package/microbundle).
+ * Creates ESM or UMD bundles for node modules using [microbundle][].
  *
  * ```text
  * Description
- *   Creates ESM or UMD bundles for ES6 modules using `microbundle`
+ *   Creates ESM or UMD bundles for node modules using `microbundle`
  *
  * Usage
  *   $ sgrud runtimify [...modules] [options]
@@ -38,19 +37,27 @@ cli.command('runtimify [...modules]')
  *   $ sgrud runtimify @microsoft/fast # Runtimify `@microsoft/fast`
  * ```
  *
+ * [microbundle]: https://github.com/developit/microbundle
+ *
  * @param options - Options object.
  * @returns Execution promise.
  *
- * @example Run with default options.
+ * @example
+ * Run with default options:
  * ```js
  * require('@sgrud/bin');
+ *
  * sgrud.bin.runtimify();
  * ```
  *
- * @example Runtimify `@microsoft/fast`.
+ * @example
+ * **Runtimify** `@microsoft/fast`:
  * ```js
  * require('@sgrud/bin');
- * sgrud.bin.runtimify({ modules: ['@microsoft/fast'] });
+ *
+ * sgrud.bin.runtimify({
+ *   modules: ['@microsoft/fast']
+ * });
  * ```
  */
 export async function runtimify({
@@ -61,16 +68,16 @@ export async function runtimify({
 }: {
 
   /**
-   * Runtimify bundle format (umd or esm).
+   * **Runtimify** bundle format (umd or esm).
    *
    * @defaultValue `'umd'`
    */
   format?: string;
 
   /**
-   * Modules to runtimify.
+   * Modules to **runtimify**.
    *
-   * @defaultValue `[]`
+   * @defaultValue `package.json#sgrud.runtimify`
    */
   modules?: string[];
 

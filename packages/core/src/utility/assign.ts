@@ -2,16 +2,19 @@ import { Merge } from '../typing/merge';
 import { TypeOf } from './type-of';
 
 /**
- * Deep copy the values of all of the enumerable own properties from one or more
- * source objects to a target object. Returns the target object.
+ * **Assign**s (deep copies) the values of all of the enumerable own properties
+ * from one or more `source` objects to a `target` object. The last value within
+ * the last `source` object takes precedence over any previously encountered
+ * values. Returns the `target` object.
  *
- * @param target - Target object to deep copy properties to.
- * @param sources - Source objects from which to deep copy properties.
+ * @param target - Object to **assign** properties to.
+ * @param sources - Objects from which to deep copy properties.
  * @typeParam T - Target type.
  * @typeParam S - Source types.
- * @returns Target object.
+ * @returns **Assign**ed object.
  *
- * @example Deep copy nested properties.
+ * @example
+ * **Assign** nested properties:
  * ```ts
  * import { assign } from '@sgrud/core';
  *
@@ -21,7 +24,7 @@ import { TypeOf } from './type-of';
  *   { two: true }
  * );
  *
- * // { one: { one: true, key: null }, two: true },
+ * // { one: { one: true, key: null }, two: true }
  * ```
  */
 export function assign<

@@ -1,19 +1,27 @@
 /**
- * Class decorator factory. Enforces transparent singleton pattern on decorated
- * class. When calling the `new` operator on a decorated class, if provided, the
- * `apply` callback is fired with the singleton instance and the construction
+ * Class decorator factory. Enforces a transparent **Singleton** pattern on the
+ * decorated class. When calling the `new` operator on a decorated class for the
+ * first time, an instance of the decorated class is created using the supplied
+ * arguments, if any. This instance will remain the **Singleton** instance of
+ * the decorated class indefinitely. When calling the `new` operator on a
+ * decorated class already instantiated, the **Singleton** pattern is enforced
+ * and the previously constructed instance is returned. Instead, if provided,
+ * the `apply` callback is fired with the **Singleton** instance and the `new`
  * invocation parameters.
  *
  * @param apply - Construct function.
  * @typeParam T - Constructor type.
  * @returns Class decorator.
  *
- * @example Singleton class.
+ * @example
+ * **Singleton** class:
  * ```ts
  * import { Singleton } from '@sgrud/core';
  *
- * @Singleton<typeof Service>()
+ * ⁠@Singleton<typeof Service>()
  * export class Service { }
+ *
+ * new Service() === new Service(); // true
  * ```
  */
 export function Singleton<T extends new (...args: any[]) => any>(

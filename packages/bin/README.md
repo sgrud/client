@@ -1,10 +1,10 @@
 # SGRUD
-> SGRUD is Growing Rapidly Until Distinction
+> SGRUD is Growing Rapidly Until Distinction.
 
 ## @sgrud/bin
-> `@sgrud/bin` - The [SGRUD](https://github.com/sgrud/client) CLI.
+> `@sgrud/bin` - The [SGRUD](https://sgrud.github.io) CLI.
 
 ### References
-- [API documentation](https://sgrud.github.io/client/modules/bin)
-- [GIT repository](https://github.com/sgrud/client/blob/main/packages/bin)
-- [NPM listing](https://www.npmjs.com/package/@sgrud/bin)
+- [Documentation](https://sgrud.github.io/client/modules/bin)
+- [Repository](https://github.com/sgrud/client/tree/main/packages/bin)
+- [Package](https://www.npmjs.com/package/@sgrud/bin)

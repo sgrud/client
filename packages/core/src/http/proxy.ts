@@ -4,25 +4,33 @@ import { Provide, provide } from '../super/provide';
 import { HttpHandler } from './client';
 
 /**
- * Abstract base class to implement proxies, i.e., HTTP request interceptors, on
- * the client side. By extending this abstract base class and providing the
- * extending class to the {@link Linker}, e.g., by {@link Target}ing it, the
- * respective classes {@link proxy} method will be called with the request
- * details (which could have been modified by a previous HttpProxy) and the next
- * {@link HttpHandler} (which could be the next HttpProxy or the `rxjs/ajax`
- * method), when a request is fired through the {@link HttpClient}.
+ * Abstract **HttpProxy** base class to implement proxies, i.e., HTTP request
+ * interceptors, on the client side. By extending this abstract base class and
+ * providing the extending class to the [Linker][], e.g., by [Target][]ing it,
+ * the respective classes *proxy* method will be called with the request details
+ * (which could have been modified by a previous **HttpProxy**) and the next
+ * [HttpHandler][] (which could be the next **HttpProxy** or the [ajax][]
+ * method), whenever a request is fired through the [HttpClient][].
  *
- * @decorator {@link Provide}
+ * [ajax]: https://rxjs.dev/api/ajax/ajax
+ * [HttpClient]: https://sgrud.github.io/client/classes/core.HttpClient
+ * [HttpHandler]: https://sgrud.github.io/client/interfaces/core.HttpHandler
+ * [Linker]: https://sgrud.github.io/client/classes/core.Linker
+ * [Provide]: https://sgrud.github.io/client/functions/core.Provide-1
+ * [Target]: https://sgrud.github.io/client/functions/core.Target
  *
- * @example Simple proxy intercepting `file:` requests.
+ * @decorator [Provide][]
+ *
+ * @example
+ * Simple **HttpProxy** intercepting `file:` requests:
  * ```ts
  * import type { HttpHandler, HttpProxy } from '@sgrud/core';
+ * import type { AjaxConfig, AjaxResponse } from 'rxjs/ajax';
  * import { Provider, Target } from '@sgrud/core';
  * import { Observable, of } from 'rxjs';
- * import type { AjaxConfig, AjaxResponse } from 'rxjs/ajax';
  * import { file } from './file';
  *
- * @Target<typeof FileProxy>()
+ * ⁠@Target<typeof FileProxy>()
  * export class FileProxy
  *   extends Provider<typeof HttpProxy>('sgrud.core.http.HttpProxy') {
  *
@@ -39,30 +47,39 @@ import { HttpHandler } from './client';
  * }
  * ```
  *
- * @see {@link HttpClient}
+ * @see [HttpClient][]
  */
 @Provide<typeof HttpProxy>()
 export abstract class HttpProxy {
 
   /**
-   * Magic string by which this class is provided.
+   * Magic string by which this class is [provide][]d.
    *
-   * @see {@link provide}
+   * [provide]: https://sgrud.github.io/client/variables/core.provide-2
+   *
+   * @see [provide][]
    */
   public static readonly [provide]:
   'sgrud.core.http.HttpProxy' = 'sgrud.core.http.HttpProxy';
 
   /**
-   * The overridden proxy method of linked classes extending HttpProxy is called
-   * whenever a request is fired through the {@link HttpClient}. The extending
-   * class can either pass the `request` to the next `handler`, with or without
-   * modifying it, or an interceptor can chose to completely handle a `request`
-   * by itself through returning an Observable.
+   * The **proxy** method of linked classes extending the [HttpProxy][] base
+   * class is called whenever a request is fired through the [HttpClient][]. The
+   * extending class can either pass the `request` to the next `handler`, with
+   * or without modifying it, or an interceptor can chose to completely handle a
+   * `request` by itself through returning an [Observable][] [AjaxResponse][].
    *
-   * @param request - Request.
-   * @param handler - Next handler.
+   * [AjaxConfig]: https://rxjs.dev/api/ajax/AjaxConfig
+   * [AjaxResponse]: https://rxjs.dev/api/ajax/AjaxResponse
+   * [HttpClient]: https://sgrud.github.io/client/classes/core.HttpClient
+   * [HttpHandler]: https://sgrud.github.io/client/interfaces/core.HttpHandler
+   * [HttpProxy]: https://sgrud.github.io/client/classes/core.HttpProxy
+   * [Observable]: https://rxjs.dev/api/index/class/Observable
+   *
+   * @param request - Requesting [AjaxConfig][].
+   * @param handler - Next [HttpHandler][].
    * @typeParam T - Response type.
-   * @returns Observable response.
+   * @returns [Observable][] of the requested [AjaxResponse][].
    */
   public abstract proxy<T>(
     request: Request,

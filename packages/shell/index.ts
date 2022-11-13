@@ -1,30 +1,19 @@
 /**
- * `@sgrud/shell` - The [SGRUD](https://github.com/sgrud/client) web UI shell.
+ * `@sgrud/shell` - The [SGRUD][] Web UI Shell.
  *
- * The functions and classes found within this module ease the implementation of
- * component-based frontends by providing `jsx-runtime`-compliant bindings and a
- * router targeted at rendering components based upon the `@sgrud` libraries,
- * but not limited to those. Furthermore, complex routing strategies and actions
- * may be implemented through interceptor-like router tasks.
+ * The functions and classes found within this module are intended to ease the
+ * implementation of [Component][]-based frontends by providing [JSX][] runtime
+ * bindings for the [incremental-dom][] library and a [Router][] targeted at
+ * routing through [Component][]s based upon the [SGRUD][] client libraries, but
+ * not limited to those. Furthermore, complex routing strategies and actions may
+ * be implemented through the interceptor-like [RouterTask][] pattern.
  *
- * The different functions and classes implemented within this module can be
- * roughly categorized into the following functional aspects.
- *
- * - Custom components and their dynamic rendering
- *   - {@link Component}: registers the decorated class as custom component
- *   - {@link Attribute}: binds the decorated property to a component attribute
- *   - {@link Reference}: binds the decorated property to a referenced node
- *   - {@link customElements}: Extension of the built-in `customElements` object
- * - `jsx-runtime`-compliant bindings
- *   - {@link createElement}: `incremental-dom`-based JSX element factory
- *   - {@link createFragment}: JSX fragment (placeholder html element) factory
- *   - {@link render}:  `incremental-dom`-based JSX rendering helper
- * - Client-side component-based routing
- *   - {@link Router}: provides routing and rendering capabilities
- *   - {@link RouterTask}: abstract base class to implement router tasks
- *   - {@link RouterOutlet}: declarative rendering outlet for the router
- *   - {@link RouterLink}: declarative trigger for router navigations
- *   - {@link Route}: associates a route to the decorated component
+ * [Component]: https://sgrud.github.io/client/interfaces/shell.Component-1
+ * [incremental-dom]: https://google.github.io/incremental-dom
+ * [JSX]: https://www.typescriptlang.org/docs/handbook/jsx.html
+ * [Router]: https://sgrud.github.io/client/classes/shell.Router
+ * [RouterTask]: https://sgrud.github.io/client/classes/shell.RouterTask
+ * [SGRUD]: https://sgrud.github.io
  *
  * @packageDocumentation
  */

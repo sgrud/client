@@ -4,31 +4,34 @@ import { wrap } from 'comlink';
 import { TypeOf } from '../utility/type-of';
 
 /**
- * Class property decorator factory. Spawns a worker process, wraps it with
- * [comlink.wrap](https://www.npmjs.com/package/comlink#api) and assigns it to
- * the decorated class property.
+ * This prototype property decorator factory **Spawn**s a [Worker][], wraps it
+ * with [Comlink][] and assigns it to the decorated prototype property.
  *
- * @param workerFactory - Worker constructor.
- * @param factoryArgs - Worker constructor arguments.
- * @typeParam T - Worker constructor type.
+ * [Comlink]: https://www.npmjs.com/package/comlink
+ * [Module]: https://sgrud.github.io/client/interfaces/core.Kernel-1.Module
+ * [Thread]: https://sgrud.github.io/client/functions/core.Thread-1
+ * [Worker]: https://developer.mozilla.org/docs/Web/API/Worker/Worker
+ *
+ * @param worker - Worker constructor to **Spawn**.
+ * @param source - Optional [Module][] source.
+ * @typeParam T - Constructor type.
  * @returns Class property decorator.
  *
- * @example Spawn a WebWorker.
+ * @example
+ * **Spawn** a [Worker][]:
  * ```ts
- * import type { Thread } from '@sgrud/core';
- * import { Spawn } from '@sgrud/core';
- * import WebWorkerThread from 'worker:./web-worker';
- * import { WebWorker } from './web-worker';
+ * import { Spawn, Thread } from '@sgrud/core';
+ * import { ExampleWorker } from 'example-worker';
  *
- * export class WebWorkerHandler {
+ * export class ExampleWorkerHandler {
  *
- *   @Spawn(WebWorkerThread)
- *   private static readonly worker: Thread<WebWorker>;
+ *   ⁠@Spawn('example-worker')
+ *   private static readonly worker: Thread<ExampleWorker>;
  *
  * }
  * ```
  *
- * @see {@link Thread}
+ * @see [Thread][]
  */
 export function Spawn<T extends new (...args: any[]) => Worker>(
   workerFactory: T,
@@ -36,8 +39,9 @@ export function Spawn<T extends new (...args: any[]) => Worker>(
 ) {
 
   /**
-   * @param constructor - Class constructor to be decorated.
-   * @param propertyKey - Class property to be decorated.
+   * @param prototype - Prototype to be decorated.
+   * @param propertyKey - Prototype property to be decorated.
+   * @throws ReferenceError.
    */
   return function(
     constructor: new (...args: any[]) => any,

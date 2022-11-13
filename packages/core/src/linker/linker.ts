@@ -1,17 +1,25 @@
 import { Singleton } from '../utility/singleton';
 
 /**
- * Linker is the {@link Singleton} link map used by the {@link Factor} decorator
- * to lookup the linked instances of targeted constructors. To programmatically
- * insert some links, the inherited `MapConstructor` or `Map.prototype.set`
- * methods are available. The former will insert all entries into this singleton
- * link map, internally calling the latter for each.
+ * The [Singleton][] **Linker** class provides the means to lookup instances of
+ * [Target][]ed constructors. The **Linker** is used throughout the [SGRUD][]
+ * client libraries, e.g., by the [Factor][] decorator, to provide and retrieve
+ * different centrally provisioned class instances. To programmatically insert
+ * some links, the inherited *constructor* or *set* methods can be used. The
+ * former will insert all entries into this [Singleton][] link mapping,
+ * internally calling the latter for each.
  *
- * @decorator {@link Singleton}
- * @typeParam K - Target constructor type.
- * @typeParam V - Linked instance type.
+ * [Factor]: https://sgrud.github.io/client/functions/core.Factor
+ * [Singleton]: https://sgrud.github.io/client/functions/core.Singleton
+ * [SGRUD]: https://sgrud.github.io
+ * [Target]: https://sgrud.github.io/client/functions/core.Target
  *
- * @example Preemptively link an instance.
+ * @decorator [Singleton][]
+ * @typeParam K - Constructor type.
+ * @typeParam V - Instance type.
+ *
+ * @example
+ * Preemptively link an instance:
  * ```ts
  * import { Linker } from '@sgrud/core';
  * import { Service } from './service';
@@ -20,9 +28,6 @@ import { Singleton } from '../utility/singleton';
  *   [Service, new Service('linked')]
  * ]);
  * ```
- *
- * @see {@link Factor}
- * @see {@link Target}
  */
 @Singleton<typeof Linker>((self, [tuples]) => {
   if (tuples) {
@@ -39,16 +44,16 @@ export class Linker<
 > extends Map<K, V> {
 
   /**
-   * Overridden `Map.prototype.get` method. Looks up the linked instance based
-   * on the target constructor. If no linked instance is found, one is created
-   * by calling the `new` operator on the target constructor. Therefor the
-   * target constructors must not require parameters (i.e. all parameters have
-   * to be optional).
+   * Overridden **get** method. Calling this method looks up the linked instance
+   * based on the supplied `target` constructor. If no linked instance is found,
+   * one is created by calling the `new` operator on the `target` constructor.
+   * Therefor the `target` constructors must not require parameters.
    *
    * @param target - Target constructor.
    * @returns Linked instance.
    *
-   * @example Retrieve a linked instance.
+   * @example
+   * Retrieve a linked instance:
    * ```ts
    * import { Linker } from '@sgrud/core';
    * import { Service } from './service';
@@ -69,13 +74,14 @@ export class Linker<
 
   /**
    * Returns all linked instances, which satisfy `instanceof target`. Use this
-   * method when multiple linked constructors extend the same base class and are
-   * to be retrieved.
+   * method when multiple linked `target` constructors extend the same base
+   * class and are to be retrieved.
    *
    * @param target - Target constructor.
-   * @returns Linked instances.
+   * @returns All linked instances.
    *
-   * @example Retrieve all linked instances.
+   * @example
+   * Retrieve all linked instances:
    * ```ts
    * import { Linker } from '@sgrud/core';
    * import { Service } from './service';

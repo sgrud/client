@@ -4,37 +4,46 @@ import { expose, Remote } from 'comlink';
 import { TypeOf } from '../utility/type-of';
 
 /**
- * Interface describing an exposed class in a remote context. Created by
- * wrapping [comlink.Remote](https://www.npmjs.com/package/comlink#typescript)
- * in a Promise. Use in conjunction with the `@Thread()` decorator.
+ * Type alias describing an exposed class in a remote context. Created by
+ * wrapping a [Comlink][] *Remote* in a *Promise*. Used and intended to be used
+ * in conjunction with the [Thread][] decorator.
  *
- * @typeParam T - Thread instance type.
+ * [Comlink]: https://www.npmjs.com/package/comlink
+ * [Thread]: https://sgrud.github.io/client/functions/core.Thread-1
  *
- * @see {@link Thread}
+ * @typeParam T - Instance type.
+ *
+ * @see [Thread][]
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Thread<T> extends Promise<Remote<T>> { }
 
 /**
- * Class decorator factory. Exposes the decorated class as worker via
- * [comlink.expose](https://www.npmjs.com/package/comlink#api).
+ * Class decorator factory. Exposes an instance of the decorated class as
+ * [Worker][] **Thread** via [Comlink][].
  *
  * @returns Class decorator.
  *
- * @example WebWorker thread.
+ * [Comlink]: https://www.npmjs.com/package/comlink
+ * [Spawn]: https://sgrud.github.io/client/functions/core.Spawn
+ * [Worker]: https://developer.mozilla.org/docs/Web/API/Worker/Worker
+ *
+ * @example
+ * ExampleWorker **Thread**:
  * ```ts
  * import { Thread } from '@sgrud/core';
  *
- * @Thread()
- * export class WebWorker { }
+ * ⁠@Thread()
+ * export class ExampleWorker { }
  * ```
  *
- * @see {@link Spawn}
+ * @see [Spawn][]
  */
 export function Thread() {
 
   /**
    * @param constructor - Class constructor to be decorated.
+   * @throws ReferenceError.
    */
   return function(
     constructor: new (...args: any[]) => any

@@ -6,18 +6,18 @@ import simpleGit from 'simple-git';
 import { cli, _b, _g, __ } from './.cli';
 
 cli.command('kickstart [library]')
-  .describe('Kickstarts a SGRUD-based project')
+  .describe('Kickstarts a SGRUD-based project using `simple-git`')
   .example('kickstart # Run with default options')
   .example('kickstart preact --prefix ./module # Kickstart preact in ./module')
   .option('--prefix', 'Use an alternative working directory', './')
   .action((library, opts) => kickstart({ ...opts, library }));
 
 /**
- * Kickstarts a [SGRUD](https://github.com/sgrud/client)-based project.
+ * **Kickstart**s a [SGRUD][]-based project using [simple-git][].
  *
  * ```text
  * Description
- *   Kickstarts a SGRUD-based project
+ *   Kickstarts a SGRUD-based project using `simple-git`
  *
  * Usage
  *   $ sgrud kickstart [library] [options]
@@ -31,19 +31,29 @@ cli.command('kickstart [library]')
  *   $ sgrud kickstart preact --prefix ./module # Kickstart preact in ./module
  * ```
  *
+ * [SGRUD]: https://sgrud.github.io
+ * [simple-git]: https://github.com/steveukx/git-js
+ *
  * @param options - Options object.
  * @returns Execution promise.
  *
- * @example Run with default options.
+ * @example
+ * Run with default options:
  * ```js
  * require('@sgrud/bin');
+ *
  * sgrud.bin.kickstart();
  * ```
  *
- * @example Kickstart `preact` in `./module`.
+ * @example
+ * **Kickstart** `preact` in `./module`:
  * ```js
  * require('@sgrud/bin');
- * sgrud.bin.kickstart({ prefix: './module', library: 'preact' });
+ *
+ * sgrud.bin.kickstart({
+ *   prefix: './module',
+ *   library: 'preact'
+ * });
  * ```
  */
 export async function kickstart({

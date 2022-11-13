@@ -1,17 +1,19 @@
 /**
- * Pluralizes words of the English language.
+ * **Pluralize**s words of the English language.
  *
  * @param singular - English word in singular form.
- * @returns Plural form of `singular`.
+ * @returns **Pluralize**d form of `singular`.
  *
- * @example Pluralize `'money'`.
+ * @example
+ * **Pluralize** `'money'`:
  * ```ts
  * import { pluralize } from '@sgrud/core';
  *
  * pluralize('money'); // 'money'
  * ```
  *
- * @example Pluralize `'thesis'`.
+ * @example
+ * **Pluralize** `'thesis'`:
  * ```ts
  * import { pluralize } from '@sgrud/core';
  *

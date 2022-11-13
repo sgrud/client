@@ -3,92 +3,98 @@ import { customElements } from '../component/registry';
 import { Router } from './router';
 
 /**
- * Interface describing the shape of a route. A route must consist of at least a
- * {@link path} and may declare a {@link component}, which will be rendered when
- * the route is navigated to, as well as {@link slots} and components which will
- * be slotted within those. Furthermore a route may specify {@link children}.
+ * Interface describing the shape of a **Route**. A **Route** must consist of at
+ * least a *path* and may declare a *component*, which will be rendered when the
+ * **Route** is navigated to, as well as *slots* and elements which will be
+ * slotted within those. Furthermore a **Route** may also specify *children*.
  *
- * @typeParam S - Route path string type.
+ * [Router]: https://sgrud.github.io/client/classes/shell.Router
  *
- * @example Define a route.
+ * @typeParam S - **Route** path string type.
+ *
+ * @example
+ * Define a **Route**:
  * ```ts
  * import type { Route } from '@sgrud/shell';
  *
  * const route: Route = {
  *   path: '',
- *   component: 'example-component',
+ *   component: 'example-element',
  *   children: [
  *     {
  *       path: 'child',
- *       component: 'child-component'
+ *       component: 'child-element'
  *     }
  *   ]
  * };
  * ```
  *
- * @see {@link Router}
+ * @see [Router][]
  */
 export interface Route<S extends string = string> {
 
   /**
-   * Optional array of children for this route.
+   * Optional array of **children** for this route.
    */
   readonly children?: Route[];
 
   /**
-   * Optional route component.
+   * Optional route **component**.
    */
   readonly component?: CustomElementTagName;
 
   /**
-   * Required route path.
+   * Required route **path**.
    */
   readonly path: S;
 
   /**
-   * Optional mapping of slot names to slotted components.
+   * Optional mapping of **slots** to their elements.
    */
   readonly slots?: Record<string, CustomElementTagName>;
 
 }
 
 /**
- * Symbol used as property key by the {@link Route} decorator to associate the
- * supplied route configuration to the decorated component.
+ * Unique symbol used as property key by the [Route][] decorator to associate
+ * the supplied route configuration to the decorated element.
  *
- * @see {@link Route}
+ * [Route]: https://sgrud.github.io/client/functions/shell.Route
  */
 export const route = Symbol('@sgrud/shell/router/route');
 
 /**
- * Class decorator factory. Applying this decorator to a custom component will
- * associate the supplied route `config`uration to the decorated component
- * constructor. Further, the `config`ured children are iterated and every child
- * that is a custom element itself will be replaced by its respective route
- * `config`uration. Finally, the processed `config`uration for the decorated
- * component is associated to the component constructor and added to the
- * {@link Router}.
+ * Class decorator factory. Applying the **Route** decorator to a custom element
+ * will associate the supplied [Route][] `config` to the decorated element
+ * constructor. Further, the configured children are iterated and every child
+ * that is a custom element itself will be replaced by its respective [Route][].
+ * Finally, the processed `config` for the decorated element is associated to
+ * the element constructor and added to the [Router][].
  *
- * @param config - Route configuration for this component.
+ * [Route]: https://sgrud.github.io/client/interfaces/shell.Route-1
+ * [Router]: https://sgrud.github.io/client/classes/shell.Router
+ *
+ * @param config - [Route][] config for this element.
  * @typeParam S - Route path string type.
  * @returns Class decorator.
  *
- * @example Associate a route `config`uration to a component.
+ * @example
+ * Associate a [Route][] `config` to a element:
  * ```ts
  * import { Component, Route } from '@sgrud/shell';
  * import { ChildComponent } from './child-component';
  *
- * @Route({
+ * ⁠@Route({
  *   path: 'example',
  *   children: [
  *     ChildComponent
  *   ]
  * })
- * @Component('example-component')
+ * ⁠@Component('example-element')
  * export class ExampleComponent extends HTMLElement implements Component { }
  * ```
  *
- * @see {@link Router}
+ * @see [Router][]
  */
 export function Route<S extends string>(config: Assign<{
   children?: (Route | typeof HTMLElement & { [route]?: Route })[];
@@ -96,7 +102,9 @@ export function Route<S extends string>(config: Assign<{
 }, Omit<Route<S>, 'component'>> & {
 
   /**
-   * Optional parent for this route.
+   * Optional parent for this [Route][].
+   *
+   * [Route]: https://sgrud.github.io/client/interfaces/shell.Route-1
    */
   parent?: Route | typeof HTMLElement & { [route]?: Route };
 

@@ -3,9 +3,11 @@ import { Model } from '../model/model';
 
 /**
  * Type alias for a union type of all primitive constructors which may be used
- * as `typeFactory` argument for the {@link Property} decorator.
+ * as `typeFactory` argument for the [Property][] decorator.
  *
- * @see {@link Property}
+ * [Property]: https://sgrud.github.io/client/functions/data.Property-1
+ *
+ * @see [Property][]
  */
 export type Property =
   Model.Type<any> |
@@ -15,38 +17,46 @@ export type Property =
   typeof String;
 
 /**
- * Symbol used as property key by the {@link Property} decorator to register
- * decorated fields for further computation, e.g., serialization, treemapping
- * etc.
+ * Unique symbol used as property key by the [Property][] decorator to register
+ * decorated [Model][] fields for further computation, e.g., serialization,
+ * treemapping etc.
  *
- * @see {@link Property}
+ * [Model]: https://sgrud.github.io/client/classes/data.Model
+ * [Property]: https://sgrud.github.io/client/functions/data.Property-1
+ *
+ * @see [Property][]
  */
 export const property = Symbol('@sgrud/data/model/property');
 
 // eslint-disable-next-line valid-jsdoc
 /**
- * {@link Model} field decorator factory. Using this decorator, Models can be
+ * [Model][] field decorator factory. Using this decorator, [Model][]s can be
  * enriched with primitive fields. The compatible primitives are the subset of
- * primitives JavaScript shares with JSON, i.e., `Boolean`, `Date` (in
- * serialized form), `Number` and `String`. The `Object` primitive cannot be
- * uses as a `typeFactory`, as Model fields containing objects are declared by
- * the {@link HasOne} and {@link HasMany} Model field decorators. By employing
- * this decorator, the decorated field will (depending on the `transient`
- * argument) be recognized when serializing or treemapping the Model containing
- * the decorated field.
+ * primitives JavaScript shares with JSON, i.e., *Boolean*, *Date* (serialized),
+ * *Number* and *String*. *Objects* cannot be uses as a `typeFactory` argument
+ * value, as [Model][] fields containing objects should be declared by the
+ * [HasOne][] and [HasMany][] [Model][] field decorators. By employing this
+ * decorator, the decorated field will (depending on the `transient` argument
+ * value) be taken into account when serializing or treemapping the [Model][]
+ * containing the decorated field.
+ *
+ * [HasMany]: https://sgrud.github.io/client/functions/data.HasMany
+ * [HasOne]: https://sgrud.github.io/client/functions/data.HasOne
+ * [Model]: https://sgrud.github.io/client/classes/data.Model
  *
  * @param typeFactory - Forward reference to the field value constructor.
  * @param transient - Whether the decorated field is transient.
  * @typeParam T - Field value constructor type.
- * @returns Model field decorator.
+ * @returns [Model][] field decorator.
  *
- * @example Model with a string type field.
+ * @example
+ * [Model][] with a primitive field:
  * ```ts
  * import { Model, Property } from '@sgrud/data';
  *
  * export class ExampleModel extends Model<ExampleModel> {
  *
- *   @Property(() => String)
+ *   ⁠@Property(() => String)
  *   public field?: string;
  *
  *   protected [Symbol.toStringTag]: string = 'ExampleModel';
@@ -54,9 +64,9 @@ export const property = Symbol('@sgrud/data/model/property');
  * }
  * ```
  *
- * @see {@link Model}
- * @see {@link HasOne}
- * @see {@link HasMany}
+ * @see [Model][]
+ * @see [HasOne][]
+ * @see [HasMany][]
  */
 export function Property<T extends Property>(
   typeFactory: () => T,

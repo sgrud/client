@@ -4,51 +4,109 @@ import ConduitWorkerThread from 'worker:./worker';
 import { ConduitWorker } from './worker';
 
 /**
- * String literal helper type. Enforces any assigned string to contain at least
- * three dots. A ConduitHandle represents a domain name in reverse notation.
+ * The **BusHandle** is a string literal helper type which enforces any assigned
+ * value to contain at least three dots. It represents a type constraint which
+ * should be thought of as domain name in reverse notation. All **BusHandle**s
+ * thereby designate a hierarchical structure, which the [BusHandler][] in
+ * conjunction with the [BusWorker][] operate upon.
  *
- * @example Library-wide ConduitHandle.
+ * [BusHandler]: https://sgrud.github.io/client/classes/bus.BusHandler
+ * [BusWorker]: https://sgrud.github.io/client/classes/bus.BusWorker
+ *
+ * @example
+ * Library-wide **BusHandle**:
  * ```ts
- * import type { ConduitHandle } from '@sgrud/bus';
+ * import { BusHandle } from '@sgrud/bus';
  *
- * const sgrudHandle: ConduitHandle = 'io.github.sgrud';
+ * const busHandle: BusHandle = 'io.github.sgrud';
  * ```
  *
- * @see {@link ConduitHandler}
+ * @example
+ * An invalid **BusHandle**:
+ * ```ts
+ * import { BusHandle } from '@sgrud/bus';
+ *
+ * const busHandle: BusHandle = 'org.example';
+ * // Type [...] is not assignable to type 'BusHandle'.
+ * ```
+ *
+ * @see [BusHandler][]
  */
 export type ConduitHandle = `${string}.${string}.${string}`;
 
 /**
- * Interface describing all values emitted by any conduit. All values emitted by
- * any conduit contain the emitted `value` as well as the emitting `handle`. As
- * a {@link ConduitHandle} represents a domain-like hierarchy, it may contain
- * any number of children, whose emittances are merged into their respective
- * parents.
+ * The **BusValue** is an interface describing the shape of all values emitted
+ * by any bus. As busses are [Observable][] streams, which are dynamically
+ * merged through their hierarchical structure and therefore may emit more than
+ * one `value` from more than one `handle`, each value emitted by any bus
+ * contains its originating `handle` and its typed internal `value`.
  *
- * @typeParam T - Conduit type.
+ * [BusHandler]: https://sgrud.github.io/client/classes/bus.BusHandler
+ * [Observable]: https://rxjs.dev/api/index/class/Observable
  *
- * @see {@link ConduitHandler}
+ * @typeParam T - Bus type.
+ *
+ * @example
+ * Logging emitted **BusValue**s.
+ * ```ts
+ * import { BusHandler } from '@sgrud/bus';
+ *
+ * const busHandler = new BusHandler();
+ * busHandler.get('io.github.sgrud').subscribe(console.log);
+ * // { handle: 'io.github.sgrud.example', value: 'published' }
+ * ```
+ *
+ * @see [BusHandler][]
  */
 export interface ConduitValue<T> {
 
   /**
-   * Emitting {@link ConduitHandle}.
+   * Emitting [BusHandle][].
+   *
+   * [BusHandle]: https://sgrud.github.io/client/types/bus.BusHandle
    */
   readonly handle: ConduitHandle;
 
   /**
-   * Emitted value.
+   * Emitted `value`.
    */
   readonly value: T;
 
 }
 
 /**
- * The ConduitHandler is a {@link Singleton} implementing and orchestrating the
- * establishment, transferral and deconstruction of conduits in conjunction with
- * the {@link ConduitWorker} process.
+ * The **BusHandler** is a [Singleton][] class, implementing and orchestrating
+ * the establishment, transferral and deconstruction of busses in conjunction
+ * with the [BusWorker][] process. To designate different busses, the string
+ * literal helper type [BusHandle][] is employed. As an example, let the
+ * following hierarchical structure be given:
  *
- * @decorator {@link Singleton}
+ * ```text
+ * io.github.sgrud
+ * ├── io.github.sgrud.core
+ * │   ├── io.github.sgrud.core.httpState
+ * │   └── io.github.sgrud.core.kernel
+ * ├── io.github.sgrud.data
+ * │   ├── io.github.sgrud.data.model.current
+ * │   └── io.github.sgrud.data.model.global
+ * └── io.github.sgrud.shell
+ *     └── io.github.sgrud.shell.route
+ * ```
+ *
+ * Depending on the [BusHandle][], one may subscribe to all established busses
+ * beneath the root `io.github.sgrud` handle or only to a specific bus, e.g.,
+ * `io.github.sgrud.core.kernel`. The resulting [Observable][] will either emit
+ * all values passed through all busses with their corresponding [BusHandle][]s,
+ * or only the specific scoped values, corresponding to the [BusHandle][].
+ *
+ * [BusHandle]: https://sgrud.github.io/client/types/bus.BusHandle
+ * [BusWorker]: https://sgrud.github.io/client/classes/bus.BusWorker
+ * [Observable]: https://rxjs.dev/api/index/class/Observable
+ * [Singleton]: https://sgrud.github.io/client/functions/core.Singleton
+ *
+ * @decorator [Singleton][]
+ *
+ * @see [BusWorker][]
  */
 @Singleton<typeof ConduitHandler>((self, [tuples]) => {
   if (tuples) {
@@ -62,32 +120,37 @@ export interface ConduitValue<T> {
 export class ConduitHandler {
 
   /**
-   * {@link Spawn}ed worker process and main conduit workhorse. The underlying
-   * {@link ConduitWorker} is run inside a `WebWorker` context and handles all
-   * published and subscribed conduits and the aggregation of their values
-   * depending on their hierarchy.
+   * [Spawn][]ed **worker** process and main bus workhorse. The underlying
+   * [BusWorker][] is run inside a [Worker][] context and handles all published
+   * and subscribed busses and the aggregation of their values depending on
+   * their [BusHandle][], i.e., hierarchy.
    *
-   * @decorator {@link Spawn}
+   * [BusHandle]: https://sgrud.github.io/client/types/bus.BusHandle
+   * [BusWorker]: https://sgrud.github.io/client/classes/bus.BusWorker
+   * [Spawn]: https://sgrud.github.io/client/functions/core.Spawn
+   * [Worker]: https://developer.mozilla.org/docs/Web/API/Worker/Worker
    *
-   * @see {@link ConduitWorker}
+   * @decorator [Spawn][]
    */
   @Spawn(ConduitWorkerThread)
   private static readonly worker: Thread<ConduitWorker>;
 
   /**
-   * Public ConduitHandler constructor. As the ConduitHandler is a transparent
-   * {@link Singleton}, calling the `new` operator on it will always yield the
-   * same instance. The `new` operator can therefore be used to bulk-publish
-   * conduits.
+   * Public **constructor**. As this class is a transparent [Singleton][],
+   * calling the `new` operator on it will always yield the same instance. The
+   * `new` operator can therefore be used to bulk-publish busses.
    *
-   * @param tuples - List of conduits to publish.
+   * [Singleton]: https://sgrud.github.io/client/functions/core.Singleton
    *
-   * @example Set the `'io.github.sgrud.example'` conduit.
+   * @param tuples - List of busses to publish.
+   *
+   * @example
+   * Set the `'io.github.sgrud.example'` bus:
    * ```ts
-   * import { ConduitHandler } from '@sgrud/bus';
+   * import { BusHandler } from '@sgrud/bus';
    * import { of } from 'rxjs';
    *
-   * new ConduitHandler([
+   * new BusHandler([
    *   ['io.github.sgrud.example', of('published')]
    * ]);
    * ```
@@ -101,26 +164,30 @@ export class ConduitHandler {
   }
 
   /**
-   * Gets the conduit representing the supplied `handle`. Calling this method
-   * yields an Observable originating from the {@link ConduitWorker} which emits
-   * all {@link ConduitValue}s published under the supplied `handle`. When
-   * getting `'io.github.sgrud'`, all conduits published hierarchically beneath
-   * this `handle`, e.g., `'io.github.sgrud.bus.status'`, will also be emitted
-   * by the returned Observable.
+   * Invoking this method **get**s the [Observable][] bus represented by the
+   * supplied `handle`. The method will return an [Observable][] originating
+   * from the [BusWorker][] which emits all [BusValue][]s published under the
+   * supplied `handle`. When **get**ting `'io.github.sgrud'`, all busses
+   * hierarchically beneath this `handle`, e.g., `'io.github.bus.status'`, will
+   * also be emitted by the returned [Observable][].
    *
-   * @param handle - Conduit handle.
-   * @typeParam T - Conduit type.
-   * @returns Observable.
+   * [BusHandle]: https://sgrud.github.io/client/types/bus.BusHandle
+   * [BusValue]: https://sgrud.github.io/client/interfaces/bus.BusValue
+   * [BusWorker]: https://sgrud.github.io/client/classes/bus.BusWorker
+   * [Observable]: https://rxjs.dev/api/index/class/Observable
    *
-   * @example Get the `'io.github.sgrud'` conduit.
+   * @param handle - [BusHandle][] to **get**.
+   * @typeParam T - Bus type.
+   * @returns [Observable][] bus for `handle`.
+   *
+   * @example
+   * **Get** the `'io.github.sgrud'` bus:
    * ```ts
-   * import { ConduitHandler } from '@sgrud/bus';
+   * import { BusHandler } from '@sgrud/bus';
    *
-   * new ConduitHandler().get('io.github.sgrud').subscribe(console.log);
+   * const busHandler = new BusHandler();
+   * busHandler.get('io.github.sgrud.example').subscribe(console.log);
    * ```
-   *
-   * @see {@link ConduitHandle}
-   * @see {@link ConduitValue}
    */
   public get<T>(handle: ConduitHandle): Observable<ConduitValue<T>> {
     return from(ConduitHandler.worker).pipe(
@@ -130,25 +197,30 @@ export class ConduitHandler {
   }
 
   /**
-   * Publishes the supplied `conduit` under the supplied `handle`. This method
-   * will register the passed Observable  with the {@link ConduitWorker}. When
-   * calling `complete` on the Observable source, the `conduit` will
-   * self destruct. When overwriting a `conduit` by supplying a previously used
-   * `handle`, the previously supplied `conduit` will be unsubscribed.
+   * Publishes the supplied [Observable][] `bus` under the supplied `handle`.
+   * Calling this method registers the supplied [Observable][] with the
+   * [BusWorker][]. When the [Observable][] completes, the registration will
+   * self-destruct. When overwriting a registration by supplying a previously
+   * used `handle` in conjunction with a different [Observable][] `bus`, the
+   * previously supplied [Observable][] will be unsubscribed.
    *
-   * @param handle - Conduit handle.
-   * @param conduit - Observable.
-   * @typeParam T - Conduit type.
+   * [BusHandle]: https://sgrud.github.io/client/types/bus.BusHandle
+   * [BusWorker]: https://sgrud.github.io/client/classes/bus.BusWorker
+   * [Observable]: https://rxjs.dev/api/index/class/Observable
    *
-   * @example Set the `'io.github.sgrud.example'` conduit.
+   * @param handle - [BusHandle][] to **set**.
+   * @param bus - [Observable][] bus for `handle`.
+   * @typeParam T - Bus type.
+   *
+   * @example
+   * **Set** the `'io.github.sgrud.example'` bus:
    * ```ts
-   * import { ConduitHandler } from '@sgrud/bus';
+   * import { BusHandler } from '@sgrud/bus';
    * import { of } from 'rxjs';
    *
-   * new ConduitHandler().set('io.github.sgrud.example', of('published'));
+   * const busHandler = new BusHandler();
+   * busHandler.set('io.github.sgrud.example', of('published'));
    * ```
-   *
-   * @see {@link ConduitHandle}
    */
   public set<T>(handle: ConduitHandle, conduit: Observable<T>): void {
     from(ConduitHandler.worker).pipe(

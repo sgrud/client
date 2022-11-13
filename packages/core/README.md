@@ -1,10 +1,10 @@
 # SGRUD
-> SGRUD is Growing Rapidly Until Distinction
+> SGRUD is Growing Rapidly Until Distinction.
 
 ## @sgrud/core
-> `@sgrud/core` - The [SGRUD](https://github.com/sgrud/client) core module.
+> `@sgrud/core` - The [SGRUD](https://sgrud.github.io) Core Module.
 
 ### References
-- [API documentation](https://sgrud.github.io/client/modules/core)
-- [GIT repository](https://github.com/sgrud/client/blob/main/packages/core)
-- [NPM listing](https://www.npmjs.com/package/@sgrud/core)
+- [Documentation](https://sgrud.github.io/client/modules/core)
+- [Repository](https://github.com/sgrud/client/tree/main/packages/core)
+- [Package](https://www.npmjs.com/package/@sgrud/core)

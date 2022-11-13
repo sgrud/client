@@ -15,8 +15,7 @@ cli.command('postbuild [...modules]')
   .action((_ = [], opts) => postbuild({ ...opts, modules: opts._.concat(_) }));
 
 /**
- * Replicates exported package metadata for
- * [SGRUD](https://github.com/sgrud/client)-based projects.
+ * Replicates exported package metadata for [SGRUD][]-based projects.
  *
  * ```text
  * Description
@@ -35,25 +34,37 @@ cli.command('postbuild [...modules]')
  *   $ sgrud postbuild --prefix ./module # Run in ./module
  * ```
  *
+ * [SGRUD]: https://sgrud.github.io
+ *
  * @param options - Options object.
  * @returns Execution promise.
  *
- * @example Run with default options.
+ * @example
+ * Run with default options:
  * ```js
  * require('@sgrud/bin');
+ *
  * sgrud.bin.postbuild();
  * ```
  *
- * @example Postbuild `./project/module`.
+ * @example
+ * **Postbuild** `./project/module`:
  * ```js
  * require('@sgrud/bin');
- * sgrud.bin.postbuild({ modules: ['./project/module'] });
+ *
+ * sgrud.bin.postbuild({
+ *   modules: ['./project/module']
+ * });
  * ```
  *
- * @example Run in `./module`.
+ * @example
+ * Run in `./module`:
  * ```js
  * require('@sgrud/bin');
- * sgrud.bin.postbuild({ prefix: './module' });
+ *
+ * sgrud.bin.postbuild({
+ *   prefix: './module'
+ * });
  * ```
  */
 export async function postbuild({
@@ -62,9 +73,9 @@ export async function postbuild({
 }: {
 
   /**
-   * Modules to build.
+   * Modules to **postbuild**.
    *
-   * @defaultValue `undefined`
+   * @defaultValue `package.json#sgrud.postbuild`
    */
   modules?: string[];
 

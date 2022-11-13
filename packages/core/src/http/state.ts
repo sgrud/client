@@ -7,16 +7,23 @@ import { HttpHandler } from './client';
 import { HttpProxy } from './proxy';
 
 /**
- * Built-in {@link HttpProxy} intercepting all requests fired through the
- * {@link HttpClient}. This proxy implements {@link [observable]}, through which
- * it emits an array of all currently open connections every time a new request
- * is fired or a running request is completed.
+ * The [Target][]ed [Singleton][] **HttpState** is a built-in [HttpProxy][]
+ * intercepting all requests fired through the [HttpClient][]. This proxy
+ * implements the [observable][] pattern, through which it emits an array of all
+ * currently open connections every time a new request is fired or a previously
+ * fired request completes.
  *
- * @decorator {@link Singleton}
- * @decorator {@link Target}
+ * [HttpClient]: https://sgrud.github.io/client/classes/core.HttpClient
+ * [HttpProxy]: https://sgrud.github.io/client/classes/core.HttpProxy
+ * [observable]: https://rxjs.dev/api/index/const/observable
+ * [Singleton]: https://sgrud.github.io/client/functions/core.Singleton
+ * [Target]: https://sgrud.github.io/client/functions/core.Target
  *
- * @see {@link HttpClient}
- * @see {@link HttpProxy}
+ * @decorator [Target][]
+ * @decorator [Singleton][]
+ *
+ * @see [HttpClient][]
+ * @see [HttpProxy][]
  */
 @Target<typeof HttpState>()
 @Singleton<typeof HttpState>()
@@ -24,14 +31,17 @@ export class HttpState
   extends Provider<typeof HttpProxy>('sgrud.core.http.HttpProxy') {
 
   /**
-   * Symbol property typed as callback to a Subscribable. The returned
-   * Subscribable emits an array of all active requests whenever this list
-   * mutates. Using the returned Subscribable, e.g., a load indicator can easily
-   * be implemented.
+   * Symbol property typed as callback to a [Subscribable][]. The returned
+   * [Subscribable][] emits an array of all active requests whenever this list
+   * changes. Using the returned [Subscribable][], e.g., a load indicator can
+   * easily be implemented.
    *
-   * @returns Callback to a Subscribable.
+   * [Subscribable]: https://rxjs.dev/api/index/interface/Subscribable
    *
-   * @example Subscribe to the currently active requests.
+   * @returns Callback to a [Subscribable][].
+   *
+   * @example
+   * Subscribe to the currently active requests:
    * ```ts
    * import { HttpState, Linker } from '@sgrud/core';
    * import { from } from 'rxjs';
@@ -43,19 +53,26 @@ export class HttpState
   public readonly [Symbol.observable]!: () => Subscribable<Response<any>[]>;
 
   /**
-   * BehaviorSubject emitting every time a request is added to or deleted from
-   * the internal {@link running} map.
+   * [BehaviorSubject][] emitting every time a request is added to or deleted
+   * from the internal *running* mapping.
+   *
+   * [BehaviorSubject]: https://rxjs.dev/api/index/class/BehaviorSubject
    */
   private readonly changes: BehaviorSubject<this>;
 
   /**
-   * Internal map containing all running requests. Updating this map should
-   * always be accompanied by an emittance of the {@link changes}.
+   * Internal mapping containing all running requests. Updating this map should
+   * always be accompanied by an emittance of the *changes* [BehaviorSubject][].
+   *
+   * [BehaviorSubject]: https://rxjs.dev/api/index/class/BehaviorSubject
    */
   private readonly running: Map<Request, Response<any>>;
 
   /**
-   * `rxjs.observable` interop getter returning a callback to a Subscribable.
+   * [observable][] interop getter returning a callback to a [Subscribable][].
+   *
+   * [observable]: https://rxjs.dev/api/index/const/observable
+   * [Subscribable]: https://rxjs.dev/api/index/interface/Subscribable
    */
   public get [observable](): () => Subscribable<Response<any>[]> {
     return () => this.changes.pipe(
@@ -64,8 +81,11 @@ export class HttpState
   }
 
   /**
-   * Public constructor. Called by the {@link Target} decorator to link this
-   * {@link HttpProxy} into the proxy chain.
+   * Public **constructor**. Called by the [Target][] decorator to link this
+   * [HttpProxy][] into the proxy chain.
+   *
+   * [HttpProxy]: https://sgrud.github.io/client/classes/core.HttpProxy
+   * [Target]: https://sgrud.github.io/client/functions/core.Target
    */
   public constructor() {
     super();
@@ -75,16 +95,23 @@ export class HttpState
   }
 
   /**
-   * Overridden {@link proxy} method of the {@link HttpProxy} base class.
-   * Mutates the request to also emit progress events while the request is
-   * running. These progress events will be consumed by the HttpState
-   * interceptor and re-supplied via the Observable returned by the
-   * {@link [observable]} getter.
+   * Overridden **proxy** method of the [HttpProxy][] base class. Mutates the
+   * `request` to also emit progress events while the it is running. These
+   * progress events will be consumed by the [HttpState][] interceptor and
+   * re-supplied via the [Subscribable][] returned by the interop getter.
    *
-   * @param request - Request.
-   * @param handler - Next handler.
+   * [AjaxConfig]: https://rxjs.dev/api/ajax/AjaxConfig
+   * [AjaxResponse]: https://rxjs.dev/api/ajax/AjaxResponse
+   * [HttpHandler]: https://sgrud.github.io/client/interfaces/core.HttpHandler
+   * [HttpProxy]: https://sgrud.github.io/client/classes/core.HttpProxy
+   * [HttpState]: https://sgrud.github.io/client/classes/core.HttpState
+   * [Observable]: https://rxjs.dev/api/index/class/Observable
+   * [Subscribable]: https://rxjs.dev/api/index/interface/Subscribable
+   *
+   * @param request - Requesting [AjaxConfig][].
+   * @param handler - Next [HttpHandler][].
    * @typeParam T - Response type.
-   * @returns Observable response.
+   * @returns [Observable][] of the requested [AjaxResponse][].
    */
   public override proxy<T>(
     request: Request,

@@ -6,7 +6,9 @@ declare global {
   interface HTMLElementTagNameMap {
 
     /**
-     * @see {@link RouterOutlet}
+     * [RouterOutlet]: https://sgrud.github.io/client/classes/shell.RouterOutlet
+     *
+     * @see [RouterOutlet][]
      */
     'router-outlet': RouterOutlet;
 
@@ -14,44 +16,49 @@ declare global {
 }
 
 /**
- * Custom element extending the `HTMLSlotElement`. When this component is
- * constructed, it binds the {@link Router} to itself while supplying the value
- * of its {@link baseHref} attribute as {@link Router.baseHref} and the presence
- * of a {@link hashBased} attribute on itself as {@link Router.hashBased}. This
- * component should only be used once, as it will be used by the {@link Router}
- * as {@link Router.outlet} to render the current {@link Router.State}.
+ * Custom element extending the [HTMLSlotElement][]. When this element is
+ * constructed, it supplies the value of its *baseHref* attribute and the
+ * presence of a *hashBased* attribute on itself to the [Router][] while
+ * *bind*ing the [Router][] to itself. This element should only be used once, as
+ * it will be used by the [Router][] as *outlet* to render the current
+ * [State][].
  *
- * @example A `router-outlet`.
+ * [HTMLSlotElement]: https://developer.mozilla.org/docs/Web/API/HTMLSlotElement
+ * [Router]: https://sgrud.github.io/client/classes/shell.Router
+ * [State]: https://sgrud.github.io/client/interfaces/shell.Router-1.State
+ *
+ * @example
+ * A `router-outlet`:
  * ```html
  * <slot baseHref="/example" is="router-outlet">Loading...</slot>
  * ```
  *
- * @see {@link Route}
- * @see {@link Router}
+ * @see [Router][]
  */
 export class RouterOutlet extends HTMLSlotElement {
 
   /**
-   * Getter mirroring the `baseHref` attribute of the component.
+   * Getter mirroring the **baseHref** attribute of the element.
    */
   public get baseHref(): string | undefined {
     return this.getAttribute('baseHref') || undefined;
   }
 
   /**
-   * Getter mirroring the presence of a `hashBased` attribute on the component.
+   * Getter mirroring the presence of a **hashBased** attribute on the element.
    */
   public get hashBased(): boolean {
     return this.hasAttribute('hashBased');
   }
 
   /**
-   * Custom `router-outlet` component constructor. Invokes {@link Router.bind}
-   * on itself while supplying its {@link baseHref} attribute value and the
-   * presence of a {@link hashBased} attribute on itself. It furthermore invokes
-   * a `setTimeout` loop running until the number of routes the router contains
-   * evaluates truthy, which in turn triggers an initial {@link Router.navigate}
-   * invocation.
+   * Custom element **constructor**. Supplies the value of its *baseHref*
+   * attribute and the presence of a *hashBased* attribute on itself to the
+   * [Router][] while *bind*ing the [Router][] to itself. It furthermore invokes
+   * a `setTimeout` loop, running until the number of routes the router contains
+   * evaluates truthy, which in turn triggers an initial navigation.
+   *
+   * [Router]: https://sgrud.github.io/client/classes/shell.Router
    */
   public constructor() {
     super();
@@ -73,7 +80,7 @@ export class RouterOutlet extends HTMLSlotElement {
 }
 
 /**
- * Registration of this custom element with the `CustomElementRegistry`.
+ * Registration of this custom element.
  */
 customElements.define('router-outlet', RouterOutlet, {
   extends: 'slot'

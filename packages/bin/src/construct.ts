@@ -8,7 +8,7 @@ import packageJson from '../package.json';
 import { cli, _b, _g, __ } from './.cli';
 
 cli.command('construct [...modules]')
-  .describe('Builds a SGRUD-based project using `microbundle`')
+  .describe('Constructs a SGRUD-based project using `microbundle`')
   .example('construct # Run with default options')
   .example('construct ./project/module # Build ./project/module')
   .example('construct ./module --format umd # Build ./module as umd')
@@ -18,12 +18,11 @@ cli.command('construct [...modules]')
   .action((_ = [], opts) => construct({ ...opts, modules: opts._.concat(_) }));
 
 /**
- * Builds a [SGRUD](https://github.com/sgrud/client)-based project using
- * [microbundle](https://www.npmjs.com/package/microbundle).
+ * **Construct**s a [SGRUD][]-based project using [microbundle][].
  *
  * ```text
  * Description
- *   Builds a SGRUD-based project using `microbundle`
+ *   Constructs a SGRUD-based project using `microbundle`
  *
  * Usage
  *   $ sgrud construct [...modules] [options]
@@ -40,25 +39,39 @@ cli.command('construct [...modules]')
  *   $ sgrud construct ./module --format umd # Build ./module as umd
  * ```
  *
+ * [microbundle]: https://github.com/developit/microbundle
+ * [SGRUD]: https://sgrud.github.io
+ *
  * @param options - Options object.
  * @returns Execution promise.
  *
- * @example Run with default options.
+ * @example
+ * Run with default options:
  * ```js
  * require('@sgrud/bin');
+ *
  * sgrud.bin.construct();
  * ```
  *
- * @example Build `./project/module`.
+ * @example
+ * **Construct** `./project/module`:
  * ```js
  * require('@sgrud/bin');
- * sgrud.bin.construct({ modules: ['./project/module'] });
+ *
+ * sgrud.bin.construct({
+ *   modules: ['./project/module']
+ * });
  * ```
  *
- * @example Build `./module` as `umd`.
+ * @example
+ * **Construct** `./module` as `umd`:
  * ```js
  * require('@sgrud/bin');
- * sgrud.bin.construct({ modules: ['./module'], format: 'umd' });
+ *
+ * sgrud.bin.construct({
+ *   modules: ['./module'],
+ *   format: 'umd'
+ * });
  * ```
  */
 export async function construct({
@@ -69,23 +82,23 @@ export async function construct({
 }: {
 
   /**
-   * Compress/minify build output.
+   * Compress/minify **construct** output.
    *
    * @defaultValue `true`
    */
   compress?: boolean;
 
   /**
-   * Build specified formats.
+   * **Construct** specified formats.
    *
    * @defaultValue `'commonjs,modern,umd'`
    */
   format?: string;
 
   /**
-   * Modules to build.
+   * Modules to **construct**.
    *
-   * @defaultValue `undefined`
+   * @defaultValue `package.json#sgrud.construct`
    */
   modules?: string[];
 

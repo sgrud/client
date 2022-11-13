@@ -1,20 +1,16 @@
 /**
- * `@sgrud/bus` - The [SGRUD](https://github.com/sgrud/client) software bus.
+ * `@sgrud/bus` - The [SGRUD][] Software Bus.
  *
- * The functionality implemented within this package is intended to ease the
- * inter-component-communication of applications building upon the `@sgrud`
- * libraries. By establishing conduits between different aspects of an
- * application or between plugins extending an application, loose coupling of
- * data transferral can be achieved.
+ * The functions and classes found within this module are intended to ease the
+ * internal communication of applications building upon the [SGRUD][] client
+ * libraries. By establishing busses between different modules of an application
+ * or between an application and plugins extending it, loose coupling of data
+ * transferral and functionality can be achieved. This module includes a
+ * standalone JavaScript bundle which will be used to instantiate a [Worker][],
+ * which is used as central hub for data exchange.
  *
- * The different functions and classes implemented within this module can be
- * roughly categorized into the following functional aspects.
- *
- * - Conduit handling functionality
- *   - {@link ConduitHandler}: singleton class orchestrating all conduits
- *   - {@link ConduitWorker}: `WebWorker` handling all conduit compilation
- *   - {@link Publish}: property decorator publishing the decorated conduit
- *   - {@link Subscribe}: property decorator subscribing to a conduit
+ * [SGRUD]: https://sgrud.github.io
+ * [Worker]: https://developer.mozilla.org/docs/Web/API/Worker/Worker
  *
  * @packageDocumentation
  */

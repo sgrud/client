@@ -5,111 +5,136 @@ import { Singleton } from '../utility/singleton';
 import { HttpProxy } from './proxy';
 
 /**
- * The HttpHandler interface enforces the generic {@link handle} method with
- * `rxjs/ajax` compliant typing on the implementing class or object. Used by
- * {@link HttpProxy} to type the next hops in the proxy chain.
+ * The **HttpHandler** interface enforces the generic *handle* method with
+ * [ajax][] compliant typing on the implementing class or object. This contract
+ * is used by the [HttpProxy][] to type the next hops in the [HttpClient][]
+ * proxy chain.
  *
- * @see {@link HttpClient}
- * @see {@link HttpProxy}
+ * [ajax]: https://rxjs.dev/api/ajax/ajax
+ * [HttpClient]: https://sgrud.github.io/client/classes/core.HttpClient
+ * [HttpProxy]: https://sgrud.github.io/client/classes/core.HttpProxy
+ *
+ * @see [HttpClient][]
  */
 export interface HttpHandler {
 
   /**
-   * Generic method enforcing `rxjs/ajax` compliant typing. The method signature
-   * corresponds to that of the `rxjs/ajax` method itself.
+   * Generic **handle** method enforcing [ajax][] compliant typing. The method
+   * signature corresponds to that of the [ajax][] method itself.
    *
-   * @param request - Request.
+   * [ajax]: https://rxjs.dev/api/ajax/ajax
+   * [AjaxConfig]: https://rxjs.dev/api/ajax/AjaxConfig
+   * [AjaxResponse]: https://rxjs.dev/api/ajax/AjaxResponse
+   * [Observable]: https://rxjs.dev/api/index/class/Observable
+   *
+   * @param request - Requesting [AjaxConfig][].
    * @typeParam T - Response type.
-   * @returns Observable response.
+   * @returns [Observable][] of the requested [AjaxResponse][].
    */
   handle<T>(request: Request): Observable<Response<T>>;
 
 }
 
 /**
- * The HttpClient is a thin wrapper around the `rxjs/ajax` method. The main
- * function of this wrapper is to pipe all requests through a chain of classes
- * extending {@link HttpProxy}. Thereby interceptors for various requests can be
- * implemented to, e.g., provide API credentials etc.
+ * The [Singleton][] **HttpClient** is a thin wrapper around the [ajax][]
+ * method. The main function of this wrapper is to pipe all requests through a
+ * chain of classes extending the abstract [HttpProxy][] class. Thereby
+ * interceptors for various requests can be implemented to, e.g., provide API
+ * credentials etc.
  *
- * @decorator {@link Singleton}
+ * [ajax]: https://rxjs.dev/api/ajax/ajax
+ * [HttpProxy]: https://sgrud.github.io/client/classes/core.HttpProxy
+ * [Singleton]: https://sgrud.github.io/client/functions/core.Singleton
+ *
+ * @decorator [Singleton][]
+ *
+ * @see [HttpProxy][]
  */
 @Singleton<typeof HttpClient>()
 export class HttpClient implements HttpHandler {
 
   /**
-   * Fires a `HTTP DELETE` request upon subscription. Shorthand for calling
-   * {@link handle} with respective arguments.
+   * Fires an HTTP **DELETE** request against the supplied `url` upon
+   * subscription.
+   *
+   * [AjaxResponse]: https://rxjs.dev/api/ajax/AjaxResponse
+   * [Observable]: https://rxjs.dev/api/index/class/Observable
    *
    * @param url - Request URL.
    * @typeParam T - Response type.
-   * @returns Observable response.
+   * @returns [Observable][] of the requested [AjaxResponse][].
    *
-   * @example Fire a `DELETE` request against `https://example.com`.
+   * @example
+   * Fire an HTTP **DELETE** request against `https://example.com`:
    * ```ts
    * import { HttpClient } from '@sgrud/core';
    *
    * HttpClient.delete('https://example.com').subscribe(console.log);
    * ```
-   *
-   * @see {@link handle}
    */
   public static delete<T>(url: string): Observable<Response<T>> {
     return this.prototype.handle<T>({ method: 'DELETE', url });
   }
 
   /**
-   * Fires a `HTTP GET` request upon subscription. Shorthand for calling
-   * {@link handle} with respective arguments.
+   * Fires an HTTP **GET** request against the supplied `url` upon subscription.
+   *
+   * [AjaxResponse]: https://rxjs.dev/api/ajax/AjaxResponse
+   * [Observable]: https://rxjs.dev/api/index/class/Observable
    *
    * @param url - Request URL.
    * @typeParam T - Response type.
-   * @returns Observable response.
+   * @returns [Observable][] of the requested [AjaxResponse][].
    *
-   * @example Fire a `GET` request against `https://example.com`.
+   * @example
+   * Fire an HTTP **GET** request against `https://example.com`:
    * ```ts
    * import { HttpClient } from '@sgrud/core';
    *
    * HttpClient.get('https://example.com').subscribe(console.log);
    * ```
-   *
-   * @see {@link handle}
    */
   public static get<T>(url: string): Observable<Response<T>> {
     return this.prototype.handle<T>({ method: 'GET', url });
   }
 
   /**
-   * Fires a `HTTP HEAD` request upon subscription. Shorthand for calling
-   * {@link handle} with respective arguments.
+   * Fires an HTTP **HEAD** request against the supplied `url` upon
+   * subscription.
+   *
+   * [AjaxResponse]: https://rxjs.dev/api/ajax/AjaxResponse
+   * [Observable]: https://rxjs.dev/api/index/class/Observable
    *
    * @param url - Request URL.
    * @typeParam T - Response type.
-   * @returns Observable response.
+   * @returns [Observable][] of the requested [AjaxResponse][].
    *
-   * @example Fire a `HEAD` request against `https://example.com`.
+   * @example
+   * Fire an HTTP **HEAD** request against `https://example.com`:
    * ```ts
    * import { HttpClient } from '@sgrud/core';
    *
    * HttpClient.head('https://example.com').subscribe(console.log);
    * ```
-   *
-   * @see {@link handle}
    */
   public static head<T>(url: string): Observable<Response<T>> {
     return this.prototype.handle<T>({ method: 'HEAD', url });
   }
 
   /**
-   * Fires a `HTTP PATCH` request upon subscription. Shorthand for calling
-   * {@link handle} with respective arguments.
+   * Fires an HTTP **PATCH** request against the supplied `url` containing the
+   * supplied `body` upon subscription.
+   *
+   * [AjaxResponse]: https://rxjs.dev/api/ajax/AjaxResponse
+   * [Observable]: https://rxjs.dev/api/index/class/Observable
    *
    * @param url - Request URL.
    * @param body - Request body.
    * @typeParam T - Response type.
-   * @returns Observable response.
+   * @returns [Observable][] of the requested [AjaxResponse][].
    *
-   * @example Fire a `PATCH` request against `https://example.com`.
+   * @example
+   * Fire an HTTP **PATCH** request against `https://example.com`:
    * ```ts
    * import { HttpClient } from '@sgrud/core';
    *
@@ -117,23 +142,25 @@ export class HttpClient implements HttpHandler {
    *   bodyContent: 'value'
    * }).subscribe(console.log);
    * ```
-   *
-   * @see {@link handle}
    */
   public static patch<T>(url: string, body: unknown): Observable<Response<T>> {
     return this.prototype.handle<T>({ body, method: 'PATCH', url });
   }
 
   /**
-   * Fires a `HTTP POST` request upon subscription. Shorthand for calling
-   * {@link handle} with respective arguments.
+   * Fires an HTTP **POST** request against the supplied `url` containing the
+   * supplied `body` upon subscription.
+   *
+   * [AjaxResponse]: https://rxjs.dev/api/ajax/AjaxResponse
+   * [Observable]: https://rxjs.dev/api/index/class/Observable
    *
    * @param url - Request URL.
    * @param body - Request body.
    * @typeParam T - Response type.
-   * @returns Observable response.
+   * @returns [Observable][] of the requested [AjaxResponse][].
    *
-   * @example Fire a `POST` request against `https://example.com`.
+   * @example
+   * Fire an HTTP **POST** request against `https://example.com`:
    * ```ts
    * import { HttpClient } from '@sgrud/core';
    *
@@ -141,23 +168,25 @@ export class HttpClient implements HttpHandler {
    *   bodyContent: 'value'
    * }).subscribe(console.log);
    * ```
-   *
-   * @see {@link handle}
    */
   public static post<T>(url: string, body: unknown): Observable<Response<T>> {
     return this.prototype.handle<T>({ body, method: 'POST', url });
   }
 
   /**
-   * Fires a `HTTP PUT` request upon subscription. Shorthand for calling
-   * {@link handle} with respective arguments.
+   * Fires an HTTP **PUT** request against the supplied `url` containing the
+   * supplied `body` upon subscription.
+   *
+   * [AjaxResponse]: https://rxjs.dev/api/ajax/AjaxResponse
+   * [Observable]: https://rxjs.dev/api/index/class/Observable
    *
    * @param url - Request URL.
    * @param body - Request body.
    * @typeParam T - Response type.
-   * @returns Observable response.
+   * @returns [Observable][] of the requested [AjaxResponse][].
    *
-   * @example Fire a `PUT` request against `https://example.com`.
+   * @example
+   * Fire an HTTP **PUT** request against `https://example.com`:
    * ```ts
    * import { HttpClient } from '@sgrud/core';
    *
@@ -165,23 +194,28 @@ export class HttpClient implements HttpHandler {
    *   bodyContent: 'value'
    * }).subscribe(console.log);
    * ```
-   *
-   * @see {@link handle}
    */
   public static put<T>(url: string, body: unknown): Observable<Response<T>> {
     return this.prototype.handle<T>({ body, method: 'PUT', url });
   }
 
   /**
-   * Generic handle method, enforced by the {@link HttpHandler} interface. Main
-   * method of the HttpClient. Internally pipes the request config through all
-   * linked classes extending {@link HttpProxy}.
+   * Generic **handle** method, enforced by the [HttpHandler][] interface. Main
+   * method of the this class. Internally pipes the `request` through all linked
+   * classes extending [HttpProxy][].
    *
-   * @param request - Request.
+   * [AjaxConfig]: https://rxjs.dev/api/ajax/AjaxConfig
+   * [AjaxResponse]: https://rxjs.dev/api/ajax/AjaxResponse
+   * [HttpHandler]: https://sgrud.github.io/client/interfaces/core.HttpHandler
+   * [HttpProxy]: https://sgrud.github.io/client/classes/core.HttpProxy
+   * [Observable]: https://rxjs.dev/api/index/class/Observable
+   *
+   * @param request - Requesting [AjaxConfig][].
    * @typeParam T - Response type.
-   * @returns Observable response.
+   * @returns [Observable][] of the requested [AjaxResponse][].
    *
-   * @example Fire a custom request against `https://example.com`.
+   * @example
+   * Fire an HTTP custom request against `https://example.com`:
    * ```ts
    * import { HttpClient } from '@sgrud/core';
    *
@@ -191,8 +225,6 @@ export class HttpClient implements HttpHandler {
    *   headers: { 'x-example': 'value' }
    * }).subscribe(console.log);
    * ```
-   *
-   * @see {@link HttpProxy}
    */
   public handle<T>(request: Request): Observable<Response<T>> {
     const proxies = new Linker<typeof HttpProxy>().getAll(HttpProxy);

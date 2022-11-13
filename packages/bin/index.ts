@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * `@sgrud/bin` - The [SGRUD](https://github.com/sgrud/client) CLI.
+ * `@sgrud/bin` - The [SGRUD][] CLI.
  *
  * ```text
  * Description
@@ -12,7 +12,7 @@
  *
  * Available Commands
  *   construct    Builds a SGRUD-based project using `microbundle`
- *   kickstart    Kickstarts a SGRUD-based project
+ *   kickstart    Kickstarts a SGRUD-based project using `simple-git`
  *   postbuild    Replicates exported package metadata for SGRUD-based projects
  *   runtimify    Creates ESM or UMD bundles for ES6 modules using `microbundle`
  *   universal    Runs SGRUD in universal (SSR) mode using `puppeteer`
@@ -25,6 +25,8 @@
  *   -v, --version    Displays current version
  *   -h, --help       Displays this message
  * ```
+ *
+ * [SGRUD]: https://sgrud.github.io
  *
  * @packageDocumentation
  */

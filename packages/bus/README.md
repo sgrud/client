@@ -1,10 +1,10 @@
 # SGRUD
-> SGRUD is Growing Rapidly Until Distinction
+> SGRUD is Growing Rapidly Until Distinction.
 
 ## @sgrud/bus
-> `@sgrud/bus` - The [SGRUD](https://github.com/sgrud/client) software bus.
+> `@sgrud/bus` - The [SGRUD](https://sgrud.github.io) Software Bus.
 
 ### References
-- [API documentation](https://sgrud.github.io/client/modules/bus)
-- [GIT repository](https://github.com/sgrud/client/blob/main/packages/bus)
-- [NPM listing](https://www.npmjs.com/package/@sgrud/bus)
+- [Documentation](https://sgrud.github.io/client/modules/bus)
+- [Repository](https://github.com/sgrud/client/tree/main/packages/bus)
+- [Package](https://www.npmjs.com/package/@sgrud/bus)

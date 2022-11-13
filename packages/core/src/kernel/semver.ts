@@ -1,12 +1,15 @@
 /**
- * Best-effort [semver](https://semver.org) matcher. The supplied `version`
- * will be tested against all supplied `range`.
+ * Best-effort [semver][] matcher. The supplied `version` will be tested against
+ * the supplied `range`.
+ *
+ * [semver]: https://semver.org
  *
  * @param version - Tested semantic version string.
  * @param range - Range to test the `version` against.
  * @returns Wether `version` satisfies `range`.
  *
- * @example Test `'1.2.3'` against `'>2 <1 || ~1.2.*'`.
+ * @example
+ * Test `'1.2.3'` against `'>2 <1 || ~1.2.*'`:
  * ```ts
  * import { semver } from '@sgrud/core';
  *

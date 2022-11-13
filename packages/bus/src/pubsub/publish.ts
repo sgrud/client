@@ -3,51 +3,63 @@ import { Observable, Subject } from 'rxjs';
 import { ConduitHandle, ConduitHandler } from '../conduit/handler';
 
 /**
- * Prototype property decorator factory. This decorator publishes the decorated
- * property value under the supplied `handle`. If the supplied `source` is a
- * string it is assumed to reference a property key of the prototype containing
- * the decorated property. The first instance value assigned to this `source`
- * property is assigned as readonly on the instance and appended to the supplied
- * `handle`, thus creating an _instance-scoped handle_. This _scoped handle_ is
- * then used to publish the first instance value assigned to the decorated
- * property. This implies that the publication will wait until both the
- * decorated property and the referenced `source` property are assigned values.
- * If the supplied `source` is of an Observable type, this Observable is
- * published under the supplied `handle` and assigned as readonly to the
- * decorated prototype property. If no `source` is supplied, a new Subject will
- * be created and implicitly supplied as `source`.
+ * Prototype property decorator factory. This decorator **publish**es the
+ * decorated property value under the supplied `handle`. If the supplied
+ * `source` isn't an [Observable][] it is assumed to reference a property key of
+ * the prototype containing the decorated property. The first instance value
+ * assigned to this `source` property is assigned as readonly on the instance
+ * and appended to the supplied `handle`, thus creating an *instance-scoped
+ * handle*. This *scoped handle* is then used to **publish** the first instance
+ * value assigned to the decorated property. This implies that the publication
+ * to the underlying bus will wait until both the decorated property and the
+ * referenced `source` property are assigned values. If the supplied `source` is
+ * of an [Observable][] type, this [Observable][] is **publish**ed under the
+ * supplied `handle` and assigned as readonly to the decorated prototype
+ * property. If no `source` is supplied, a new [Subject][] will be created and
+ * implicitly supplied as `source`. This decorator is more or less the opposite
+ * of the [Subscribe][] decorator, while both rely on the [BusHandler][] to
+ * fulfill contracts.
  *
- * Precautions should be taken to ensure completion of the supplied Observable
- * source as otherwise memory leaks may occur due to dangling subscriptions.
+ * Precautions should be taken to ensure completion of the supplied
+ * [Observable][] `source` as otherwise memory leaks may occur due to dangling
+ * subscriptions.
  *
- * @param handle - Conduit handle.
- * @param source - Property key or Observable.
+ * [BusHandle]: https://sgrud.github.io/client/types/bus.BusHandle
+ * [BusHandler]: https://sgrud.github.io/client/classes/bus.BusHandler
+ * [Observable]: https://rxjs.dev/api/index/class/Observable
+ * [Subject]: https://rxjs.dev/api/index/class/Subject
+ * [Subscribe]: https://sgrud.github.io/client/functions/bus.Subscribe
+ *
+ * @param handle - [BusHandle][] to **publish**.
+ * @param source - Property key or [Observable][].
  * @returns Prototype property decorator.
  *
- * @example Publish the `'io.github.sgrud.example'` conduit.
+ * @example
+ * **Publish** the `'io.github.sgrud.example'` bus:
  * ```ts
- * import { Publish } from '@sgrud/bus';
  * import type { Subject } from 'rxjs';
+ * import { Publish } from '@sgrud/bus';
  *
  * export class Publisher {
  *
- *   @Publish('io.github.sgrud.example')
- *   public readonly conduit!: Subject<any>;
+ *   ⁠@Publish('io.github.sgrud.example')
+ *   public readonly bus!: Subject<any>;
  *
  * }
  *
- * Publisher.prototype.conduit.complete();
+ * Publisher.prototype.bus.complete();
  * ```
  *
- * @example Publish the `'io.github.sgrud.example'` conduit.
+ * @example
+ * **Publish** the `'io.github.sgrud.example'` bus:
  * ```ts
  * import { Publish } from '@sgrud/bus';
  * import { Subject } from 'rxjs';
  *
  * export class Publisher {
  *
- *   @Publish('io.github.sgrud', 'scope')
- *   public readonly conduit: Subject<any> = new Subject<any>();
+ *   ⁠@Publish('io.github.sgrud', 'scope')
+ *   public readonly bus: Subject<any> = new Subject<any>();
  *
  *   public constructor(
  *     private readonly scope: string
@@ -56,11 +68,11 @@ import { ConduitHandle, ConduitHandler } from '../conduit/handler';
  * }
  *
  * const publisher = new Publisher('example');
- * publisher.conduit.complete();
+ * publisher.bus.complete();
  * ```
  *
- * @see {@link ConduitHandler}
- * @see {@link Subscribe}
+ * @see [BusHandler][]
+ * @see [Subscribe][]
  */
 export function Publish(
   handle: ConduitHandle,

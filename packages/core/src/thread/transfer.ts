@@ -5,12 +5,14 @@ import { Observable, Observer, Subscribable, Subscriber } from 'rxjs';
 import { TypeOf } from '../utility/type-of';
 
 /**
- * Observable transfer handler. This specific implementation of
- * [comlink.transferHandlers](https://www.npmjs.com/package/comlink#api) should
- * transparently proxy [rxjs](https://www.npmjs.com/package/rxjs) `Observable`
- * between a worker and the main threads.
+ * [Comlink][] **transferHandler** for values of type [Observable][]. This
+ * custom implementation of a [Comlink][] **transferHandler** transparently
+ * proxies [Observable][] streams between two [Comlink][] endpoints.
  *
- * @see https://github.com/GoogleChromeLabs/comlink/issues/219
+ * [Comlink]: https://www.npmjs.com/package/comlink
+ * [Observable]: https://rxjs.dev/api/index/class/Observable
+ *
+ * @remarks https://github.com/GoogleChromeLabs/comlink/issues/219
  */
 transferHandlers.set('observable', {
   canHandle: (value: unknown): value is Observable<unknown> => {
@@ -40,10 +42,14 @@ transferHandlers.set('observable', {
 });
 
 /**
- * Subscriber transfer handler. This specific implementation of
- * [comlink.transferHandlers](https://www.npmjs.com/package/comlink#api) should
- * transparently proxy [rxjs](https://www.npmjs.com/package/rxjs) `Subscriber`
- * between a worker and the main threads.
+ * [Comlink][] **transferHandler** for values of type [Subscriber][]. This
+ * custom implementation of a [Comlink][] **transferHandler** transparently
+ * proxies the [Subscriber][] to a previously proxied [Observable][] stream
+ * between two [Comlink][] endpoints.
+ *
+ * [Comlink]: https://www.npmjs.com/package/comlink
+ * [Observable]: https://rxjs.dev/api/index/class/Observable
+ * [Subscriber]: https://rxjs.dev/api/index/class/Subscriber
  */
 transferHandlers.set('subscriber', {
   canHandle: (value: unknown): value is Subscriber<unknown> => {
@@ -62,11 +68,13 @@ if (TypeOf.process(globalThis.process)) {
   const nodeEndpoint = require('comlink/dist/umd/node-adapter.min');
 
   /**
-   * NodeJS proxy transfer handler. This specific implementation of
-   * [comlink.transferHandlers](https://www.npmjs.com/package/comlink#api)
-   * adopts the default `proxyTransferHandler` for usage under NodeJS.
+   * Overridden default [Comlink][] *proxyTransferHandler* **transferHandler**.
+   * This custom implementation of a [Comlink][] **transferHandler** adopts the
+   * default [Comlink][] *proxyTransferHandler* for usage under NodeJS.
    *
-   * @see https://github.com/GoogleChromeLabs/comlink/issues/313
+   * [Comlink]: https://www.npmjs.com/package/comlink
+   *
+   * @remarks https://github.com/GoogleChromeLabs/comlink/issues/313
    */
   transferHandlers.set('proxy', {
     // eslint-disable-next-line @typescript-eslint/unbound-method

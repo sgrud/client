@@ -1,8 +1,10 @@
 /**
- * Worker wildcard module declaration. Allows inlining worker code by importing
- * the synthetic default export of a source file prefixed with `worker:`.
+ * **Worker** wildcard module declaration. Allows inlining **worker** code by
+ * importing the synthetic default export of a source file prefixed with
+ * `worker:`.
  *
- * @example Inline a WebWorker.
+ * @example 
+ * Inline a WebWorker:
  * ```ts
  * import WebWorkerThread from 'worker:./web-worker';
  * ```

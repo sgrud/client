@@ -2,18 +2,23 @@ import { Mutable } from '@sgrud/core';
 import { Component } from './component';
 
 /**
- * Prototype property decorator factory. Applying this decorator to a property
- * of a registered {@link Component} binds the decorated property to the
- * corresponding attribute of the custom component and adds the attribute to the
- * {@link observedAttributes} array. If no `name` parameter is supplied, the
- * name of the decorated property will be used instead. If both, a parameter
- * initializer and an initial attribute value are supplied, the attribute value
- * takes precedence.
+ * [Component][] prototype property decorator factory. Applying the
+ * **Attribute** decorator to a property of a [Component][] binds the decorated
+ * property to the corresponding attribute of the respective [Component][]. This
+ * implies that the attribute `name` is added to the *observedAttributes* array
+ * of the [Component][] and the decorated property is replaced with a getter and
+ * setter deferring those operations to the attribute. If no `name` supplied,
+ * the name of the decorated property will be used instead. Further, if both, a
+ * parameter initializer and an initial attribute value are supplied, the
+ * attribute value takes precedence.
  *
- * @param name - Component attribute name.
- * @returns Component property decorator.
+ * [Component]: https://sgrud.github.io/client/interfaces/shell.Component-1
  *
- * @example Decorate a property.
+ * @param name - [Component][] attribute name.
+ * @returns [Component][] prototype property decorator.
+ *
+ * @example
+ * Decorate a property:
  * ```tsx
  * import { Attribute, Component } from '@sgrud/shell';
  *
@@ -23,10 +28,10 @@ import { Component } from './component';
  *   }
  * }
  *
- * @Component('example-component')
+ * ⁠@Component('example-component')
  * export class ExampleComponent extends HTMLElement implements Component {
  *
- *   @Attribute()
+ *   ⁠@Attribute()
  *   public field?: string;
  *
  *   public get template(): JSX.Element {
@@ -36,13 +41,15 @@ import { Component } from './component';
  * }
  * ```
  *
- * @see {@link Component}
+ * @see [Component][]
  */
 export function Attribute(name?: string) {
 
   /**
-   * @param prototype - Component prototype to be decorated.
-   * @param propertyKey - Component property to be decorated.
+   * @param prototype - [Component][] prototype to be decorated.
+   * @param propertyKey - [Component][] property to be decorated.
+   *
+   * [Component]: https://sgrud.github.io/client/interfaces/shell.Component-1
    */
   return function(
     prototype: Component,

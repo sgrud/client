@@ -2,55 +2,62 @@ import { customElements } from './registry';
 import { createElement, render } from './runtime';
 
 /**
- * Interface describing the shape of a custom component. Mostly adheres to the
- * [specs](https://developer.mozilla.org/en-US/docs/Web/Web_Components) while
- * providing rendering and change detection capabilities.
+ * Interface describing the shape of a **Component**. Mostly adheres to the
+ * [WebComponents][] specification while providing rendering and change
+ * detection capabilities.
+ *
+ * [WebComponents]: https://developer.mozilla.org/docs/Web/Web_Components
  */
 export interface Component extends HTMLElement {
 
   /**
-   * Array of attribute names, which should be observed for changes, which will
-   * trigger the {@link attributeChangedCallback}.
+   * Array of [Attribute][] names, which should be observed for changes, which
+   * will trigger the *attributeChangedCallback*.
    *
-   * @see {@link Attribute}
+   * [Attribute]: https://sgrud.github.io/client/functions/shell.Attribute
    */
   readonly observedAttributes?: string[];
 
   /**
-   * Mapping of references to observed events, which, when emitted by the
-   * referenced node, trigger the {@link referenceChangedCallback}.
+   * Mapping of [Reference][]s to observed events, which, when emitted by the
+   * referenced node, trigger the *referenceChangedCallback*.
    *
-   * @see {@link Reference}
+   * [Reference]: https://sgrud.github.io/client/functions/shell.Reference
    */
   readonly observedReferences?: Record<JSX.Key, (keyof HTMLElementEventMap)[]>;
 
   /**
    * Internal readiness indication. Initially resolves to `undefined` and will
-   * mirror the `isConnected` state, when ready.
+   * mirror the *isConnected* state, when ready.
    */
   readonly readyState?: boolean;
 
   /**
-   * Array of CSS strings, which should be included within the shadow dom of the
-   * component.
+   * Array of CSS **styles** in string form, which should be included within the
+   * shadow dom of the *Component*.
    */
   readonly styles?: string[];
 
   /**
-   * JSX representation of the component template. If no template is supplied, a
-   * slot element will be rendered instead.
+   * [JSX][] representation of the *Component* **template**. If no template is
+   * supplied, an [HTMLSlotElement][] will be rendered instead.
+   *
+   * [HTMLSlotElement]: https://developer.mozilla.org/docs/Web/API/HTMLSlotElement
+   * [JSX]: https://www.typescriptlang.org/docs/handbook/jsx.html
    */
   readonly template?: JSX.Element;
 
   /**
-   * Called when the component is moved between documents.
+   * Called when the *Component* is moved between documents.
    */
   adoptedCallback?(): void;
 
   /**
-   * Called when one of the component's observed attributes is added, removed or
-   * changed. Which component attributes are observed depends on the contents of
-   * the {@link observedAttributes} array.
+   * Called when one of the *Component*'s observed [Attribute][]s is added,
+   * removed or changed. Which *Component* attributes are observed depends on
+   * the contents of the *observedAttributes* array.
+   *
+   * [Attribute]: https://sgrud.github.io/client/functions/shell.Attribute
    *
    * @param name - Attribute name.
    * @param prev - Previous value.
@@ -59,48 +66,58 @@ export interface Component extends HTMLElement {
   attributeChangedCallback?(name: string, prev?: string, next?: string): void;
 
   /**
-   * Called when the component is appended to or moved within the dom.
+   * Called when the *Component* is appended to or moved within the dom.
    */
   connectedCallback?(): void;
 
   /**
-   * Called when the component is removed from the dom.
+   * Called when the *Component* is removed from the dom.
    */
   disconnectedCallback?(): void;
 
   /**
-   * Called when one of the component's referenced and observed nodes emits an
-   * event. Which referenced nodes are observed for which events depends on the
-   * contents of the {@link observedReferences} mapping.
+   * Called when one of the *Component*'s [Reference][]d and observed nodes
+   * emits an event. Which [Reference][]d nodes are observed for which events
+   * depends on the contents of the *observedReferences* mapping.
    *
-   * @param name - Reference name.
+   * [Reference]: https://sgrud.github.io/client/functions/shell.Reference
+   *
+   * @param name - [Reference][] name.
    * @param event - Emitted event.
    */
   referenceChangedCallback?(name: string, node: Node, event: Event): void;
 
   /**
-   * Called when the component has changed and should be (re-)rendered.
+   * Called when the *Component* has changed and should be (re-)[render][]ed.
+   *
+   * [render]: https://sgrud.github.io/client/functions/shell.render
    */
   renderComponent?(): void;
 
 }
 
 /**
- * Class decorator factory. Registers the decorated class as component through
- * the {@link customElements} registry. Registered components can be used in
- * conjunction with the {@link Attribute} and {@link Reference} prototype
- * property decorators which will trigger the component to re-render, when one
- * of the {@link observedAttributes} or {@link observedReferences} changes.
- * While any custom component which is registered by this decorator is enriched
- * with basic rendering functionality, any implemented method will cancel out
- * its `super` logic.
+ * Class decorator factory. Registers the decorated class as **Component**
+ * through the [customElements][] registry. Registered **Component**s can be
+ * used in conjunction with the [Attribute][] and [Reference][] prototype
+ * property decorators which will trigger the **Component** to re-[render][],
+ * when one of the *observedAttributes* or *observedReferences* changes. While
+ * any **Component** which is registered by this decorator is enriched with
+ * basic rendering functionality, any implemented method will cancel out its
+ * `super` logic.
  *
- * @param selector - Component tag name.
+ * [customElements]: https://sgrud.github.io/client/variables/shell.customElements
+ * [Attribute]: https://sgrud.github.io/client/functions/shell.Attribute
+ * [Reference]: https://sgrud.github.io/client/functions/shell.Reference
+ * [render]: https://sgrud.github.io/client/functions/shell.render
+ *
+ * @param selector - **Component** tag name.
  * @param inherits - Extended tag name.
- * @typeParam S - Component tag type.
+ * @typeParam S - **Component** tag type.
  * @returns Class decorator.
  *
- * @example Register a component.
+ * @example
+ * Register a component:
  * ```tsx
  * import { Component } from '@sgrud/shell';
  *
@@ -110,7 +127,7 @@ export interface Component extends HTMLElement {
  *   }
  * }
  *
- * @Component('example-component')
+ * ⁠@Component('example-component')
  * export class ExampleComponent extends HTMLElement implements Component {
  *
  *   public readonly styles: string[] = [`
@@ -126,8 +143,8 @@ export interface Component extends HTMLElement {
  * }
  * ```
  *
- * @see {@link Attribute}
- * @see {@link Reference}
+ * @see [Attribute][]
+ * @see [Reference][]
  */
 export function Component<
   S extends CustomElementTagName,

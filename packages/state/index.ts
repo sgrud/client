@@ -1,5 +1,7 @@
 /**
- * `@sgrud/state` - The [SGRUD](https://github.com/sgrud/client) state machine.
+ * `@sgrud/state` - The [SGRUD][] State Machine.
+ *
+ * [SGRUD]: https://sgrud.github.io
  *
  * @packageDocumentation
  */

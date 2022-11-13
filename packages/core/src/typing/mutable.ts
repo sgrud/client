@@ -1,9 +1,9 @@
 /**
- * Type helper marking the supplied type as mutable (opposed to readonly).
+ * Type helper marking the supplied type as **Mutable** (opposed to *readonly*).
  *
- * @typeParam T - Type to be marked mutable.
+ * @typeParam T - Readonly type.
  *
- * @see https://github.com/Microsoft/TypeScript/issues/24509
+ * @remarks https://github.com/Microsoft/TypeScript/issues/24509
  */
 export type Mutable<T extends object> = {
   -readonly [K in keyof T]: T[K];

@@ -1,21 +1,27 @@
+/* eslint-disable @typescript-eslint/unbound-method */
+
 import { assign, Mutable } from '@sgrud/core';
 import { Component } from './component';
 import { references } from './runtime';
 
 /**
- * Prototype property decorator factory. Applying this decorator to a property
- * of a registered {@link Component} while supplying the `ref`erence key and,
- * optionally, an array of events to `observe`, will replace the decorated
- * property with a getter returning the referenced node, once rendered. If an
- * array of events is supplied, whenever one of those events is emitted by the
- * referenced node, the {@link referenceChangedCallback} is called with the
- * `ref`erence key, the referenced node and the emitted event.
+ * [Component][] prototype property decorator factory. Applying the
+ * **Reference** decorator to a property of a registered [Component][] while
+ * supplying the `reference` key and, optionally, an array of events to
+ * `observe`, will replace the decorated property with a getter returning the
+ * referenced node, once rendered. If an array of events is supplied, whenever
+ * one of those events is emitted by the referenced node, the
+ * *referenceChangedCallback* of the respective [Component][] is called with the
+ * `reference` key, the referenced node and the emitted event.
  *
- * @param ref - Element reference.
+ * [Component]: https://sgrud.github.io/client/interfaces/shell.Component-1
+ *
+ * @param reference - Element reference.
  * @param observe - Events to observe.
- * @returns Component property decorator.
+ * @returns [Component][] prototype property decorator.
  *
- * @example Reference a node.
+ * @example
+ * Reference a node:
  * ```tsx
  * import { Component, Reference } from '@sgrud/shell';
  *
@@ -25,10 +31,10 @@ import { references } from './runtime';
  *   }
  * }
  *
- * @Component('example-component')
+ * ⁠@Component('example-component')
  * export class ExampleComponent extends HTMLElement implements Component {
  *
- *   @Reference('example-key')
+ *   ⁠@Reference('example-key')
  *   private readonly span?: HTMLSpanElement;
  *
  *   public get template(): JSX.Element {
@@ -38,7 +44,7 @@ import { references } from './runtime';
  * }
  * ```
  *
- * @see {@link Component}
+ * @see [Component][]
  */
 export function Reference(
   ref: JSX.Key,
@@ -46,8 +52,10 @@ export function Reference(
 ) {
 
   /**
-   * @param prototype - Component prototype to be decorated.
-   * @param propertyKey - Component property to be decorated.
+   * @param prototype - [Component][] prototype to be decorated.
+   * @param propertyKey - [Component][] property to be decorated.
+   *
+   * [Component]: https://sgrud.github.io/client/interfaces/shell.Component-1
    */
   return function(
     prototype: Component,

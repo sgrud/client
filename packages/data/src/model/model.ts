@@ -7,40 +7,50 @@ import { property, Property } from '../relation/property';
 import { Enum } from './enum';
 
 /**
- * Namespace containing types and interfaces to be used in conjunction with
- * classes extending the abstract model base class. All the types and interfaces
- * within this namespace are only applicable to classes extending the abstract
- * model base class, as their generic type argument is always constrained to
- * this abstract base class.
+ * Namespace containing types and interfaces used and intended to be used in
+ * conjunction with classes extending the abstract [Model][] base class. All the
+ * types and interfaces within this namespace are only applicable to classes
+ * extending the abstract [Model][] base class, as their generic type argument
+ * is always constrained to this abstract base class.
  *
- * @see {@link Model}
+ * [Model]: https://sgrud.github.io/client/classes/data.Model
+ *
+ * @see [Model][]
  */
 export namespace Model {
   /* eslint-disable @typescript-eslint/indent */
 
   /**
-   * Type alias for all fields, i.e., own enumerable properties, (excluding
-   * internally used ones) of classes extending the abstract model base class.
+   * Type alias for all **Field**s, i.e., own enumerable properties, (excluding
+   * internally used ones) of classes extending the abstract [Model][] base
+   * class.
    *
-   * @typeParam T - Extending model instance type.
+   * [Model]: https://sgrud.github.io/client/classes/data.Model
+   *
+   * @typeParam T - Extending *Model* instance type.
    */
   export type Field<T extends Model> = string &
     Exclude<keyof T, Exclude<keyof Model, 'id' | 'created' | 'modified'>>;
 
   /**
-   * Type alias referencing {@link Params}.
+   * Type alias referencing **Filter** [Params][].
    *
-   * @typeParam T - Extending model instance type.
+   * [Model]: https://sgrud.github.io/client/classes/data.Model
+   * [Params]: https://sgrud.github.io/client/interfaces/data.Model-1.Filter-1.Params
    *
-   * @see {@link Params}
+   * @typeParam T - Extending *Model* instance type.
+   *
+   * @see [Params][]
    */
   export type Filter<T extends Model> = Filter.Params<T>;
 
   /**
-   * Mapped type to compile strongly typed graphs of classes extending the
-   * abstract model base class, while providing intellisense.
+   * Mapped type to compile strongly typed **Graph**s of classes extending the
+   * abstract [Model][] base class, while providing intellisense.
    *
-   * @typeParam T - Extending model instance type.
+   * [Model]: https://sgrud.github.io/client/classes/data.Model
+   *
+   * @typeParam T - Extending *Model* instance type.
    */
   export type Graph<T extends Model> = {
     [K in Field<T>]?:
@@ -52,11 +62,13 @@ export namespace Model {
   }[Field<T>][];
 
   /**
-   * Mapped type to compile strongly typed property paths of classes extending
-   * the abstract model base class, while providing intellisense.
+   * Mapped type to compile strongly typed property **Path**s of classes
+   * extending the abstract [Model][] base class, while providing intellisense.
    *
-   * @typeParam T - Extending model instance type.
-   * @typeParam S - String array limiting the path depth.
+   * [Model]: https://sgrud.github.io/client/classes/data.Model
+   *
+   * @typeParam T - Extending *Model* instance type.
+   * @typeParam S - String array type.
    */
   export type Path<T extends Model, S extends string[] = []> = {
     [K in Field<T>]:
@@ -70,10 +82,12 @@ export namespace Model {
   }[Field<T>];
 
   /**
-   * Mapped type to compile strongly typed shapes of classes extending the
-   * abstract model base class, while providing intellisense.
+   * Mapped type to compile strongly typed **Shape**s of classes extending the
+   * abstract [Model][] base class, while providing intellisense.
    *
-   * @typeParam T - Extending model instance type.
+   * [Model]: https://sgrud.github.io/client/classes/data.Model
+   *
+   * @typeParam T - Extending *Model* instance type.
    */
   export type Shape<T extends Model> = {
     [K in Field<T>]?:
@@ -87,10 +101,12 @@ export namespace Model {
   };
 
   /**
-   * Interface describing the type, i.e., static constructable context, of
-   * classes extending the abstract model base class.
+   * Interface describing the **Type**, i.e., static constructable context, of
+   * classes extending the abstract [Model][] base class.
    *
-   * @typeParam T - Extending model instance type.
+   * [Model]: https://sgrud.github.io/client/classes/data.Model
+   *
+   * @typeParam T - Extending *Model* instance type.
    */
   export interface Type<T extends Model> extends Required<typeof Model> {
 
@@ -98,7 +114,6 @@ export namespace Model {
      * Overridden and concretized constructor signature.
      *
      * @param args - Class constructor rest parameter.
-     * @returns Constructed class instance.
      */
     new (...args: ConstructorParameters<typeof Model>): T;
 
@@ -109,17 +124,19 @@ export namespace Model {
 
 /**
  * Namespace containing types and interfaces to be used when searching through
- * the repositories of classes extending the abstract model base class. All the
- * interfaces within this namespace are only applicable to classes extending the
- * abstract model base class, as their generic type argument is always
+ * the repositories of classes extending the abstract [Model][] base class. All
+ * the interfaces within this namespace are only applicable to classes extending
+ * the abstract [Model][] base class, as their generic type argument is always
  * constrained to this abstract base class.
  *
- * @see {@link Model}
+ * [Model]: https://sgrud.github.io/client/classes/data.Model
+ *
+ * @see [Model][]
  */
 export namespace Model.Filter {
 
   /**
-   * Type alias for a string union type of all possible filter conjunctions,
+   * Type alias for a string union type of all possible **Conjunction**s,
    * namely: `'AND'`, `'AND_NOT'`, `'OR'` and `'OR_NOT'`.
    */
   export type Conjunction =
@@ -129,9 +146,9 @@ export namespace Model.Filter {
     'OR_NOT';
 
   /**
-   * Type alias for a string union type of all possible filter operators,
-   * namely: `'EQUAL'`, `'NOT_EQUAL'`, `'LIKE'`, `'GREATER_THAN'`,
-   * `'GREATER_OR_EQUAL'`,  `'LESS_THAN'` and `'LESS_OR_EQUAL'`.
+   * Type alias for a string union type of all possible **Operator**s, namely:
+   * `'EQUAL'`, `'NOT_EQUAL'`, `'LIKE'`, `'GREATER_THAN'`, `'GREATER_OR_EQUAL'`,
+   * `'LESS_THAN'` and `'LESS_OR_EQUAL'`.
    */
   export type Operator =
     'EQUAL' |
@@ -143,79 +160,80 @@ export namespace Model.Filter {
     'NOT_EQUAL';
 
   /**
-   * Interface describing filter expressions which may be employed through the
-   * {@link Params} as part of a {@link findAll} invocation. Filter expressions
-   * can either be the plain shape of an `entity` or compositions of multiple
-   * filter expressions, conjunct by one of the {@link Conjunction}s.
+   * Interface describing the shape of an **Expression** which may be employed
+   * through the [Params][] as part of a *findAll* invocation of the [Model][].
+   * **Expression**s can either be the plain shape of an *entity* or
+   * compositions of multiple filter expressions, conjunct by one of the
+   * [Conjunction][]s.
    *
-   * @typeParam T - Extending model instance type.
+   * [Conjunction]: https://sgrud.github.io/client/types/data.Model-1.Filter-1.Conjunction
+   * [Model]: https://sgrud.github.io/client/classes/data.Model
+   * [Params]: https://sgrud.github.io/client/interfaces/data.Model-1.Filter-1.Params
+   *
+   * @typeParam T - Extending *Model* instance type.
    */
   export interface Expression<T extends Model> {
 
     /**
-     * Conjunction of multiple filter {@link Expression}s requested data models
-     * are matched against. The {@link conjunction} sibling parameter has to be
+     * **Conjunction** of multiple filter expressions requested data [Model][]s
+     * are matched against. The *conjunction* sibling parameter has to be
      * undefined when supplying this parameter. By supplying filter expressions,
-     * conjunct by specific {@link Conjunction} operators, fine-grained filter
+     * conjunct by specific [Conjunction][] operators, fine-grained filter
      * operations can be compiled.
      *
-     * @see {@link Conjunction}
-     * @see {@link Expression}
+     * [Conjunction]: https://sgrud.github.io/client/types/data.Model-1.Filter-1.Conjunction
+     * [Model]: https://sgrud.github.io/client/classes/data.Model
      */
     readonly conjunction?: {
 
       /**
-       * List of {@link Expression}s which are logically combined through an
-       * {@link operator}. These expressions may be nested and can be used to
-       * construct complex composite filter operations.
-       *
-       * @see {@link Expression}
-       * @see {@link operator}
+       * List of expressions which are logically combined through an *operator*.
+       * These expressions may be nested and can be used to construct complex
+       * composite filter operations.
        */
       readonly operands: Expression<T>[];
 
       /**
-       * {@link Conjunction} operator used to logically combine all supplied
-       * {@link operands}.
+       * [Conjunction][] **operator** used to logically combine all supplied
+       * *operands*.
        *
-       * @see {@link Conjunction}
-       * @see {@link operands}
+       * [Conjunction]: https://sgrud.github.io/client/types/data.Model-1.Filter-1.Conjunction
        */
       readonly operator?: Conjunction;
 
     };
 
     /**
-     * Shape the requested data models are matched against. Supplying this
-     * parameter requires the {@link conjunction} sibling parameter to be
-     * undefined. By specifying the shape to match data models against, simple
-     * filter operations can be compiled.
+     * Shape the requested data [Model][]s are matched against. Supplying this
+     * parameter requires the *conjunction* sibling parameter to be undefined.
+     * By specifying the **entity** shape to match data [Model][]s against,
+     * simple filter operations can be compiled.
      *
-     * @see {@link conjunction}
+     * [Model]: https://sgrud.github.io/client/classes/data.Model
      */
     readonly entity?: {
 
       /**
-       * Filter {@link Operator} to use for matching.
+       * [Operator][] to use for matching.
        *
-       * @see {@link Operator}
+       * [Operator]: https://sgrud.github.io/client/types/data.Model-1.Filter-1.Operator
        */
       readonly operator?: Operator;
 
       /**
-       * Property path from within the data model which to match against. The
-       * value which will be matched against has to be supplied through the
-       * {@link value} property.
+       * Property **path** from within the data [Model][] which to match
+       * against. The value which will be matched against has to be supplied
+       * through the *value* property.
        *
-       * @see {@link value}
+       * [Model]: https://sgrud.github.io/client/classes/data.Model
        */
       readonly path: Model.Path<T>;
 
       /**
-       * Property value to match data models against. The property path of this
-       * value has to be supplied through the {@link path} property.
+       * Property **value** to match data [Model][]s against. The property path
+       * of this value has to be supplied through the *path* property.
        *
-       * @see {@link path}
+       * [Model]: https://sgrud.github.io/client/classes/data.Model
        */
       readonly value: unknown;
 
@@ -224,65 +242,66 @@ export namespace Model.Filter {
   }
 
   /**
-   * Interface describing the parameters of, e.g., the {@link findAll} method.
-   * This is the most relevant interface within this namespace (and is therefore
-   * also referenced by the {@link Filter} type alias), as it describes the
-   * input parameters of any filter operation.
+   * Interface describing the **Params** of, e.g., the [Model][] *findAll*
+   * method. This is the most relevant interface within this namespace (and is
+   * therefore also referenced by the [Filter][] type alias), as it describes
+   * the input **Params** of any selective data retrieval.
    *
-   * @typeParam T - Extending model instance type.
+   * [Filter]: https://sgrud.github.io/client/types/data.Model-1.Filter
+   * [Model]: https://sgrud.github.io/client/classes/data.Model
+   *
+   * @typeParam T - Extending *Model* instance type.
+   *
+   * @see [Model][]
    */
   export interface Params<T extends Model> {
 
     /**
-     * Desired sorting direction of the requested data models. To specify which
-     * field the results should be sorted by, the {@link sort} property must be
-     * supplied.
+     * Desired sorting **dir**ection of the requested data [Model][]s. To
+     * specify which field the results should be sorted by, the *sort* property
+     * must be supplied.
      *
-     * @see {@link sort}
+     * [Model]: https://sgrud.github.io/client/classes/data.Model
      */
     readonly dir?: 'asc' | 'desc';
 
     /**
-     * {@link Expression} to evaluate results against. This expression may be a
-     * simple matching or more complex, conjunct and nested expressions.
-     *
-     * @see {@link Expression}
+     * **Expression** to evaluate results against. This **expression** may be a
+     * simple matching or more complex, conjunct and nested **expression**s.
      */
     readonly expression?: Expression<T>;
 
     /**
-     * Page number, i.e., offset within the list of all results for a data model
-     * request. This property should be used together with the page {@link size}
-     * property.
+     * **Page** number, i.e., offset within the list of all results for a data
+     * [Model][] request. This property should be used together with the page
+     * *size* property.
      *
-     * @see {@link size}
+     * [Model]: https://sgrud.github.io/client/classes/data.Model
      */
     readonly page?: number;
 
     /**
-     * Free-text search field. This field overrides all {@link expression}s, as
-     * such that if this field contains a value, all expressions are ignored and
-     * only this free-text search filter is applied.
-     *
-     * @see {@link expression}
+     * Free-text **search** field. This field overrides all *expression*s, as
+     * such that if this field contains a value, all *expression*s are ignored
+     * and only this free-text **search** filter is applied.
      */
     readonly search?: string;
 
     /**
-     * Page size, i.e., number of results which should be included within the
-     * response to a data model request. This property should be used together
-     * with the {@link page} offset property.
+     * Page **size**, i.e., number of results which should be included within
+     * the response to a data [Model][] request. This property should be used
+     * together with the *page* offset property.
      *
-     * @see {@link page}
+     * [Model]: https://sgrud.github.io/client/classes/data.Model
      */
     readonly size?: number;
 
     /**
-     * Property path used to determine the value which to sort the requested
-     * data models by. This property should be used together with the sorting
-     * {@link dir}ection property.
+     * Property path used to determine the value which to **sort** the requested
+     * data [Model][]s by. This property should be used together with the
+     * sorting *dir*ection property.
      *
-     * @see {@link dir}
+     * [Model]: https://sgrud.github.io/client/classes/data.Model
      */
     readonly sort?: Path<T>;
 
@@ -292,48 +311,59 @@ export namespace Model.Filter {
 
 // eslint-disable-next-line valid-jsdoc
 /**
- * Abstract base class to implement data models. By extending this abstract base
- * class while providing the enforced symbol property containing the singular
- * name of the resulting data model, type safe data handling, i.e., retrieval,
- * mutation and storage, can easily be achieved. Through the use of the static-
- * and instance-scoped polymorphic `this`, all inherited operations warrant type
- * safety and provide intellisense.
+ * Abstract base class to implement data **Model**s. By extending this abstract
+ * base class while providing the enforced symbol property containing the
+ * singular name of the resulting data **Model**, type safe data handling, i.e.,
+ * retrieval, mutation and storage, can easily be achieved. Through the use of
+ * the static- and instance-scoped polymorphic `this`, all inherited operations
+ * warrant type safety and provide intellisense.
  *
- * @typeParam M - Extending model instance type.
+ * [Querier]: https://sgrud.github.io/client/classes/data.Querier
  *
- * @example Extend the model base class.
+ * @typeParam M - Extending *Model* instance type.
+ *
+ * @example
+ * Extend the *Model* base class:
  * ```ts
  * import { Model, Property } from '@sgrud/data';
  *
  * export class ExampleModel extends Model<ExampleModel> {
  *
- *   @Property(() => String)
+ *   ⁠@Property(() => String)
  *   public field: string?;
  *
  *   protected [Symbol.toStringTag]: string = 'ExampleModel';
  *
  * }
  * ```
+ *
+ * @see [Querier][]
  */
 export abstract class Model<M extends Model = any> {
 
   /**
-   * Static commit method. Calling this method on a class extending the abstract
-   * model base class, while supplying an `operation` and all its embedded
-   * `variables`, will dispatch the supplied operation to the respective model
-   * repository through the highest priority {@link Querier} or, if no querier
-   * is compatible, throw an error. This method is the central point of origin
-   * for all model-related data transferral and is internally called by all
-   * other distinct methods of the model.
+   * Static **commit** method. Calling this method on a class extending the
+   * abstract *Model* base class, while supplying an `operation` and all its
+   * embedded `variables`, will dispatch the supplied [Operation][] to the
+   * respective *Model* repository through the highest priority [Querier][] or,
+   * if no [Querier][] is compatible, throw an error. This method is the central
+   * point of origin for all *Model*-related data transferral and is internally
+   * called by all other distinct methods of the *Model*.
    *
-   * @param this - Static polymorphic this.
-   * @param operation - Operation to commit.
-   * @param variables - Variables within the `operation`.
-   * @typeParam T - Extending model instance type.
-   * @returns Observable of the commitment.
-   * @throws Observable of ReferenceError.
+   * [Observable]: https://rxjs.dev/api/index/class/Observable
+   * [Operation]: https://sgrud.github.io/client/types/data.Querier-1.Operation
+   * [Querier]: https://sgrud.github.io/client/classes/data.Querier
+   * [Variables]: https://sgrud.github.io/client/interfaces/data.Querier-1.Variables
    *
-   * @example Commit a `query`-type operation.
+   * @param this - Static polymorphic `this`.
+   * @param operation - [Operation][] to **commit**.
+   * @param variables - [Variables][] within the `operation`.
+   * @typeParam T - Extending *Model* instance type.
+   * @returns [Observable][] of the **commit**ment.
+   * @throws [Observable][] of ReferenceError.
+   *
+   * @example
+   * **Commit** a `query`-type operation:
    * ```ts
    * import { ExampleModel } from './example-model';
    *
@@ -346,7 +376,6 @@ export abstract class Model<M extends Model = any> {
    * }).subscribe(console.log);
    * ```
    *
-   * @see {@link Querier}
    */
   public static commit<T extends Model>(
     this: Model.Type<T>,
@@ -375,19 +404,22 @@ export abstract class Model<M extends Model = any> {
   }
 
   /**
-   * Static deleteAll method. Calling this method on a class extending the
-   * model, while supplying a list of `uuids`, will dispatch the deletion of all
-   * model instances identified by these UUIDs to the respective model
-   * repository by internally calling the {@link commit} operation with suitable
-   * arguments. Through this method, bulk-deletions from the respective model
+   * Static **deleteAll** method. Calling this method on a class extending the
+   * *Model*, while supplying a list of `uuids`, will dispatch the deletion of
+   * all *Model* instances identified by these UUIDs to the respective *Model*
+   * repository by internally calling the *commit* operation with suitable
+   * arguments. Through this method, bulk-deletions from the respective *Model*
    * repository can be achieved.
    *
-   * @param this - Static polymorphic this.
-   * @param uuids - UUIDs of model instances to be deleted.
-   * @typeParam T - Extending model instance type.
-   * @returns Observable of the deletion.
+   * [Observable]: https://rxjs.dev/api/index/class/Observable
    *
-   * @example Delete all model instances by UUIDs.
+   * @param this - Static polymorphic `this`.
+   * @param uuids - UUIDs of *Model* instances to be deleted.
+   * @typeParam T - Extending *Model* instance type.
+   * @returns [Observable][] of the deletion.
+   *
+   * @example
+   * Drop all model instances by UUIDs:
    * ```ts
    * import { ExampleModel } from './example-model';
    *
@@ -410,19 +442,22 @@ export abstract class Model<M extends Model = any> {
   }
 
   /**
-   * Static deleteOne method. Calling this method on a class extending the
-   * model, while supplying an `uuid`, will dispatch the deletion of the model
-   * instance identified by this UUID to the respective model repository by
-   * internally calling the {@link commit} operation with suitable arguments.
-   * Through this method, the deletion of a single model instance from the
-   * respective model repository can be achieved.
+   * Static **deleteOne** method. Calling this method on a class extending the
+   * *Model*, while supplying an `uuid`, will dispatch the deletion of the
+   * *Model* instance identified by this UUID to the respective *Model*
+   * repository by internally calling the *commit* operation with suitable
+   * arguments. Through this method, the deletion of a single *Model* instance
+   * from the respective *Model* repository can be achieved.
    *
-   * @param this - Static polymorphic this.
-   * @param uuid - UUID of the model instance to be deleted.
-   * @typeParam T - Extending model instance type.
-   * @returns Observable of the deletion.
+   * [Observable]: https://rxjs.dev/api/index/class/Observable
    *
-   * @example Delete one model instance by UUID.
+   * @param this - Static polymorphic `this`.
+   * @param uuid - UUID of the *Model* instance to be deleted.
+   * @typeParam T - Extending *Model* instance type.
+   * @returns [Observable][] of the deletion.
+   *
+   * @example
+   * Drop one model instance by UUID:
    * ```ts
    * import { ExampleModel } from './example-model';
    *
@@ -443,21 +478,26 @@ export abstract class Model<M extends Model = any> {
   }
 
   /**
-   * Static findAll method. Calling this method on a class extending the
-   * abstract model base class, while supplying a `filter` to match model
+   * Static **findAll** method. Calling this method on a class extending the
+   * abstract *Model* base class, while supplying a `filter` to match *Model*
    * instances by and a `graph` containing the fields to be included in the
-   * result, will dispatch the lookup operation to the respective model
-   * repository by internally calling the {@link commit} operation with suitable
-   * arguments. Through this method, the bulk-lookup of model instances from the
-   * respective model repository can be achieved.
+   * result, will dispatch a lookup operation to the respective *Model*
+   * repository by internally calling the *commit* operation with suitable
+   * arguments. Through this method, the bulk-lookup of *Model* instances from
+   * the respective *Model* repository can be achieved.
    *
-   * @param this - Static polymorphic this.
-   * @param filter - Filter to find model instances by.
-   * @param graph - Graph of fields to be included.
-   * @typeParam T - Extending model instance type.
-   * @returns Observable of the find operation.
+   * [Filter]: https://sgrud.github.io/client/types/data.Model-1.Filter
+   * [Graph]: https://sgrud.github.io/client/types/data.Model-1.Graph
+   * [Observable]: https://rxjs.dev/api/index/class/Observable
    *
-   * @example Find all UUIDs for model instances modified between two dates.
+   * @param this - Static polymorphic `this`.
+   * @param filter - [Filter][] to find *Model* instances by.
+   * @param graph - [Graph][] of fields to be included.
+   * @typeParam T - Extending *Model* instance type.
+   * @returns [Observable][] of the find operation.
+   *
+   * @example
+   * Lookup all UUIDs for model instances modified between two dates:
    * ```ts
    * import { ExampleModel } from './example-model';
    *
@@ -509,21 +549,26 @@ export abstract class Model<M extends Model = any> {
   }
 
   /**
-   * Static findOne method. Calling this method on a class extending the
-   * abstract model base class, while supplying the `shape` to match the model
-   * instance by and a `graph` describing the fields to be included in the
-   * result, will dispatch the lookup operation to the respective model
-   * repository by internally calling the {@link commit} operation with suitable
-   * arguments. Through this method, the retrieval of one specific model
-   * instance from the respective model repository can be achieved.
+   * Static **findOne** method. Calling this method on a class extending the
+   * abstract *Model* base class, while supplying the `shape` to match the
+   * *Model* instance by and a `graph` describing the fields to be included in
+   * the result, will dispatch the lookup operation to the respective *Model*
+   * repository by internally calling the *commit* operation with suitable
+   * arguments. Through this method, the retrieval of one specific *Model*
+   * instance from the respective *Model* repository can be achieved.
    *
-   * @param this - Static polymorphic this.
-   * @param shape - Shape of the model instance to find.
-   * @param graph - Graph of fields to be included.
-   * @typeParam T - Extending model instance type.
-   * @returns Observable of the find operation.
+   * [Graph]: https://sgrud.github.io/client/types/data.Model-1.Graph
+   * [Observable]: https://rxjs.dev/api/index/class/Observable
+   * [Shape]: https://sgrud.github.io/client/types/data.Model-1.Shape
    *
-   * @example Find one model instance by UUID.
+   * @param this - Static polymorphic `this`.
+   * @param shape - [Shape][] of the *Model* instance to find.
+   * @param graph - [Graph][] of fields to be included.
+   * @typeParam T - Extending *Model* instance type.
+   * @returns [Observable][] of the find operation.
+   *
+   * @example
+   * Lookup one model instance by UUID:
    * ```ts
    * import { ExampleModel } from './example-model';
    *
@@ -552,21 +597,25 @@ export abstract class Model<M extends Model = any> {
   }
 
   /**
-   * Static saveAll method. Calling this method on a class extending the
-   * abstract model base class, while supplying a list of `models` which to save
-   * and a `graph` describing the fields to be included in the result, will
-   * dispatch the save operation to the respective model repository by
-   * internally calling the {@link commit} operation with suitable arguments.
-   * Through this method, bulk-persistance of model instances from the
-   * respective model repository can be achieved.
+   * Static **saveAll** method. Calling this method on a class extending the
+   * abstract *Model* base class, while supplying a list of `models` which to
+   * save and a `graph` describing the fields to be included in the result, will
+   * dispatch the save operation to the respective *Model* repository by
+   * internally calling the *commit* operation with suitable arguments. Through
+   * this method, bulk-persistance of *Model* instances from the respective
+   * *Model* repository can be achieved.
    *
-   * @param this - Static polymorphic this.
-   * @param models - Array of models to be saved.
-   * @param graph - Graph of fields to be included.
-   * @typeParam T - Extending model instance type.
-   * @returns Observable of the save operation.
+   * [Graph]: https://sgrud.github.io/client/types/data.Model-1.Graph
+   * [Observable]: https://rxjs.dev/api/index/class/Observable
    *
-   * @example Persist multiple models.
+   * @param this - Static polymorphic `this`.
+   * @param models - Array of *Model*s to be saved.
+   * @param graph - [Graph][] of fields to be included.
+   * @typeParam T - Extending *Model* instance type.
+   * @returns [Observable][] of the save operation.
+   *
+   * @example
+   * Persist multiple *Model*s:
    * ```ts
    * import { ExampleModel } from './example-model';
    *
@@ -597,21 +646,25 @@ export abstract class Model<M extends Model = any> {
   }
 
   /**
-   * Static saveOne method. Calling this method on a class extending the
-   * abstract model base class, while supplying a `model` which to save and a
+   * Static **saveOne** method. Calling this method on a class extending the
+   * abstract *Model* base class, while supplying a `model` which to save and a
    * `graph` describing the fields to be included in the result, will dispatch
-   * the save operation to the respective model repository by internally calling
-   * the {@link commit} operation with suitable arguments. Through this method,
-   * persistance of one specific model instance from the respective model
-   * repository can be achieved.
+   * the save operation to the respective *Model* repository by internally
+   * calling the *commit* operation with suitable arguments. Through this
+   * method, persistance of one specific *Model* instance from the respective
+   * *Model* repository can be achieved.
    *
-   * @param this - Static polymorphic this.
-   * @param model - Model which is to be saved.
-   * @param graph - Graph of fields to be included.
-   * @typeParam T - Extending model instance type.
-   * @returns Observable of the save operation.
+   * [Graph]: https://sgrud.github.io/client/types/data.Model-1.Graph
+   * [Observable]: https://rxjs.dev/api/index/class/Observable
    *
-   * @example Persist a model.
+   * @param this - Static polymorphic `this`.
+   * @param model - *Model* which is to be saved.
+   * @param graph - [Graph][] of fields to be included.
+   * @typeParam T - Extending *Model* instance type.
+   * @returns [Observable][] of the save operation.
+   *
+   * @example
+   * Persist a model:
    * ```ts
    * import { ExampleModel } from './example-model';
    *
@@ -638,23 +691,26 @@ export abstract class Model<M extends Model = any> {
   }
 
   /**
-   * Static serialize method. Calling this method on a class extending the
-   * model, while supplying a `model` which to serialize and optionally enabling
-   * `shallow` serialization, will return the shape of the model, i.e., a plain
-   * JSON representation of all model fields, or undefined, if the supplied
-   * `model` does not contain any fields or values. By serializing `shallow`ly,
-   * only properties defined on the supplied `model` are included (which means,
-   * all one-to-one and one-to-many associations are ignored). Through this
-   * method, the serialization of one specific model instance from the
-   * respective model repository can be achieved.
+   * Static **serialize** method. Calling this method on a class extending the
+   * *Model*, while supplying a `model` which to **serialize** and optionally
+   * enabling `shallow` serialization, will return the [Shape][] of the *Model*,
+   * i.e., a plain JSON representation of all *Model* fields, or undefined, if
+   * the supplied `model` does not contain any fields or values. By serializing
+   * `shallow`ly, only properties defined on the supplied `model` are included
+   * (which means, all one-to-one and one-to-many associations are ignored).
+   * Through this method, the serialization of one specific *Model* instance
+   * from the respective *Model* repository can be achieved.
    *
-   * @param this - Static polymorphic this.
-   * @param model - Model which is to be serialized.
-   * @param shallow - Whether to serialize shallowly.
-   * @typeParam T - Extending model instance type.
-   * @returns Shape of the model or undefined.
+   * [Shape]: https://sgrud.github.io/client/types/data.Model-1.Shape
    *
-   * @example Serialize a model.
+   * @param this - Static polymorphic `this`.
+   * @param model - *Model* which is to be **serialize**d.
+   * @param shallow - Whether to **serialize** shallowly.
+   * @typeParam T - Extending *Model* instance type.
+   * @returns [Shape][] of the *Model* or undefined.
+   *
+   * @example
+   * **Serialize** a model:
    * ```ts
    * import { ExampleModel } from './example-model';
    *
@@ -705,23 +761,27 @@ export abstract class Model<M extends Model = any> {
   }
 
   /**
-   * Static treemap method. Calling this method on a class extending the
-   * abstract model base class, while supplying a `model` which to treemap and
-   * optionally enabling `shallow` treemapping, will return a graph describing
-   * the fields which are declared and defined on the supplied `model`, or
-   * undefined, if the supplied `model` does not contain any fields or values.
-   * By treemapping `shallow`ly, only properties defined on the supplied `model`
-   * are included (which means, all one-to-one and one-to-many associations are
-   * ignored). Through this method, the graph for one specific model instance
-   * from the respective model repository can be retrieved.
+   * Static **treemap** method. Calling this method on a class extending the
+   * abstract *Model* base class, while supplying a `model` which to **treemap**
+   * and optionally enabling `shallow` **treemap**ping, will return a [Graph][]
+   * describing the fields which are declared and defined on the supplied
+   * `model`, or undefined, if the supplied `model` does not contain any fields
+   * or values. By **treemap**ping `shallow`ly, only properties defined on the
+   * supplied `model` are included (which means, all one-to-one and one-to-many
+   * associations are ignored). Through this method, the [Graph][] for one
+   * specific *Model* instance from the respective *Model* repository can be
+   * retrieved.
    *
-   * @param this - Static polymorphic this.
-   * @param model - Model which is to be treemapped.
-   * @param shallow - Whether to treemap shallowly.
-   * @typeParam T - Extending model instance type.
-   * @returns Graph of the model or undefined.
+   * [Graph]: https://sgrud.github.io/client/types/data.Model-1.Graph
    *
-   * @example Treemap a model.
+   * @param this - Static polymorphic `this`.
+   * @param model - *Model* which is to be **treemap**ped.
+   * @param shallow - Whether to **treemap** shallowly.
+   * @typeParam T - Extending *Model* instance type.
+   * @returns [Graph][] of the *Model* or undefined.
+   *
+   * @example
+   * **Treemap** a *Model*:
    * ```ts
    * import { ExampleModel } from './example-model';
    *
@@ -768,19 +828,23 @@ export abstract class Model<M extends Model = any> {
   }
 
   /**
-   * Static unravel method. Calling this method on a class extending the
-   * abstract model base class, while supplying a `graph` describing the fields
-   * which to unravel, will return the unraveled graph as raw string. Through
-   * this method, the graph for one specific model instance from the respective
-   * model repository can be unraveled into a raw string. This unraveled graph
-   * can than be consumed by, e.g., the {@link commit} method.
+   * Static **unravel** method. Calling this method on a class extending the
+   * abstract *Model* base class, while supplying a `graph` describing the
+   * fields which to **unravel**, will return the **unravel**ed [Graph][] as raw
+   * string. Through this method, the [Graph][] for one specific *Model*
+   * instance from the respective *Model* repository can be **unravel**ed into a
+   * raw string. This **unravel**ed [Graph][] can then be consumed by, e.g., the
+   * *commit* method.
    *
-   * @param this - Static polymorphic this.
-   * @param graph - Graph which is to be unraveled.
-   * @typeParam T - Extending model instance type.
-   * @returns Unraveled graph as raw string.
+   * [Graph]: https://sgrud.github.io/client/types/data.Model-1.Graph
    *
-   * @example Unravel a graph.
+   * @param this - Static polymorphic `this`.
+   * @param graph - [Graph][] which is to be **unravel**ed.
+   * @typeParam T - Extending *Model* instance type.
+   * @returns **Unravel**ed [Graph][] as raw string.
+   *
+   * @example
+   * **Unravel** a [Graph][]:
    * ```ts
    * import { ExampleModel } from './example-model';
    *
@@ -839,20 +903,24 @@ export abstract class Model<M extends Model = any> {
   }
 
   /**
-   * Static valuate method. Calling this method on a class extending the
-   * abstract model base class, while supplying a `model` and a `field` which to
-   * valuate, will return the preprocessed value (e.g., primitive representation
-   * of JavaScript Dates) of the supplied `field` of the supplied `model`.
-   * Through this method, the preprocessed `field` value of one specific model
-   * instance from the respective model repository can be retrieved.
+   * Static **valuate** method. Calling this method on a class extending the
+   * abstract *Model* base class, while supplying a `model` and a `field` which
+   * to **valuate**, will return the preprocessed value (e.g., primitive
+   * representation of JavaScript Dates) of the supplied `field` of the supplied
+   * `model`. Through this method, the preprocessed `field` value of one
+   * specific *Model* instance from the respective *Model* repository can be
+   * retrieved.
    *
-   * @param this - Static polymorphic this.
-   * @param model - Model which is to be valuated.
-   * @param field - Field of the model to be valuated.
-   * @typeParam T - Extending model instance type.
-   * @returns Valuated field value.
+   * [Field]: https://sgrud.github.io/client/types/data.Model-1.Field
    *
-   * @example Valuate a field.
+   * @param this - Static polymorphic `this`.
+   * @param model - *Model* which is to be **valuate**d.
+   * @param field - [Field][] of the *Model* to be **valuate**d.
+   * @typeParam T - Extending *Model* instance type.
+   * @returns Valuated `field` value.
+   *
+   * @example
+   * **Valuate** a `field`:
    * ```ts
    * import { ExampleModel } from './example-model';
    *
@@ -887,13 +955,16 @@ export abstract class Model<M extends Model = any> {
   }
 
   /**
-   * Enforced symbol property containing the singular name of this model. The
+   * Enforced symbol property containing the singular name of this *Model*. The
    * value of this property represents the repository which all instances of
-   * this model are considered to belong to. In Detail, the different operations
-   * {@link commit}ted through this model are derived from this singular name
-   * (and the corresponding {@link pluralize}d form).
+   * this *Model* are considered to belong to. In Detail, the different
+   * operations *commit*ted through this *Model* are derived from this singular
+   * name (and the corresponding [pluralize][]d form).
    *
-   * @example Provide a valid symbol property.
+   * [pluralize]: http://127.0.0.1:8080/docs/functions/core.pluralize
+   *
+   * @example
+   * Provide a valid symbol property:
    * ```ts
    * import { Model } from '@sgrud/data';
    *
@@ -907,33 +978,36 @@ export abstract class Model<M extends Model = any> {
   protected abstract readonly [Symbol.toStringTag]: string;
 
   /**
-   * Symbol property used by the {@link HasOne} decorator.
+   * Symbol property used by the [HasOne][] decorator.
    *
-   * @see {@link HasOne}
+   * [HasOne]: http://127.0.0.1:8080/docs/functions/data.HasOne
    */
   public readonly [hasOne]?: Record<keyof M, () => unknown>;
 
   /**
-   * Symbol property used by the {@link HasMany} decorator.
+   * Symbol property used by the [HasMany][] decorator.
    *
-   * @see {@link HasMany}
+   * [HasMany]: http://127.0.0.1:8080/docs/functions/data.HasMany
    */
   public readonly [hasMany]?: Record<keyof M, () => unknown>;
 
   /**
-   * Symbol property used by the {@link Property} decorator.
+   * Symbol property used by the [Property][] decorator.
    *
-   * @see {@link Property}
+   * [Property]: http://127.0.0.1:8080/docs/functions/data.Property-1
    */
   public readonly [property]?: Record<keyof M, () => unknown>;
 
   /**
-   * Symbol property typed as callback to a Subscribable. The returned
-   * Subscribable emits every mutation this model instance experiences.
+   * Symbol property typed as callback to a [Subscribable][]. The returned
+   * [Subscribable][] emits every mutation this *Model* instance experiences.
    *
-   * @returns Callback to a Subscribable.
+   * [Subscribable]: https://rxjs.dev/api/index/interface/Subscribable
    *
-   * @example Subscribe to a model instance.
+   * @returns Callback to a [Subscribable][].
+   *
+   * @example
+   * Subscribe to a *Model* instance:
    * ```ts
    * import { from } from 'rxjs';
    * import { ExampleModel } from './example-model';
@@ -945,76 +1019,83 @@ export abstract class Model<M extends Model = any> {
   public readonly [Symbol.observable]!: () => Subscribable<M>;
 
   /**
-   * Universally unique identifier of this model instance.
+   * Universally unique identifier of this *Model* instance.
    */
   @Property(() => String)
   public id?: string;
 
   /**
-   * Transient creation date of this model instance.
+   * Transient creation date of this *Model* instance.
    */
   @Property(() => Date, true)
   public created?: Date;
 
   /**
-   * Transient modification date of this model instance.
+   * Transient modification date of this *Model* instance.
    */
   @Property(() => Date, true)
   public modified?: Date;
 
   /**
-   * BehaviorSubject emitting every time this model instance experiences a
-   * mutation.
+   * [BehaviorSubject][] emitting every time this *Model* instance experiences
+   * **changes**.
+   *
+   * [BehaviorSubject]: https://rxjs.dev/api/index/class/BehaviorSubject
    */
   protected readonly changes: BehaviorSubject<M>;
 
   /**
-   * Type-asserted alias for the static model context.
+   * Type-asserted alias for the **static** *Model* context.
    */
   protected readonly static: Model.Type<M>;
 
   /**
-   * `rxjs.observable` interop getter returning a callback to a Subscribable.
+   * [observable][] interop getter returning a callback to a [Subscribable][].
+   *
+   * [observable]: https://rxjs.dev/api/index/const/observable
+   * [Subscribable]: https://rxjs.dev/api/index/interface/Subscribable
    */
   public get [observable](): () => Subscribable<M> {
     return () => this.changes.asObservable();
   }
 
   /**
-   * Accessor to the singular name of this model.
+   * Accessor to the singular name of this *Model*.
    *
-   * @returns Singular name of this model.
+   * @returns Singular name of this *Model*.
    */
   protected get entity(): string {
     return this.type.endsWith('Entity') ? this.type.slice(0, -6) : this.type;
   }
 
   /**
-   * Accessor to the pluralized name of this model.
+   * Accessor to the **plural**ized name of this *Model*.
    *
-   * @returns Pluralized name of this model.
+   * @returns **Plural**ized name of this *Model*.
    */
   protected get plural(): string {
     return pluralize(this.entity);
   }
 
   /**
-   * Accessor to the raw name of this model.
+   * Accessor to the raw name of this *Model*.
    *
-   * @returns Raw name of this model.
+   * @returns Raw name of this *Model*.
    */
   protected get type(): string {
     return this[Symbol.toStringTag];
   }
 
   /**
-   * Public constructor. The constructor of all classes extending the abstract
-   * model base class, unless explicitly overridden, behaves analogous to the
-   * instance-scoped {@link assign} method, as it takes all supplied `parts` and
-   * assigns them to the instantiated and returned model. The constructor
-   * furthermore wires some internal functionality, e.g., creates a new
-   * {@link changes} BehaviorSubject which emits every mutation this model
-   * instance experiences.
+   * Public **constructor**. The **constructor** of all classes extending the
+   * abstract *Model* base class, unless explicitly overridden, behaves
+   * analogous to the instance-scoped *assign* method, as it takes all supplied
+   * `parts` and assigns them to the instantiated and returned *Model*. The
+   * **constructor** furthermore wires some internal functionality, e.g.,
+   * creates a new *changes* [BehaviorSubject][] which emits every mutation this
+   * *Model* instance experiences.
+   *
+   * [BehaviorSubject]: https://rxjs.dev/api/index/class/BehaviorSubject
    *
    * @param parts - Array of parts to assign.
    */
@@ -1025,18 +1106,21 @@ export abstract class Model<M extends Model = any> {
   }
 
   /**
-   * Instance-scoped assign method. Calling this method, while supplying a list
-   * of `parts`, will assign all supplied `parts` to the model instance. The
-   * assignment is implemented as deep merge assignment. Using this method, an
-   * existing model instance can easily be mutated while still emitting the
-   * mutated changes.
+   * Instance-scoped **assign** method. Calling this method, while supplying a
+   * list of `parts`, will **assign** all supplied `parts` to the *Model*
+   * instance. The **assign**ment is implemented as deep merge **assign**ment.
+   * Using this method, an existing *Model* instance can easily be mutated while
+   * still emitting the mutated *changes*.
    *
-   * @param this - Polymorphic this.
-   * @param parts - Array of parts to assign.
-   * @typeParam T - Extending model instance type.
-   * @returns Observable of the mutated instance.
+   * [Observable]: https://rxjs.dev/api/index/class/Observable
    *
-   * @example Assign parts to a model instance.
+   * @param this - Polymorphic `this`.
+   * @param parts - Array of parts to **assign**.
+   * @typeParam T - Extending *Model* instance type.
+   * @returns [Observable][] of the mutated instance.
+   *
+   * @example
+   * **Assign** `parts` to a *Model* instance:
    * ```ts
    * import { ExampleModel } from './example-model';
    *
@@ -1054,19 +1138,22 @@ export abstract class Model<M extends Model = any> {
   }
 
   /**
-   * Instance-scoped clear method. Calling this method on an instance of a class
-   * extending the abstract model base class, while optionally supplying a list
-   * of `keys` which are to be cleared, will set the value of the properties
-   * described by either the supplied `keys` or, if no `keys` were supplied, all
-   * enumerable properties of the class extending the abstract model base class
-   * to undefined, effectively clearing them.
+   * Instance-scoped **clear** method. Calling this method on an instance of a
+   * class extending the abstract *Model* base class, while optionally supplying
+   * a list of `keys` which are to be **clear**ed, will set the value of the
+   * properties described by either the supplied `keys` or, if no `keys` were
+   * supplied, all enumerable properties of the class extending the abstract
+   * *Model* base class to undefined, effectively **clear**ing them.
    *
-   * @param this - Polymorphic this.
-   * @param keys - Optional array of keys to clear.
-   * @typeParam T - Extending model instance type.
-   * @returns Observable of the mutated instance.
+   * [Observable]: https://rxjs.dev/api/index/class/Observable
    *
-   * @example Clear a model instance selectively.
+   * @param this - Polymorphic `this`.
+   * @param keys - Optional array of keys to **clear**.
+   * @typeParam T - Extending *Model* instance type.
+   * @returns [Observable][] of the mutated instance.
+   *
+   * @example
+   * **Clear** a *Model* instance selectively:
    * ```ts
    * import { ExampleModel } from './example-model';
    *
@@ -1098,22 +1185,28 @@ export abstract class Model<M extends Model = any> {
   }
 
   /**
-   * Instance-scoped commit method. Internally calls {@link commit} on the
-   * this-context of an instance of a class extending the abstract model base
-   * class and furthermore {@link assign}s the returned data to the model
-   * instance the find method was called upon. When supplying a `mapping`, the
-   * returned data will be mutated by the supplied OperatorFunction (otherwise
-   * this `mapping` defaults to
-   * [rxjs.identity](https://rxjs.dev/api/index/function/identity)).
+   * Instance-scoped **commit** method. Internally calls the static *commit*
+   * method on the `this`-context of an instance of a class extending the
+   * abstract *Model* base class and furthermore *assign*s the returned data to
+   * the *Model* instance the **commit** method was called upon. When supplying
+   * a `mapping`, the returned data will be mutated by the supplied
+   * [OperatorFunction][] (otherwise this `mapping` defaults to [identity][]).
    *
-   * @param this - Polymorphic this.
-   * @param operation - GraphQL Operation to commit.
-   * @param variables - Variables within the `operation`.
-   * @param mapping - Mapping to apply to the result.
-   * @typeParam T - Extending model instance type.
-   * @returns Observable of the mutated instance.
+   * [identity]: https://rxjs.dev/api/index/function/identity
+   * [Observable]: https://rxjs.dev/api/index/class/Observable
+   * [Operation]: https://sgrud.github.io/client/types/data.Querier-1.Operation
+   * [OperatorFunction]: https://rxjs.dev/api/index/interface/OperatorFunction
+   * [Variables]: https://sgrud.github.io/client/interfaces/data.Querier-1.Variables
    *
-   * @example Commit a `query`-type operation.
+   * @param this - Polymorphic `this`.
+   * @param operation - [Operation][] to **commit**.
+   * @param variables - [Variables][] within the `operation`.
+   * @param mapping - [OperatorFunction][] to apply.
+   * @typeParam T - Extending *Model* instance type.
+   * @returns [Observable][] of the mutated instance.
+   *
+   * @example
+   * Commit a `query`-type operation:
    * ```ts
    * import { ExampleModel } from './example-model';
    *
@@ -1127,8 +1220,6 @@ export abstract class Model<M extends Model = any> {
    *   variable: 'value'
    * }).subscribe(console.log);
    * ```
-   *
-   * @see {@link Querier}
    */
   public commit<T extends Model = M>(
     this: T,
@@ -1142,18 +1233,22 @@ export abstract class Model<M extends Model = any> {
   }
 
   /**
-   * Instance-scoped delete method. Internally calls {@link deleteOne} while
-   * supplying the UUID of an instance of a class extending the abstract model
-   * base class. Calling this method furthermore {@link clear}s the model
-   * instance and finalizes its deletion by calling complete on the internal
-   * {@link changes} BehaviorSubject of the model instance the delete method was
-   * called upon.
+   * Instance-scoped **delete** method. Internally calls the static *deleteOne*
+   * method while supplying the UUID of this instance of a class extending the
+   * abstract *Model* base class. Calling this method furthermore *clear*s the
+   * *Model* instance and completes its deletion by calling complete on the
+   * internal *changes* [BehaviorSubject][] of the *Model* instance the
+   * **delete** method was called upon.
    *
-   * @param this - Polymorphic this.
-   * @typeParam T - Extending model instance type.
-   * @returns Observable of the mutated instance.
+   * [BehaviorSubject]: https://rxjs.dev/api/index/class/BehaviorSubject
+   * [Observable]: https://rxjs.dev/api/index/class/Observable
    *
-   * @example Delete a model instance by UUID.
+   * @param this - Polymorphic `this`.
+   * @typeParam T - Extending *Model* instance type.
+   * @returns [Observable][] of the mutated instance.
+   *
+   * @example
+   * Drop a *Model* instance by UUID:
    * ```ts
    * import { ExampleModel } from './example-model';
    *
@@ -1163,8 +1258,6 @@ export abstract class Model<M extends Model = any> {
    *
    * model.delete().subscribe(console.log);
    * ```
-   *
-   * @see {@link deleteOne}
    */
   public delete<T extends Model = M>(
     this: T
@@ -1176,18 +1269,23 @@ export abstract class Model<M extends Model = any> {
   }
 
   /**
-   * Instance-scoped find method. Internally calls {@link findOne} on the
-   * this-context of an instance of a class extending the abstract model base
-   * class and furthermore {@link assign}s the returned data to the model
-   * instance the find method was called upon.
+   * Instance-scoped **find** method. Internally calls the static *findOne*
+   * method on the `this`-context of an instance of a class extending the
+   * abstract *Model* base class and then *assign*s the returned data to the
+   * *Model* instance the **find** method was called upon.
    *
-   * @param this - Polymorphic this.
-   * @param graph - Graph of fields to be included.
-   * @param shape - Shape of the model to find.
-   * @typeParam T - Extending model instance type.
-   * @returns Observable of the mutated instance.
+   * [Graph]: https://sgrud.github.io/client/types/data.Model-1.Graph
+   * [Observable]: https://rxjs.dev/api/index/class/Observable
+   * [Shape]: https://sgrud.github.io/client/types/data.Model-1.Shape
    *
-   * @example Find a model instance by UUID.
+   * @param this - Polymorphic `this`.
+   * @param graph - [Graph][] of fields to be included.
+   * @param shape - [Shape][] of the *Model* to find.
+   * @typeParam T - Extending *Model* instance type.
+   * @returns [Observable][] of the mutated instance.
+   *
+   * @example
+   * **Find** a *Model* instance by UUID:
    * ```ts
    * import { ExampleModel } from './example-model';
    *
@@ -1201,8 +1299,6 @@ export abstract class Model<M extends Model = any> {
    *   'field'
    * ]).subscribe(console.log);
    * ```
-   *
-   * @see {@link findOne}
    */
   public find<T extends Model = M>(
     this: T,
@@ -1215,17 +1311,20 @@ export abstract class Model<M extends Model = any> {
   }
 
   /**
-   * Instance-scoped save method. Internally calls {@link saveOne} on the
-   * this-context of an instance of a class extending the abstract model base
-   * class and furthermore {@link assign}s the returned data to the model
-   * instance the save method was called upon.
+   * Instance-scoped **save** method. Internally calls the static *saveOne*
+   * method on the `this`-context of an instance of a class extending the
+   * abstract *Model* base class and then *assign*s the returned data to the
+   * *Model* instance the **save** method was called upon.
    *
-   * @param this - Polymorphic this.
+   * [Observable]: https://rxjs.dev/api/index/class/Observable
+   *
+   * @param this - Polymorphic `this`.
    * @param graph - Graph of fields to be included.
-   * @typeParam T - Extending model instance type.
-   * @returns Observable of the mutated instance.
+   * @typeParam T - Extending *Model* instance type.
+   * @returns [Observable][] of the mutated instance.
    *
-   * @example Persist a model instance.
+   * @example
+   * Persist a *Model* instance:
    * ```ts
    * import { ExampleModel } from './example-model';
    *
@@ -1237,8 +1336,6 @@ export abstract class Model<M extends Model = any> {
    *   'field'
    * ]).subscribe(console.log);
    * ```
-   *
-   * @see {@link saveOne}
    */
   public save<T extends Model = M>(
     this: T,
@@ -1250,24 +1347,25 @@ export abstract class Model<M extends Model = any> {
   }
 
   /**
-   * Instance-scoped serialize method. Internally calls {@link serialize} on the
-   * this-context of an instance of a class extending the abstract model base
-   * class.
+   * Instance-scoped **serialize** method. Internally calls the static
+   * *serialize* method on the `this`-context of an instance of a class
+   * extending the abstract *Model* base class.
    *
-   * @param this - Polymorphic this.
-   * @param shallow - Whether to serialize shallowly.
-   * @typeParam T - Extending model instance type.
-   * @returns Shape of this instance or undefined.
+   * [Shape]: https://sgrud.github.io/client/types/data.Model-1.Shape
    *
-   * @example Serialize a model instance.
+   * @param this - Polymorphic `this`.
+   * @param shallow - Whether to **serialize** shallowly.
+   * @typeParam T - Extending *Model* instance type.
+   * @returns [Shape][] of this instance or undefined.
+   *
+   * @example
+   * **Serialize** a *Model* instance:
    * ```ts
    * import { ExampleModel } from './example-model';
    *
    * const model = new ExampleModel({ field: 'example' });
    * console.log(model.serialize()); // { field: 'example' }
    * ```
-   *
-   * @see {@link serialize}
    */
   public serialize<T extends Model = M>(
     this: T,
@@ -1277,24 +1375,25 @@ export abstract class Model<M extends Model = any> {
   }
 
   /**
-   * Instance-scoped treemap method. Internally calls {@link treemap} on the
-   * this-context of an instance of a class extending the abstract model base
-   * class.
+   * Instance-scoped **treemap** method. Internally calls the static *treemap*
+   * method on the `this`-context of an instance of a class extending the
+   * abstract *Model* base class.
    *
-   * @param this - Polymorphic this.
-   * @param shallow - Whether to treemap shallowly.
-   * @typeParam T - Extending model instance type.
-   * @returns Graph of this instance or undefined.
+   * [Graph]: https://sgrud.github.io/client/types/data.Model-1.Graph
    *
-   * @example Treemap a model instance.
+   * @param this - Polymorphic `this`.
+   * @param shallow - Whether to **treemap** shallowly.
+   * @typeParam T - Extending *Model* instance type.
+   * @returns [Graph][] of this instance or undefined.
+   *
+   * @example
+   * **Treemap** a *Model* instance:
    * ```ts
    * import { ExampleModel } from './example-model';
    *
    * const model = new ExampleModel({ field: 'example' });
    * console.log(model.treemap()); // ['field']
    * ```
-   *
-   * @see {@link treemap}
    */
   public treemap<T extends Model = M>(
     this: T,

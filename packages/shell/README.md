@@ -1,10 +1,10 @@
 # SGRUD
-> SGRUD is Growing Rapidly Until Distinction
+> SGRUD is Growing Rapidly Until Distinction.
 
 ## @sgrud/shell
-> `@sgrud/shell` - The [SGRUD](https://github.com/sgrud/client) web UI shell.
+> `@sgrud/shell` - The [SGRUD](https://sgrud.github.io) Web UI Shell.
 
 ### References
-- [API documentation](https://sgrud.github.io/client/modules/shell)
-- [GIT repository](https://github.com/sgrud/client/blob/main/packages/shell)
-- [NPM listing](https://www.npmjs.com/package/@sgrud/shell)
+- [Documentation](https://sgrud.github.io/client/modules/shell)
+- [Repository](https://github.com/sgrud/client/tree/main/packages/shell)
+- [Package](https://www.npmjs.com/package/@sgrud/shell)

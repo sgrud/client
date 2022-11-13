@@ -3,7 +3,7 @@
  *
  * @typeParam T - Union type.
  *
- * @see https://github.com/microsoft/TypeScript/issues/29594
+ * @remarks https://github.com/microsoft/TypeScript/issues/29594
  */
 export type Merge<T>
   = (T extends T ? (_: T) => T : never) extends (_: infer I) => T ? I : never;

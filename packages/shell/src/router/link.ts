@@ -6,7 +6,9 @@ declare global {
   interface HTMLElementTagNameMap {
 
     /**
-     * @see {@link RouterLink}
+     * [RouterLink]: https://sgrud.github.io/client/classes/shell.RouterLink
+     *
+     * @see [RouterLink][]
      */
     'router-link': RouterLink;
 
@@ -14,39 +16,49 @@ declare global {
 }
 
 /**
- * Custom component extending the `HTMLAnchorElement`. This component provides a
- * declarative way to invoke the {@link Router}, while maintaining compatibility
- * with SSR/SEO aspects of SPAs. This is achieved by rewriting absolute `href`s
- * to be contained within the {@link Router.baseHref} and replacing the default
- * browser behavior when {@link onclick}ed with {@link Router.navigate}.
+ * Custom element extending the [HTMLAnchorElement][]. This element provides a
+ * declarative way to invoke the [Router][], while maintaining compatibility
+ * with SSR/SEO aspects of SPAs. This is achieved by rewriting absolute *href*s
+ * to be contained within the applications base href and intercepting the
+ * default browser behavior when *onclick*ed.
  *
- * @example A `router-link`.
+ * [HTMLAnchorElement]: https://developer.mozilla.org/en-US/docs/Web/API/HTMLAnchorElement
+ * [Router]: https://sgrud.github.io/client/classes/shell.Router
+ *
+ * @example
+ * A `router-link`:
  * ```html
  * <a href="/example" is="router-link">Example</a>
  * ```
  *
- * @see {@link Route}
- * @see {@link Router}
+ * @see [Router][]
  */
 export class RouterLink extends HTMLAnchorElement {
 
   /**
    * Array of attribute names, which should be observed for changes, which will
-   * trigger the {@link attributeChangedCallback}. This component only observes
-   * the `href` attribute.
+   * trigger the *attributeChangedCallback*. This element only observes the
+   * `href` attribute.
    */
   public static readonly observedAttributes: string[] = [
     'href'
   ];
 
   /**
-   * Factored-in router property retrieving the linked {@link Router}.
+   * [Factor][]ed-in **router** property retrieving the linked [Router][].
    *
-   * @decorator {@link Factor}
+   * [Factor]: https://sgrud.github.io/client/functions/core.Factor
+   * [Router]: https://sgrud.github.io/client/classes/shell.Router
+   *
+   * @decorator [Factor][]
    */
   @Factor(() => Router)
   private readonly router!: Router;
 
+  /**
+   * Public **constructor** of this custom element. This **constructor** is
+   * called whenever an instance this custom element is rendered.
+   */
   public constructor() {
     super();
 
@@ -56,9 +68,11 @@ export class RouterLink extends HTMLAnchorElement {
   }
 
   /**
-   * Called when the component's `href` attribute is added, removed or changed.
-   * The `next` attribute value is used to determine wether to rewrite the
-   * `href` by passing it through the {@link Router.rebase} method.
+   * This method id called whenever the element's `href` attribute is added,
+   * removed or changed. The `next` attribute value is used to determine wether
+   * to rewrite the `href` by letting the [Router][] *rebase* it.
+   *
+   * [Router]: https://sgrud.github.io/client/classes/shell.Router
    *
    * @param _name - Attribute name (ignored).
    * @param _prev - Previous value (ignored).
@@ -76,8 +90,10 @@ export class RouterLink extends HTMLAnchorElement {
   }
 
   /**
-   * Overridden `onclick` handler, preventing the default browser behavior and
-   * calling the {@link Router.navigate} method instead.
+   * Overridden **onclick** handler, preventing the default browser behavior and
+   * letting the [Router][] handle the navigation instead.
+   *
+   * [Router]: https://sgrud.github.io/client/classes/shell.Router
    *
    * @param event - Mouse click event.
    */
@@ -91,6 +107,6 @@ export class RouterLink extends HTMLAnchorElement {
 }
 
 /**
- * Registration of this custom element with the `CustomElementRegistry`.
+ * Registration of this custom element.
  */
 customElements.define('router-link', RouterLink, { extends: 'a' });

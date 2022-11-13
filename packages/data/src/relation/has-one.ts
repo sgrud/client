@@ -2,34 +2,43 @@ import { assign, Mutable, TypeOf } from '@sgrud/core';
 import { Model } from '../model/model';
 
 /**
- * Symbol used as property key by the {@link HasOne} decorator to register
- * decorated fields for further computation, e.g., serialization, treemapping
- * etc.
+ * Unique symbol used as property key by the [HasOne][] decorator to register
+ * decorated [Model][] fields for further computation, e.g., serialization,
+ * treemapping etc.
  *
- * @see {@link HasOne}
+ * [HasOne]: https://sgrud.github.io/client/functions/data.HasOne
+ * [Model]: https://sgrud.github.io/client/classes/data.Model
+ *
+ * @see [HasOne][]
  */
 export const hasOne = Symbol('@sgrud/data/model/has-one');
 
 /**
- * {@link Model} field decorator factory. Using this decorator, Models can be
- * enriched with one-to-one associations to other Models. Any argument for the
- * `typeFactory` has to be another Model. By applying this decorator, the
- * decorated field will (depending on the `transient` argument) be recognized
- * when serializing or treemapping the Model containing the decorated field.
+ * [Model][] field decorator factory. Using this decorator, [Model][]s can be
+ * enriched with one-to-one associations to other [Model][]s. The value for the
+ * `typeFactory` argument has to be another [Model][]. By applying this
+ * decorator, the decorated field will (depending on the `transient` argument
+ * value) be taken into account when serializing or treemapping the [Model][]
+ * containing the decorated field.
+ *
+ * [HasMany]: https://sgrud.github.io/client/functions/data.HasMany
+ * [Model]: https://sgrud.github.io/client/classes/data.Model
+ * [Property]: https://sgrud.github.io/client/functions/data.Property-1
  *
  * @param typeFactory - Forward reference to the field value constructor.
  * @param transient - Whether the decorated field is transient.
  * @typeParam T - Field value constructor type.
- * @returns Model field decorator.
+ * @returns [Model][] field decorator.
  *
- * @example Model with a has one association.
+ * @example
+ * [Model][] with a one-to-one association:
  * ```ts
  * import { HasOne, Model } from '@sgrud/data';
  * import { OwnedModel } from './owned-model';
  *
  * export class ExampleModel extends Model<ExampleModel> {
  *
- *   @HasOne(() => OwnedModel)
+ *   ⁠@HasOne(() => OwnedModel)
  *   public field?: OwnedModel;
  *
  *   protected [Symbol.toStringTag]: string = 'ExampleModel';
@@ -37,9 +46,9 @@ export const hasOne = Symbol('@sgrud/data/model/has-one');
  * }
  * ```
  *
- * @see {@link Model}
- * @see {@link HasMany}
- * @see {@link Property}
+ * @see [Model][]
+ * @see [HasMany][]
+ * @see [Property][]
  */
 export function HasOne<T extends Model.Type<any>>(
   typeFactory: () => T,

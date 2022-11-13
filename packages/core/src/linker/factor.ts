@@ -3,27 +3,31 @@ import { Linker } from './linker';
 /**
  * Prototype property decorator factory. Replaces the decorated prototype
  * property with a getter, which looks up the linked instance of a target
- * constructor forwarded-referenced by the `linkFactory()`.
+ * constructor forwarded-referenced by the `targetFactory`.
+ *
+ * [Linker]: https://sgrud.github.io/client/classes/core.Linker
+ * [Target]: https://sgrud.github.io/client/functions/core.Target
  *
  * @param targetFactory - Forward reference to the target constructor.
- * @typeParam K - Target constructor type.
+ * @typeParam K - Constructor type.
  * @returns Prototype property decorator.
  *
- * @example Factor a service.
+ * @example
+ * **Factor** a service:
  * ```ts
  * import { Factor } from '@sgrud/core';
  * import { Service } from './service';
  *
  * export class ServiceHandler {
  *
- *   @Factor(() => Service)
+ *   ⁠@Factor(() => Service)
  *   private readonly service!: Service;
  *
  * }
  * ```
  *
- * @see {@link Linker}
- * @see {@link Target}
+ * @see [Linker][]
+ * @see [Target][]
  */
 export function Factor<K extends new () => any>(
   targetFactory: () => K

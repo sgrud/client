@@ -2,54 +2,50 @@ import { Singleton } from '../utility/singleton';
 
 /**
  * String literal helper type. Enforces any assigned string to contain at least
- * three dots. Registrations are used to lookup constructors by magic strings
- * through classes extending the base {@link Provider} and should represent sane
- * package paths in dot-notation.
+ * three dots. **Registration**s are used by the [Registry][] to alias classes
+ * extending the base [Provider][] as magic strings and should represent sane
+ * module paths in dot-notation.
  *
- * @example Library-wide Registration pattern.
+ * [Provider]: https://sgrud.github.io/client/functions/core.Provider
+ * [Registry]: https://sgrud.github.io/client/classes/core.Registry
+ *
+ * @example
+ * Library-wide **Registration** pattern:
  * ```ts
  * import type { Registration } from '@sgrud/core';
  *
  * const registration: Registration = 'sgrud.module.path.ClassName';
  * ```
  *
- * @see {@link Provide}
- * @see {@link Provider}
- * @see {@link Registry}
+ * @see [Registry][]
  */
 export type Registration = `${string}.${string}.${string}`;
 
 /**
- * The Registry is a {@link Singleton} map used by the {@link Provider} to
- * lookup {@link Provide}d constructors by magic strings upon class extension.
- * Magic strings should represent sane package paths in dot-notation. To
- * programmatically provide constructors by magic strings to extending classes,
- * the inherited `MapConstructor` or `Map.prototype.set` methods are available.
- * The former will insert all entries into this singleton Registry map,
- * internally calling the latter for each. Whenever a currently no registered
- * constructor is requested, an intermediary class is created, {@link cached}
- * internally and returned. When the actual constructor is registered, the
+ * The [Singleton][] **Registry** is a mapping used by the [Provider][] to
+ * lookup [Provide][]d constructors by [Registration][]s upon class extension.
+ * Magic strings should represent sane module paths in dot-notation. To
+ * programmatically provide constructors by [Registration][]s to extending
+ * classes, the inherited *constructor* or *set* methods are available. The
+ * former will insert all entries into this [Singleton][] **Registry** map,
+ * internally calling the latter for each. Whenever a currently not registered
+ * constructor is requested, an intermediary class is created, *cached*
+ * internally and returned. When the actual constructor is registered later, the
  * previously created intermediary class is removed from the internal caching
- * and further steps are taken, to guarantee the transparent addressing of the
- * actual constructor through the intermediary class.
+ * and further steps are taken to guarantee the transparent addressing of the
+ * actual constructor through the dropped intermediary class.
  *
- * @decorator {@link Singleton}
+ * [Provide]: https://sgrud.github.io/client/functions/core.Provide-1
+ * [Provider]: https://sgrud.github.io/client/functions/core.Provider
+ * [Registration]: https://sgrud.github.io/client/types/core.Registration
+ * [Singleton]: https://sgrud.github.io/client/functions/core.Singleton
+ *
+ * @decorator [Singleton][]
  * @typeParam K - Magic string type.
- * @typeParam V - Providing constructor type.
+ * @typeParam V - Constructor type.
  *
- * @example Preemptively provide a constructor by magic string.
- * ```ts
- * import type { Registration } from '@sgrud/core';
- * import { Registry } from '@sgrud/core';
- * import { Service } from './service';
- *
- * new Registry<Registration, typeof Service>([
- *   ['sgrud.example.Service', Service]
- * ]);
- * ```
- *
- * @see {@link Provide}
- * @see {@link Provider}
+ * @see [Provide][]
+ * @see [Provider][]
  */
 @Singleton<typeof Registry>((self, [tuples]) => {
   if (tuples) {
@@ -66,13 +62,15 @@ export class Registry<
 > extends Map<K, V> {
 
   /**
-   * Internally used map of all cached, i.e., forward referenced, constructors.
-   * Whenever a constructor, which is not currently registered, is requested as
-   * a provider, an intermediary class is created and stored within this map
-   * until the actual constructor is registered. As soon as this happens, the
-   * intermediary class is removed from this map and further steps are taken, to
-   * guarantee the transparent addressing of the actual constructor through the
-   * intermediary class.
+   * Internally used mapping of all **cached**, i.e., forward-referenced,
+   * constructors. Whenever a constructor, which is not currently registered, is
+   * requested as a [Provider][], an intermediary class is created and stored
+   * within this map until the actual constructor is registered. As soon as this
+   * happens, the intermediary class is removed from this map and further steps
+   * are taken to guarantee the transparent addressing of the actual constructor
+   * through the dropped intermediary class.
+   *
+   * [Provider]: https://sgrud.github.io/client/functions/core.Provider
    */
   private readonly cached: Map<K, V>;
 
@@ -85,13 +83,28 @@ export class Registry<
   private readonly caches: WeakSet<V>;
 
   /**
-   * Overridden `MapConstructor`. The constructor of this class accepts the same
-   * parameters as the overridden `MapConstructor` and acts the same. I.e.,
-   * through instantiating this Registry singleton and passing a list of tuples
-   * of {@link Registration}s and their corresponding constructors, these tuples
-   * will be stored.
+   * Public **constructor**. The constructor of this class accepts the same
+   * parameters as its overridden `super` **constructor** and acts the same.
+   * I.e., through instantiating this [Singleton][] class and passing a list of
+   * tuples of [Registration][]s and their corresponding constructors, these
+   * tuples will be stored.
+   *
+   * [Registration]: https://sgrud.github.io/client/types/core.Registration
+   * [Singleton]: https://sgrud.github.io/client/functions/core.Singleton
    *
    * @param tuples - List of constructors to provide.
+   *
+   * @example
+   * Preemptively provide a constructor by magic string:
+   * ```ts
+   * import type { Registration } from '@sgrud/core';
+   * import { Registry } from '@sgrud/core';
+   * import { Service } from './service';
+   *
+   * new Registry<Registration, typeof Service>([
+   *   ['sgrud.example.Service', Service]
+   * ]);
+   * ```
    */
   public constructor(tuples?: [K, V][]) {
     super();
@@ -107,26 +120,30 @@ export class Registry<
   }
 
   /**
-   * Overridden `Map.prototype.get` method. Looks up the {@link Provide}d
-   * constructor by magic string. If no provided constructor is found, an
-   * intermediary class is created, {@link cached} internally and returned.
-   * While this intermediary class and the functionality supporting it takes
-   * care of inheritance, i.e., allows to forward-reference base classes to be
-   * extended, it cannot substitute for the actual extended constructor.
-   * Therefore, static extension of forward-referenced classes may be used, but
-   * as long as the actual extended constructor is not registered (and therefore
-   * the intermediary class is still acting as inheritance cache), the extending
-   * class cannot be instantiated, called etc. Doing so will result in a
-   * ReferenceError being thrown.
+   * Overridden **get** method. Looks up the [Provide][]d constructor by magic
+   * string. If no provided constructor is found, an intermediary class is
+   * created, *cached* internally and returned. While this intermediary class
+   * and the functionality supporting it takes care of inheritance, i.e., allows
+   * to forward-reference base classes to be extended, it cannot substitute for
+   * the actual extended constructor. Therefore, static extension of
+   * forward-referenced classes may be used, but as long as the actual extended
+   * constructor is not registered (and therefore the intermediary class is
+   * still acting as inheritance cache), the extending class cannot be
+   * instantiated, called etc. Doing so will result in a ReferenceError being
+   * thrown.
+   *
+   * [Provide]: https://sgrud.github.io/client/functions/core.Provide-1
    *
    * @param registration - Magic string.
-   * @returns Providing constructor.
+   * @returns [Provide][]d constructor.
+   * @throws ReferenceError.
    *
-   * @example Retrieve a provided constructor by magic string.
+   * @example
+   * Retrieve a provided constructor by magic string:
    * ```ts
    * import type { Registration } from '@sgrud/core';
-   * import { Registry } from '@sgrud/core';
    * import type { Service } from 'example-module';
+   * import { Registry } from '@sgrud/core';
    *
    * new Registry<Registration, typeof Service>().get('org.example.Service');
    * ```
@@ -162,19 +179,20 @@ export class Registry<
   }
 
   /**
-   * Overridden `Map.prototype.set` method. Whenever a constructor is provided
-   * by magic string through calling this method, a check is run, wether this
-   * constructor was previously requested and therefore was {@link cached} as
-   * intermediary class. If so, the intermediary class is removed from this
-   * internal map and further steps are taken, to guarantee the transparent
-   * addressing of the newly provided constructor through the previously cached
+   * Overridden **set** method. Whenever a constructor is provided by magic
+   * string through calling this method, a check is run, wether this constructor
+   * was previously requested and therefore was *cached* as intermediary class.
+   * If so, the intermediary class is removed from this internal mapping and
+   * further steps are taken to guarantee the transparent addressing of the
+   * newly provided constructor through the previously *cached* and now dropped
    * intermediary class.
    *
    * @param registration - Magic string.
    * @param constructor - Providing constructor.
-   * @returns This registry instance.
+   * @returns This instance.
    *
-   * @example Preemptively provide a constructor by magic string.
+   * @example
+   * Preemptively provide a constructor by magic string:
    * ```ts
    * import type { Registration } from '@sgrud/core';
    * import { Registry } from '@sgrud/core';

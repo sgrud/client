@@ -3,22 +3,30 @@ import { Observable } from 'rxjs';
 import { Router } from '../router/router';
 
 /**
- * Abstract base class to implement {@link Router.Task}s. By {@link Target}ing
- * or otherwise providing an implementation of this abstract base class to the
- * {@link Linker}, the implemented {@link handle} method is called whenever a
- * new {@link Router.State} is triggered by navigating. This interceptor-pattern
- * makes complex routing strategies like asynchronous module-retrieval and the
- * like easy to be implemented.
+ * Abstract base class to implement **RouterTask**s. By [Target][]ing or
+ * otherwise providing an implementation of this abstract **RouterTask** base
+ * class to the [Linker][], the implemented *handle* method is called whenever a
+ * new [State][] is triggered by navigating. This interceptor-like pattern makes
+ * complex routing strategies like asynchronous module-retrieval and the similar
+ * tasks easy to be implemented.
  *
- * @decorator {@link Provide}
+ * [Linker]: https://sgrud.github.io/client/classes/core.Linker
+ * [Provide]: https://sgrud.github.io/client/functions/core.Provide-1
+ * [Route]: https://sgrud.github.io/client/functions/shell.Route
+ * [Router]: https://sgrud.github.io/client/classes/shell.Router
+ * [Target]: https://sgrud.github.io/client/functions/core.Target
+ * [State]: https://sgrud.github.io/client/interfaces/shell.Router-1.State
  *
- * @example Simple router task stub.
+ * @decorator [Provide][]
+ *
+ * @example
+ * Simple **RouterTask** stub:
  * ```ts
- * import { Provider, Target } from '@sgrud/core';
  * import type { Router, RouterTask } from '@sgrud/shell';
  * import type { Observable } from 'rxjs';
+ * import { Provider, Target } from '@sgrud/core';
  *
- * @Target<typeof ExampleRouterTask>()
+ * ⁠@Target<typeof ExampleRouterTask>()
  * export class ExampleRouterTask
  *   extends Provider<typeof RouterTask>('sgrud.shell.router.RouterTask') {
  *
@@ -33,29 +41,33 @@ import { Router } from '../router/router';
  * }
  * ```
  *
- * @see {@link Route}
- * @see {@link Router}
+ * @see [Route][]
+ * @see [Router][]
  */
 @Provide<typeof RouterTask>()
 export abstract class RouterTask {
 
   /**
-   * Magic string by which this class is provided.
+   * Magic string by which this class is [provide][]d.
    *
-   * @see {@link provide}
+   * [provide]: https://sgrud.github.io/client/variables/core.provide-2
+   *
+   * @see [provide][]
    */
   public static readonly [provide]:
   'sgrud.shell.router.RouterTask' = 'sgrud.shell.router.RouterTask';
 
   /**
-   * Abstract handle method, called whenever a new {@link Router.State} should
-   * be navigated to. This method provides the possibility to intercept these
-   * upcoming states and, e.g., mutate or redirect them.
+   * Abstract **handle** method, called whenever a new [State][] should be
+   * navigated to. This method provides the possibility to intercept these
+   * upcoming [State][]s and, e.g., mutate or redirect them.
    *
-   * @param prev - Previously active state.
-   * @param next - Next state to be activated.
+   * [State]: https://sgrud.github.io/client/interfaces/shell.Router-1.State
+   *
+   * @param prev - Previously active router state.
+   * @param next - Next router state to be activated.
    * @param handler - Next task handler.
-   * @returns Next handled state.
+   * @returns Next handled router state.
    */
   public abstract handle(
     prev: Router.State,

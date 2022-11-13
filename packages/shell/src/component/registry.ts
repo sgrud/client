@@ -1,14 +1,16 @@
 /**
- * Internal weak mapping of all registered elements to their name.
+ * Internal mapping of all registered **elements** to their name.
  */
 const elements = new WeakMap<CustomElementConstructor, string>();
 
 /**
- * Proxy around the built-in `customElements` object, maintaining a mapping of
+ * Proxy around the built-in [customElements][] object, maintaining a mapping of
  * all registered elements and their corresponding names, which can be queried
- * by calling `customElements.getName()`.
+ * by calling *getName*.
  *
- * @see https://github.com/WICG/webcomponents/issues/566
+ * [customElements]: https://developer.mozilla.org/en-US/docs/Web/API/Window/customElements
+ *
+ * @remarks https://github.com/WICG/webcomponents/issues/566
  */
 const registry = new Proxy(customElements, {
   get: (_, propertyKey: keyof CustomElementRegistry | 'getName') => {
@@ -43,6 +45,16 @@ const registry = new Proxy(customElements, {
     }
   }
 }) as CustomElementRegistry & {
+
+  /**
+   * Retrieve the name under which the supplied `constructor` was registered
+   * with the [customElements][] registry.
+   *
+   * [customElements]: https://developer.mozilla.org/en-US/docs/Web/API/Window/customElements
+   *
+   * @param constructor - Class constructor to be looked up.
+   * @returns Name under which the `constructor` was registered, if.
+   */
   getName(constructor: CustomElementConstructor): string | undefined;
 };
 

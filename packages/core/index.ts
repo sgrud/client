@@ -1,46 +1,17 @@
 /**
- * `@sgrud/core` - The [SGRUD](https://github.com/sgrud/client) core module.
+ * `@sgrud/core` - The [SGRUD][] Core Module.
  *
  * The functions and classes found within this module represent the base upon
- * which the SGRUD client library is built. Therefore, most of the code provided
- * within this module does not aim to fulfill one specific high-level need, but
- * is intended to be used as low-level building block for downstream projects.
- * This practice is employed throughout the SGRUD client library, as all modules
- * depend on this core module. By providing the core functionality within this
- * singular module, all downstream SGRUD modules should be considered opt-in
- * functionality which may be used within projects building upon the SGRUD
- * client library.
+ * which the [SGRUD][] client libraries are built. Therefore, most of the code
+ * provided within this module does not aim at fulfilling one specific
+ * high-level need, but is used and intended to be used as low-level building
+ * blocks for downstream projects. This practice is employed throughout the
+ * [SGRUD][] client libraries, as all modules depend on this core module. By
+ * providing the core functionality within this singular module, all downstream
+ * [SGRUD][] modules should be considered opt-in functionality which may be used
+ * within projects building upon the [SGRUD][] client libraries.
  *
- * The different functions and classes implemented within this module can be
- * roughly categorized into the following functional aspects.
- *
- * - SGRUD Kernel
- *   - {@link Kernel}: an essential dependency loader
- *   - {@link semver}: best-effort `semver` matcher
- * - HTTP client
- *   - {@link HttpClient}: a simple `rxjs/ajax`-based HTTP client
- *   - {@link HttpProxy}: abstract base class for proxies/interceptors
- *   - {@link HttpState}: built-in HTTP proxy collecting request progress
- * - Super extensions
- *   - {@link Provide}: Provides the decorated constructor to extending classes
- *   - {@link Provider}: Mixin-style functional provider of base classes
- *   - {@link Registry}: extended `Map`, containing all providing constructors
- * - Dependency-linking
- *   - {@link Factor}: property decorator factoring a targeted constructor
- *   - {@link Linker}: extended `Map`, containing all linked instances
- *   - {@link Target}: class decorator linking the decorated constructor
- * - Threading tools
- *   - {@link Spawn}: property decorator to easily spawn a `WebWorker`
- *   - {@link Thread}: class decorator exposing the class inside a `WebWorker`
- * - Type helpers
- *   - {@link Assign}: assigns the own property types from a source to a target
- *   - {@link Merge}: type helper to convert union types to intersection types
- *   - {@link Mutable}: type helper marking the supplied type as mutable
- * - Miscellaneous utilities
- *   - {@link Singleton}: class decorator enforcing the singleton pattern
- *   - {@link TypeOf}: strict type-assertion and runtime type-checking utility
- *   - {@link assign}: deep assigns all properties from sources to a target
- *   - {@link pluralize}: pluralizes words of the English language
+ * [SGRUD]: https://sgrud.github.io
  *
  * @packageDocumentation
  */

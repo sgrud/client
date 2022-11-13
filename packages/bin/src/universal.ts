@@ -9,15 +9,14 @@ cli.command('universal [entry]')
   .example('universal # Run with default options')
   .example('universal --host 0.0.0.0 # Listen on all IPs')
   .example('universal -H 192.168.0.10 -p 4040 # Listen on 192.168.0.10:4040')
-  .option('--chrome', 'Chrome executable', '/usr/bin/chromium-browser')
+  .option('--chrome', 'Chrome executable path', '/usr/bin/chromium-browser')
   .option('--prefix', 'Use an alternative working directory', './')
-  .option('-H, --host', 'Host to bind to', '127.0.0.1')
+  .option('-H, --host', 'Host/IP to bind to', '127.0.0.1')
   .option('-p, --port', 'Port to bind to', '4000')
   .action((entry, opts) => universal({ ...opts, entry }));
 
 /**
- * Runs SGRUD in universal (SSR) mode using
- * [puppeteer](https://www.npmjs.com/package/puppeteer).
+ * Runs [SGRUD][] in **universal** (SSR) mode using [puppeteer][].
  *
  * ```text
  * Description
@@ -27,9 +26,9 @@ cli.command('universal [entry]')
  *   $ sgrud universal [entry] [options]
  *
  * Options
- *   --chrome      Chrome executable  (default /usr/bin/chromium-browser)
+ *   --chrome      Chrome executable path  (default /usr/bin/chromium-browser)
  *   --prefix      Use an alternative working directory  (default ./)
- *   -H, --host    Host to bind to  (default 127.0.0.1)
+ *   -H, --host    Host/IP to bind to  (default 127.0.0.1)
  *   -p, --port    Port to bind to  (default 4000)
  *   -h, --help    Displays this message
  *
@@ -39,25 +38,39 @@ cli.command('universal [entry]')
  *   $ sgrud universal -H 192.168.0.10 -p 4040 # Listen on 192.168.0.10:4040
  * ```
  *
+ * [puppeteer]: https://pptr.dev
+ * [SGRUD]: https://sgrud.github.io
+ *
  * @param options - Options object.
  * @returns Execution promise.
  *
- * @example Run with default options.
+ * @example
+ * Run with default options:
  * ```js
  * require('@sgrud/bin');
+ *
  * sgrud.bin.universal();
  * ```
  *
- * @example Listen on all IPs.
+ * @example
+ * Listen on all IPs:
  * ```js
  * require('@sgrud/bin');
- * sgrud.bin.universal({ host: '0.0.0.0' });
+ *
+ * sgrud.bin.universal({
+ *   host: '0.0.0.0'
+ * });
  * ```
  *
- * @example Listen on `192.168.0.10:4040`.
+ * @example
+ * Listen on `192.168.0.10:4040`:
  * ```js
  * require('@sgrud/bin');
- * sgrud.bin.universal({ host: '192.168.0.10', port: '4040' });
+ *
+ * sgrud.bin.universal({
+ *   host: '192.168.0.10',
+ *   port: '4040'
+ * });
  * ```
  */
 export async function universal({
@@ -69,7 +82,7 @@ export async function universal({
 }: {
 
   /**
-   * Chrome executable.
+   * Chrome executable path.
    *
    * @defaultValue `'/usr/bin/chromium-browser'`
    */
@@ -83,7 +96,7 @@ export async function universal({
   entry?: string;
 
   /**
-   * Host to bind to.
+   * Host/IP to bind to.
    *
    * @defaultValue `'127.0.0.1'`
    */

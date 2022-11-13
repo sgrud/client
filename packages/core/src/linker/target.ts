@@ -1,41 +1,46 @@
 import { Linker } from './linker';
 
 /**
- * Type helper to allow {@link Factor}ing targeted constructors with required
- * arguments. Use in conjunction with the `@Target()` decorator.
+ * Type helper to allow [Factor][]ing **Target**ed constructors with required
+ * arguments. Used and to be used in conjunction with the [Target][] decorator.
  *
- * @typeParam V - Linked instance type.
+ * [Factor]: https://sgrud.github.io/client/functions/core.Factor
+ * [Target]: https://sgrud.github.io/client/functions/core.Target
  *
- * @see {@link Factor}
+ * @typeParam V - Instance type.
  */
 export interface Target<V> {
 
   /**
    * Enforced constructor contract.
    *
-   * @param args - Class constructor rest parameter.
-   * @returns Linked instance.
+   * @param args - Constructor arguments.
    */
   new (...args: any[]): V;
 
 }
 
 /**
- * Class decorator factory. Links the decorated target constructor to its
- * corresponding instance by applying the decorated constructor arguments.
- * Employ this helper to link target constructors with required arguments.
- * Supplying a `target` constructor overrides it with the constructed instance.
+ * Class decorator factory. Links the **Target**ed constructor to its
+ * corresponding instance by applying the supplied `factoryArgs`. Employ this
+ * helper to link **Target**ed constructors with required arguments. Supplying a
+ * `target` constructor overrides its linked instance, if any, with the
+ * constructed instance.
  *
- * @param factoryArgs - Arguments for the target constructor.
- * @param target - Target constructor override.
- * @typeParam K - Target constructor type.
+ * [Factor]: https://sgrud.github.io/client/functions/core.Factor
+ * [Linker]: https://sgrud.github.io/client/classes/core.Linker
+ *
+ * @param factoryArgs - **Target** constructor arguments.
+ * @param target - **Target** constructor override.
+ * @typeParam K - Constructor type.
  * @returns Class decorator.
  *
- * @example Target a service.
+ * @example
+ * **Target** a service:
  * ```ts
  * import { Target } from '@sgrud/core';
  *
- * @Target<typeof Service>(['default'])
+ * ⁠@Target<typeof Service>(['default'])
  * export class Service {
  *
  *   public constructor(
@@ -45,22 +50,23 @@ export interface Target<V> {
  * }
  * ```
  *
- * @example Factor a targeted service.
+ * @example
+ * [Factor][] a **Target**ed service:
  * ```ts
- * import { Factor } from '@sgrud/core';
  * import type { Target } from '@sgrud/core';
+ * import { Factor } from '@sgrud/core';
  * import { Service } from './service';
  *
  * export class ServiceHandler {
  *
- *   @Factor<Target<Service>>(() => Service)
+ *   ⁠@Factor<Target<Service>>(() => Service)
  *   public readonly service!: Service;
  *
  * }
  * ```
  *
- * @see {@link Factor}
- * @see {@link Linker}
+ * @see [Factor][]
+ * @see [Linker][]
  */
 export function Target<K extends new (...args: any[]) => any>(
   factoryArgs?: ConstructorParameters<K>,

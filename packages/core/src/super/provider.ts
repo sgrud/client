@@ -2,19 +2,21 @@ import { provide, Provide } from './provide';
 import { Registration, Registry } from './registry';
 
 /**
- * Type helper to allow referencing {@link Provide}d constructors as `new`-able
- * targets. Use in conjunction with the `@Provide()` decorator.
+ * Type helper to allow referencing [Provide][]d constructors as `new`-able
+ * targets. Used and intended to be used in conjunction with the [Provider][]
+ * decorator.
  *
- * @typeParam V - Providing instance type.
+ * [Provide]: https://sgrud.github.io/client/functions/core.Provide-1
+ * [Provider]: https://sgrud.github.io/client/functions/core.Provider
  *
- * @see {@link Provide}
+ * @typeParam V - Instance type.
+ *
+ * @see [Provider][]
  */
 export interface Provider<V> {
 
   /**
    * Enforced provider contract.
-   *
-   * @see {@link provide}
    */
   readonly [provide]: Registration;
 
@@ -22,31 +24,34 @@ export interface Provider<V> {
    * Enforced constructor contract.
    *
    * @param args - Class constructor rest parameter.
-   * @returns Linked instance.
    */
   new (...args: any[]): V;
 
 }
 
 /**
- * Provider of base classes. Extending this mixin-style function while supplying
- * the `typeof` a {@link Provide}d constructor enforces type safety and hinting
- * on the supplied magic string and the resulting class which `extends` this
- * Provider mixin. The main purpose of this pattern is bridging module gaps by
- * de-coupling bundle files while maintaining a well-defined prototype chain.
- * This still requires the base class to be defined (and {@link Provide}d)
+ * **Provider** of base classes. Extending this mixin-style function while
+ * supplying the `typeof` a [Provide][]d constructor enforces type safety and
+ * hinting on the supplied magic string and the resulting class which `extends`
+ * this **Provider** mixin. The main purpose of this pattern is bridging module
+ * gaps by de-coupling bundle files while maintaining a well-defined prototype
+ * chain. This still requires the base class to be defined (and [Provide][]d)
  * before extension but allows intellisense'd OOP patterns across multiple
  * modules while maintaining runtime language specifications.
  *
+ * [Provide]: https://sgrud.github.io/client/functions/core.Provide-1
+ * [Registry]: https://sgrud.github.io/client/classes/core.Registry
+ *
  * @param provider - Magic string.
- * @typeParam V - Providing constructor type.
+ * @typeParam V - Constructor type.
  * @typeParam K - Magic string type.
  * @returns Providing constructor.
  *
- * @example Extend a provided class.
+ * @example
+ * Extend a provided class:
  * ```ts
- * import { Provider } from '@sgrud/core';
  * import type { Base } from 'example-module';
+ * import { Provider } from '@sgrud/core';
  *
  * export class Class
  *   extends Provider<typeof Base>('org.example.Base') {
@@ -58,8 +63,8 @@ export interface Provider<V> {
  * }
  * ```
  *
- * @see {@link Provide}
- * @see {@link Registry}
+ * @see [Provide][]
+ * @see [Registry][]
  */
 export function Provider<
   V extends Provide<K, V>,
