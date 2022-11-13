@@ -28,7 +28,7 @@ export namespace Router {
    * const left: Router.Left<'nested/route/path'>; // 'nested'
    * ```
    */
-  export type Left<S extends string> = S extends `${infer L}/${string}` ? L : S;
+  export type Left<S extends string> = S extends `${infer I}/${string}` ? I : S;
 
   /**
    * Type helper representing the (optional) **Params** of a [Route][] path. By
@@ -50,13 +50,13 @@ export namespace Router {
    * ```
    */
   export type Params<S> = S extends `${string}:${infer P}` ? (
-    Left<P> extends `${infer O}?`
-      ? { [K in O]?: string }
-      : { [K in Left<P>]: string }
-  ) & (
     P extends `${Left<P>}${infer R}`
       ? Params<R>
       : never
+  ) & (
+    Left<P> extends `${infer O}?`
+      ? { [K in O]?: string }
+      : { [K in Left<P>]: string }
   ) : { };
 
   /**

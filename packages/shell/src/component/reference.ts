@@ -47,7 +47,7 @@ import { references } from './runtime';
  * @see [Component][]
  */
 export function Reference(
-  ref: JSX.Key,
+  reference: JSX.Key,
   observe?: (keyof HTMLElementEventMap)[]
 ) {
 
@@ -61,30 +61,31 @@ export function Reference(
     prototype: Component,
     propertyKey: PropertyKey
   ): void {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
     const connectedCallback = prototype.connectedCallback;
 
     if (observe?.length) {
       assign((prototype as Mutable<Component>).observedReferences ||= { }, {
-        [ref]: observe
+        [reference]: observe
       });
     }
 
     Object.defineProperty(prototype, propertyKey, {
+      enumerable: true,
       get(this: Component): Node | undefined {
-        return references(this.shadowRoot!)?.get(ref);
+        return references(this.shadowRoot!)?.get(reference);
       },
       set: Function.prototype as (...args: any[]) => void
     });
 
     prototype.connectedCallback = function(this: Component): void {
       if (this.observedReferences) {
-        (this as Mutable<Component>).observedReferences = undefined;
+        delete (this as Mutable<Component>).observedReferences;
+
         const listeners = { } as Record<JSX.Key, (event: Event) => void>;
-        const renderComponent = this.renderComponent?.bind(this);
+        const renderComponent = this.renderComponent;
 
         this.renderComponent = function(this: Component): void {
-          renderComponent?.();
+          renderComponent?.call(this);
           const refs = references(this.shadowRoot!);
 
           if (refs) {

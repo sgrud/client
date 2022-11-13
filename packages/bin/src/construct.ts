@@ -184,7 +184,11 @@ export async function construct({
         'pkg-main': true,
         workers: false
       }).then(({ output: result }) => {
-        console.log(__, result, '\n');
+        console.log(
+          _g, '[construct]',
+          _b, result,
+          __
+        );
       });
     }
 

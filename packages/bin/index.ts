@@ -38,7 +38,26 @@ import { postbuild } from './src/postbuild';
 import { runtimify } from './src/runtimify';
 import { universal } from './src/universal';
 
-const bin = {
+declare global {
+
+  /**
+   * Global [SGRUD][] namespace.
+   *
+  * [SGRUD]: https://sgrud.github.io
+   */
+  namespace sgrud {
+
+    /**
+     * `@sgrud/bin` - The [SGRUD][] CLI.
+     *
+     * [SGRUD]: https://sgrud.github.io
+     */
+    const bin: typeof module;
+
+  }
+}
+
+const module = {
   construct,
   kickstart,
   postbuild,
@@ -49,12 +68,8 @@ const bin = {
 if (process.argv[1]?.endsWith('sgrud')) {
   cli.parse(process.argv);
 } else {
-  global.sgrud = { bin };
+  global.sgrud = { bin: module };
 }
-
-declare const global: typeof globalThis & {
-  sgrud: { bin: typeof bin };
-};
 
 export {
   construct,

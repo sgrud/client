@@ -2,7 +2,7 @@
   "name": "@sgrud/eslint-config",
   "private": true,
   "version": "0.0.0",
-  "main": "./.eslintrc.json",
+  "main": "./index.json",
   "peerDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.27.1",
     "@typescript-eslint/parser": "^5.27.1",

@@ -29,9 +29,7 @@ import { Linker } from './linker';
  * @see [Linker][]
  * @see [Target][]
  */
-export function Factor<K extends new () => any>(
-  targetFactory: () => K
-) {
+export function Factor<K extends new () => any>(targetFactory: () => K) {
 
   /**
    * @param prototype - Prototype to be decorated.

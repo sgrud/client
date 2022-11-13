@@ -2,6 +2,14 @@ import { customElements } from './registry';
 import { createElement, render } from './runtime';
 
 /**
+ * Unique symbol used as property key by the [Component][] decorator to
+ * associate the supplied constructor with its wrapper.
+ *
+ * [Component]: https://sgrud.github.io/client/functions/shell.Component
+ */
+export const component = Symbol('@sgrud/shell/component/component');
+
+/**
  * Interface describing the shape of a **Component**. Mostly adheres to the
  * [WebComponents][] specification while providing rendering and change
  * detection capabilities.
@@ -163,7 +171,9 @@ export function Component<
   )>(
     constructor: T
   ): T {
-    class Class extends (constructor as new () => Component) {
+    class Element extends (constructor as new () => Component) {
+
+      public static readonly [component]: T = constructor;
 
       public static get observedAttributes(): string[] {
         return this.prototype.observedAttributes || [];
@@ -177,20 +187,25 @@ export function Component<
         }
 
         Object.defineProperty(this, 'readyState', {
+          enumerable: true,
           get: () => this.isConnected
         });
       }
 
       public override adoptedCallback(): void {
-        return super.adoptedCallback
-          ? super.adoptedCallback()
-          : this.renderComponent();
+        if (super.adoptedCallback) {
+          super.adoptedCallback();
+        } else {
+          this.renderComponent();
+        }
       }
 
       public override connectedCallback(): void {
-        return super.connectedCallback
-          ? super.connectedCallback()
-          : this.renderComponent();
+        if (super.connectedCallback) {
+          super.connectedCallback();
+        } else {
+          this.renderComponent();
+        }
       }
 
       public override attributeChangedCallback(
@@ -198,9 +213,11 @@ export function Component<
         prev?: string,
         next?: string
       ): void {
-        return super.attributeChangedCallback
-          ? super.attributeChangedCallback(name, prev, next)
-          : this.renderComponent();
+        if (super.attributeChangedCallback) {
+          super.attributeChangedCallback(name, prev, next);
+        } else {
+          this.renderComponent();
+        }
       }
 
       public override referenceChangedCallback(
@@ -208,32 +225,39 @@ export function Component<
         node: Node,
         event: Event
       ): void {
-        return super.referenceChangedCallback
-          ? super.referenceChangedCallback(name, node, event)
-          : this.renderComponent();
+        if (super.referenceChangedCallback) {
+          super.referenceChangedCallback(name, node, event);
+        } else {
+          this.renderComponent();
+        }
       }
 
       public override renderComponent(): void {
-        const { styles = [], template = [] } = this;
+        if (super.renderComponent) {
+          super.renderComponent();
+        } else {
+          const { styles = [], template = [] } = this;
 
-        if (!template.length) {
-          template.push(...createElement('slot'));
+          if (!template.length) {
+            template.push(...createElement('slot'));
+          }
+
+          if (styles.length) {
+            template.unshift(...createElement('style', {
+              children: styles
+            }));
+          }
+
+          render(this.shadowRoot!, template);
         }
-
-        if (styles.length) {
-          template.unshift(...createElement('style', {
-            children: styles
-          }));
-        }
-
-        render(this.shadowRoot!, template);
       }
 
     }
 
+    constructor.prototype[component] = Element;
     const options = inherits && { extends: inherits };
-    customElements.define(selector, Class, options);
-    return Class as unknown as T;
+    customElements.define(selector, Element, options);
+    return Element as unknown as T;
   };
 
 }

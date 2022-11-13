@@ -1,5 +1,5 @@
 import { assign, Linker, pluralize, TypeOf } from '@sgrud/core';
-import { BehaviorSubject, finalize, identity, map, observable, Observable, of, OperatorFunction, Subscribable, switchMap, throwError } from 'rxjs';
+import { BehaviorSubject, identity, map, observable, Observable, of, OperatorFunction, Subscribable, switchMap, tap, throwError } from 'rxjs';
 import { Querier } from '../querier/querier';
 import { hasMany } from '../relation/has-many';
 import { hasOne } from '../relation/has-one';
@@ -309,7 +309,6 @@ export namespace Model.Filter {
 
 }
 
-// eslint-disable-next-line valid-jsdoc
 /**
  * Abstract base class to implement data **Model**s. By extending this abstract
  * base class while providing the enforced symbol property containing the
@@ -380,7 +379,7 @@ export abstract class Model<M extends Model = any> {
   public static commit<T extends Model>(
     this: Model.Type<T>,
     operation: Querier.Operation,
-    variables: Querier.Variables = { }
+    variables?: Querier.Variables
   ): Observable<any> {
     const compatible = [];
     const queriers = new Linker<typeof Querier>().getAll(Querier);
@@ -1133,7 +1132,7 @@ export abstract class Model<M extends Model = any> {
     ...parts: Model.Shape<T>[]
   ): Observable<T> {
     return of(assign(this, ...parts)).pipe(
-      finalize(() => this.changes.next(this))
+      tap(() => this.changes.next(this))
     );
   }
 
@@ -1224,11 +1223,12 @@ export abstract class Model<M extends Model = any> {
   public commit<T extends Model = M>(
     this: T,
     operation: Querier.Operation,
-    variables: Querier.Variables = { },
-    mapping: OperatorFunction<any, T> = identity
+    variables?: Querier.Variables,
+    mapping: OperatorFunction<any, Model.Shape<T>> = identity
   ): Observable<T> {
     return this.static.commit<T>(operation, variables).pipe(
-      mapping, switchMap((model) => this.assign(model as Model.Shape<T>))
+      mapping,
+      switchMap((model) => this.assign(model))
     );
   }
 
@@ -1264,7 +1264,7 @@ export abstract class Model<M extends Model = any> {
   ): Observable<T> {
     return this.static.deleteOne<T>(this.id!).pipe(
       switchMap(() => this.clear()),
-      finalize(() => this.changes.complete())
+      tap(() => this.changes.complete())
     );
   }
 

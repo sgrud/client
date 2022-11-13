@@ -1,7 +1,7 @@
 /**
  * Internal mapping of all registered **elements** to their name.
  */
-const elements = new WeakMap<CustomElementConstructor, string>();
+const elements = new Map<CustomElementConstructor, string>();
 
 /**
  * Proxy around the built-in [customElements][] object, maintaining a mapping of
@@ -56,6 +56,7 @@ const registry = new Proxy(customElements, {
    * @returns Name under which the `constructor` was registered, if.
    */
   getName(constructor: CustomElementConstructor): string | undefined;
+
 };
 
 export { registry as customElements };

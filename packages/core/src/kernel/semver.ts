@@ -32,7 +32,7 @@ export function semver(version: string, range: string): boolean {
         return '';
       }).replace(/^V|\.[X*]/gi, '');
 
-      if (part === 'latest' || /^[X~*^]*$/i.exec(part)) {
+      if (part === 'latest' || /^[X~*^]*$/i.test(part)) {
         tests = [['>=', ['0', '0', '0', '0']]];
         break;
       }
@@ -56,7 +56,7 @@ export function semver(version: string, range: string): boolean {
     }
 
     for (const [mode, taken] of tests) {
-      const latest = input.some((i) => /[^\d]+/.exec(i));
+      const latest = input.some((i) => /[^\d]+/.test(i));
       const length = Math.min(input.length, taken.length);
       const source = input.slice(0, length).join('.');
       const target = taken.slice(0, length).join('.');

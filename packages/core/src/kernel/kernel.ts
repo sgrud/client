@@ -294,7 +294,7 @@ export class Kernel {
      *
      * @defaultValue `location.origin`
      */
-    baseHref: string = location.origin,
+    public readonly baseHref: string = location.origin,
 
     /**
      * Href of the [SGRUD][] API **endpoint**. [Module][]s to be initially
@@ -371,7 +371,7 @@ export class Kernel {
    */
   public insmod(
     module: Kernel.Module,
-    pathname: string = `${this.nodeModules}/${module.name}`,
+    source: string = `${this.nodeModules}/${module.name}`,
     entryModule: boolean = false
   ): Observable<Kernel.Module> {
     let loader = this.loaders.get(module.name);
@@ -387,7 +387,7 @@ export class Kernel {
         const entries = Object.entries(module.sgrudDependencies);
 
         chain.push(forkJoin(entries.map(([name, version]) => {
-          const path = /^([./]|http)/.exec(version) ? version : undefined;
+          const path = /^([./]|http)/.test(version) ? version : undefined;
 
           return this.resolve(name, path).pipe(switchMap((dependency) => {
             if (!path && !semver(dependency.version, version)) {
@@ -401,7 +401,7 @@ export class Kernel {
       }
 
       if (module.exports && !this.imports.has(module.name)) {
-        const src = `${pathname}/${module.exports}`;
+        const src = `${source}/${module.exports}`;
 
         dependencies.exports = { [module.name]: src };
         this.imports.set(module.name, src);
@@ -431,7 +431,7 @@ export class Kernel {
         }
       }
 
-      if (!(globalThis as any).sgrud && module.exports) {
+      if (!globalThis.sgrud && module.exports) {
         if (dependencies.exports) {
           chain.push(this.script({
             innerHTML: JSON.stringify({ imports: dependencies.exports }),
@@ -440,7 +440,7 @@ export class Kernel {
         }
 
         chain.push(this.verify({
-          href: `${pathname}/${module.exports}`,
+          href: `${source}/${module.exports}`,
           integrity: module.digest?.exports || '',
           rel: 'modulepreload' + this.shimmed
         }));
@@ -448,7 +448,7 @@ export class Kernel {
         if (entryModule) {
           chain.push(defer(() => import(module.name)));
         }
-      } else if ((globalThis as any).sgrud && module.unpkg) {
+      } else if (globalThis.sgrud && module.unpkg) {
         if (dependencies.unpkg?.length) {
           chain.push(forkJoin(dependencies.unpkg.map((bundle) => this.script({
             src: bundle,
@@ -458,7 +458,7 @@ export class Kernel {
 
         chain.push(this.script({
           integrity: module.digest?.unpkg || '',
-          src: `${pathname}/${module.unpkg}`,
+          src: `${source}/${module.unpkg}`,
           type: 'text/javascript'
         }));
       } else if (this.loaders.size > 1) {
@@ -500,13 +500,13 @@ export class Kernel {
    */
   public resolve(
     name: string,
-    pathname: string = `${this.nodeModules}/${name}`
+    source: string = `${this.nodeModules}/${name}`
   ): Observable<Kernel.Module> {
     if (this.loaders.has(name)) {
       return this.loaders.get(name)!;
     }
 
-    return HttpClient.get<Kernel.Module>(`${pathname}/package.json`).pipe(
+    return HttpClient.get<Kernel.Module>(`${source}/package.json`).pipe(
       map(({ response }) => response)
     );
   }

@@ -28,7 +28,6 @@ export type Property =
  */
 export const property = Symbol('@sgrud/data/model/property');
 
-// eslint-disable-next-line valid-jsdoc
 /**
  * [Model][] field decorator factory. Using this decorator, [Model][]s can be
  * enriched with primitive fields. The compatible primitives are the subset of
@@ -84,7 +83,7 @@ export function Property<T extends Property>(
     const key = '#' + field as Model.Field<M>;
 
     if (!transient) {
-      assign((model as Mutable<M>)[property] ??= { }, {
+      assign((model as Mutable<M>)[property] ||= { }, {
         [field]: typeFactory
       });
     }

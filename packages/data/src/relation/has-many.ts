@@ -66,7 +66,7 @@ export function HasMany<T extends Model.Type<any>>(
     const key = '#' + field as Model.Field<M>;
 
     if (!transient) {
-      assign((model as Mutable<M>)[hasMany] ??= { }, {
+      assign((model as Mutable<M>)[hasMany] ||= { }, {
         [field]: typeFactory
       });
     }

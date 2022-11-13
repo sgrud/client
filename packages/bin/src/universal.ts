@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import { existsSync, readFileSync } from 'fs-extra';
 import { extname, join, resolve } from 'path';
 import { launch } from 'puppeteer-core';
@@ -118,6 +118,7 @@ export async function universal({
 
 } = { }): Promise<void> {
   const app = express();
+  const buffer = readFileSync(resolve(prefix, entry));
   const caches = new Map<string, Promise<string>>();
   const puppeteer = await launch({
     executablePath: chrome,
@@ -133,11 +134,11 @@ export async function universal({
     fallthrough: false
   }));
 
-  app.use(async(
+  app.use((
     _: Record<string, any>,
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction
+    req: Request,
+    res: Response,
+    next: NextFunction
   ) => {
     let cache = caches.get(req.url);
 
@@ -147,7 +148,7 @@ export async function universal({
 
         page.on('domcontentloaded', () => void page.evaluate(() => {
           delete (Document.prototype as any).adoptedStyleSheets;
-          document.body.dataset.universal = Date.now().toString();
+          document.documentElement.dataset.universal = Date.now().toString();
         }));
 
         page.on('request', (event) => {
@@ -159,7 +160,7 @@ export async function universal({
             return void event.respond({
               status: 200,
               contentType: 'text/html',
-              body: readFileSync(resolve(prefix, entry))
+              body: buffer
             });
           } else if ((
             initiator === 'script' && type === 'fetch'
@@ -204,11 +205,9 @@ export async function universal({
       caches.set(req.url, cache);
     }
 
-    try {
-      return res.status(200).send(await cache);
-    } catch (error) {
-      return next(error);
-    }
+    return void cache
+      .then((body) => res.send(body))
+      .catch((error) => next(error));
   });
 
   app.listen(Number.parseInt(port), host, () => {

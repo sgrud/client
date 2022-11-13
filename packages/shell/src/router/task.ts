@@ -55,7 +55,7 @@ export abstract class RouterTask {
    * @see [provide][]
    */
   public static readonly [provide]:
-  'sgrud.shell.router.RouterTask' = 'sgrud.shell.router.RouterTask';
+  'sgrud.shell.router.RouterTask' = 'sgrud.shell.router.RouterTask' as const;
 
   /**
    * Abstract **handle** method, called whenever a new [State][] should be

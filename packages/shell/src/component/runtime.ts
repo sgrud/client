@@ -148,17 +148,21 @@ export function createElement(
     }
   }
 
-  element.push(elementOpen.bind(null, type, ref, null, ...attributes));
+  element.push(
+    elementOpen.bind(undefined, type, ref, undefined, ...attributes)
+  );
 
   for (const child of children) {
     if (TypeOf.string(child) || TypeOf.number(child)) {
-      element.push(text.bind(null, child));
+      element.push(text.bind(undefined, child));
     } else if (TypeOf.function(child)) {
       element.push(child);
     }
   }
 
-  element.push(elementClose.bind(null, type as keyof JSX.IntrinsicElements));
+  element.push(
+    elementClose.bind(undefined, type as keyof JSX.IntrinsicElements)
+  );
 
   return element;
 }
@@ -178,7 +182,7 @@ export function createFragment(props?: Record<string, any>): JSX.Element {
 
   for (const child of children) {
     if (TypeOf.string(child) || TypeOf.number(child)) {
-      fragment.push(text.bind(null, child));
+      fragment.push(text.bind(undefined, child));
     } else if (TypeOf.function(child)) {
       fragment.push(child);
     }
@@ -203,7 +207,7 @@ export function createFragment(props?: Record<string, any>): JSX.Element {
 export function references(
   target: DocumentFragment | Element
 ): Map<JSX.Key, Node> | undefined {
-  return resolved.get(target);
+  return rendered.get(target);
 }
 
 /**
@@ -239,7 +243,7 @@ export function render(
     }
 
     if (refs.size) {
-      resolved.set(target, refs);
+      rendered.set(target, refs);
     }
   });
 }
@@ -250,7 +254,7 @@ export function render(
  *
  * [Key]: https://sgrud.github.io/client/types/shell.JSX.Key
  */
-const resolved = new WeakMap<DocumentFragment | Element, Map<JSX.Key, Node>>();
+const rendered = new WeakMap<DocumentFragment | Element, Map<JSX.Key, Node>>();
 
 export {
   CustomElementTagName,

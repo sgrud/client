@@ -97,8 +97,8 @@ export const route = Symbol('@sgrud/shell/router/route');
  * @see [Router][]
  */
 export function Route<S extends string>(config: Assign<{
-  children?: (Route | typeof HTMLElement & { [route]?: Route })[];
-  slots?: Record<string, CustomElementTagName | typeof HTMLElement>;
+  children?: (Route | CustomElementConstructor & { [route]?: Route })[];
+  slots?: Record<string, CustomElementTagName | CustomElementConstructor>;
 }, Omit<Route<S>, 'component'>> & {
 
   /**
@@ -106,14 +106,14 @@ export function Route<S extends string>(config: Assign<{
    *
    * [Route]: https://sgrud.github.io/client/interfaces/shell.Route-1
    */
-  parent?: Route | typeof HTMLElement & { [route]?: Route };
+  parent?: Route | CustomElementConstructor & { [route]?: Route };
 
 }) {
 
   /**
    * @param constructor - Class constructor to be decorated.
    */
-  return function<T extends typeof HTMLElement & { [route]?: Route<S> }>(
+  return function<T extends CustomElementConstructor & { [route]?: Route<S> }>(
     constructor: T
   ): void {
     const name = customElements.getName(constructor);

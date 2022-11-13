@@ -59,6 +59,7 @@ export function Attribute(name?: string) {
     ((prototype as Mutable<Component>).observedAttributes ||= []).push(key);
 
     Object.defineProperty(prototype, propertyKey, {
+      enumerable: true,
       get(this: Component): string | undefined {
         return this.getAttribute(key) ?? undefined;
       },

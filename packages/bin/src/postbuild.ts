@@ -106,6 +106,9 @@ export async function postbuild({
     for (const key in source) {
       switch (key) {
         case 'amdNames':
+        case 'eslintConfig':
+        case 'eslintIgnore':
+        case 'jest':
         case 'source':
           delete source[key];
           break;
@@ -185,7 +188,7 @@ export async function postbuild({
         ...target,
         digest: Object.keys(hashes).length ? hashes : undefined,
         sgrud: runtimify.length ? { runtimify } : undefined
-      })));
+      }, undefined, 2)));
 
       for (const resource of resources) {
         operations.push([

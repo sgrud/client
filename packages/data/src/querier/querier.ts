@@ -103,7 +103,7 @@ export abstract class Querier {
    * @see [provide][]
    */
   public static readonly [provide]:
-  'sgrud.data.querier.Querier' = 'sgrud.data.querier.Querier';
+  'sgrud.data.querier.Querier' = 'sgrud.data.querier.Querier' as const;
 
   /**
    * A set containing all [Type][]s of queries this class can handle. May
@@ -134,7 +134,7 @@ export abstract class Querier {
    */
   public abstract commit(
     operation: Querier.Operation,
-    variables: Querier.Variables
+    variables?: Querier.Variables
   ): Observable<any>;
 
   /**

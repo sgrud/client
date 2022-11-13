@@ -1,4 +1,4 @@
-import { Factor } from '@sgrud/core';
+import { Factor, TypeOf } from '@sgrud/core';
 import { customElements } from '../component/registry';
 import { Router } from './router';
 
@@ -62,8 +62,10 @@ export class RouterLink extends HTMLAnchorElement {
   public constructor() {
     super();
 
-    if (this.hasAttribute('href')) {
-      this.attributeChangedCallback('href', null!, this.getAttribute('href')!);
+    const href = this.getAttribute('href');
+
+    if (TypeOf.string(href)) {
+      this.attributeChangedCallback('href', undefined, href);
     }
   }
 

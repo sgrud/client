@@ -60,7 +60,7 @@ export abstract class HttpProxy {
    * @see [provide][]
    */
   public static readonly [provide]:
-  'sgrud.core.http.HttpProxy' = 'sgrud.core.http.HttpProxy';
+  'sgrud.core.http.HttpProxy' = 'sgrud.core.http.HttpProxy' as const;
 
   /**
    * The **proxy** method of linked classes extending the [HttpProxy][] base

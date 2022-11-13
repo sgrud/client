@@ -75,6 +75,7 @@ export class HttpQuerier
      * @defaultValue `0`
      */
     private readonly prioritize: number | Map<Model.Type<any>, number> = 0
+
   ) {
     super();
   }
@@ -99,7 +100,7 @@ export class HttpQuerier
    */
   public override commit(
     operation: Querier.Operation,
-    variables: Querier.Variables
+    variables?: Querier.Variables
   ): Observable<any> {
     return HttpClient.post<any>(this.endpoint, {
       query: operation,
