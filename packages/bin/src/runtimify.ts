@@ -171,7 +171,9 @@ export async function runtimify({
       if (name.startsWith(join(id, scope)) || (
         scope.startsWith('!') && !name.startsWith(join(id, scope.slice(1)))
       )) {
-        if (name === path) {
+        if (name === path || (
+          new RegExp(join(name, 'index') + '\\.[cm]?js').test(path)
+        )) {
           stream.write(`export * from '${source}';`);
         } else {
           const namespace = relative(join(id, scope), name);
