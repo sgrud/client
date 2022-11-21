@@ -3,6 +3,15 @@ import { auditTime, first, from } from 'rxjs';
 
 describe('@sgrud/data/relation/property', () => {
 
+  const values = [
+    { bool: true },
+    { date: new Date() },
+    { num: 0 },
+    { str: 'string' },
+    { unset: undefined },
+    { unused: undefined }
+  ];
+
   class Class extends Model<Class> {
     @Property(() => Boolean) public bool?: boolean;
     @Property(() => Date) public date?: Date;
@@ -12,15 +21,6 @@ describe('@sgrud/data/relation/property', () => {
     @Property(() => null!, true) public unused?: null;
     protected readonly [Symbol.toStringTag]: string = 'Class';
   }
-
-  const values = [
-    { bool: true },
-    { date: new Date() },
-    { num: 0 },
-    { str: 'string' },
-    { unset: undefined },
-    { unused: undefined }
-  ];
 
   describe('instantiating a model containing properties using parts', () => {
     const model = new Class(...values);

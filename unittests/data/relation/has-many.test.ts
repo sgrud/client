@@ -3,6 +3,13 @@ import { auditTime, first, from } from 'rxjs';
 
 describe('@sgrud/data/relation/has-many', () => {
 
+  const values = [
+    { owned: [{ property: 'ownedOne' }, { property: 'ownedTwo' }] },
+    { property: 'owner' },
+    { unset: undefined },
+    { unused: undefined }
+  ];
+
   class Owner extends Model<Owner> {
     @HasMany(() => Owned) public owned?: Owned[];
     @Property(() => String) public property?: string;
@@ -15,13 +22,6 @@ describe('@sgrud/data/relation/has-many', () => {
     @Property(() => String) public property?: string;
     protected readonly [Symbol.toStringTag]: string = 'Owned';
   }
-
-  const values = [
-    { owned: [{ property: 'ownedOne' }, { property: 'ownedTwo' }] },
-    { property: 'owner' },
-    { unset: undefined },
-    { unused: undefined }
-  ];
 
   describe('instantiating a model which has many models using parts', () => {
     const owner = new Owner(...values);

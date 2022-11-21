@@ -3,15 +3,15 @@ import { auditTime, catchError, first, from, identity, NEVER } from 'rxjs';
 
 describe('@sgrud/data/model/model', () => {
 
-  class Class extends Model<Class> {
-    protected readonly [Symbol.toStringTag]: string = 'ClassEntity';
-  }
-
   const values = [
     { id: 'id' },
     { created: new Date(0) },
     { modified: new Date() }
   ];
+
+  class Class extends Model<Class> {
+    protected readonly [Symbol.toStringTag]: string = 'ClassEntity';
+  }
 
   describe('statically committing an operation', () => {
     it('throws an error because no querier is available', (done) => {
