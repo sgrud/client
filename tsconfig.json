@@ -64,6 +64,20 @@
       "./packages/state/index.ts"
     ],
 
+    "externalSymbolLinkMappings": {
+      "comlink": {
+        "*": "https://www.npmjs.com/package/comlink#api",
+      },
+      "rxjs": {
+        "AjaxConfig": "https://rxjs.dev/api/ajax/AjaxConfig",
+        "AjaxResponse": "https://rxjs.dev/api/ajax/AjaxResponse",
+        "BehaviorSubject": "https://rxjs.dev/api/index/class/BehaviorSubject",
+        "Observable": "https://rxjs.dev/api/index/class/Observable",
+        "ReplaySubject": "https://rxjs.dev/api/index/class/ReplaySubject",
+        "Subscribable": "https://rxjs.dev/api/index/interface/Subscribable"
+      }
+    },
+
     "plugin": [
       "typedoc-plugin-mdn-links",
       "@sgrud/typedoc-plugin"
