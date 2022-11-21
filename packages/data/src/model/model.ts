@@ -1,5 +1,5 @@
 import { assign, Linker, pluralize, TypeOf } from '@sgrud/core';
-import { BehaviorSubject, identity, map, observable, Observable, of, OperatorFunction, Subscribable, switchMap, tap, throwError } from 'rxjs';
+import { BehaviorSubject, identity, map, observable, Observable, of, Subscribable, switchMap, tap, throwError } from 'rxjs';
 import { Querier } from '../querier/querier';
 import { hasMany } from '../relation/has-many';
 import { hasOne } from '../relation/has-one';
@@ -1188,19 +1188,18 @@ export abstract class Model<M extends Model = any> {
    * method on the `this`-context of an instance of a class extending the
    * abstract *Model* base class and furthermore *assign*s the returned data to
    * the *Model* instance the **commit** method was called upon. When supplying
-   * a `mapping`, the returned data will be mutated by the supplied
-   * [OperatorFunction][] (otherwise this `mapping` defaults to [identity][]).
+   * a `mapping`, the returned data will be mutated through the supplied
+   * `mapping` (otherwise this `mapping` defaults to [identity][]).
    *
    * [identity]: https://rxjs.dev/api/index/function/identity
    * [Observable]: https://rxjs.dev/api/index/class/Observable
    * [Operation]: https://sgrud.github.io/client/types/data.Querier-1.Operation
-   * [OperatorFunction]: https://rxjs.dev/api/index/interface/OperatorFunction
    * [Variables]: https://sgrud.github.io/client/interfaces/data.Querier-1.Variables
    *
    * @param this - Polymorphic `this`.
    * @param operation - [Operation][] to **commit**.
    * @param variables - [Variables][] within the `operation`.
-   * @param mapping - [OperatorFunction][] to apply.
+   * @param mapping - Mutation to apply.
    * @typeParam T - Extending *Model* instance type.
    * @returns [Observable][] of the mutated instance.
    *
@@ -1224,10 +1223,10 @@ export abstract class Model<M extends Model = any> {
     this: T,
     operation: Querier.Operation,
     variables?: Querier.Variables,
-    mapping: OperatorFunction<any, Model.Shape<T>> = identity
+    mapping: (response: any) => Model.Shape<T> = identity
   ): Observable<T> {
     return this.static.commit<T>(operation, variables).pipe(
-      mapping,
+      map(mapping),
       switchMap((model) => this.assign(model))
     );
   }
