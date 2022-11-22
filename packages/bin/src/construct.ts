@@ -4,7 +4,7 @@ import { Assign } from '@sgrud/core';
 import { readFileSync } from 'fs-extra';
 import { Module } from 'module';
 import { join, resolve } from 'path';
-import packageJson from '../package.json';
+import { dependencies } from '../package.json';
 import { cli, _b, _g, __ } from './.cli';
 
 cli.command('construct [...modules]')
@@ -115,7 +115,7 @@ export async function construct({
     /babelHelpers: 'bundled'/g,
     `babelHelpers: 'runtime', plugins: [
       ['@babel/plugin-transform-runtime', {
-        version: '${packageJson.dependencies['@babel/runtime']}'
+        version: '${dependencies['@babel/runtime']}'
       }]
     ]`
   );

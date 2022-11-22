@@ -1,7 +1,7 @@
 import { Singleton, Spawn, Thread } from '@sgrud/core';
 import { from, Observable, switchMap } from 'rxjs';
 import { BusWorker } from '../worker';
-import packageJson from '../worker/package.json';
+import { name } from '../worker/package.json';
 
 /**
  * The **BusHandle** is a string literal helper type which enforces any assigned
@@ -132,7 +132,7 @@ export class BusHandler {
    *
    * @decorator [Spawn][]
    */
-  @Spawn(packageJson.name)
+  @Spawn(name)
   public readonly worker!: Thread<BusWorker>;
 
   /**

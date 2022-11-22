@@ -76,6 +76,8 @@ export async function kickstart({
   prefix?: string;
 
 } = { }): Promise<void> {
+  const { repository } = require(resolve(__dirname, 'package.json'));
+
   console.log(
     _g, '[kickstart]',
     _b, library,
@@ -84,10 +86,8 @@ export async function kickstart({
     __
   );
 
-  const packageJson = require(resolve(__dirname, 'package.json'));
-
   await simpleGit().clone(
-    packageJson.repository.url.replace(/\/client$/, '/skeletons'),
+    repository.url.replace(/\/client$/, '/skeletons'),
     prefix = resolve(prefix)
   );
 

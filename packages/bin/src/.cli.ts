@@ -1,5 +1,5 @@
 import sade from 'sade';
-import packageJson from '../package.json';
+import { version } from '../package.json';
 
 /**
  * RGB (and clear) console colors.
@@ -23,4 +23,4 @@ export const [
  */
 export const cli = sade('sgrud')
   .describe('@sgrud/bin - The SGRUD CLI')
-  .version(packageJson.version);
+  .version(version);

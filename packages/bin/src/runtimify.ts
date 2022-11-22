@@ -4,7 +4,7 @@ import { Assign } from '@sgrud/core';
 import { createWriteStream, readFileSync } from 'fs-extra';
 import { Module } from 'module';
 import { join, relative, resolve } from 'path';
-import packageJson from '../package.json';
+import { dependencies } from '../package.json';
 import { cli, _b, _g, __ } from './.cli';
 
 cli.command('runtimify [...modules]')
@@ -101,7 +101,7 @@ export async function runtimify({
     /babelHelpers: 'bundled'/g,
     `babelHelpers: 'runtime', plugins: [
       ['@babel/plugin-transform-runtime', {
-        version: '${packageJson.dependencies['@babel/runtime']}'
+        version: '${dependencies['@babel/runtime']}'
       }]
     ]`
   );
@@ -126,16 +126,16 @@ export async function runtimify({
   }
 
   if (!modules.length) {
-    const dependencies = [] as [string, string][];
+    const sgrudDependencies = [] as [string, string][];
     let module = require(resolve(prefix, 'package.json'));
     modules = module.sgrud?.runtimify || [];
 
     for (const key in module.sgrudDependencies) {
-      dependencies.push([key, module.sgrudDependencies[key]]);
+      sgrudDependencies.push([key, module.sgrudDependencies[key]]);
     }
 
-    for (let i = 0; i < dependencies.length; i++) {
-      const [id, version] = dependencies[i];
+    for (let i = 0; i < sgrudDependencies.length; i++) {
+      const [id, version] = sgrudDependencies[i];
 
       if (version.startsWith('.')) {
         module = require(resolve(prefix, version, 'package.json'));
@@ -150,7 +150,8 @@ export async function runtimify({
       }
 
       for (const key in module.sgrudDependencies) {
-        dependencies.splice(i + 1, 0, [key, module.sgrudDependencies[key]]);
+        const value = module.sgrudDependencies[key];
+        sgrudDependencies.splice(i + 1, 0, [key, value]);
       }
     }
   }
