@@ -4,6 +4,6 @@
   "version": "0.0.15",
   "main": "./index.js",
   "peerDependencies": {
-    "typedoc": "^0.23.20"
+    "typedoc": "^0.23.21"
   }
 }
