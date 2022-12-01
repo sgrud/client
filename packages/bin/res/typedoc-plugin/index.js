@@ -17,7 +17,7 @@ exports.load = (app) => {
   });
 };
 
-function resolveLinks(context, warn = false) {
+function resolveLinks(context, warn) {
   for (const key in context.project.reflections) {
     const { comment } = context.project.reflections[key];
 
@@ -42,7 +42,7 @@ function resolveLinks(context, warn = false) {
           if (links[ref]) {
             item.text = item.text.replace(match, () => {
               return `<a href="${links[ref]}" target="${
-                links[ref].includes('sgrud.github.io') ? '_top' : '_blank'
+                links[ref].includes('://sgrud.github.io') ? '_top' : '_blank'
               }">${ref}</a>`;
             });
           } else if (warn) {
