@@ -72,10 +72,7 @@ describe('@sgrud/data/querier/http', () => {
   describe('statically committing an operation through the HttpQuerier', () => {
     const operation = 'query test';
     const variables = { query: 'test' };
-    const request = JSON.stringify({
-      query: operation,
-      variables
-    });
+    const request = JSON.stringify({ query: operation, variables });
 
     it('commits the operation through the HttpQuerier', (done) => {
       const subscription = Class.commit(operation, variables).subscribe(() => {
@@ -91,11 +88,7 @@ describe('@sgrud/data/querier/http', () => {
     const linker = new Linker<Target<HttpQuerier>>();
     const operation = 'mutation test';
     const variables = { mutation: 'test' };
-    const request = JSON.stringify({
-      query: operation,
-      variables
-    });
-
+    const request = JSON.stringify({ query: operation, variables });
     const update = () => linker.set(
       HttpQuerier, new HttpQuerier('/path', new Map([[Class, 50]]))
     );
@@ -120,10 +113,7 @@ describe('@sgrud/data/querier/http', () => {
   describe('receiving an exception through the HttpQuerier', () => {
     const linker = new Linker<Target<HttpQuerier>>();
     const operation = 'query exception';
-    const request = JSON.stringify({
-      query: operation
-    });
-
+    const request = JSON.stringify({ query: operation });
     const update = () => linker.set(
       HttpQuerier, new HttpQuerier('/exception', new Map())
     );

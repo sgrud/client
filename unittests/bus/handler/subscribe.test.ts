@@ -41,8 +41,8 @@ describe('@sgrud/bus/handler/subscribe', () => {
   });
 
   describe('subscribing to the decorated prototype property', () => {
-    const classOne = new ClassOne();
     const handler = new BusHandler();
+    const classOne = new ClassOne();
 
     it('observes values emitted by the supplied handle', (done) => {
       const subscription = classOne.bus.subscribe(({
@@ -60,8 +60,8 @@ describe('@sgrud/bus/handler/subscribe', () => {
   });
 
   describe('subscribing to the decorated instance property', () => {
-    const classTwo = new ClassTwo('two');
     const handler = new BusHandler();
+    const classTwo = new ClassTwo('two');
 
     it('observes values emitted by the scoped handle', (done) => {
       const subscription = classTwo.bus.subscribe(({

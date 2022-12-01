@@ -35,6 +35,7 @@ describe('@sgrud/core/super/registry', () => {
   describe('registering a constructor by magic string', () => {
     const registry = new Registry<Registration, typeof Base>();
     const unknown = class extends registry.get('sgrud.test.Unknown') { };
+    const construct = () => new unknown();
     registry.set('sgrud.test.Base', Base);
 
     it('registers the decorated constructor by magic string', () => {
@@ -42,13 +43,13 @@ describe('@sgrud/core/super/registry', () => {
     });
 
     it('throws if no constructor was registered for the magic string', () => {
-      expect(() => new unknown()).toThrowError(ReferenceError);
+      expect(construct).toThrowError(ReferenceError);
     });
   });
 
   describe('extending a provider by magic string before registering it', () => {
-    const instance = new Class('instance');
     const extending = new class extends Class { }('extending');
+    const instance = new Class('instance');
     const unknown = new class { };
 
     it('calls the super constructor', () => {

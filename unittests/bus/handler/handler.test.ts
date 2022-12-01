@@ -16,7 +16,9 @@ describe('@sgrud/bus/handler/handler', () => {
     const subject = new Subject<string>();
 
     it('observes values emitted within its parent handle', (done) => {
-      const subscription = handler.get('sgrud.test.bus').subscribe(({
+      const subscription = handler.get<string>(
+        'sgrud.test.bus'
+      ).subscribe(({
         handle,
         value
       }) => {
@@ -40,7 +42,9 @@ describe('@sgrud/bus/handler/handler', () => {
     const behaviorSubject = new BehaviorSubject<string>('default');
 
     it('observes values emitted within its parent handle', (done) => {
-      const subscriptionOne = handler.get('sgrud.test.bus').subscribe(({
+      const subscriptionOne = handler.get<string>(
+        'sgrud.test.bus'
+      ).subscribe(({
         handle,
         value
       }) => {
@@ -49,13 +53,18 @@ describe('@sgrud/bus/handler/handler', () => {
         subscriptionOne.unsubscribe();
       });
 
-      const subscriptionTwo = handler.get('sgrud.test.bus').subscribe(({
+      const subscriptionTwo = handler.get<string>(
+        'sgrud.test.bus'
+      ).subscribe(({
         handle,
         value
       }) => {
         expect(handle).toBe('sgrud.test.bus.behaviorSubject');
         expect(value).toBe(behaviorSubject.value);
-        if (value === 'done') subscriptionTwo.unsubscribe();
+
+        if (value === 'done') {
+          subscriptionTwo.unsubscribe();
+        }
       });
 
       subscriptionTwo.add(() => {
@@ -73,7 +82,9 @@ describe('@sgrud/bus/handler/handler', () => {
     const subject = new Subject<string>();
 
     it('does not emit any values', (done) => {
-      const subscription = handler.get('sgrud.test.bus.nonexistent').pipe(
+      const subscription = handler.get<never>(
+        'sgrud.test.bus.nonexistent'
+      ).pipe(
         timeout(250),
         catchError((error) => of({
           handle: null,
@@ -103,7 +114,9 @@ describe('@sgrud/bus/handler/handler', () => {
     const exception = throwError(() => null);
 
     it('emits the error to the observer', (done) => {
-      const subscription = handler.get('sgrud.test.bus.error').pipe(
+      const subscription = handler.get<never>(
+        'sgrud.test.bus.error'
+      ).pipe(
         catchError((error) => of({
           handle: null,
           value: error

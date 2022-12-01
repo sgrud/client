@@ -110,9 +110,7 @@ describe('@sgrud/data/relation/has-many', () => {
 
   describe('serializing a model which has null-parts', () => {
     const owner = new Owner(...values.flatMap((value) => {
-      return Object.keys(value).map((key) => ({
-        [key]: null
-      }));
+      return Object.keys(value).map((key) => ({ [key]: null }));
     }));
     const validate = (value: Model.Shape<Owner>) => {
       expect(value.property).toBeNull();

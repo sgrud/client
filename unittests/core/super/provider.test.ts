@@ -24,8 +24,8 @@ describe('@sgrud/core/super/provider', () => {
   }
 
   describe('extending a provider by magic string', () => {
-    const instance = new Class('instance');
     const extending = new class extends Class { }('extending');
+    const instance = new Class('instance');
     const unknown = new class { };
 
     it('calls the super constructor', () => {

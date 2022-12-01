@@ -45,11 +45,13 @@ describe('@sgrud/bus/handler/publish', () => {
   });
 
   describe('calling next on the decorated prototype property', () => {
-    const classOne = new ClassOne();
     const handler = new BusHandler();
+    const classOne = new ClassOne();
 
     it('emits values through the supplied handle', (done) => {
-      const subscription = handler.get('sgrud.test.bus').subscribe(({
+      const subscription = handler.get<number>(
+        'sgrud.test.bus'
+      ).subscribe(({
         handle,
         value
       }) => {
@@ -68,13 +70,15 @@ describe('@sgrud/bus/handler/publish', () => {
   });
 
   describe('calling next on the decorated instance property', () => {
-    const classTwo = new ClassTwo();
     const handler = new BusHandler();
+    const classTwo = new ClassTwo();
 
     classTwo.handle = 'two';
 
     it('emits values through the scoped handle', (done) => {
-      const subscription = handler.get('sgrud.test.bus').subscribe(({
+      const subscription = handler.get<number>(
+        'sgrud.test.bus'
+      ).subscribe(({
         handle,
         value
       }) => {

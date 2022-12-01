@@ -67,8 +67,8 @@ describe('@sgrud/shell/component/component', () => {
 
   describe('declaring a component with styles and template', () => {
     document.body.innerHTML = '<element-two></element-two>';
-    const classTwo = document.querySelector('element-two') as ElementTwo;
     const doc = document.implementation.createHTMLDocument();
+    const classTwo = document.querySelector('element-two') as ElementTwo;
 
     doc.adoptNode(classTwo);
     classTwo.attribute = 'value';
@@ -84,8 +84,8 @@ describe('@sgrud/shell/component/component', () => {
 
   describe('declaring a component extending an element', () => {
     document.body.innerHTML = '<main is="main-element"></main>';
-    const classMain = document.querySelector('main[is]') as MainElement;
     const doc = document.implementation.createHTMLDocument();
+    const classMain = document.querySelector('main[is]') as MainElement;
 
     doc.adoptNode(classMain);
     classMain.attribute = 'value';

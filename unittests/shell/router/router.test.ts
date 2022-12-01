@@ -255,8 +255,9 @@ describe('@sgrud/shell/router/router', () => {
   });
 
   describe('binding the router', () => {
-    const router = new Router();
     const doc = document.implementation.createHTMLDocument();
+    const router = new Router();
+    const bind = () => router.bind();
     const spy = jest.spyOn(router, 'navigate');
 
     it('binds the router to the window.onpopstate event', () => {
@@ -272,12 +273,13 @@ describe('@sgrud/shell/router/router', () => {
     });
 
     it('throws an error when trying to bind again without unbinding', () => {
-      expect(() => router.bind()).toThrowError(ReferenceError);
+      expect(bind).toThrowError(ReferenceError);
     });
   });
 
   describe('unbinding the router', () => {
     const router = new Router();
+    const unbind = () => router.unbind();
     const spy = jest.spyOn(router, 'navigate');
 
     it('unbinds the router from the window.onpopstate event', () => {
@@ -293,7 +295,7 @@ describe('@sgrud/shell/router/router', () => {
     });
 
     it('throws an error when trying to unbind again without binding', () => {
-      expect(() => router.unbind()).toThrowError(ReferenceError);
+      expect(unbind).toThrowError(ReferenceError);
     });
   });
 

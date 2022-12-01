@@ -39,7 +39,6 @@ describe('@sgrud/core/linker/linker', () => {
 
   describe('programmatically inserting an instance', () => {
     const linker = new Linker<typeof ServiceTwo>();
-
     const update = () => linker.set(
       ServiceTwo, new ServiceTwo('three')
     );
