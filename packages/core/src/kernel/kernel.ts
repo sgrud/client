@@ -1,8 +1,9 @@
-import { concat, defaultIfEmpty, defer, forkJoin, ignoreElements, map, observable, Observable, of, ReplaySubject, Subscribable, switchMap, throwError } from 'rxjs';
+import { concat, defaultIfEmpty, defer, forkJoin, ignoreElements, map, Observable, of, ReplaySubject, Subscribable, switchMap, throwError } from 'rxjs';
 import { HttpClient } from '../http/client';
 import { Mutable } from '../typing/mutable';
 import { assign } from '../utility/assign';
 import { Singleton } from '../utility/singleton';
+import { Symbol } from '../utility/symbols';
 import { semver } from './semver';
 
 /**
@@ -183,26 +184,6 @@ export namespace Kernel {
 export class Kernel {
 
   /**
-   * Symbol property typed as callback to a [Subscribable][]. The returned
-   * [Subscribable][] emits every [Module][] that is successfully loaded.
-   *
-   * [Module]: https://sgrud.github.io/client/interfaces/core.Kernel-1.Module
-   * [Subscribable]: https://rxjs.dev/api/index/interface/Subscribable
-   *
-   * @returns Callback to a [Subscribable][].
-   *
-   * @example
-   * Subscribe to the stream of loaded [Module][]s:
-   * ```ts
-   * import { Kernel } from '@sgrud/core';
-   * import { from } from 'rxjs';
-   *
-   * from(new Kernel()).subscribe(console.log);
-   * ```
-   */
-  public readonly [Symbol.observable]!: () => Subscribable<Kernel.Module>;
-
-  /**
    * Internal mapping of all via `importmap`s defined [Module][] identifiers to
    * their corresponding paths. This mapping is used for housekeeping, e.g., to
    * prevent the same [Module][] identifier to be defined multiple times.
@@ -247,12 +228,24 @@ export class Kernel {
   private readonly shimmed: string;
 
   /**
-   * [observable][] interop getter returning a callback to a [Subscribable][].
+   * Symbol property typed as callback to a [Subscribable][]. The returned
+   * [Subscribable][] emits every [Module][] that is successfully loaded.
    *
-   * [observable]: https://rxjs.dev/api/index/const/observable
+   * [Module]: https://sgrud.github.io/client/interfaces/core.Kernel-1.Module
    * [Subscribable]: https://rxjs.dev/api/index/interface/Subscribable
+   *
+   * @returns Callback to a [Subscribable][].
+   *
+   * @example
+   * Subscribe to the stream of loaded [Module][]s:
+   * ```ts
+   * import { Kernel } from '@sgrud/core';
+   * import { from } from 'rxjs';
+   *
+   * from(new Kernel()).subscribe(console.log);
+   * ```
    */
-  public get [observable](): () => Subscribable<Kernel.Module> {
+  public get [Symbol.observable](): () => Subscribable<Kernel.Module> {
     return () => this.loading.asObservable();
   }
 

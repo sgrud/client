@@ -36,4 +36,5 @@ export * from './src/typing/mutable';
 export * from './src/utility/assign';
 export * from './src/utility/pluralize';
 export * from './src/utility/singleton';
+export * from './src/utility/symbols';
 export * from './src/utility/type-of';

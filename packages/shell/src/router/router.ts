@@ -1,5 +1,5 @@
-import { assign, Linker, Mutable, Singleton, Target, TypeOf } from '@sgrud/core';
-import { BehaviorSubject, defer, observable, Observable, of, onErrorResumeNext, Subscribable, throwError, throwIfEmpty } from 'rxjs';
+import { assign, Linker, Mutable, Singleton, Symbol, Target, TypeOf } from '@sgrud/core';
+import { BehaviorSubject, defer, Observable, of, onErrorResumeNext, Subscribable, throwError, throwIfEmpty } from 'rxjs';
 import { createElement, render } from '../component/runtime';
 import { Route } from './route';
 import { RouterTask } from './task';
@@ -192,26 +192,6 @@ export namespace Router {
 export class Router extends Set<Route> implements Router.Task {
 
   /**
-   * Symbol property typed as callback to a [Subscribable][]. The returned
-   * [Subscribable][] emits the current [State][] and every time this *changes*.
-   *
-   * [State]: https://sgrud.github.io/client/interfaces/shell.Router-1.State
-   * [Subscribable]: https://rxjs.dev/api/index/interface/Subscribable
-   *
-   * @returns Callback to a [Subscribable][].
-   *
-   * @example
-   * Subscribe to the *Router*:
-   * ```ts
-   * import { Router } from '@sgrud/shell';
-   * import { from } from 'rxjs';
-   *
-   * from(new Router()).subscribe(console.log);
-   * ```
-   */
-  public readonly [Symbol.observable]!: () => Subscribable<Router.State>;
-
-  /**
    * Absolute **baseHref** for navigation.
    */
   public readonly baseHref: string;
@@ -238,12 +218,24 @@ export class Router extends Set<Route> implements Router.Task {
   private readonly changes: BehaviorSubject<Router.State>;
 
   /**
-   * [observable][] interop getter returning a callback to a [Subscribable][].
+   * Symbol property typed as callback to a [Subscribable][]. The returned
+   * [Subscribable][] emits the current [State][] and every time this *changes*.
    *
-   * [observable]: https://rxjs.dev/api/index/const/observable
+   * [State]: https://sgrud.github.io/client/interfaces/shell.Router-1.State
    * [Subscribable]: https://rxjs.dev/api/index/interface/Subscribable
+   *
+   * @returns Callback to a [Subscribable][].
+   *
+   * @example
+   * Subscribe to the *Router*:
+   * ```ts
+   * import { Router } from '@sgrud/shell';
+   * import { from } from 'rxjs';
+   *
+   * from(new Router()).subscribe(console.log);
+   * ```
    */
-  public get [observable](): () => Subscribable<Router.State> {
+  public get [Symbol.observable](): () => Subscribable<Router.State> {
     return () => this.changes.asObservable();
   }
 

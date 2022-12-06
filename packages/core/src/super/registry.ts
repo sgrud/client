@@ -1,4 +1,5 @@
 import { Singleton } from '../utility/singleton';
+import { Symbol } from '../utility/symbols';
 
 /**
  * String literal helper type. Enforces any assigned string to contain at least

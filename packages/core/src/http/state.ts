@@ -1,8 +1,9 @@
-import { BehaviorSubject, filter, finalize, map, observable, Observable, Subscribable, tap } from 'rxjs';
+import { BehaviorSubject, filter, finalize, map, Observable, Subscribable, tap } from 'rxjs';
 import { AjaxConfig as Request, AjaxResponse as Response } from 'rxjs/ajax';
 import { Target } from '../linker/target';
 import { Provider } from '../super/provider';
 import { Singleton } from '../utility/singleton';
+import { Symbol } from '../utility/symbols';
 import { HttpHandler } from './client';
 import { HttpProxy } from './proxy';
 
@@ -31,6 +32,22 @@ export class HttpState
   extends Provider<typeof HttpProxy>('sgrud.core.http.HttpProxy') {
 
   /**
+   * [BehaviorSubject][] emitting every time a request is added to or deleted
+   * from the internal *running* mapping.
+   *
+   * [BehaviorSubject]: https://rxjs.dev/api/index/class/BehaviorSubject
+   */
+  private readonly changes: BehaviorSubject<this>;
+
+  /**
+   * Internal mapping containing all running requests. Updating this map should
+   * always be accompanied by an emittance of the *changes* [BehaviorSubject][].
+   *
+   * [BehaviorSubject]: https://rxjs.dev/api/index/class/BehaviorSubject
+   */
+  private readonly running: Map<Request, Response<any>>;
+
+  /**
    * Symbol property typed as callback to a [Subscribable][]. The returned
    * [Subscribable][] emits an array of all active requests whenever this list
    * changes. Using the returned [Subscribable][], e.g., a load indicator can
@@ -50,31 +67,7 @@ export class HttpState
    * from(httpState).subscribe(console.log);
    * ```
    */
-  public readonly [Symbol.observable]!: () => Subscribable<Response<any>[]>;
-
-  /**
-   * [BehaviorSubject][] emitting every time a request is added to or deleted
-   * from the internal *running* mapping.
-   *
-   * [BehaviorSubject]: https://rxjs.dev/api/index/class/BehaviorSubject
-   */
-  private readonly changes: BehaviorSubject<this>;
-
-  /**
-   * Internal mapping containing all running requests. Updating this map should
-   * always be accompanied by an emittance of the *changes* [BehaviorSubject][].
-   *
-   * [BehaviorSubject]: https://rxjs.dev/api/index/class/BehaviorSubject
-   */
-  private readonly running: Map<Request, Response<any>>;
-
-  /**
-   * [observable][] interop getter returning a callback to a [Subscribable][].
-   *
-   * [observable]: https://rxjs.dev/api/index/const/observable
-   * [Subscribable]: https://rxjs.dev/api/index/interface/Subscribable
-   */
-  public get [observable](): () => Subscribable<Response<any>[]> {
+  public get [Symbol.observable](): () => Subscribable<Response<any>[]> {
     return () => this.changes.pipe(
       map(() => Array.from(this.running.values()))
     );

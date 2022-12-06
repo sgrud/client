@@ -1,5 +1,5 @@
-import { assign, Linker, pluralize, TypeOf } from '@sgrud/core';
-import { BehaviorSubject, identity, map, observable, Observable, of, Subscribable, switchMap, tap, throwError } from 'rxjs';
+import { assign, Linker, pluralize, Symbol, TypeOf } from '@sgrud/core';
+import { BehaviorSubject, identity, map, Observable, of, Subscribable, switchMap, tap, throwError } from 'rxjs';
 import { Querier } from '../querier/querier';
 import { hasMany } from '../relation/has-many';
 import { hasOne } from '../relation/has-one';
@@ -998,26 +998,6 @@ export abstract class Model<M extends Model = any> {
   public readonly [property]?: Record<keyof M, () => unknown>;
 
   /**
-   * Symbol property typed as callback to a [Subscribable][]. The returned
-   * [Subscribable][] emits every mutation this *Model* instance experiences.
-   *
-   * [Subscribable]: https://rxjs.dev/api/index/interface/Subscribable
-   *
-   * @returns Callback to a [Subscribable][].
-   *
-   * @example
-   * Subscribe to a *Model* instance:
-   * ```ts
-   * import { from } from 'rxjs';
-   * import { ExampleModel } from './example-model';
-   *
-   * const model = new ExampleModel();
-   * from(model).subscribe(console.log);
-   * ```
-   */
-  public readonly [Symbol.observable]!: () => Subscribable<M>;
-
-  /**
    * Universally unique identifier of this *Model* instance.
    */
   @Property(() => String)
@@ -1049,12 +1029,24 @@ export abstract class Model<M extends Model = any> {
   protected readonly static: Model.Type<M>;
 
   /**
-   * [observable][] interop getter returning a callback to a [Subscribable][].
+   * Symbol property typed as callback to a [Subscribable][]. The returned
+   * [Subscribable][] emits every mutation this *Model* instance experiences.
    *
-   * [observable]: https://rxjs.dev/api/index/const/observable
    * [Subscribable]: https://rxjs.dev/api/index/interface/Subscribable
+   *
+   * @returns Callback to a [Subscribable][].
+   *
+   * @example
+   * Subscribe to a *Model* instance:
+   * ```ts
+   * import { from } from 'rxjs';
+   * import { ExampleModel } from './example-model';
+   *
+   * const model = new ExampleModel();
+   * from(model).subscribe(console.log);
+   * ```
    */
-  public get [observable](): () => Subscribable<M> {
+  public get [Symbol.observable](): () => Subscribable<M> {
     return () => this.changes.asObservable();
   }
 
