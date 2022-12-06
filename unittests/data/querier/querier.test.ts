@@ -1,4 +1,4 @@
-import { Linker, Target } from '@sgrud/core';
+import { Linker, Symbol, Target } from '@sgrud/core';
 import { Model, Querier } from '@sgrud/data';
 import { forkJoin, Observable, of } from 'rxjs';
 

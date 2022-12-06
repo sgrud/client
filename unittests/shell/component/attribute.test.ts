@@ -4,7 +4,7 @@ globalThis.HTMLElement = new Proxy(HTMLElement, {
   }
 });
 
-import { Attribute } from '@sgrud/shell';
+import { Attribute, customElements } from '@sgrud/shell';
 
 describe('@sgrud/shell/component/attribute', () => {
 

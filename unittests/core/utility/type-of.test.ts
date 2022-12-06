@@ -1,4 +1,4 @@
-import { TypeOf } from '@sgrud/core';
+import { Symbol, TypeOf } from '@sgrud/core';
 
 describe('@sgrud/core/utility/type-of', () => {
 

@@ -1,4 +1,4 @@
-import { route, Route } from '@sgrud/shell';
+import { customElements, route, Route } from '@sgrud/shell';
 
 describe('@sgrud/shell/router/route', () => {
 

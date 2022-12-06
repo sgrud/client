@@ -1,3 +1,4 @@
+import { Symbol } from '@sgrud/core';
 import { Enum, enumerate, Model } from '@sgrud/data';
 
 describe('@sgrud/data/model/enum', () => {

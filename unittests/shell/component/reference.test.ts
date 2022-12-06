@@ -4,7 +4,7 @@ globalThis.HTMLElement = new Proxy(HTMLElement, {
   }
 });
 
-import { Component, Reference } from '@sgrud/shell';
+import { Component, customElements, Reference } from '@sgrud/shell';
 import { jsx } from '@sgrud/shell/jsx-runtime';
 
 declare global {

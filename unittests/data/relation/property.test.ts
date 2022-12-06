@@ -1,3 +1,4 @@
+import { Symbol } from '@sgrud/core';
 import { Model, Property } from '@sgrud/data';
 import { auditTime, first, from } from 'rxjs';
 

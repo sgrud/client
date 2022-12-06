@@ -1,5 +1,6 @@
 import { TypeOf } from '@sgrud/core';
 import { elementClose, elementOpen, getKey, patch, text } from 'incremental-dom';
+import { customElements } from './registry';
 
 declare global {
 

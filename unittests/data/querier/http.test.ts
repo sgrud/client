@@ -1,4 +1,4 @@
-import { Linker, Target } from '@sgrud/core';
+import { Linker, Symbol, Target } from '@sgrud/core';
 import { HttpQuerier, Model } from '@sgrud/data';
 import express from 'express';
 import { Server } from 'http';
