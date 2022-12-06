@@ -8,7 +8,7 @@ const elements = new Map<CustomElementConstructor, string>();
  * all registered elements and their corresponding names, which can be queried
  * by calling *getName*.
  *
- * [customElements]: https://developer.mozilla.org/en-US/docs/Web/API/Window/customElements
+ * [customElements]: https://developer.mozilla.org/docs/Web/API/Window/customElements
  *
  * @remarks https://github.com/WICG/webcomponents/issues/566
  */
@@ -50,7 +50,7 @@ const registry = new Proxy(customElements, {
    * Retrieve the name under which the supplied `constructor` was registered
    * with the [customElements][] registry.
    *
-   * [customElements]: https://developer.mozilla.org/en-US/docs/Web/API/Window/customElements
+   * [customElements]: https://developer.mozilla.org/docs/Web/API/Window/customElements
    *
    * @param constructor - Class constructor to be looked up.
    * @returns Name under which the `constructor` was registered, if.

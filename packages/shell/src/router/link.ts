@@ -22,7 +22,7 @@ declare global {
  * to be contained within the applications base href and intercepting the
  * default browser behavior when *onclick*ed.
  *
- * [HTMLAnchorElement]: https://developer.mozilla.org/en-US/docs/Web/API/HTMLAnchorElement
+ * [HTMLAnchorElement]: https://developer.mozilla.org/docs/Web/API/HTMLAnchorElement
  * [Router]: https://sgrud.github.io/client/classes/shell.Router
  *
  * @example
