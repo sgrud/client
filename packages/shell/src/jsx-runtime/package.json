@@ -2,19 +2,14 @@
   "name": "@sgrud/shell/jsx-runtime",
   "private": true,
   "version": "0.0.15",
-  "source": "./index.d.ts",
-  "types": "./index.d.ts",
+  "source": "./index.ts",
+  "types": "../src/jsx-runtime/index.d.ts",
   "main": "../../../../dist/shell/jsx-runtime/index.js",
   "exports": "../../../../dist/shell/jsx-runtime/index.modern.js",
   "unpkg": "../../../../dist/shell/jsx-runtime/index.umd.js",
   "amdNames": {
     "@sgrud/shell": null,
     "@sgrud/shell/jsx-runtime": null
-  },
-  "sgrud": {
-    "resources": [
-      "./index.d.ts"
-    ]
   },
   "dependencies": {
     "@sgrud/shell": "latest"
