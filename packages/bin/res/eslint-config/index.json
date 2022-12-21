@@ -46,14 +46,7 @@
     "@typescript-eslint/no-namespace": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/no-shadow": "error",
-    "@typescript-eslint/no-this-alias": [
-      "error",
-      {
-        "allowedNames": [
-          "self"
-        ]
-      }
-    ],
+    "@typescript-eslint/no-this-alias": "off",
     "@typescript-eslint/no-unsafe-argument": "off",
     "@typescript-eslint/no-unsafe-assignment": "off",
     "@typescript-eslint/no-unsafe-call": "off",
