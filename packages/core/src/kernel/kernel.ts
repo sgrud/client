@@ -351,7 +351,7 @@ export class Kernel {
    * @param source - Optional [Module][] source.
    * @param entryModule - Wether to run the [Module][].
    * @returns [Observable][] of the [Module][] loading.
-   * @throws [Observable][] of RangeError or ReferenceError.
+   * @throws [Observable][] of a RangeError or ReferenceError.
    *
    * @example
    * Insert a module by definition:

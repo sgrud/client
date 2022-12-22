@@ -359,7 +359,7 @@ export abstract class Model<M extends Model = any> {
    * @param variables - [Variables][] within the `operation`.
    * @typeParam T - Extending *Model* instance type.
    * @returns [Observable][] of the **commit**ment.
-   * @throws [Observable][] of ReferenceError.
+   * @throws [Observable][] of a ReferenceError.
    *
    * @example
    * **Commit** a `query`-type operation:
@@ -960,7 +960,7 @@ export abstract class Model<M extends Model = any> {
    * operations *commit*ted through this *Model* are derived from this singular
    * name (and the corresponding [pluralize][]d form).
    *
-   * [pluralize]: http://127.0.0.1:8080/docs/functions/core.pluralize
+   * [pluralize]: https://sgrud.github.io/client/functions/core.pluralize
    *
    * @example
    * Provide a valid symbol property:
@@ -979,38 +979,50 @@ export abstract class Model<M extends Model = any> {
   /**
    * Symbol property used by the [HasOne][] decorator.
    *
-   * [HasOne]: http://127.0.0.1:8080/docs/functions/data.HasOne
+   * [HasOne]: https://sgrud.github.io/client/functions/data.HasOne
    */
   public readonly [hasOne]?: Record<keyof M, () => unknown>;
 
   /**
    * Symbol property used by the [HasMany][] decorator.
    *
-   * [HasMany]: http://127.0.0.1:8080/docs/functions/data.HasMany
+   * [HasMany]: https://sgrud.github.io/client/functions/data.HasMany
    */
   public readonly [hasMany]?: Record<keyof M, () => unknown>;
 
   /**
    * Symbol property used by the [Property][] decorator.
    *
-   * [Property]: http://127.0.0.1:8080/docs/functions/data.Property-1
+   * [Property]: https://sgrud.github.io/client/functions/data.Property-1
    */
   public readonly [property]?: Record<keyof M, () => unknown>;
 
   /**
    * Universally unique identifier of this *Model* instance.
+   *
+   * [Property]: https://sgrud.github.io/client/functions/data.Property-1
+   *
+   * @decorator [Property][]
    */
   @Property(() => String)
   public id?: string;
 
   /**
    * Transient creation date of this *Model* instance.
+   *
+   * [Property]: https://sgrud.github.io/client/functions/data.Property-1
+   *
+   * @decorator [Property][]
    */
   @Property(() => Date, true)
   public created?: Date;
 
   /**
    * Transient modification date of this *Model* instance.
+   *
+   * [Property]: https://sgrud.github.io/client/functions/data.Property-1
+   *
+   * @decorator [Property][]
    */
   @Property(() => Date, true)
   public modified?: Date;

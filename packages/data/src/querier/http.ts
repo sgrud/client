@@ -96,7 +96,7 @@ export class HttpQuerier
    * @param operation - Querier [Operation][] to be committed.
    * @param variables - Variables within the [Operation][].
    * @returns [Observable][] of the committed [Operation][].
-   * @throws [Observable][] of AggregateError.
+   * @throws [Observable][] of an AggregateError.
    */
   public override commit(
     operation: Querier.Operation,

@@ -561,7 +561,7 @@ export class Router extends Set<Route> implements Router.Task {
    * @param search - Optional search parameters.
    * @param replace - Wether to replace the [State][].
    * @returns [Observable][] of the *Router* [State][].
-   * @throws [Observable][] if URIError.
+   * @throws [Observable][] of an URIError.
    */
   public navigate(
     target: string | Router.Segment,
