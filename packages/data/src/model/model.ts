@@ -67,17 +67,17 @@ export namespace Model {
    *
    * [Model]: https://sgrud.github.io/client/classes/data.Model
    *
+   * @typeParam N - String array type.
    * @typeParam T - Extending *Model* instance type.
-   * @typeParam S - String array type.
    */
-  export type Path<T extends Model, S extends string[] = []> = {
+  export type Path<T extends Model, N extends string[] = []> = {
     [K in Field<T>]:
-      S extends { length: 5 }
+      N extends { length: 5 }
         ? never :
       Required<T>[K] extends (...args: any[]) => any
         ? never :
       Required<T>[K] extends Model<infer I> | Model<infer I>[]
-        ? `${K}.${Path<I, [...S, string]>}` :
+        ? `${K}.${Path<I, [...N, string]>}` :
       K;
   }[Field<T>];
 

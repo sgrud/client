@@ -155,7 +155,7 @@ export class BusHandler {
    * ]);
    * ```
    */
-  public constructor(tuples?: [BusHandle, Observable<any>][]) {
+  public constructor(tuples?: Iterable<[BusHandle, Observable<any>]>) {
     if (tuples) {
       for (const [key, value] of tuples) {
         this.set(key, value).subscribe();

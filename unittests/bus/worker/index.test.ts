@@ -6,6 +6,12 @@ import { join } from 'path';
 import { Browser, launch, Page } from 'puppeteer-core';
 import { Worker } from 'worker_threads';
 
+declare global {
+  interface Window {
+    bus: unknown;
+  }
+}
+
 describe('@sgrud/bus/worker', () => {
 
   const html = readFileSync(join(__dirname, 'index.test.html')).toString();
@@ -49,7 +55,7 @@ describe('@sgrud/bus/worker', () => {
   describe('requiring the module as browser worker', () => {
     it('creates a browser worker', async() => {
       await page.goto(location.href, { waitUntil: 'networkidle0' });
-      const value = await page.evaluate(() => (window as any).bus);
+      const value = await page.evaluate(() => window.bus);
 
       expect(value).toMatchObject({
         handle: 'sgrud.test.bus.worker',

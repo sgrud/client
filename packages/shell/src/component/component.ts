@@ -156,18 +156,15 @@ export interface Component extends HTMLElement {
  */
 export function Component<
   S extends CustomElementTagName,
-  R extends HTMLElementTagName
->(
-  selector: S,
-  inherits?: R
-) {
+  K extends HTMLElementTagName
+>(selector: S, inherits?: K) {
 
   /**
    * @param constructor - Class constructor to be decorated.
    * @returns Decorated class constructor.
    */
   return function<T extends new () => Component & (
-    HTMLElementTagNameMap[S] & HTMLElementTagNameMap[R]
+    HTMLElementTagNameMap[S] & HTMLElementTagNameMap[K]
   )>(
     constructor: T
   ): T {

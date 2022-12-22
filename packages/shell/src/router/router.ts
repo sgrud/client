@@ -50,12 +50,12 @@ export namespace Router {
    * ```
    */
   export type Params<S> = S extends `${string}:${infer P}` ? (
-    P extends `${Left<P>}${infer R}`
-      ? Params<R>
+    P extends `${Left<P>}${infer I}`
+      ? Params<I>
       : never
   ) & (
-    Left<P> extends `${infer O}?`
-      ? { [K in O]?: string }
+    Left<P> extends `${infer I}?`
+      ? { [K in I]?: string }
       : { [K in Left<P>]: string }
   ) : { };
 

@@ -107,7 +107,7 @@ export class Registry<
    * ]);
    * ```
    */
-  public constructor(tuples?: [K, V][]) {
+  public constructor(tuples?: Iterable<[K, V]>) {
     super();
 
     this.cached = new Map<K, V>();
