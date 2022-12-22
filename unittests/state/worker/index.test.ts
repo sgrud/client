@@ -41,7 +41,6 @@ describe('@sgrud/state/worker', () => {
 
   beforeAll(async() => {
     puppeteer = await launch({
-      dumpio: true,
       executablePath: '/usr/bin/chromium-browser',
       args: ['--disable-setuid-sandbox', '--no-sandbox']
     });
