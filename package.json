@@ -17,9 +17,9 @@
     "url": "https://github.com/sgrud/client"
   },
   "scripts": {
-    "install": "microbundle -f cjs --cwd ./packages/bin --target node",
-    "postinstall": "node -e 'sgrud.bin.postbuild();' -r ./dist/bin",
-    "prepare": "npm install -s --no-audit --no-save ./dist/bin",
+    "install": "microbundle -f commonjs --cwd ./packages/bin --target node",
+    "postinstall": "node -e 'global.sgrud.bin.postbuild();' -r ./dist/bin",
+    "prepare": "npm install --install-links false --no-save ./dist/bin",
     "build": "sgrud construct && sgrud postbuild",
     "test": "eslint ./ && jest && typedoc"
   },
