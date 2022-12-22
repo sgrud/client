@@ -29,14 +29,14 @@ import { Singleton } from '../utility/singleton';
  * ]);
  * ```
  */
-@Singleton<typeof Linker>((self, [tuples]) => {
+@Singleton<typeof Linker>((linker, [tuples]) => {
   if (tuples) {
     for (const [key, value] of tuples) {
-      self.set(key, value);
+      linker.set(key, value);
     }
   }
 
-  return self;
+  return linker;
 })
 export class Linker<
   K extends abstract new () => V,

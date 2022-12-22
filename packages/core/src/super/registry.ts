@@ -48,14 +48,14 @@ export type Registration = `${string}.${string}.${string}`;
  * @see [Provide][]
  * @see [Provider][]
  */
-@Singleton<typeof Registry>((self, [tuples]) => {
+@Singleton<typeof Registry>((registry, [tuples]) => {
   if (tuples) {
     for (const [key, value] of tuples) {
-      self.set(key, value);
+      registry.set(key, value);
     }
   }
 
-  return self;
+  return registry;
 })
 export class Registry<
   K extends Registration,

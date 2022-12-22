@@ -108,14 +108,14 @@ export interface BusValue<T> {
  *
  * @see [BusWorker][]
  */
-@Singleton<typeof BusHandler>((self, [tuples]) => {
+@Singleton<typeof BusHandler>((busHandler, [tuples]) => {
   if (tuples) {
     for (const [key, value] of tuples) {
-      self.set(key, value);
+      busHandler.set(key, value);
     }
   }
 
-  return self;
+  return busHandler;
 })
 export class BusHandler {
 
