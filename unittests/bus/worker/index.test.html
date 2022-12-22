@@ -23,7 +23,7 @@
   const bus = new Subject();
 
   handler.set('sgrud.test.bus.worker', bus).subscribe();
-  setTimeout(() => bus.next('@sgrud/bus/worker'), 250);
+  setTimeout(() => bus.next('@sgrud/bus/worker'), 500);
 
   window.bus = firstValueFrom(handler.get('sgrud.test.bus.worker'));
 </script>

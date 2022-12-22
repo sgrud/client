@@ -1,0 +1,10 @@
+{
+  "name": "@sgrud/state/worker",
+  "private": true,
+  "version": "0.0.15",
+  "source": "./index.ts",
+  "types": "../src/worker/index.d.ts",
+  "main": "../../../../dist/state/worker/index.js",
+  "exports": "../../../../dist/state/worker/index.modern.js",
+  "unpkg": "../../../../dist/state/worker/index.umd.js"
+}
