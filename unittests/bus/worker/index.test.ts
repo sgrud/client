@@ -42,7 +42,7 @@ describe('@sgrud/bus/worker', () => {
       }))
       .use('/', (_, r) => r.send(html))
       .listen(location.port);
-  }, 30000);
+  }, 50000);
 
   describe('requiring the module as worker thread', () => {
     const worker = new Worker(require.resolve('@sgrud/bus/worker'));

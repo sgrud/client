@@ -40,9 +40,9 @@ const registry = new Proxy(customElements, {
 
         return name;
       };
-
-      default: return customElements[propertyKey].bind(customElements);
     }
+
+    return customElements[propertyKey].bind(customElements);
   }
 }) as CustomElementRegistry & {
 

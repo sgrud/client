@@ -7,13 +7,14 @@ describe('@sgrud/core/thread/spawn', () => {
 
   class Class {
     @Spawn(new Worker('(' + (() => {
-      /* eslint-disable */
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       require('./dist/core').Thread()(class {
+        /* eslint-disable */
         // @ts-expect-error implicit any
         callable = (...args) => args.length;
         thirteen = 13;
+        /* eslint-enable */
       });
-      /* eslint-enable */
     }) + ')()', { eval: true }))
     public static readonly worker: Thread<{
       callable: (...args: any[]) => number;

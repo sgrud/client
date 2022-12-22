@@ -17,9 +17,11 @@
  */
 export type Assign<S, T> = {
   /* eslint-disable @typescript-eslint/indent */
+
   [K in keyof (S & T)]:
     K extends keyof S ? S[K] :
     K extends keyof T ? T[K] :
     never;
+
   /* eslint-enable @typescript-eslint/indent */
 };

@@ -88,7 +88,6 @@
   "jest": {
     "forceExit": true,
     "maxWorkers": 1,
-    "preset": "ts-jest",
     "testEnvironment": "jest-environment-jsdom",
     "moduleNameMapper": {
       "@sgrud/(.*)": "<rootDir>/dist/$1"
