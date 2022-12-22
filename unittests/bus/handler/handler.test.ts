@@ -13,7 +13,7 @@ describe('@sgrud/bus/handler/handler', () => {
 
   describe('subscribing to a Subject bus', () => {
     const handler = new BusHandler();
-    const subject = new Subject<string>();
+    const bus = new Subject<string>();
 
     it('observes values emitted within its parent handle', (done) => {
       const subscription = handler.get<string>(
@@ -28,18 +28,18 @@ describe('@sgrud/bus/handler/handler', () => {
       });
 
       subscription.add(() => {
-        subject.complete();
+        bus.complete();
         done();
       });
 
-      handler.set('sgrud.test.bus.subject', subject);
-      setTimeout(() => subject.next('done'), 250);
+      handler.set('sgrud.test.bus.subject', bus).subscribe();
+      setTimeout(() => bus.next('done'), 250);
     });
   });
 
   describe('subscribing to a BehaviorSubject bus', () => {
     const handler = new BusHandler();
-    const behaviorSubject = new BehaviorSubject<string>('default');
+    const bus = new BehaviorSubject<string>('default');
 
     it('observes values emitted within its parent handle', (done) => {
       const subscriptionOne = handler.get<string>(
@@ -49,7 +49,7 @@ describe('@sgrud/bus/handler/handler', () => {
         value
       }) => {
         expect(handle).toBe('sgrud.test.bus.behaviorSubject');
-        expect(value).toBe(behaviorSubject.value);
+        expect(value).toBe(bus.value);
         subscriptionOne.unsubscribe();
       });
 
@@ -60,7 +60,7 @@ describe('@sgrud/bus/handler/handler', () => {
         value
       }) => {
         expect(handle).toBe('sgrud.test.bus.behaviorSubject');
-        expect(value).toBe(behaviorSubject.value);
+        expect(value).toBe(bus.value);
 
         if (value === 'done') {
           subscriptionTwo.unsubscribe();
@@ -68,18 +68,18 @@ describe('@sgrud/bus/handler/handler', () => {
       });
 
       subscriptionTwo.add(() => {
-        behaviorSubject.complete();
+        bus.complete();
         done();
       });
 
-      handler.set('sgrud.test.bus.behaviorSubject', behaviorSubject);
-      setTimeout(() => behaviorSubject.next('done'), 250);
+      handler.set('sgrud.test.bus.behaviorSubject', bus).subscribe();
+      setTimeout(() => bus.next('done'), 250);
     });
   });
 
   describe('subscribing to an empty bus', () => {
     const handler = new BusHandler();
-    const subject = new Subject<string>();
+    const bus = new Subject<string>();
 
     it('does not emit any values', (done) => {
       const subscription = handler.get<never>(
@@ -100,18 +100,18 @@ describe('@sgrud/bus/handler/handler', () => {
       });
 
       subscription.add(() => {
-        subject.complete();
+        bus.complete();
         done();
       });
 
-      handler.set('sgrud.test.bus.subject', subject);
-      setTimeout(() => subject.next('done'), 250);
+      handler.set('sgrud.test.bus.subject', bus).subscribe();
+      setTimeout(() => bus.next('done'), 250);
     });
   });
 
   describe('pushing an error through a bus', () => {
     const handler = new BusHandler();
-    const exception = throwError(() => null);
+    const bus = throwError(() => null);
 
     it('emits the error to the observer', (done) => {
       const subscription = handler.get<never>(
@@ -131,7 +131,7 @@ describe('@sgrud/bus/handler/handler', () => {
       });
 
       subscription.add(done);
-      handler.set('sgrud.test.bus.error', exception);
+      handler.set('sgrud.test.bus.error', bus).subscribe();
     });
   });
 

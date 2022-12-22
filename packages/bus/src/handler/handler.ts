@@ -111,7 +111,7 @@ export interface BusValue<T> {
 @Singleton<typeof BusHandler>((busHandler, [tuples]) => {
   if (tuples) {
     for (const [key, value] of tuples) {
-      busHandler.set(key, value);
+      busHandler.set(key, value).subscribe();
     }
   }
 
@@ -158,7 +158,7 @@ export class BusHandler {
   public constructor(tuples?: [BusHandle, Observable<any>][]) {
     if (tuples) {
       for (const [key, value] of tuples) {
-        this.set(key, value);
+        this.set(key, value).subscribe();
       }
     }
   }
@@ -211,6 +211,7 @@ export class BusHandler {
    * @param handle - [BusHandle][] to **set**.
    * @param bus - [Observable][] bus for `handle`.
    * @typeParam T - Bus type.
+   * @returns [Observable][].
    *
    * @example
    * **Set** the `'io.github.sgrud.example'` bus:
@@ -222,10 +223,10 @@ export class BusHandler {
    * busHandler.set('io.github.sgrud.example', of('published'));
    * ```
    */
-  public set<T>(handle: BusHandle, bus: Observable<T>): void {
-    from(this.worker).pipe(
+  public set<T>(handle: BusHandle, bus: Observable<T>): Observable<void> {
+    return from(this.worker).pipe(
       switchMap((worker) => worker.set(handle, bus))
-    ).subscribe();
+    );
   }
 
 }

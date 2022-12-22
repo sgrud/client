@@ -20,10 +20,10 @@
   import { firstValueFrom, Subject } from 'rxjs';
 
   const handler = new BusHandler();
-  const subject = new Subject();
+  const bus = new Subject();
 
-  handler.set('sgrud.test.bus.worker', subject);
-  setTimeout(() => subject.next('@sgrud/bus/worker'), 250);
+  handler.set('sgrud.test.bus.worker', bus).subscribe();
+  setTimeout(() => bus.next('@sgrud/bus/worker'), 250);
 
   window.bus = firstValueFrom(handler.get('sgrud.test.bus.worker'));
 </script>

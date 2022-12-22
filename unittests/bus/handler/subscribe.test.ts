@@ -55,7 +55,7 @@ describe('@sgrud/bus/handler/subscribe', () => {
       });
 
       subscription.add(done);
-      handler.set('sgrud.test.bus.one', of(1));
+      handler.set('sgrud.test.bus.one', of(1)).subscribe();
     });
   });
 
@@ -74,7 +74,7 @@ describe('@sgrud/bus/handler/subscribe', () => {
       });
 
       subscription.add(done);
-      handler.set('sgrud.test.bus.two', of(2));
+      handler.set('sgrud.test.bus.two', of(2)).subscribe();
     });
   });
 
