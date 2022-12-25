@@ -12,12 +12,7 @@ import { name } from '../worker/package.json';
  * @decorator [Singleton][]
  */
 @Singleton<typeof StateHandler>()
-export class StateHandler {
-
-  /**
-   *
-   */
-  public readonly stores: Map<BusHandle, Store>;
+export class StateHandler extends Map<BusHandle, Store> {
 
   /**
    *
@@ -44,10 +39,9 @@ export class StateHandler {
    * @throws ReferenceError.
    */
   public constructor() {
-    this.stores = new Map<BusHandle, Store>();
+    super();
 
     this.worker = (async() => {
-      const { port1, port2 } = new MessageChannel();
       const source = `${this.kernel.nodeModules}/${name}`;
       const module = await firstValueFrom(this.kernel.resolve(name, source));
 
@@ -65,17 +59,18 @@ export class StateHandler {
         throw new ReferenceError(module.name);
       }
 
-      const worker = await this.busHandler.worker;
-      const thread = await worker[createEndpoint]();
-      const remote = wrap<StateWorker>(port2);
-
-      const serviceWorker = navigator.serviceWorker.controller! || await (
+      const controller = navigator.serviceWorker.controller! || await (
         firstValueFrom(fromEvent(navigator.serviceWorker, 'controllerchange'))
       ).then(() => navigator.serviceWorker.controller);
 
-      serviceWorker.postMessage({ [name]: port1 }, [port1]);
-      await remote.connect(transfer(thread, [thread]));
-      return remote;
+      const { port1, port2 } = new MessageChannel();
+      const remote = await this.busHandler.worker;
+      const thread = await remote[createEndpoint]();
+      const worker = wrap<StateWorker>(port1);
+
+      controller.postMessage({ [name]: port2 }, [port2]);
+      await worker.connect(transfer(thread, [thread]));
+      return worker;
     })();
   }
 
@@ -92,7 +87,7 @@ export class StateHandler {
     state: Store.State<T>,
     transient: boolean = false
   ): Observable<Store<T>> {
-    let deployed = this.stores.get(handle);
+    let deployed = super.get(handle);
 
     if (!deployed) {
       deployed = assign(Object.create(store.prototype), {
@@ -106,7 +101,7 @@ export class StateHandler {
 
       return from(this.worker).pipe(
         switchMap((worker) => worker.deploy(handle, store, state, transient)),
-        tap(() => this.stores.set(handle, deployed!)),
+        tap(() => super.set(handle, deployed!)),
         map(() => deployed!)
       );
     }
