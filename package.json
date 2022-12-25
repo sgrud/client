@@ -87,6 +87,7 @@
     "/docs"
   ],
   "jest": {
+    "coverageProvider": "v8",
     "forceExit": true,
     "maxWorkers": 1,
     "testEnvironment": "jest-environment-jsdom",
