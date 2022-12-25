@@ -9,6 +9,8 @@
   "amdNames": {
     "@babel/runtime/helpers/createClass": null,
     "@babel/runtime/helpers/createForOfIteratorHelperLoose": null,
+    "@babel/runtime/helpers/inheritsLoose": null,
+    "@babel/runtime/helpers/wrapNativeSuper": null,
     "@sgrud/bus": null,
     "@sgrud/core": null,
     "@sgrud/state": null,
