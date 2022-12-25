@@ -61,8 +61,8 @@ export function Spawn(
             worker = new Worker(require.resolve(worker));
           }
 
-          const nodeAdapter = require('comlink/dist/umd/node-adapter');
-          worker = nodeAdapter(worker);
+          const nodeEndpoint = require('comlink/dist/umd/node-adapter');
+          worker = nodeEndpoint(worker);
         } else if (TypeOf.string(worker)) {
           const kernel = new Kernel();
           source ||= `${kernel.nodeModules}/${worker}`;

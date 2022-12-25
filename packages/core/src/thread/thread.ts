@@ -54,8 +54,8 @@ export function Thread() {
       const { isMainThread, parentPort } = require('worker_threads');
 
       if (!isMainThread) {
-        const nodeAdapter = require('comlink/dist/umd/node-adapter');
-        return expose(new constructor(), nodeAdapter(parentPort));
+        const nodeEndpoint = require('comlink/dist/umd/node-adapter');
+        return expose(new constructor(), nodeEndpoint(parentPort));
       }
     }
 
