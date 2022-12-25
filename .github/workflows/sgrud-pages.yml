@@ -35,7 +35,7 @@ jobs:
           npm run build
           npx typedoc --out ./client
           npx jest --collectCoverage --coverageReporters html
-          git --git-dir ../target/.git add -A ./client ./coverage
+          git --git-dir ../target/.git add -Af ./client ./coverage
 
       - name: Push target
         working-directory: ./target
