@@ -27,19 +27,21 @@ describe('@sgrud/state/handler/transfer', () => {
       };
 
       require('@sgrud/core').Thread()(class {
-        /* eslint-disable */
+        /* eslint-disable @typescript-eslint/explicit-member-accessibility */
+        /* eslint-disable @typescript-eslint/typedef */
         store = class extends require('@sgrud/state').Store {
           param = 'default';
           // @ts-expect-error implicit any
           action(param) {
             return Object.assign({ }, this, { param });
           }
-        }
+        };
         // @ts-expect-error implicit any
         action(store) {
           return Object.prototype.toString.call(store.prototype.action);
         }
-        /* eslint-enable */
+        /* eslint-enable @typescript-eslint/explicit-member-accessibility */
+        /* eslint-enable @typescript-eslint/typedef */
       });
     }) + ')()', { eval: true }))
     public static readonly worker: import('@sgrud/core').Thread<unknown>;

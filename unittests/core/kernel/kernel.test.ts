@@ -5,7 +5,7 @@ import { catchError, EMPTY, from, of, timeout } from 'rxjs';
 
 declare global {
   // eslint-disable-next-line no-var
-  var sgrud: unknown;
+  var sgrud: boolean;
 }
 
 describe('@sgrud/core/kernel/kernel', () => {
@@ -21,7 +21,6 @@ describe('@sgrud/core/kernel/kernel', () => {
     .use('/api/sgrud/v1/insmod', (_, r) => r.send(depmod))
     .use('/node_modules/dirmod/package.json', (_, r) => r.send(dirmod))
     .use('/node_modules/submod/package.json', (_, r) => r.send(submod))
-    .use('/', (_, r) => r.send())
     .listen(location.port));
 
   const append = jest.spyOn(document.head, 'appendChild');
@@ -228,31 +227,35 @@ describe('@sgrud/core/kernel/kernel', () => {
     ];
 
     it('calls insmod on the modules', (done) => {
-      let counter = 0;
-
-      const subscription = from(kernel).pipe(
-        timeout(250),
-        catchError(() => EMPTY)
-      ).subscribe((next) => {
-        switch (counter++) {
-          case 0: expect(next).toMatchObject(submod); break;
-          case 1: expect(next).toMatchObject(dirmod); break;
-          case 2: expect(next).toMatchObject(depmod); break;
+      const test = jest.fn((value) => {
+        switch (test.mock.calls.length) {
+          case 1: expect(value).toMatchObject(submod); break;
+          case 2: expect(value).toMatchObject(dirmod); break;
+          case 3: expect(value).toMatchObject(depmod); return true;
         }
 
+        return false;
+      });
+
+      from(kernel).pipe(
+        timeout(250),
+        catchError(() => EMPTY)
+      ).subscribe((value) => {
         expect(select).toHaveBeenCalled();
         expect(send).toHaveBeenCalledTimes(opened.length);
 
-        appended.slice(0, counter + 1).forEach((n, i) => {
+        appended.slice(0, test.mock.calls.length).forEach((n, i) => {
           expect(append).toHaveBeenNthCalledWith(++i, n);
         });
 
         opened.forEach((n, i) => {
           expect(open).toHaveBeenNthCalledWith(++i, ...n);
         });
-      });
 
-      subscription.add(done);
+        if (test(value)) {
+          done();
+        }
+      });
     });
 
     it('returns the singleton kernel', () => {
@@ -285,25 +288,20 @@ describe('@sgrud/core/kernel/kernel', () => {
     ];
 
     it('calls insmod on the legacy modules', (done) => {
-      globalThis.sgrud = true as any;
+      globalThis.sgrud = true;
 
-      const subscription = kernel.insmod(module).subscribe((next) => {
-        expect(next).toMatchObject(module);
+      kernel.insmod(module).subscribe((value) => {
+        expect(append).toHaveBeenCalledWith(...appended);
+        expect(value).toMatchObject(module);
 
-        appended.forEach((n, i) => {
-          expect(append).toHaveBeenNthCalledWith(++i, n);
-        });
+        clearInterval(interval);
+        globalThis.sgrud = false;
+        done();
       });
 
       const interval = setInterval(() => {
         append.mock.calls.forEach(([i]: [any]) => i.onload?.());
-      }, 100);
-
-      subscription.add(() => {
-        clearInterval(interval);
-        globalThis.sgrud = null!;
-        done();
-      });
+      }, 250);
     });
   });
 
@@ -312,25 +310,23 @@ describe('@sgrud/core/kernel/kernel', () => {
     const module = usrmod[key as keyof typeof usrmod];
 
     it('inserts the module', (done) => {
-      globalThis.sgrud = (key === 'unpkg') as any;
+      globalThis.sgrud = (key === 'unpkg');
 
-      const subscription = kernel.insmod(
+      kernel.insmod(
         module,
         undefined,
         true
-      ).subscribe((next) => {
-        expect(next).toMatchObject(module);
+      ).subscribe((value) => {
+        expect(value).toMatchObject(module);
+
+        clearInterval(interval);
+        globalThis.sgrud = false;
+        done();
       });
 
       const interval = setInterval(() => {
         append.mock.calls.forEach(([i]: [any]) => i.onload?.());
-      }, 100);
-
-      subscription.add(() => {
-        clearInterval(interval);
-        globalThis.sgrud = null!;
-        done();
-      });
+      }, 250);
     });
   });
 
@@ -339,13 +335,12 @@ describe('@sgrud/core/kernel/kernel', () => {
     const module = { name: 'nonexistent' } as Kernel.Module;
 
     it('throws an error', (done) => {
-      const subscription = kernel.insmod(module).pipe(
+      kernel.insmod(module).pipe(
         catchError((error) => of(error))
-      ).subscribe((next) => {
-        expect(next).toBeInstanceOf(ReferenceError);
+      ).subscribe((value) => {
+        expect(value).toBeInstanceOf(ReferenceError);
+        done();
       });
-
-      subscription.add(done);
     });
   });
 
@@ -356,13 +351,12 @@ describe('@sgrud/core/kernel/kernel', () => {
     it('throws an error', (done) => {
       module.sgrudDependencies!.submod = '0.1.0';
 
-      const subscription = kernel.insmod(module).pipe(
+      kernel.insmod(module).pipe(
         catchError((error) => of(error))
       ).subscribe((next) => {
         expect(next).toBeInstanceOf(RangeError);
+        done();
       });
-
-      subscription.add(done);
     });
   });
 
@@ -373,13 +367,12 @@ describe('@sgrud/core/kernel/kernel', () => {
     it('throws an error', (done) => {
       module.sgrudDependencies!.submod = '0.0.1';
 
-      const subscription = kernel.insmod(module).pipe(
+      kernel.insmod(module).pipe(
         catchError((error) => of(error))
-      ).subscribe((next) => {
-        expect(next).toBeInstanceOf(RangeError);
+      ).subscribe((value) => {
+        expect(value).toBeInstanceOf(RangeError);
+        done();
       });
-
-      subscription.add(done);
     });
   });
 
@@ -400,27 +393,22 @@ describe('@sgrud/core/kernel/kernel', () => {
     ];
 
     it('emits the error to the observer', (done) => {
-      globalThis.sgrud = true as any;
+      globalThis.sgrud = true;
 
-      const subscription = kernel.insmod(module).pipe(
+      kernel.insmod(module).pipe(
         catchError((error) => of(error))
-      ).subscribe((next) => {
-        expect(next).toBeUndefined();
+      ).subscribe((value) => {
+        expect(append).toHaveBeenCalledWith(...appended);
+        expect(value).toBeUndefined();
 
-        appended.forEach((n, i) => {
-          expect(append).toHaveBeenNthCalledWith(++i, n);
-        });
+        clearInterval(interval);
+        globalThis.sgrud = false;
+        done();
       });
 
       const interval = setInterval(() => {
         append.mock.calls.forEach(([i]: [any]) => i.onerror?.());
-      }, 100);
-
-      subscription.add(() => {
-        clearInterval(interval);
-        globalThis.sgrud = null!;
-        done();
-      });
+      }, 250);
     });
   });
 

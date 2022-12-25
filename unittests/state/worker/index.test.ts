@@ -1,4 +1,3 @@
-import { Kernel } from '@sgrud/core';
 import { Store } from '@sgrud/state';
 import express from 'express';
 import { readFileSync } from 'fs-extra';
@@ -27,7 +26,6 @@ declare class Local extends Store<Local> {
 describe('@sgrud/state/worker', () => {
 
   const html = readFileSync(join(__dirname, 'index.test.html')).toString();
-  const insmod = { name: 'insmod', version: '0.0.0' } as Kernel.Module;
 
   let pageOne: Page;
   let pageTwo: Page;
@@ -49,7 +47,7 @@ describe('@sgrud/state/worker', () => {
     pageTwo = await puppeteer.newPage();
 
     server = express()
-      .use('/api/sgrud/v1/insmod', (_, r) => r.send(insmod))
+      .use('/api/sgrud/v1/insmod', (_, r) => r.send({ }))
       .use('/node_modules/@sgrud', express.static('./dist', {
         setHeaders: (res) => res.setHeader('service-worker-allowed', '/')
       }))

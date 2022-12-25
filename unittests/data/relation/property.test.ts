@@ -47,12 +47,14 @@ describe('@sgrud/data/relation/property', () => {
     };
 
     it('emits the changed model containing properties', (done) => {
-      const subscription = from(model).pipe(
+      from(model).pipe(
         auditTime(250),
         first()
-      ).subscribe(validate);
+      ).subscribe((value) => {
+        validate(value);
+        done();
+      });
 
-      subscription.add(done);
       model.assign(...values).subscribe(validate);
     });
 
@@ -71,12 +73,13 @@ describe('@sgrud/data/relation/property', () => {
     };
 
     it('emits the changed model containing properties', (done) => {
-      const subscription = from(model).pipe(
+      from(model).pipe(
         auditTime(250),
         first()
-      ).subscribe(validate);
-
-      subscription.add(done);
+      ).subscribe((value) => {
+        validate(value);
+        done();
+      });
 
       model.assign(...values.flatMap((value) => {
         return Object.keys(value).map((key) => ({
@@ -100,12 +103,14 @@ describe('@sgrud/data/relation/property', () => {
     };
 
     it('emits the changed model containing properties', (done) => {
-      const subscription = from(model).pipe(
+      from(model).pipe(
         auditTime(250),
         first()
-      ).subscribe(validate);
+      ).subscribe((value) => {
+        validate(value);
+        done();
+      });
 
-      subscription.add(done);
       model.clear().subscribe(validate);
     });
 

@@ -44,12 +44,14 @@ describe('@sgrud/data/relation/has-one', () => {
     };
 
     it('emits the changed model which has one model', (done) => {
-      const subscription = from(owner).pipe(
+      from(owner).pipe(
         auditTime(250),
         first()
-      ).subscribe(validate);
+      ).subscribe((value) => {
+        validate(value);
+        done();
+      });
 
-      subscription.add(done);
       owner.assign(...values).subscribe(validate);
     });
 
@@ -66,12 +68,13 @@ describe('@sgrud/data/relation/has-one', () => {
     };
 
     it('emits the changed model which has one model', (done) => {
-      const subscription = from(owner).pipe(
+      from(owner).pipe(
         auditTime(250),
         first()
-      ).subscribe(validate);
-
-      subscription.add(done);
+      ).subscribe((value) => {
+        validate(value);
+        done();
+      });
 
       owner.assign(...values.flatMap((value) => {
         return Object.keys(value).map((key) => ({
@@ -93,12 +96,14 @@ describe('@sgrud/data/relation/has-one', () => {
     };
 
     it('emits the changed model which has one model', (done) => {
-      const subscription = from(owner).pipe(
+      from(owner).pipe(
         auditTime(250),
         first()
-      ).subscribe(validate);
+      ).subscribe((value) => {
+        validate(value);
+        done();
+      });
 
-      subscription.add(done);
       owner.clear().subscribe(validate);
     });
 

@@ -1,6 +1,6 @@
 import { Symbol } from '@sgrud/core';
 import { Model } from '@sgrud/data';
-import { auditTime, catchError, first, from, identity, NEVER } from 'rxjs';
+import { auditTime, catchError, EMPTY, first, from, identity } from 'rxjs';
 
 describe('@sgrud/data/model/model', () => {
 
@@ -20,7 +20,7 @@ describe('@sgrud/data/model/model', () => {
         expect(error).toBeInstanceOf(ReferenceError);
         done();
 
-        return NEVER;
+        return EMPTY;
       })).subscribe();
     });
   });
@@ -31,7 +31,7 @@ describe('@sgrud/data/model/model', () => {
         expect(error).toBeInstanceOf(ReferenceError);
         done();
 
-        return NEVER;
+        return EMPTY;
       })).subscribe();
     });
   });
@@ -42,7 +42,7 @@ describe('@sgrud/data/model/model', () => {
         expect(error).toBeInstanceOf(ReferenceError);
         done();
 
-        return NEVER;
+        return EMPTY;
       })).subscribe();
     });
   });
@@ -53,7 +53,7 @@ describe('@sgrud/data/model/model', () => {
         expect(error).toBeInstanceOf(ReferenceError);
         done();
 
-        return NEVER;
+        return EMPTY;
       })).subscribe();
     });
   });
@@ -64,7 +64,7 @@ describe('@sgrud/data/model/model', () => {
         expect(error).toBeInstanceOf(ReferenceError);
         done();
 
-        return NEVER;
+        return EMPTY;
       })).subscribe();
     });
   });
@@ -77,7 +77,7 @@ describe('@sgrud/data/model/model', () => {
         expect(error).toBeInstanceOf(ReferenceError);
         done();
 
-        return NEVER;
+        return EMPTY;
       })).subscribe();
     });
   });
@@ -90,7 +90,7 @@ describe('@sgrud/data/model/model', () => {
         expect(error).toBeInstanceOf(ReferenceError);
         done();
 
-        return NEVER;
+        return EMPTY;
       })).subscribe();
     });
   });
@@ -201,12 +201,14 @@ describe('@sgrud/data/model/model', () => {
     };
 
     it('emits the changed model', (done) => {
-      const subscription = from(model).pipe(
+      from(model).pipe(
         auditTime(250),
         first()
-      ).subscribe(validate);
+      ).subscribe((value) => {
+        validate(value);
+        done();
+      });
 
-      subscription.add(done);
       model.assign(...values).subscribe(validate);
     });
 
@@ -224,12 +226,13 @@ describe('@sgrud/data/model/model', () => {
     };
 
     it('emits the changed model', (done) => {
-      const subscription = from(model).pipe(
+      from(model).pipe(
         auditTime(250),
         first()
-      ).subscribe(validate);
-
-      subscription.add(done);
+      ).subscribe((value) => {
+        validate(value);
+        done();
+      });
 
       model.assign(...values.flatMap((value) => {
         return Object.keys(value).map((key) => ({
@@ -252,12 +255,14 @@ describe('@sgrud/data/model/model', () => {
     };
 
     it('emits the changed model', (done) => {
-      const subscription = from(model).pipe(
+      from(model).pipe(
         auditTime(250),
         first()
-      ).subscribe(validate);
+      ).subscribe((value) => {
+        validate(value);
+        done();
+      });
 
-      subscription.add(done);
       model.clear().subscribe(validate);
     });
 
@@ -275,12 +280,14 @@ describe('@sgrud/data/model/model', () => {
     };
 
     it('emits the changed model', (done) => {
-      const subscription = from(model).pipe(
+      from(model).pipe(
         auditTime(250),
         first()
-      ).subscribe(validate);
+      ).subscribe((value) => {
+        validate(value);
+        done();
+      });
 
-      subscription.add(done);
       model.clear(['created', 'modified']).subscribe(validate);
     });
 
@@ -297,7 +304,7 @@ describe('@sgrud/data/model/model', () => {
         expect(error).toBeInstanceOf(ReferenceError);
         done();
 
-        return NEVER;
+        return EMPTY;
       })).subscribe();
     });
   });
@@ -310,7 +317,7 @@ describe('@sgrud/data/model/model', () => {
         expect(error).toBeInstanceOf(ReferenceError);
         done();
 
-        return NEVER;
+        return EMPTY;
       })).subscribe();
     });
   });
@@ -323,7 +330,7 @@ describe('@sgrud/data/model/model', () => {
         expect(error).toBeInstanceOf(ReferenceError);
         done();
 
-        return NEVER;
+        return EMPTY;
       })).subscribe();
     });
   });
@@ -336,7 +343,7 @@ describe('@sgrud/data/model/model', () => {
         expect(error).toBeInstanceOf(ReferenceError);
         done();
 
-        return NEVER;
+        return EMPTY;
       })).subscribe();
     });
   });
@@ -349,7 +356,7 @@ describe('@sgrud/data/model/model', () => {
         expect(error).toBeInstanceOf(ReferenceError);
         done();
 
-        return NEVER;
+        return EMPTY;
       })).subscribe();
     });
   });

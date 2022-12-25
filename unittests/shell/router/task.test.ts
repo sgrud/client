@@ -67,8 +67,8 @@ describe('@sgrud/shell/router/task', () => {
     const router = new Router();
 
     it('loops the next state through the router task', (done) => {
-      router.navigate('route', '?param=value').subscribe((next) => {
-        expect(next.path).toBe('one');
+      router.navigate('route', '?param=value').subscribe((value) => {
+        expect(value.path).toBe('one');
         done();
       });
     });
@@ -78,8 +78,8 @@ describe('@sgrud/shell/router/task', () => {
     const router = new Router();
 
     it('loops the next state through the router task list', (done) => {
-      router.navigate('route/path').subscribe((next) => {
-        expect(next.path).toBe('two');
+      router.navigate('route/path').subscribe((value) => {
+        expect(value.path).toBe('two');
         done();
       });
     });

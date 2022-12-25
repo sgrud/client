@@ -303,8 +303,8 @@ describe('@sgrud/shell/router/router', () => {
     const router = new Router();
 
     it('emits the next state', (done) => {
-      router.navigate('route/child').subscribe((next) => {
-        expect(next.path).toBe('route/child');
+      router.navigate('route/child').subscribe((value) => {
+        expect(value.path).toBe('route/child');
         done();
       });
     });
@@ -314,9 +314,9 @@ describe('@sgrud/shell/router/router', () => {
     const router = new Router();
 
     it('emits the next state with search params', (done) => {
-      router.navigate('route', '?param=value').subscribe((next) => {
-        expect(next.path).toBe('route');
-        expect(next.search).toBe('?param=value');
+      router.navigate('route', '?param=value').subscribe((value) => {
+        expect(value.path).toBe('route');
+        expect(value.search).toBe('?param=value');
         done();
       });
     });
@@ -342,9 +342,9 @@ describe('@sgrud/shell/router/router', () => {
     it('emits the next states', (done) => {
       const subscription = from(router).pipe(
         skip(1)
-      ).subscribe((next) => {
-        expect(next).toBe(router.state);
-        expect(next.path).toBe('route/child');
+      ).subscribe((value) => {
+        expect(value).toBe(router.state);
+        expect(value.path).toBe('route/child');
         subscription.unsubscribe();
       });
 

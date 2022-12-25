@@ -20,6 +20,9 @@
   import { StateHandler, Store } from '@sgrud/state';
   import { from } from 'rxjs';
 
+  const handler = new StateHandler();
+  const seed = { param: null };
+
   class Global extends Store {
     param;
     setGlobal(param) {
@@ -33,9 +36,6 @@
       return { ...this, param };
     }
   }
-
-  const handler = new StateHandler();
-  const seed = { param: null };
 
   handler.deploy('sgrud.test.local', Local, seed, true).subscribe((store) => {
     window.setLocal = (...action) => store.dispatch(...action).subscribe();

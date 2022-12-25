@@ -39,15 +39,14 @@ describe('@sgrud/core/http/client', () => {
 
   describe.each(targets)('firing a custom request through %O', (target) => {
     it('dispatches a custom XHR', (done) => {
-      const subscription = target.handle({
+      target.handle({
         method: 'HEAD',
         url: '/head'
       }).subscribe(() => {
         expect(open).toHaveBeenCalledWith('HEAD', '/head', true);
         expect(send).toHaveBeenCalledWith();
+        done();
       });
-
-      subscription.add(done);
     });
   });
 
@@ -55,12 +54,11 @@ describe('@sgrud/core/http/client', () => {
     const request = requests[methods.indexOf(method)];
 
     it('dispatches a XHR ' + request, (done) => {
-      const subscription = method('/path', undefined).subscribe(() => {
+      method('/path', undefined).subscribe(() => {
         expect(open).toHaveBeenCalledWith(request, '/path', true);
         expect(send).toHaveBeenCalledWith();
+        done();
       });
-
-      subscription.add(done);
     });
   });
 

@@ -26,11 +26,13 @@ describe('@sgrud/core/thread/transfer', () => {
       };
 
       require('@sgrud/core').Thread()(class {
-        /* eslint-disable */
+        /* eslint-disable @typescript-eslint/explicit-member-accessibility */
+        /* eslint-disable @typescript-eslint/typedef */
         observable = require('rxjs').of(1, 2, 3);
         subject = new (require('rxjs').BehaviorSubject)('behaviorSubject');
         error = require('rxjs').throwError(() => new Error());
-        /* eslint-enable */
+        /* eslint-enable @typescript-eslint/explicit-member-accessibility */
+        /* eslint-enable @typescript-eslint/typedef */
       });
     }) + ')()', { eval: true }))
     public static readonly worker: import('@sgrud/core').Thread<unknown>;
@@ -75,8 +77,8 @@ describe('@sgrud/core/thread/transfer', () => {
         switchMap((behaviorSubject: any) => behaviorSubject),
         first()
       ).subscribe({
-        next: (next: string) => {
-          expect(next).toBe('behaviorSubject');
+        next: (value: string) => {
+          expect(value).toBe('behaviorSubject');
           done();
         }
       });

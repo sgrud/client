@@ -1,4 +1,3 @@
-import { Kernel } from '@sgrud/core';
 import express from 'express';
 import { readFileSync } from 'fs-extra';
 import { Server } from 'http';
@@ -15,7 +14,6 @@ declare global {
 describe('@sgrud/bus/worker', () => {
 
   const html = readFileSync(join(__dirname, 'index.test.html')).toString();
-  const insmod = { name: 'insmod', version: '0.0.0' } as Kernel.Module;
 
   let page: Page;
   let puppeteer: Browser;
@@ -33,7 +31,7 @@ describe('@sgrud/bus/worker', () => {
     })).newPage();
 
     server = express()
-      .use('/api/sgrud/v1/insmod', (_, r) => r.send(insmod))
+      .use('/api/sgrud/v1/insmod', (_, r) => r.send({ }))
       .use('/node_modules/@sgrud', express.static('./dist'))
       .use('/node_modules', express.static('./node_modules', {
         index: ['index.js'],

@@ -1,4 +1,4 @@
-import { HttpClient, HttpHandler, HttpProxy, Linker, Target } from '@sgrud/core';
+import { HttpClient, HttpHandler, HttpProxy, HttpState, Linker, Target } from '@sgrud/core';
 import { map, Observable, of } from 'rxjs';
 import { AjaxConfig as Request, AjaxResponse as Response } from 'rxjs/ajax';
 
@@ -11,9 +11,7 @@ describe('@sgrud/core/http/proxy', () => {
       handler: HttpHandler
     ): Observable<Response<T>> {
       if (request.url === 'one') {
-        return of({
-          response: request.url as unknown as T
-        } as Response<T>);
+        return of({ response: request.url } as Response<T>);
       }
 
       return handler.handle<T>({
@@ -26,17 +24,14 @@ describe('@sgrud/core/http/proxy', () => {
 
   @Target<typeof ProxyTwo>()
   class ProxyTwo extends HttpProxy {
-    public override proxy<T>(
-      request: Request
-    ): Observable<Response<T>> {
-      return of({
-        response: request.headers!.next
-      } as Response<T>);
+    public override proxy<T>(request: Request): Observable<Response<T>> {
+      return of({ response: request.headers!.next } as Response<T>);
     }
   }
 
   describe('targeting HttpProxy subclasses', () => {
     const linker = new Linker<typeof HttpProxy>();
+    expect(linker.delete(HttpState)).toBeTruthy();
     const proxies = linker.getAll(HttpProxy);
 
     it('appends the targets to the proxy chain', () => {
@@ -49,11 +44,10 @@ describe('@sgrud/core/http/proxy', () => {
     const request = HttpClient.get('one');
 
     it('intercepts the request with the proxy', (done) => {
-      const subscription = request.subscribe((response) => {
+      request.subscribe((response) => {
         expect(response.response).toBe('one');
+        done();
       });
-
-      subscription.add(done);
     });
   });
 
@@ -61,13 +55,11 @@ describe('@sgrud/core/http/proxy', () => {
     const request = HttpClient.get('two');
 
     it('intercepts the request with the proxy chain', (done) => {
-      const subscription = request.subscribe((response) => {
-        expect(response.request.headers.next).toBe('two');
+      request.subscribe((response) => {
         expect(response.responseHeaders.prev).toBe('one');
         expect(response.response).toBe('two');
+        done();
       });
-
-      subscription.add(done);
     });
   });
 

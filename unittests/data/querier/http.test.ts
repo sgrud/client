@@ -9,28 +9,14 @@ describe('@sgrud/data/querier/http', () => {
   let server: Server;
   afterAll(() => server.close());
   beforeAll(() => server = express()
-    .use('/api/sgrud/v1/insmod', (_, r) => r.send(depmod))
-    .use('/exception', (_, r) => r.send(exception))
-    .use('/', (_, r) => r.send(response))
+    .use('/api/sgrud/v1/insmod', (_, r) => r.send({ }))
+    .use('/exception', (_, r) => r.send({ errors: [null] }))
+    .use('/', (_, r) => r.send({ data: null }))
     .listen(location.port));
 
   const open = jest.spyOn(XMLHttpRequest.prototype, 'open');
   const send = jest.spyOn(XMLHttpRequest.prototype, 'send');
   afterEach(() => [open, send].forEach((i) => i.mockClear()));
-
-  const depmod = {
-    name: 'depmod'
-  };
-
-  const exception = {
-    errors: [
-      null
-    ]
-  };
-
-  const response = {
-    data: null
-  };
 
   class Class extends Model<Class> {
     protected readonly [Symbol.toStringTag]: string = 'Class';
@@ -75,12 +61,11 @@ describe('@sgrud/data/querier/http', () => {
     const request = JSON.stringify({ query: operation, variables });
 
     it('commits the operation through the HttpQuerier', (done) => {
-      const subscription = Class.commit(operation, variables).subscribe(() => {
+      Class.commit(operation, variables).subscribe(() => {
         expect(open).toHaveBeenCalledWith('POST', '/api', true);
         expect(send).toHaveBeenCalledWith(request);
+        done();
       });
-
-      subscription.add(done);
     });
   });
 
@@ -101,12 +86,11 @@ describe('@sgrud/data/querier/http', () => {
     });
 
     it('overrides the previously targeted HttpQuerier', (done) => {
-      const subscription = Class.commit(operation, variables).subscribe(() => {
+      Class.commit(operation, variables).subscribe(() => {
         expect(open).toHaveBeenCalledWith('POST', '/path', true);
         expect(send).toHaveBeenCalledWith(request);
+        done();
       });
-
-      subscription.add(done);
     });
   });
 
@@ -121,15 +105,14 @@ describe('@sgrud/data/querier/http', () => {
     it('emits the error to the observer', (done) => {
       expect(update()).toBe(linker);
 
-      const subscription = Class.commit(operation).pipe(
+      Class.commit(operation).pipe(
         catchError((error) => of(error))
       ).subscribe((error) => {
+        expect(error).toBeInstanceOf(AggregateError);
         expect(open).toHaveBeenCalledWith('POST', '/exception', true);
         expect(send).toHaveBeenCalledWith(request);
-        expect(error).toBe(exception.errors[0]);
+        done();
       });
-
-      subscription.add(done);
     });
   });
 

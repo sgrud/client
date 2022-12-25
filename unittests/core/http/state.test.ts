@@ -21,43 +21,47 @@ describe('@sgrud/core/http/state', () => {
   });
 
   describe('firing a request', () => {
-    const test = jest.fn((next) => {
+    const test = jest.fn((value) => {
       switch (test.mock.calls.length) {
-        case 1: expect(next.type).toBe('download_loadstart'); break;
-        case 2: expect(next.type).toBe('upload_loadstart'); break;
-        case 3: expect(next.type).toBe('upload_progress'); break;
-        case 4: expect(next.type).toBe('upload_load'); break;
-        case 5: expect(next.type).toBe('download_progress'); break;
-        case 6: expect(next.type).toBe('download_load'); break;
+        case 1: expect(value.type).toBe('download_loadstart'); break;
+        case 2: expect(value.type).toBe('upload_loadstart'); break;
+        case 3: expect(value.type).toBe('upload_progress'); break;
+        case 4: expect(value.type).toBe('upload_load'); break;
+        case 5: expect(value.type).toBe('download_progress'); break;
+        case 6: expect(value.type).toBe('download_load'); return true;
       }
+
+      return false;
     });
 
     it('does not consume the progress events', (done) => {
-      const subscription = HttpClient.prototype.handle({
+      HttpClient.prototype.handle({
         body: randomBytes(1024),
         includeDownloadProgress: true,
         includeUploadProgress: true,
         method: 'POST',
         url: '/api'
-      }).subscribe(test);
-
-      subscription.add(done);
+      }).subscribe((value) => {
+        if (test(value)) {
+          done();
+        }
+      });
     });
   });
 
   describe('firing a request', () => {
     const httpState = new HttpState();
-    const test = jest.fn(([next]) => {
+    const test = jest.fn(([value]) => {
       switch (test.mock.calls.length) {
-        case 1: expect(next.type).toBe('download_loadstart'); break;
-        case 2: expect(next.type).toBe('download_progress'); break;
-        case 3: expect(next.type).toBe('download_load'); break;
+        case 1: expect(value.type).toBe('download_loadstart'); break;
+        case 2: expect(value.type).toBe('download_progress'); break;
+        case 3: expect(value.type).toBe('download_load'); break;
       }
     });
 
     it('makes the request state observable', (done) => {
       const subscription = from(httpState).pipe(
-        filter((next) => Boolean(next.length))
+        filter((value) => Boolean(value.length))
       ).subscribe(test);
 
       HttpClient.get('/api').subscribe(() => {
