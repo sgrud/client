@@ -184,8 +184,6 @@ export class StateWorker {
     }
 
     if (!value) {
-      let update;
-
       if (!transient && (source = this)) {
         const database = await this.database;
 
@@ -197,15 +195,15 @@ export class StateWorker {
           request.onsuccess = () => resolve(request.result || state);
         });
 
-        update = defer(() => value!).pipe(tap((next) => {
+        value = defer(() => value!).pipe(tap((next) => {
           const session = database.transaction(name, 'readwrite');
           session.objectStore(name).put({ handle, value: next });
-        }));
+        })) as any;
       }
 
+      value?.subscribe();
       value = new BehaviorSubject<any>(state);
       states.set(source, value);
-      update?.subscribe();
     }
 
     if (deployed || transient) {
