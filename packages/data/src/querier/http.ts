@@ -34,7 +34,7 @@ export class HttpQuerier
   extends Provider<typeof Querier>('sgrud.data.querier.Querier') {
 
   /**
-   * A set containing the the [Type][]s this [Querier][] can handle. As HTTP
+   * A set containing the [Type][]s this [Querier][] can handle. As HTTP
    * connections are short-lived, this [Querier][] may only handle one-off query
    * [Type][]s, namely `'mutation'` and `'query'`.
    *
