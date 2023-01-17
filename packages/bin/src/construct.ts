@@ -152,14 +152,6 @@ export async function construct({
           : module.amdNames[module.name];
       }
 
-      console.log(
-        _g, '[construct]',
-        _b, modules[i],
-        _g, '→',
-        _b, module.name,
-        __
-      );
-
       await microbundle.exports({
         compress,
         css: 'inline',
@@ -173,9 +165,18 @@ export async function construct({
       }).then(({ output: result }) => {
         console.log(
           _g, '[construct]',
-          _b, result,
+          _b, modules[i],
+          _g, '→',
+          _b, module.name,
           __
         );
+
+        for (const line of result.split('\n').slice(1)) {
+          console.log(
+            _g, '[construct]',
+            __, line
+          );
+        }
       });
     }
 
