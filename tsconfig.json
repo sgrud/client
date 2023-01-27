@@ -78,6 +78,10 @@
       }
     },
 
+    "intentionallyNotExported": [
+      "global.sgrud.state.effects"
+    ],
+
     "plugin": [
       "typedoc-plugin-mdn-links",
       "@sgrud/typedoc-plugin"
