@@ -22,12 +22,12 @@ describe('@sgrud/shell/router/link', () => {
   });
 
   describe('dispatching a click event on a router link', () => {
+    const navigate = jest.spyOn(Router.prototype, 'navigate');
     const routerLink = document.querySelector('a[is]') as RouterLink;
-    const spy = jest.spyOn(Router.prototype, 'navigate');
 
     it('invokes the navigate function on the router', () => {
       routerLink.dispatchEvent(new Event('click'));
-      expect(spy).toHaveBeenCalledWith('/base/test', '');
+      expect(navigate).toHaveBeenCalledWith('/base/test', '');
     });
   });
 

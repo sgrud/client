@@ -3,8 +3,10 @@ import { semver } from '@sgrud/core';
 describe('@sgrud/core/kernel/semver', () => {
 
   /**
-   * Exclusive [semver](https://semver.org) ranges/versions. Subset taken from:
+   * Exclusive [semver][] ranges/versions. Subset taken from:
    * https://github.com/npm/node-semver/blob/main/test/fixtures/range-exclude.js
+   *
+   * [semver]: https://semver.org
    */
   const excludes = [
     ['^1.2.3+build', '2.0.0'],
@@ -76,10 +78,12 @@ describe('@sgrud/core/kernel/semver', () => {
     ['>=1.0.0 <1.1.0', '1.1.0'],
     ['>=1.0.0 <1.1.0', '1.1.0-pre'],
     ['>=1.0.0 <1.1.0-pre', '1.1.0-pre']
-  ] as [string, string][];
+  ];
 
   /**
-   * Faulty [semver](https://semver.org) ranges/versions.
+   * Faulty [semver][] ranges/versions.
+   *
+   * [semver]: https://semver.org
    */
   excludes.push(
     ['=>1.0.0', '1.0.0'],
@@ -90,8 +94,10 @@ describe('@sgrud/core/kernel/semver', () => {
   );
 
   /**
-   * Inclusive [semver](https://semver.org) ranges/versions. Subset taken from:
+   * Inclusive [semver][] ranges/versions. Subset taken from:
    * https://github.com/npm/node-semver/blob/main/test/fixtures/range-include.js
+   *
+   * [semver]: https://semver.org
    */
   const includes = [
     ['^1.2.3+build', '1.2.3'],
@@ -179,7 +185,7 @@ describe('@sgrud/core/kernel/semver', () => {
     ['^0.1.1-alpha', '0.1.1-beta'],
     ['^x', '1.2.3'],
     ['<=7.x', '7.9.9']
-  ] as [string, string][];
+  ];
 
   describe.each(excludes)('"%s" is satisfied by "%s"', (range, version) => {
     it('returns false', () => {

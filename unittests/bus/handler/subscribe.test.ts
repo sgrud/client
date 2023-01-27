@@ -5,44 +5,40 @@ describe('@sgrud/bus/handler/subscribe', () => {
 
   class ClassOne {
     @Subscribe('sgrud.test.bus.one')
-    public readonly bus!: Observable<BusValue<number>>;
+    public readonly bus!: Observable<BusValue<string>>;
   }
 
   class ClassTwo {
     @Subscribe('sgrud.test.bus', 'handle')
-    public readonly bus!: Observable<BusValue<number>>;
+    public readonly bus!: Observable<BusValue<string>>;
     public constructor(public readonly handle: string) { }
   }
 
   describe('applying the decorator', () => {
+    const assign = () => Object.assign(classOne, { bus: undefined });
     const classOne = new ClassOne();
-    const write = () => Object.assign(classOne, {
-      bus: new Observable<BusValue<number>>()
-    });
 
     it('freezes the bus on the prototype', () => {
       expect(classOne.bus).toBeInstanceOf(Observable);
       expect(classOne.bus).toBe(new ClassOne().bus);
-      expect(write).toThrowError(TypeError);
+      expect(assign).toThrowError(TypeError);
     });
   });
 
   describe('applying the scoped decorator', () => {
+    const assign = () => Object.assign(classTwo, { bus: undefined });
     const classTwo = new ClassTwo('two');
-    const write = () => Object.assign(classTwo, {
-      bus: new Observable<BusValue<number>>()
-    });
 
     it('freezes the bus on the instance', () => {
       expect(classTwo.bus).toBeInstanceOf(Observable);
       expect(classTwo.bus).not.toBe(new ClassTwo('two').bus);
-      expect(write).toThrowError(TypeError);
+      expect(assign).toThrowError(TypeError);
     });
   });
 
   describe('subscribing to the decorated prototype property', () => {
-    const handler = new BusHandler();
     const classOne = new ClassOne();
+    const handler = new BusHandler();
 
     it('observes values emitted by the supplied handle', (done) => {
       const subscription = classOne.bus.subscribe(({
@@ -50,18 +46,18 @@ describe('@sgrud/bus/handler/subscribe', () => {
         value
       }) => {
         expect(handle).toBe('sgrud.test.bus.one');
-        expect(value).toBe(1);
+        expect(value).toBe('one');
         subscription.unsubscribe();
       });
 
       subscription.add(done);
-      handler.set('sgrud.test.bus.one', of(1)).subscribe();
+      handler.set('sgrud.test.bus.one', of('one')).subscribe();
     });
   });
 
   describe('subscribing to the decorated instance property', () => {
-    const handler = new BusHandler();
     const classTwo = new ClassTwo('two');
+    const handler = new BusHandler();
 
     it('observes values emitted by the scoped handle', (done) => {
       const subscription = classTwo.bus.subscribe(({
@@ -69,12 +65,12 @@ describe('@sgrud/bus/handler/subscribe', () => {
         value
       }) => {
         expect(handle).toBe('sgrud.test.bus.two');
-        expect(value).toBe(2);
+        expect(value).toBe('two');
         subscription.unsubscribe();
       });
 
       subscription.add(done);
-      handler.set('sgrud.test.bus.two', of(2)).subscribe();
+      handler.set('sgrud.test.bus.two', of('two')).subscribe();
     });
   });
 

@@ -10,27 +10,27 @@ describe('@sgrud/state/store/store', () => {
     }
   }
 
-  describe('Constructing a new instance of a store', () => {
+  describe('constructing a new instance of a store', () => {
     const construct = () => new Class();
 
-    it('Correctly throws a TypeError', () => {
+    it('correctly throws a TypeError', () => {
       expect(construct).toThrowError(TypeError);
     });
   });
 
-  describe('Dispatching an action on a store', () => {
+  describe('dispatching an action on a store', () => {
     const dispatch = () => Class.prototype.dispatch('setParam', ['value']);
 
-    it('Correctly throws a ReferenceError', () => {
+    it('correctly throws a ReferenceError', () => {
       expect(dispatch).toThrowError(ReferenceError);
     });
   });
 
-  describe('Subscribing to a store', () => {
-    const state = () => from(Class.prototype).subscribe();
+  describe('subscribing to a store', () => {
+    const subscribe = () => from(Class.prototype).subscribe();
 
-    it('Correctly throws a TypeError through rxjs', () => {
-      expect(state).toThrowError(TypeError);
+    it('correctly throws a TypeError through rxjs', () => {
+      expect(subscribe).toThrowError(TypeError);
     });
   });
 

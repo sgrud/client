@@ -1,8 +1,10 @@
-import { HttpClient, HttpHandler, HttpProxy, HttpState, Linker, Target } from '@sgrud/core';
+import { HttpClient, HttpHandler, HttpProxy, Linker, Target } from '@sgrud/core';
 import { map, Observable, of } from 'rxjs';
 import { AjaxConfig as Request, AjaxResponse as Response } from 'rxjs/ajax';
 
 describe('@sgrud/core/http/proxy', () => {
+
+  new Linker<typeof HttpProxy>().clear();
 
   @Target<typeof ProxyOne>()
   class ProxyOne extends HttpProxy {
@@ -31,12 +33,11 @@ describe('@sgrud/core/http/proxy', () => {
 
   describe('targeting HttpProxy subclasses', () => {
     const linker = new Linker<typeof HttpProxy>();
-    expect(linker.delete(HttpState)).toBeTruthy();
-    const proxies = linker.getAll(HttpProxy);
+    const links = linker.getAll(HttpProxy);
 
     it('appends the targets to the proxy chain', () => {
-      expect(proxies).toContain(linker.get(ProxyOne));
-      expect(proxies).toContain(linker.get(ProxyTwo));
+      expect(links).toContain(linker.get(ProxyOne));
+      expect(links).toContain(linker.get(ProxyTwo));
     });
   });
 

@@ -7,11 +7,6 @@ import { Server } from 'http';
 import { from, map, switchMap } from 'rxjs';
 import { Worker } from 'worker_threads';
 
-declare global {
-  // eslint-disable-next-line no-var
-  var sgrud: boolean;
-}
-
 globalThis.Worker = jest.fn();
 
 describe('@sgrud/core/thread/spawn', () => {
@@ -22,6 +17,12 @@ describe('@sgrud/core/thread/spawn', () => {
     .use('/api/sgrud/v1/insmod', (_, r) => r.send({ }))
     .use('/node_modules/@sgrud/bus/worker', (_, r) => r.send(module))
     .listen(location.port));
+
+  const module = {
+    name: '@sgrud/bus/worker',
+    exports: './busWorker.esmod.js' as string | undefined,
+    unpkg: './busWorker.unpkg.js' as string | undefined
+  };
 
   class Class {
     @Spawn(new Worker('(' + (() => {
@@ -43,12 +44,6 @@ describe('@sgrud/core/thread/spawn', () => {
     public readonly esm!: Thread<any>;
     public readonly umd!: Thread<any>;
   }
-
-  const module = {
-    name: '@sgrud/bus/worker',
-    exports: './busWorker.esmod.js' as string | undefined,
-    unpkg: './busWorker.unpkg.js' as string | undefined
-  };
 
   describe('applying the decorator', () => {
     it('spawns the worker through the factory', (done) => {
@@ -122,7 +117,7 @@ describe('@sgrud/core/thread/spawn', () => {
 
     it('spawns the esm worker through the factory', async() => {
       jest.resetModules();
-      globalThis.process = undefined!;
+      Object.assign(globalThis, { process: false });
 
       const { Spawn: Decorator } = require('@sgrud/core');
       Decorator('@sgrud/bus/worker')(Class.prototype, 'esm');
@@ -147,8 +142,8 @@ describe('@sgrud/core/thread/spawn', () => {
 
     it('spawns the umd worker through the factory', async() => {
       jest.resetModules();
-      globalThis.process = undefined!;
-      globalThis.sgrud = true;
+      Object.assign(globalThis, { process: false });
+      Object.assign(globalThis, { sgrud: true });
 
       const { Spawn: Decorator } = require('@sgrud/core');
       Decorator('@sgrud/bus/worker')(Class.prototype, 'umd');
@@ -161,7 +156,7 @@ describe('@sgrud/core/thread/spawn', () => {
   describe('spawning a worker by string in an incompatible environment', () => {
     it('throws an error', async() => {
       jest.resetModules();
-      globalThis.process = undefined!;
+      Object.assign(globalThis, { process: false });
       delete module.exports;
       delete module.unpkg;
 

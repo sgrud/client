@@ -41,16 +41,16 @@ describe('@sgrud/core/http/state', () => {
         includeUploadProgress: true,
         method: 'POST',
         url: '/api'
-      }).subscribe((value) => {
-        if (test(value)) {
-          done();
-        }
+      }).pipe(filter(test)).subscribe(() => {
+        expect(test).toHaveBeenCalledTimes(6);
+        done();
       });
     });
   });
 
   describe('firing a request', () => {
     const httpState = new HttpState();
+
     const test = jest.fn(([value]) => {
       switch (test.mock.calls.length) {
         case 1: expect(value.type).toBe('download_loadstart'); break;

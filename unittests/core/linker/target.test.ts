@@ -38,6 +38,7 @@ describe('@sgrud/core/linker/target', () => {
   describe('overriding a targeted constructor', () => {
     it('links the overridden instance to the targeted constructor', () => {
       Target<typeof Service>(['target'], Service)(Override);
+
       expect(Class.prototype.service).toBeInstanceOf(Override);
       expect(Class.prototype.service.param).toBe('target-override');
     });

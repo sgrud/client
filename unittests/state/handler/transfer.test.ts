@@ -7,7 +7,7 @@
 describe('@sgrud/state/handler/transfer', () => {
 
   const { Spawn } = require('@sgrud/core');
-  const { Store } = require('@sgrud/state');
+  const { Effect, Store } = require('@sgrud/state');
   const { from, switchMap } = require('rxjs');
   const { Worker } = require('worker_threads');
 
@@ -29,6 +29,11 @@ describe('@sgrud/state/handler/transfer', () => {
       require('@sgrud/core').Thread()(class {
         /* eslint-disable @typescript-eslint/explicit-member-accessibility */
         /* eslint-disable @typescript-eslint/typedef */
+        effect = class extends require('@sgrud/state').Effect {
+          function() {
+            return Function.prototype;
+          }
+        };
         store = class extends require('@sgrud/state').Store {
           param = 'default';
           // @ts-expect-error implicit any
@@ -39,6 +44,10 @@ describe('@sgrud/state/handler/transfer', () => {
         // @ts-expect-error implicit any
         action(store) {
           return Object.prototype.toString.call(store.prototype.action);
+        }
+        // @ts-expect-error implicit any
+        function(effect) {
+          return Object.prototype.toString.call(effect.prototype.function);
         }
         /* eslint-enable @typescript-eslint/explicit-member-accessibility */
         /* eslint-enable @typescript-eslint/typedef */
@@ -71,7 +80,7 @@ describe('@sgrud/state/handler/transfer', () => {
         ))
       ).subscribe({
         next: (value: any) => {
-          expect(value).toContain('[object Function]');
+          expect(value).toContain('[object AsyncFunction]');
           done();
         }
       });
@@ -86,10 +95,40 @@ describe('@sgrud/state/handler/transfer', () => {
         switchMap((worker: any) => Promise.resolve(worker.store))
       ).subscribe({
         next: (value: any) => {
-          const next = value.prototype.action.call(state, 'next');
+          value.prototype.action.call(state, 'next').then((next: any) => {
+            expect(next).not.toBe(state);
+            expect(next.param).toBe('next');
+            done();
+          });
+        }
+      });
+    });
+  });
 
-          expect(next).not.toBe(state);
-          expect(next.param).toBe('next');
+  describe('transferring an effect', () => {
+    it('correctly de/serializes the transferred effect', (done) => {
+      from(Class.worker).pipe(
+        switchMap((worker: any) => Promise.resolve(worker.effect))
+      ).subscribe({
+        next: (value: any) => {
+          expect(value.prototype).toBeInstanceOf(Effect);
+          expect(value.prototype.constructor).toThrowError(TypeError);
+          expect(value.prototype.function).toBeInstanceOf(Function);
+          done();
+        }
+      });
+    });
+  });
+
+  describe('retransferring an effect', () => {
+    it('correctly de/serializes the retransferred effect', (done) => {
+      from(Class.worker).pipe(
+        switchMap((worker: any) => from(Promise.resolve(worker.effect)).pipe(
+          switchMap((effect: any) => Promise.resolve(worker.function(effect)))
+        ))
+      ).subscribe({
+        next: (value: any) => {
+          expect(value).toContain('[object Function]');
           done();
         }
       });

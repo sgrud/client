@@ -39,12 +39,9 @@ describe('@sgrud/core/linker/linker', () => {
 
   describe('programmatically inserting an instance', () => {
     const linker = new Linker<typeof ServiceTwo>();
-    const update = () => linker.set(
-      ServiceTwo, new ServiceTwo('three')
-    );
 
     it('links the target constructor to the inserted instance', () => {
-      expect(update()).toBe(linker);
+      linker.set(ServiceTwo, new ServiceTwo('three'));
 
       expect(linker.get(ServiceTwo)).toBeInstanceOf(ServiceTwo);
       expect(linker.get(ServiceTwo).param).toBe('three');
@@ -55,8 +52,10 @@ describe('@sgrud/core/linker/linker', () => {
     const linker = new Linker<typeof Service>();
 
     it('returns all extending linked instance', () => {
-      expect(linker.getAll(Service)).toContain(linker.get(ServiceOne));
-      expect(linker.getAll(Service)).toContain(linker.get(ServiceTwo));
+      const links = linker.getAll(Service);
+
+      expect(links).toContain(linker.get(ServiceOne));
+      expect(links).toContain(linker.get(ServiceTwo));
     });
   });
 

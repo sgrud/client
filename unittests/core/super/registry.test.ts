@@ -1,4 +1,4 @@
-import { provide, Provider, Registration, Registry } from '@sgrud/core';
+import { provide, Provider, Registry } from '@sgrud/core';
 
 describe('@sgrud/core/super/registry', () => {
 
@@ -7,17 +7,13 @@ describe('@sgrud/core/super/registry', () => {
   abstract class Base {
     public static readonly [provide]:
     'sgrud.test.Base' = 'sgrud.test.Base' as const;
-    public constructor(
-      public readonly baseParam: string = baseParam
-    ) { }
+    public constructor(public readonly baseParam: string) { }
     public baseSelf: () => this = () => this;
     public self: () => this = () => this;
   }
 
   class Class extends Provider<typeof Base>('sgrud.test.Base') {
-    public constructor(
-      public readonly classParam: string = classParam
-    ) {
+    public constructor(public readonly classParam: string) {
       super(classParam);
     }
     public classSelf: () => this = () => this;
@@ -33,9 +29,10 @@ describe('@sgrud/core/super/registry', () => {
   });
 
   describe('registering a constructor by magic string', () => {
-    const registry = new Registry<Registration, typeof Base>();
-    const unknown = class extends registry.get('sgrud.test.Unknown') { };
     const construct = () => new unknown();
+    const registry = new Registry();
+    const unknown = class extends Provider('sgrud.test.unknown') { };
+
     registry.set('sgrud.test.Base', Base);
 
     it('registers the decorated constructor by magic string', () => {

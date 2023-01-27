@@ -6,17 +6,13 @@ describe('@sgrud/core/super/provider', () => {
   abstract class Base {
     public static readonly [provide]:
     'sgrud.test.Base' = 'sgrud.test.Base' as const;
-    public constructor(
-      public readonly baseParam: string = baseParam
-    ) { }
+    public constructor(public readonly baseParam: string) { }
     public baseSelf: () => this = () => this;
     public self: () => this = () => this;
   }
 
   class Class extends Provider<typeof Base>('sgrud.test.Base') {
-    public constructor(
-      public readonly classParam: string = classParam
-    ) {
+    public constructor(public readonly classParam: string) {
       super(classParam);
     }
     public classSelf: () => this = () => this;

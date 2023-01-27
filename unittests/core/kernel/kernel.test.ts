@@ -3,11 +3,6 @@ import express from 'express';
 import { Server } from 'http';
 import { catchError, EMPTY, from, of, timeout } from 'rxjs';
 
-declare global {
-  // eslint-disable-next-line no-var
-  var sgrud: boolean;
-}
-
 describe('@sgrud/core/kernel/kernel', () => {
 
   jest.mock('depmod', () => depmod, { virtual: true });
@@ -23,11 +18,11 @@ describe('@sgrud/core/kernel/kernel', () => {
     .use('/node_modules/submod/package.json', (_, r) => r.send(submod))
     .listen(location.port));
 
+  afterEach(() => [append, select, open, send].forEach((i) => i.mockClear()));
   const append = jest.spyOn(document.head, 'appendChild');
   const select = jest.spyOn(document, 'querySelectorAll');
   const open = jest.spyOn(XMLHttpRequest.prototype, 'open');
   const send = jest.spyOn(XMLHttpRequest.prototype, 'send');
-  afterEach(() => [append, select, open, send].forEach((i) => i.mockClear()));
 
   document.head.innerHTML = `
     <script type="importmap-shim">
@@ -61,7 +56,7 @@ describe('@sgrud/core/kernel/kernel', () => {
       }
     },
     digest: {
-      exports: 'sha512-depmod-exports',
+      exports: 'sha512-depmod-esmod',
       unpkg: 'sha512-depmod-unpkg'
     }
   } as Kernel.Module;
@@ -100,7 +95,7 @@ describe('@sgrud/core/kernel/kernel', () => {
         depmod: '*'
       },
       digest: {
-        exports: 'sha512-usrmod-exports'
+        exports: 'sha512-usrmod-esmod'
       }
     } as Kernel.Module,
     unpkg: {
@@ -288,14 +283,14 @@ describe('@sgrud/core/kernel/kernel', () => {
     ];
 
     it('calls insmod on the legacy modules', (done) => {
-      globalThis.sgrud = true;
+      Object.assign(globalThis, { sgrud: true });
 
       kernel.insmod(module).subscribe((value) => {
         expect(append).toHaveBeenCalledWith(...appended);
         expect(value).toMatchObject(module);
 
         clearInterval(interval);
-        globalThis.sgrud = false;
+        Object.assign(globalThis, { sgrud: false });
         done();
       });
 
@@ -310,7 +305,7 @@ describe('@sgrud/core/kernel/kernel', () => {
     const module = usrmod[key as keyof typeof usrmod];
 
     it('inserts the module', (done) => {
-      globalThis.sgrud = (key === 'unpkg');
+      Object.assign(globalThis, { sgrud: key === 'unpkg' });
 
       kernel.insmod(
         module,
@@ -320,7 +315,7 @@ describe('@sgrud/core/kernel/kernel', () => {
         expect(value).toMatchObject(module);
 
         clearInterval(interval);
-        globalThis.sgrud = false;
+        Object.assign(globalThis, { sgrud: false });
         done();
       });
 
@@ -393,7 +388,7 @@ describe('@sgrud/core/kernel/kernel', () => {
     ];
 
     it('emits the error to the observer', (done) => {
-      globalThis.sgrud = true;
+      Object.assign(globalThis, { sgrud: true });
 
       kernel.insmod(module).pipe(
         catchError((error) => of(error))
@@ -402,7 +397,7 @@ describe('@sgrud/core/kernel/kernel', () => {
         expect(value).toBeUndefined();
 
         clearInterval(interval);
-        globalThis.sgrud = false;
+        Object.assign(globalThis, { sgrud: false });
         done();
       });
 

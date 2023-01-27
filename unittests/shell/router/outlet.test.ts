@@ -20,11 +20,11 @@ describe('@sgrud/shell/router/outlet', () => {
   });
 
   describe('inserting a route into the router', () => {
-    const spy = jest.spyOn(Router.prototype, 'navigate');
+    const navigate = jest.spyOn(Router.prototype, 'navigate');
 
     it('renders the router outlet component', () => {
       new Router().add({ path: '' }) && jest.runAllTimers();
-      expect(spy).toHaveBeenCalledWith('/', '', true);
+      expect(navigate).toHaveBeenCalledWith('/', '', true);
     });
   });
 

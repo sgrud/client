@@ -51,6 +51,7 @@ describe('@sgrud/data/model/enum', () => {
   describe('statically unraveling a graph containing an enum', () => {
     type Enumerated = Enumeration;
     const Enumerated = enumerate(Enumeration);
+
     const graph = [
       'id',
       { enum: () => ({

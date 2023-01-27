@@ -1,19 +1,20 @@
+import { BusValue } from '@sgrud/bus';
 import express from 'express';
-import { readFileSync } from 'fs-extra';
 import { Server } from 'http';
 import { join } from 'path';
 import { Browser, launch, Page } from 'puppeteer-core';
+import { setImmediate } from 'timers';
 import { Worker } from 'worker_threads';
 
 declare global {
   interface Window {
-    bus: unknown;
+    busValue: BusValue<string>;
   }
 }
 
-describe('@sgrud/bus/worker', () => {
+globalThis.setImmediate = setImmediate;
 
-  const html = readFileSync(join(__dirname, 'index.test.html')).toString();
+describe('@sgrud/bus/worker', () => {
 
   let page: Page;
   let puppeteer: Browser;
@@ -38,7 +39,7 @@ describe('@sgrud/bus/worker', () => {
         extensions: ['js'],
         fallthrough: false
       }))
-      .use('/', (_, r) => r.send(html))
+      .use('/', (_, r) => r.sendFile(join(__dirname, 'index.test.html')))
       .listen(location.port);
   }, 50000);
 
@@ -53,10 +54,10 @@ describe('@sgrud/bus/worker', () => {
   describe('requiring the module as browser worker', () => {
     it('creates a browser worker', async() => {
       await page.goto(location.href, { waitUntil: 'networkidle0' });
-      const value = await page.evaluate(() => window.bus);
+      const value = await page.evaluate(() => window.busValue);
 
       expect(value).toMatchObject({
-        handle: 'sgrud.test.bus.worker',
+        handle: 'sgrud.test.bus',
         value: '@sgrud/bus/worker'
       });
     });

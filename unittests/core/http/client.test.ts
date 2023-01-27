@@ -10,11 +10,11 @@ describe('@sgrud/core/http/client', () => {
     .use('/', (_, r) => r.send())
     .listen(location.port));
 
+  afterEach(() => [open, send].forEach((i) => i.mockClear()));
   const open = jest.spyOn(XMLHttpRequest.prototype, 'open');
   const send = jest.spyOn(XMLHttpRequest.prototype, 'send');
-  afterEach(() => [open, send].forEach((i) => i.mockClear()));
 
-  const targets = [
+  const clients = [
     HttpClient.prototype,
     new HttpClient()
   ];
@@ -37,9 +37,9 @@ describe('@sgrud/core/http/client', () => {
     'PUT'
   ];
 
-  describe.each(targets)('firing a custom request through %O', (target) => {
+  describe.each(clients)('firing a custom request through %O', (client) => {
     it('dispatches a custom XHR', (done) => {
-      target.handle({
+      client.handle({
         method: 'HEAD',
         url: '/head'
       }).subscribe(() => {

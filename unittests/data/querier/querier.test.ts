@@ -4,10 +4,9 @@ import { forkJoin, Observable, of } from 'rxjs';
 
 describe('@sgrud/data/querier/querier', () => {
 
-  const mocks = [
-    jest.fn(),
-    jest.fn()
-  ];
+  afterEach(() => [mockOne, mockTwo].forEach((i) => i.mockClear()));
+  const mockOne = jest.fn();
+  const mockTwo = jest.fn();
 
   class ClassOne extends Model<ClassOne> {
     protected readonly [Symbol.toStringTag]: string = 'ClassOne';
@@ -20,11 +19,13 @@ describe('@sgrud/data/querier/querier', () => {
   @Target<typeof QuerierOne>()
   class QuerierOne extends Querier {
     public override readonly types: Set<Querier.Type> = new Set<Querier.Type>([
-      'query', 'mutation'
+      'mutation',
+      'query'
     ]);
 
     public override commit(operation: Querier.Operation): Observable<any> {
-      mocks[0](operation);
+      mockOne(operation);
+
       const key = /(get|save)Class(One|Two)s/.exec(operation)?.[0];
       return of({ [key || 'test']: { result: [{ }], total: 1 } });
     }
@@ -41,7 +42,8 @@ describe('@sgrud/data/querier/querier', () => {
     ]);
 
     public override commit(operation: Querier.Operation): Observable<any> {
-      mocks[1](operation);
+      mockTwo(operation);
+
       const key = /(get|save)Class(One|Two)s/.exec(operation)?.[0];
       return of({ [key || 'test']: { result: [{ }], total: 1 } });
     }
@@ -51,18 +53,13 @@ describe('@sgrud/data/querier/querier', () => {
     }
   }
 
-  afterEach(() => {
-    mocks[0].mockClear();
-    mocks[1].mockClear();
-  });
-
   describe('targeting Querier subclasses', () => {
     const linker = new Linker<typeof Querier>();
-    const querier = linker.getAll(Querier);
+    const links = linker.getAll(Querier);
 
     it('appends the targets to the queriers', () => {
-      expect(querier).toContain(linker.get(QuerierOne));
-      expect(querier).toContain(linker.get(QuerierTwo));
+      expect(links).toContain(linker.get(QuerierOne));
+      expect(links).toContain(linker.get(QuerierTwo));
     });
   });
 
@@ -74,10 +71,10 @@ describe('@sgrud/data/querier/querier', () => {
         ClassOne.commit('mutation one'),
         ClassTwo.commit('mutation two')
       ]).subscribe(() => {
-        expect(mocks[0].mock.calls[0][0]).toBe('query one');
-        expect(mocks[0].mock.calls[1][0]).toBe('query two');
-        expect(mocks[0].mock.calls[2][0]).toBe('mutation one');
-        expect(mocks[1].mock.calls[0][0]).toBe('mutation two');
+        expect(mockOne.mock.calls[0][0]).toBe('query one');
+        expect(mockOne.mock.calls[1][0]).toBe('query two');
+        expect(mockOne.mock.calls[2][0]).toBe('mutation one');
+        expect(mockTwo.mock.calls[0][0]).toBe('mutation two');
         done();
       });
     });
@@ -89,10 +86,10 @@ describe('@sgrud/data/querier/querier', () => {
         ClassOne.deleteAll(['id']),
         ClassTwo.deleteAll(['id'])
       ]).subscribe(() => {
-        expect(mocks[0].mock.calls[0][0]).toContain('mutation deleteAll');
-        expect(mocks[1].mock.calls[0][0]).toContain('mutation deleteAll');
-        expect(mocks[0].mock.calls[0][0]).toContain('deleteClassOnes');
-        expect(mocks[1].mock.calls[0][0]).toContain('deleteClassTwos');
+        expect(mockOne.mock.calls[0][0]).toContain('mutation deleteAll');
+        expect(mockTwo.mock.calls[0][0]).toContain('mutation deleteAll');
+        expect(mockOne.mock.calls[0][0]).toContain('deleteClassOnes');
+        expect(mockTwo.mock.calls[0][0]).toContain('deleteClassTwos');
         done();
       });
     });
@@ -104,10 +101,10 @@ describe('@sgrud/data/querier/querier', () => {
         ClassOne.deleteOne('id'),
         ClassTwo.deleteOne('id')
       ]).subscribe(() => {
-        expect(mocks[0].mock.calls[0][0]).toContain('mutation deleteOne');
-        expect(mocks[1].mock.calls[0][0]).toContain('mutation deleteOne');
-        expect(mocks[0].mock.calls[0][0]).toContain('deleteClassOne');
-        expect(mocks[1].mock.calls[0][0]).toContain('deleteClassTwo');
+        expect(mockOne.mock.calls[0][0]).toContain('mutation deleteOne');
+        expect(mockTwo.mock.calls[0][0]).toContain('mutation deleteOne');
+        expect(mockOne.mock.calls[0][0]).toContain('deleteClassOne');
+        expect(mockTwo.mock.calls[0][0]).toContain('deleteClassTwo');
         done();
       });
     });
@@ -119,10 +116,10 @@ describe('@sgrud/data/querier/querier', () => {
         ClassOne.findAll({ }, []),
         ClassTwo.findAll({ }, [])
       ]).subscribe(() => {
-        expect(mocks[0].mock.calls[0][0]).toContain('query findAll');
-        expect(mocks[0].mock.calls[1][0]).toContain('query findAll');
-        expect(mocks[0].mock.calls[0][0]).toContain('getClassOnes');
-        expect(mocks[0].mock.calls[1][0]).toContain('getClassTwos');
+        expect(mockOne.mock.calls[0][0]).toContain('query findAll');
+        expect(mockOne.mock.calls[1][0]).toContain('query findAll');
+        expect(mockOne.mock.calls[0][0]).toContain('getClassOnes');
+        expect(mockOne.mock.calls[1][0]).toContain('getClassTwos');
         done();
       });
     });
@@ -134,10 +131,10 @@ describe('@sgrud/data/querier/querier', () => {
         ClassOne.findOne({ }, []),
         ClassTwo.findOne({ }, [])
       ]).subscribe(() => {
-        expect(mocks[0].mock.calls[0][0]).toContain('query findOne');
-        expect(mocks[0].mock.calls[1][0]).toContain('query findOne');
-        expect(mocks[0].mock.calls[0][0]).toContain('getClassOne');
-        expect(mocks[0].mock.calls[1][0]).toContain('getClassTwo');
+        expect(mockOne.mock.calls[0][0]).toContain('query findOne');
+        expect(mockOne.mock.calls[1][0]).toContain('query findOne');
+        expect(mockOne.mock.calls[0][0]).toContain('getClassOne');
+        expect(mockOne.mock.calls[1][0]).toContain('getClassTwo');
         done();
       });
     });
@@ -149,10 +146,10 @@ describe('@sgrud/data/querier/querier', () => {
         ClassOne.saveAll([new ClassOne(), new ClassOne()], []),
         ClassTwo.saveAll([new ClassTwo(), new ClassTwo()], [])
       ]).subscribe(() => {
-        expect(mocks[0].mock.calls[0][0]).toContain('mutation saveAll');
-        expect(mocks[1].mock.calls[0][0]).toContain('mutation saveAll');
-        expect(mocks[0].mock.calls[0][0]).toContain('saveClassOnes');
-        expect(mocks[1].mock.calls[0][0]).toContain('saveClassTwos');
+        expect(mockOne.mock.calls[0][0]).toContain('mutation saveAll');
+        expect(mockTwo.mock.calls[0][0]).toContain('mutation saveAll');
+        expect(mockOne.mock.calls[0][0]).toContain('saveClassOnes');
+        expect(mockTwo.mock.calls[0][0]).toContain('saveClassTwos');
         done();
       });
     });
@@ -164,32 +161,32 @@ describe('@sgrud/data/querier/querier', () => {
         ClassOne.saveOne(new ClassOne(), []),
         ClassTwo.saveOne(new ClassTwo(), [])
       ]).subscribe(() => {
-        expect(mocks[0].mock.calls[0][0]).toContain('mutation saveOne');
-        expect(mocks[1].mock.calls[0][0]).toContain('mutation saveOne');
-        expect(mocks[0].mock.calls[0][0]).toContain('saveClassOne');
-        expect(mocks[1].mock.calls[0][0]).toContain('saveClassTwo');
+        expect(mockOne.mock.calls[0][0]).toContain('mutation saveOne');
+        expect(mockTwo.mock.calls[0][0]).toContain('mutation saveOne');
+        expect(mockOne.mock.calls[0][0]).toContain('saveClassOne');
+        expect(mockTwo.mock.calls[0][0]).toContain('saveClassTwo');
         done();
       });
     });
   });
 
   describe('committing an operation on an instance', () => {
-    const queryClassOne = new ClassOne();
-    const queryClassTwo = new ClassTwo();
     const mutationClassOne = new ClassOne();
     const mutationClassTwo = new ClassTwo();
+    const queryClassOne = new ClassOne();
+    const queryClassTwo = new ClassTwo();
 
     it('commits the operation through the prioritized querier', (done) => {
       forkJoin([
-        queryClassOne.commit<any>('query one'),
-        queryClassTwo.commit<any>('query two'),
         mutationClassOne.commit<any>('mutation one'),
-        mutationClassTwo.commit<any>('mutation two')
+        mutationClassTwo.commit<any>('mutation two'),
+        queryClassOne.commit<any>('query one'),
+        queryClassTwo.commit<any>('query two')
       ]).subscribe(() => {
-        expect(mocks[0].mock.calls[0][0]).toBe('query one');
-        expect(mocks[0].mock.calls[1][0]).toBe('query two');
-        expect(mocks[0].mock.calls[2][0]).toBe('mutation one');
-        expect(mocks[1].mock.calls[0][0]).toBe('mutation two');
+        expect(mockOne.mock.calls[0][0]).toBe('mutation one');
+        expect(mockTwo.mock.calls[0][0]).toBe('mutation two');
+        expect(mockOne.mock.calls[1][0]).toBe('query one');
+        expect(mockOne.mock.calls[2][0]).toBe('query two');
         done();
       });
     });
@@ -204,10 +201,10 @@ describe('@sgrud/data/querier/querier', () => {
         classOne.delete(),
         classTwo.delete()
       ]).subscribe(() => {
-        expect(mocks[0].mock.calls[0][0]).toContain('mutation deleteOne');
-        expect(mocks[1].mock.calls[0][0]).toContain('mutation deleteOne');
-        expect(mocks[0].mock.calls[0][0]).toContain('deleteClassOne');
-        expect(mocks[1].mock.calls[0][0]).toContain('deleteClassTwo');
+        expect(mockOne.mock.calls[0][0]).toContain('mutation deleteOne');
+        expect(mockTwo.mock.calls[0][0]).toContain('mutation deleteOne');
+        expect(mockOne.mock.calls[0][0]).toContain('deleteClassOne');
+        expect(mockTwo.mock.calls[0][0]).toContain('deleteClassTwo');
         done();
       });
     });
@@ -222,10 +219,10 @@ describe('@sgrud/data/querier/querier', () => {
         classOne.find([]),
         classTwo.find([])
       ]).subscribe(() => {
-        expect(mocks[0].mock.calls[0][0]).toContain('query findOne');
-        expect(mocks[0].mock.calls[1][0]).toContain('query findOne');
-        expect(mocks[0].mock.calls[0][0]).toContain('getClassOne');
-        expect(mocks[0].mock.calls[1][0]).toContain('getClassTwo');
+        expect(mockOne.mock.calls[0][0]).toContain('query findOne');
+        expect(mockOne.mock.calls[1][0]).toContain('query findOne');
+        expect(mockOne.mock.calls[0][0]).toContain('getClassOne');
+        expect(mockOne.mock.calls[1][0]).toContain('getClassTwo');
         done();
       });
     });
@@ -240,10 +237,10 @@ describe('@sgrud/data/querier/querier', () => {
         classOne.save(),
         classTwo.save()
       ]).subscribe(() => {
-        expect(mocks[0].mock.calls[0][0]).toContain('mutation saveOne');
-        expect(mocks[1].mock.calls[0][0]).toContain('mutation saveOne');
-        expect(mocks[0].mock.calls[0][0]).toContain('saveClassOne');
-        expect(mocks[1].mock.calls[0][0]).toContain('saveClassTwo');
+        expect(mockOne.mock.calls[0][0]).toContain('mutation saveOne');
+        expect(mockTwo.mock.calls[0][0]).toContain('mutation saveOne');
+        expect(mockOne.mock.calls[0][0]).toContain('saveClassOne');
+        expect(mockTwo.mock.calls[0][0]).toContain('saveClassTwo');
         done();
       });
     });

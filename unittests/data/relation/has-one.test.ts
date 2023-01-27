@@ -26,6 +26,7 @@ describe('@sgrud/data/relation/has-one', () => {
 
   describe('instantiating a model which has one model using parts', () => {
     const owner = new Owner(...values);
+
     const validate = (value: Owner) => {
       expect(value.property).toBe(values[1].property);
       expect(value.owned!.property).toBe(values[0].owned!.property);
@@ -38,6 +39,7 @@ describe('@sgrud/data/relation/has-one', () => {
 
   describe('assigning parts to a model which has one model', () => {
     const owner = new Owner();
+
     const validate = (value: Owner) => {
       expect(value.property).toBe(values[1].property);
       expect(value.owned!.property).toBe(values[0].owned!.property);
@@ -62,6 +64,7 @@ describe('@sgrud/data/relation/has-one', () => {
 
   describe('assigning null-parts to a model which has one model', () => {
     const owner = new Owner();
+
     const validate = (value: Owner) => {
       expect(value.property).toBeNull();
       expect(value.owned).toBeNull();
@@ -90,6 +93,7 @@ describe('@sgrud/data/relation/has-one', () => {
 
   describe('clearing a model which has one model', () => {
     const owner = new Owner(...values);
+
     const validate = (value: Owner) => {
       expect(value.property).toBeUndefined();
       expect(value.owned).toBeUndefined();
@@ -114,6 +118,7 @@ describe('@sgrud/data/relation/has-one', () => {
 
   describe('serializing a model which has one model', () => {
     const owner = new Owner(...values);
+
     const validate = (value: Model.Shape<Owner>) => {
       expect(value.property).toBe(values[1].property);
       expect(value.owned!.property).toBe(values[0].owned!.property);
@@ -128,6 +133,7 @@ describe('@sgrud/data/relation/has-one', () => {
     const owner = new Owner(...values.flatMap((value) => {
       return Object.keys(value).map((key) => ({ [key]: null }));
     }));
+
     const validate = (value: Model.Shape<Owner>) => {
       expect(value.property).toBe(null);
       expect(value.owned).toBe(null);
@@ -140,6 +146,7 @@ describe('@sgrud/data/relation/has-one', () => {
 
   describe('treemapping a model which has one model', () => {
     const owner = new Owner(...values);
+
     const validate = (value: Model.Graph<Owner>) => {
       expect(value).toStrictEqual([
         'property',
@@ -156,10 +163,9 @@ describe('@sgrud/data/relation/has-one', () => {
 
   describe('unraveling a model which has one model', () => {
     const owner = new Owner(...values);
+
     const validate = (value: string) => {
-      expect(value).toBe(
-        '{property owned{property}}'
-      );
+      expect(value).toBe('{property owned{property}}');
     };
 
     it('returns the unraveled model which has one model', () => {

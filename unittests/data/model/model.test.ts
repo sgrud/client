@@ -11,7 +11,7 @@ describe('@sgrud/data/model/model', () => {
   ];
 
   class Class extends Model<Class> {
-    protected readonly [Symbol.toStringTag]: string = 'ClassEntity';
+    protected readonly [Symbol.toStringTag]: string = 'Class';
   }
 
   describe('statically committing an operation', () => {
@@ -179,6 +179,7 @@ describe('@sgrud/data/model/model', () => {
 
   describe('instantiating a model using parts', () => {
     const model = new Class(...values);
+
     const validate = (value: Class) => {
       expect(value.id).toBe(values[0].id);
       expect(value.created).toBe(values[1].created!.valueOf());
@@ -194,6 +195,7 @@ describe('@sgrud/data/model/model', () => {
 
   describe('assigning parts to a model', () => {
     const model = new Class();
+
     const validate = (value: Class) => {
       expect(value.id).toBe(values[0].id);
       expect(value.created).toBe(values[1].created!.valueOf());
@@ -219,6 +221,7 @@ describe('@sgrud/data/model/model', () => {
 
   describe('assigning null-parts to a model', () => {
     const model = new Class();
+
     const validate = (value: Class) => {
       expect(value.id).toBeNull();
       expect(value.created).toBeNull();
@@ -248,6 +251,7 @@ describe('@sgrud/data/model/model', () => {
 
   describe('clearing a model', () => {
     const model = new Class(...values);
+
     const validate = (value: Class) => {
       expect(value.id).toBeUndefined();
       expect(value.created).toBeUndefined();
@@ -273,6 +277,7 @@ describe('@sgrud/data/model/model', () => {
 
   describe('clearing a model partially', () => {
     const model = new Class(...values);
+
     const validate = (value: Class) => {
       expect(value.id).toBe(values[0].id);
       expect(value.created).toBeUndefined();

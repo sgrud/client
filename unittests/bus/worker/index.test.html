@@ -19,11 +19,11 @@
   import { BusHandler } from '@sgrud/bus';
   import { firstValueFrom, Subject } from 'rxjs';
 
-  const handler = new BusHandler();
   const bus = new Subject();
+  const handler = new BusHandler();
 
-  handler.set('sgrud.test.bus.worker', bus).subscribe();
+  handler.get('sgrud.test.bus').subscribe((value) => window.busValue = value);
+
+  handler.set('sgrud.test.bus', bus).subscribe();
   setTimeout(() => bus.next('@sgrud/bus/worker'), 500);
-
-  window.bus = firstValueFrom(handler.get('sgrud.test.bus.worker'));
 </script>

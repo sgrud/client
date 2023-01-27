@@ -25,6 +25,7 @@ describe('@sgrud/data/relation/property', () => {
 
   describe('instantiating a model containing properties using parts', () => {
     const model = new Class(...values);
+
     const validate = (value: Class) => {
       expect(value.bool).toBe(values[0].bool);
       expect(value.date).toBe(values[1].date!.valueOf());
@@ -39,6 +40,7 @@ describe('@sgrud/data/relation/property', () => {
 
   describe('assigning parts to a model containing properties', () => {
     const model = new Class();
+
     const validate = (value: Class) => {
       expect(value.bool).toBe(values[0].bool);
       expect(value.date).toBe(values[1].date!.valueOf());
@@ -65,6 +67,7 @@ describe('@sgrud/data/relation/property', () => {
 
   describe('assigning null-parts to a model containing properties', () => {
     const model = new Class();
+
     const validate = (value: Class) => {
       expect(value.bool).toBeNull();
       expect(value.date).toBeNull();
@@ -95,6 +98,7 @@ describe('@sgrud/data/relation/property', () => {
 
   describe('clearing a model containing properties', () => {
     const model = new Class(...values);
+
     const validate = (value: Class) => {
       expect(value.bool).toBeUndefined();
       expect(value.date).toBeUndefined();
@@ -121,6 +125,7 @@ describe('@sgrud/data/relation/property', () => {
 
   describe('serializing a model containing properties', () => {
     const model = new Class(...values);
+
     const validate = (value: Model.Shape<Class>) => {
       expect(value.bool).toBe(values[0].bool);
       expect(value.date).toContain('+');
@@ -135,13 +140,9 @@ describe('@sgrud/data/relation/property', () => {
 
   describe('treemapping a model containing properties', () => {
     const model = new Class(...values);
+
     const validate = (value: Model.Graph<Class>) => {
-      expect(value).toStrictEqual([
-        'bool',
-        'date',
-        'num',
-        'str'
-      ]);
+      expect(value).toStrictEqual(['bool', 'date', 'num', 'str']);
     };
 
     it('returns the treemapped model containing properties', () => {
@@ -151,10 +152,9 @@ describe('@sgrud/data/relation/property', () => {
 
   describe('unraveling a model containing properties', () => {
     const model = new Class(...values);
+
     const validate = (value: string) => {
-      expect(value).toBe(
-        '{bool date num str}'
-      );
+      expect(value).toBe('{bool date num str}');
     };
 
     it('returns the unraveled model containing properties', () => {

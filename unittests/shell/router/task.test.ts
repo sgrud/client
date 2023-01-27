@@ -55,11 +55,11 @@ describe('@sgrud/shell/router/task', () => {
 
   describe('targeting RouterTask subclasses', () => {
     const linker = new Linker<typeof RouterTask>();
-    const tasks = linker.getAll(RouterTask);
+    const links = linker.getAll(RouterTask);
 
     it('appends the targets to the list of router tasks', () => {
-      expect(tasks).toContain(linker.get(TaskOne));
-      expect(tasks).toContain(linker.get(TaskTwo));
+      expect(links).toContain(linker.get(TaskOne));
+      expect(links).toContain(linker.get(TaskTwo));
     });
   });
 

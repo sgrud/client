@@ -233,13 +233,15 @@ describe('@sgrud/shell/router/router', () => {
 
   describe('adding routes to the router set', () => {
     const router = new Router();
+
     const child = {
       path: 'child',
-      component: 'child-component' as CustomElementTagName,
+      component: 'child' as CustomElementTagName,
       slots: {
-        slot: 'slot-component' as CustomElementTagName
+        slot: 'slot' as CustomElementTagName
       }
     };
+
     const route = {
       path: 'route',
       children: [child]
@@ -252,40 +254,47 @@ describe('@sgrud/shell/router/router', () => {
       expect(router.values().next().value).toBe(route);
       expect(router.size).toBe(1);
     });
+
+    it('finds the added routes by component names', () => {
+      expect(router.lookup(child.component)).toBe('route/child');
+      expect(router.lookup('unknown-component')).toBeUndefined();
+    });
   });
 
   describe('binding the router', () => {
-    const doc = document.implementation.createHTMLDocument();
+    const html = document.implementation.createHTMLDocument();
+    const method = () => router.bind(html.body, '/base/', true);
+    const navigate = jest.spyOn(Router.prototype, 'navigate');
     const router = new Router();
-    const bind = () => router.bind();
-    const spy = jest.spyOn(router, 'navigate');
 
     it('binds the router to the window.onpopstate event', () => {
-      router.bind(doc.body, '/base/', true);
+      expect(method).not.toThrow();
+
       window.dispatchEvent(new PopStateEvent('popstate', { state }));
-      expect(spy).toHaveBeenCalledWith(state.segment, state.search);
+      expect(navigate).toHaveBeenCalledWith(state.segment, state.search);
     });
 
     it('sets the supplied arguments as properties on the router', () => {
-      expect(router.outlet).toBe(doc.body);
+      expect(router.outlet).toBe(html.body);
       expect(router.baseHref).toBe('/base/#!/');
       expect(router.hashBased).toBe(true);
     });
 
     it('throws an error when trying to bind again without unbinding', () => {
-      expect(bind).toThrowError(ReferenceError);
+      expect(method).toThrowError(ReferenceError);
     });
   });
 
   describe('unbinding the router', () => {
+    const method = () => router.unbind();
+    const navigate = jest.spyOn(Router.prototype, 'navigate');
     const router = new Router();
-    const unbind = () => router.unbind();
-    const spy = jest.spyOn(router, 'navigate');
 
     it('unbinds the router from the window.onpopstate event', () => {
-      router.unbind();
+      expect(method).not.toThrow();
+
       window.dispatchEvent(new PopStateEvent('popstate'));
-      expect(spy).toHaveBeenCalledTimes(1);
+      expect(navigate).toHaveBeenCalledTimes(1);
     });
 
     it('resets the properties on the router', () => {
@@ -295,7 +304,7 @@ describe('@sgrud/shell/router/router', () => {
     });
 
     it('throws an error when trying to unbind again without binding', () => {
-      expect(unbind).toThrowError(ReferenceError);
+      expect(method).toThrowError(ReferenceError);
     });
   });
 
@@ -378,12 +387,14 @@ describe('@sgrud/shell/router/router', () => {
 
     it('matches the empty parts of the tree', () => {
       const match = router.match('', [tree]);
+
       expect(match?.route.component).toBe('root');
       expect(match?.child?.route.component).toBe('empty');
     });
 
     it('matches the tree in-depth', () => {
       const match = router.match('route', [tree]);
+
       expect(match?.route.component).toBe('root');
       expect(match?.child?.route.component).toBe('route');
     });
@@ -391,9 +402,10 @@ describe('@sgrud/shell/router/router', () => {
 
   describe.each(paths)('matching path %O', (path) => {
     const index = paths.indexOf(path);
+    const router = new Router();
 
     describe.each(routes)('against route %O', (route) => {
-      const match = new Router().match(path, [route]);
+      const match = router.match(path, [route]);
 
       if (index === routes.indexOf(route)) {
         it('returns the matched segments', () => {
@@ -409,9 +421,11 @@ describe('@sgrud/shell/router/router', () => {
 
   describe.each(paths)('rejoining path %O', (path) => {
     const index = paths.indexOf(path);
-    const join = new Router().join(segments[index]);
+    const router = new Router();
 
     it('returns the joined segment', () => {
+      const join = router.join(segments[index]);
+
       expect(join).toBe(path);
     });
   });

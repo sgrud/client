@@ -20,9 +20,10 @@ describe('@sgrud/shell/component/attribute', () => {
 
   describe('binding a property to an attribute', () => {
     const testClass = document.querySelector('element-tag') as Element;
-    testClass.attribute = 'value';
 
     it('mirrors the bound property to the attribute', () => {
+      testClass.attribute = 'value';
+
       expect(testClass.attribute).toBe(testClass.getAttribute('attribute'));
       expect(testClass.attribute).not.toBeNull();
     });
@@ -30,9 +31,10 @@ describe('@sgrud/shell/component/attribute', () => {
 
   describe('binding a property to a data attribute', () => {
     const testClass = document.querySelector('element-tag') as Element;
-    testClass.data = 'value';
 
     it('mirrors the bound property to the dataset', () => {
+      testClass.data = 'value';
+
       expect(testClass.dataset.attr).toBe(testClass.getAttribute('data-attr'));
       expect(testClass.dataset.attr).not.toBeUndefined();
     });

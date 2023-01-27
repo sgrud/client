@@ -21,29 +21,53 @@
   import { from } from 'rxjs';
 
   const handler = new StateHandler();
-  const seed = { param: null };
+  const state = { param: null };
 
-  class Global extends Store {
-    param;
-    setGlobal(param) {
+  class Transient extends Store {
+    static handle = 'sgrud.test.state.transient';
+    async transiently(param) {
       return { ...this, param };
     }
   }
 
-  class Local extends Store {
-    param;
-    setLocal(param) {
+  class Universal extends Store {
+    static handle = 'sgrud.test.state.universal';
+    async universally(param) {
       return { ...this, param };
     }
   }
 
-  handler.deploy('sgrud.test.local', Local, seed, true).subscribe((store) => {
-    window.setLocal = (...action) => store.dispatch(...action).subscribe();
-    from(store).subscribe((state) => window.local = state);
+  class Versatile extends Store {
+    static handle = 'sgrud.test.state.versatile';
+    async versatilely(param) {
+      await sgrud.state.effects.dispatch(
+        'sgrud.test.state.transient',
+        'transiently',
+        [param]
+      );
+
+      await sgrud.state.effects.dispatch(
+        'sgrud.test.state.universal',
+        'universally',
+        [param]
+      );
+
+      return (await sgrud.state.effects.fetch('/fetch')).json();
+    }
+  }
+
+  handler.deploy(Transient.handle, Transient, state, !0).subscribe((store) => {
+    window.transiently = (...action) => store.dispatch(...action).subscribe();
+    from(store).subscribe((next) => window.transient = next);
   });
 
-  handler.deploy('sgrud.test.global', Global, seed).subscribe((store) => {
-    window.setGlobal = (...action) => store.dispatch(...action).subscribe();
-    from(store).subscribe((state) => window.global = state);
+  handler.deploy(Universal.handle, Universal, state, !1).subscribe((store) => {
+    window.universally = (...action) => store.dispatch(...action).subscribe();
+    from(store).subscribe((next) => window.universal = next);
+  });
+
+  handler.deploy(Versatile.handle, Versatile, { }, true).subscribe((store) => {
+    window.versatilely = (...action) => store.dispatch(...action).subscribe();
+    from(store).subscribe((next) => window.versatile = next);
   });
 </script>

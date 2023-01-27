@@ -11,12 +11,12 @@ describe('@sgrud/data/querier/http', () => {
   beforeAll(() => server = express()
     .use('/api/sgrud/v1/insmod', (_, r) => r.send({ }))
     .use('/exception', (_, r) => r.send({ errors: [null] }))
-    .use('/', (_, r) => r.send({ data: null }))
+    .use('/', (_, r) => r.send({ }))
     .listen(location.port));
 
+  afterEach(() => [open, send].forEach((i) => i.mockClear()));
   const open = jest.spyOn(XMLHttpRequest.prototype, 'open');
   const send = jest.spyOn(XMLHttpRequest.prototype, 'send');
-  afterEach(() => [open, send].forEach((i) => i.mockClear()));
 
   class Class extends Model<Class> {
     protected readonly [Symbol.toStringTag]: string = 'Class';
@@ -48,22 +48,32 @@ describe('@sgrud/data/querier/http', () => {
 
   describe('targeting the HttpQuerier', () => {
     const linker = new Linker<Target<HttpQuerier>>();
-    const queriers = linker.getAll(HttpQuerier);
+    const links = linker.getAll(HttpQuerier);
 
     it('appends the HttpQuerier to the queriers', () => {
-      expect(queriers).toContain(linker.get(HttpQuerier));
+      expect(links).toContain(linker.get(HttpQuerier));
     });
   });
 
   describe('statically committing an operation through the HttpQuerier', () => {
     const operation = 'query test';
     const variables = { query: 'test' };
-    const request = JSON.stringify({ query: operation, variables });
+
+    const opened = [
+      'POST',
+      '/api',
+      true
+    ];
+
+    const requested = JSON.stringify({
+      query: operation,
+      variables
+    });
 
     it('commits the operation through the HttpQuerier', (done) => {
       Class.commit(operation, variables).subscribe(() => {
-        expect(open).toHaveBeenCalledWith('POST', '/api', true);
-        expect(send).toHaveBeenCalledWith(request);
+        expect(open).toHaveBeenCalledWith(...opened);
+        expect(send).toHaveBeenCalledWith(requested);
         done();
       });
     });
@@ -73,22 +83,29 @@ describe('@sgrud/data/querier/http', () => {
     const linker = new Linker<Target<HttpQuerier>>();
     const operation = 'mutation test';
     const variables = { mutation: 'test' };
-    const request = JSON.stringify({ query: operation, variables });
-    const update = () => linker.set(
-      HttpQuerier, new HttpQuerier('/path', new Map([[Class, 50]]))
-    );
+
+    const opened = [
+      'POST',
+      '/path',
+      true
+    ];
+
+    const requested = JSON.stringify({
+      query: operation,
+      variables
+    });
 
     it('overrides the previously targeted HttpQuerier', () => {
-      expect(update()).toBe(linker);
+      linker.set(HttpQuerier, new HttpQuerier('/path', new Map([[Class, 50]])));
 
-      const querier = linker.getAll(HttpQuerier);
-      expect(querier).toContain(linker.get(HttpQuerier));
+      const links = linker.getAll(HttpQuerier);
+      expect(links).toContain(linker.get(HttpQuerier));
     });
 
     it('overrides the previously targeted HttpQuerier', (done) => {
       Class.commit(operation, variables).subscribe(() => {
-        expect(open).toHaveBeenCalledWith('POST', '/path', true);
-        expect(send).toHaveBeenCalledWith(request);
+        expect(open).toHaveBeenCalledWith(...opened);
+        expect(send).toHaveBeenCalledWith(requested);
         done();
       });
     });
@@ -97,20 +114,26 @@ describe('@sgrud/data/querier/http', () => {
   describe('receiving an exception through the HttpQuerier', () => {
     const linker = new Linker<Target<HttpQuerier>>();
     const operation = 'query exception';
-    const request = JSON.stringify({ query: operation });
-    const update = () => linker.set(
-      HttpQuerier, new HttpQuerier('/exception', new Map())
-    );
+
+    const opened = [
+      'POST',
+      '/exception',
+      true
+    ];
+
+    const requested = JSON.stringify({
+      query: operation
+    });
 
     it('emits the error to the observer', (done) => {
-      expect(update()).toBe(linker);
+      linker.set(HttpQuerier, new HttpQuerier('/exception', new Map()));
 
       Class.commit(operation).pipe(
         catchError((error) => of(error))
       ).subscribe((error) => {
         expect(error).toBeInstanceOf(AggregateError);
-        expect(open).toHaveBeenCalledWith('POST', '/exception', true);
-        expect(send).toHaveBeenCalledWith(request);
+        expect(open).toHaveBeenCalledWith(...opened);
+        expect(send).toHaveBeenCalledWith(requested);
         done();
       });
     });
