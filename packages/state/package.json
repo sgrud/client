@@ -31,12 +31,12 @@
     ]
   },
   "dependencies": {
-    "@babel/runtime": "^7.20.7",
+    "@babel/runtime": "^7.20.13",
     "@sgrud/bus": "latest",
     "@sgrud/core": "latest",
     "comlink": "^4.3.1",
     "rxjs": "^7.8.0",
-    "tslib": "^2.4.1"
+    "tslib": "^2.5.0"
   },
   "sgrudDependencies": {
     "@sgrud/bus": "latest",

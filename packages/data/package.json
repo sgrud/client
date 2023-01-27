@@ -28,10 +28,10 @@
     ]
   },
   "dependencies": {
-    "@babel/runtime": "^7.20.7",
+    "@babel/runtime": "^7.20.13",
     "@sgrud/core": "latest",
     "rxjs": "^7.8.0",
-    "tslib": "^2.4.1"
+    "tslib": "^2.5.0"
   },
   "sgrudDependencies": {
     "@sgrud/core": "latest"
