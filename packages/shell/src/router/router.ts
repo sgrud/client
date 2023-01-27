@@ -218,28 +218,6 @@ export class Router extends Set<Route> implements Router.Task {
   private readonly changes: BehaviorSubject<Router.State>;
 
   /**
-   * Symbol property typed as callback to a [Subscribable][]. The returned
-   * [Subscribable][] emits the current [State][] and every time this *changes*.
-   *
-   * [State]: https://sgrud.github.io/client/interfaces/shell.Router-1.State
-   * [Subscribable]: https://rxjs.dev/api/index/interface/Subscribable
-   *
-   * @returns Callback to a [Subscribable][].
-   *
-   * @example
-   * Subscribe to the *Router*:
-   * ```ts
-   * import { Router } from '@sgrud/shell';
-   * import { from } from 'rxjs';
-   *
-   * from(new Router()).subscribe(console.log);
-   * ```
-   */
-  public get [Symbol.observable](): () => Subscribable<Router.State> {
-    return () => this.changes.asObservable();
-  }
-
-  /**
    * Getter mirroring the current value of the *changes* [BehaviorSubject][].
    *
    * [BehaviorSubject]: https://rxjs.dev/api/index/class/BehaviorSubject
@@ -274,6 +252,29 @@ export class Router extends Set<Route> implements Router.Task {
         }
       }
     });
+  }
+
+  /**
+   * Well-known `Symbol.observable` method returning a [Subscribable][]. The
+   * returned [Subscribable][] emits the current [State][] and every time this
+   * *changes*.
+   *
+   * [State]: https://sgrud.github.io/client/interfaces/shell.Router-1.State
+   * [Subscribable]: https://rxjs.dev/api/index/interface/Subscribable
+   *
+   * @returns [Subscribable][] emitting [State][] changes.
+   *
+   * @example
+   * Subscribe to the *Router*:
+   * ```ts
+   * import { Router } from '@sgrud/shell';
+   * import { from } from 'rxjs';
+   *
+   * from(new Router()).subscribe(console.log);
+   * ```
+   */
+  public [Symbol.observable](): Subscribable<Router.State> {
+    return this.changes.asObservable();
   }
 
   /**

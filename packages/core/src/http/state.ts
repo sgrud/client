@@ -48,32 +48,6 @@ export class HttpState
   private readonly running: Map<Request, Response<any>>;
 
   /**
-   * Symbol property typed as callback to a [Subscribable][]. The returned
-   * [Subscribable][] emits an array of all active requests whenever this list
-   * changes. Using the returned [Subscribable][], e.g., a load indicator can
-   * easily be implemented.
-   *
-   * [Subscribable]: https://rxjs.dev/api/index/interface/Subscribable
-   *
-   * @returns Callback to a [Subscribable][].
-   *
-   * @example
-   * Subscribe to the currently active requests:
-   * ```ts
-   * import { HttpState, Linker } from '@sgrud/core';
-   * import { from } from 'rxjs';
-   *
-   * const httpState = new Linker<typeof HttpState>().get(HttpState);
-   * from(httpState).subscribe(console.log);
-   * ```
-   */
-  public get [Symbol.observable](): () => Subscribable<Response<any>[]> {
-    return () => this.changes.pipe(
-      map(() => Array.from(this.running.values()))
-    );
-  }
-
-  /**
    * Public **constructor**. Called by the [Target][] decorator to link this
    * [HttpProxy][] into the proxy chain.
    *
@@ -85,6 +59,30 @@ export class HttpState
 
     this.changes = new BehaviorSubject<this>(this);
     this.running = new Map<Request, Response<any>>();
+  }
+
+  /**
+   * Well-known `Symbol.observable` method returning a [Subscribable][]. The
+   * returned [Subscribable][] emits an array of all active requests whenever
+   * this list changes. Using the returned [Subscribable][], e.g., a load
+   * indicator can easily be implemented.
+   *
+   * [Subscribable]: https://rxjs.dev/api/index/interface/Subscribable
+   *
+   * @returns [Subscribable][] emitting requests.
+   *
+   * @example
+   * Subscribe to the currently active requests:
+   * ```ts
+   * import { HttpState, Linker } from '@sgrud/core';
+   * import { from } from 'rxjs';
+   *
+   * const httpState = new Linker<typeof HttpState>().get(HttpState);
+   * from(httpState).subscribe(console.log);
+   * ```
+   */
+  public [Symbol.observable](): Subscribable<Response<any>[]> {
+    return this.changes.pipe(map(() => Array.from(this.running.values())));
   }
 
   /**

@@ -228,28 +228,6 @@ export class Kernel {
   private readonly shimmed: string;
 
   /**
-   * Symbol property typed as callback to a [Subscribable][]. The returned
-   * [Subscribable][] emits every [Module][] that is successfully loaded.
-   *
-   * [Module]: https://sgrud.github.io/client/interfaces/core.Kernel-1.Module
-   * [Subscribable]: https://rxjs.dev/api/index/interface/Subscribable
-   *
-   * @returns Callback to a [Subscribable][].
-   *
-   * @example
-   * Subscribe to the stream of loaded [Module][]s:
-   * ```ts
-   * import { Kernel } from '@sgrud/core';
-   * import { from } from 'rxjs';
-   *
-   * from(new Kernel()).subscribe(console.log);
-   * ```
-   */
-  public get [Symbol.observable](): () => Subscribable<Kernel.Module> {
-    return () => this.loading.asObservable();
-  }
-
-  /**
    * [Singleton][] **constructor**. The first time, this **constructor** is
    * called, it will retrieve the list of modules which should be loaded and
    * then call *insmod* on all those modules and their transitive dependencies.
@@ -330,6 +308,29 @@ export class Kernel {
     HttpClient.get<Kernel.Module>(`${endpoint}/insmod`).pipe(
       switchMap(({ response }) => this.insmod(response, undefined, true))
     ).subscribe();
+  }
+
+  /**
+   * Well-known `Symbol.observable` method returning a [Subscribable][]. The
+   * returned [Subscribable][] emits every [Module][] that is successfully
+   * loaded.
+   *
+   * [Module]: https://sgrud.github.io/client/interfaces/core.Kernel-1.Module
+   * [Subscribable]: https://rxjs.dev/api/index/interface/Subscribable
+   *
+   * @returns [Subscribable][] emitting loaded [Module][]s.
+   *
+   * @example
+   * Subscribe to the stream of loaded [Module][]s:
+   * ```ts
+   * import { Kernel } from '@sgrud/core';
+   * import { from } from 'rxjs';
+   *
+   * from(new Kernel()).subscribe(console.log);
+   * ```
+   */
+  public [Symbol.observable](): Subscribable<Kernel.Module> {
+    return this.loading.asObservable();
   }
 
   /**

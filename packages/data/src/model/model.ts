@@ -1041,28 +1041,6 @@ export abstract class Model<M extends Model = any> {
   protected readonly static: Model.Type<M>;
 
   /**
-   * Symbol property typed as callback to a [Subscribable][]. The returned
-   * [Subscribable][] emits every mutation this *Model* instance experiences.
-   *
-   * [Subscribable]: https://rxjs.dev/api/index/interface/Subscribable
-   *
-   * @returns Callback to a [Subscribable][].
-   *
-   * @example
-   * Subscribe to a *Model* instance:
-   * ```ts
-   * import { from } from 'rxjs';
-   * import { ExampleModel } from './example-model';
-   *
-   * const model = new ExampleModel();
-   * from(model).subscribe(console.log);
-   * ```
-   */
-  public get [Symbol.observable](): () => Subscribable<M> {
-    return () => this.changes.asObservable();
-  }
-
-  /**
    * Accessor to the singular name of this *Model*.
    *
    * @returns Singular name of this *Model*.
@@ -1106,6 +1084,29 @@ export abstract class Model<M extends Model = any> {
     this.static = this.constructor as Model.Type<M>;
     this.changes = new BehaviorSubject<M>(this as Model as M);
     (this as Model as M).assign(...parts).subscribe();
+  }
+
+  /**
+   * Well-known `Symbol.observable` method returning a [Subscribable][]. The
+   * returned [Subscribable][] emits every mutation this *Model* instance
+   * experiences.
+   *
+   * [Subscribable]: https://rxjs.dev/api/index/interface/Subscribable
+   *
+   * @returns [Subscribable][] emitting *Model* changes.
+   *
+   * @example
+   * Subscribe to a *Model* instance:
+   * ```ts
+   * import { from } from 'rxjs';
+   * import { ExampleModel } from './example-model';
+   *
+   * const model = new ExampleModel();
+   * from(model).subscribe(console.log);
+   * ```
+   */
+  public [Symbol.observable](): Subscribable<M> {
+    return this.changes.asObservable();
   }
 
   /**
