@@ -8,7 +8,7 @@ export namespace Store {
   /* eslint-disable @typescript-eslint/indent */
 
   /**
-   *
+   * @typeParam T -
    */
   export type Action<T extends Store> = {
     [K in Exclude<keyof T, keyof Store<T>>]:
@@ -27,7 +27,7 @@ export namespace Store {
   export type Effects = typeof sgrud.state.effects;
 
   /**
-   *
+   * @typeParam T -
    */
   export type State<T extends Store> = {
     readonly [P in {
@@ -37,7 +37,7 @@ export namespace Store {
   };
 
   /**
-   *
+   * @typeParam T -
    */
   export interface Type<T extends Store> extends Required<typeof Store> {
 
@@ -52,7 +52,7 @@ export namespace Store {
 }
 
 /**
- *
+ * @typeParam T -
  */
 export abstract class Store<T extends Store = any> {
 

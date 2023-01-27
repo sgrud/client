@@ -164,6 +164,7 @@ export class StateWorker {
   /**
    * @param source -
    * @param port -
+   * @returns .
    */
   private async _connect(source: object, port: MessagePort): Promise<void> {
     this.remotes.set(source, wrap<BusWorker>(port));
@@ -175,6 +176,7 @@ export class StateWorker {
    * @param store -
    * @param state -
    * @param transient -
+   * @returns .
    * @throws ReferenceError.
    */
   private async _deploy(

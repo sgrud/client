@@ -468,7 +468,7 @@ export class Router extends Set<Route> implements Router.Task {
   /**
    * Main *Router* **match**ing method. Calling this method while supplying a
    * `path` and optionally an array of `routes` will return a **match**ing
-   * [Segment][] or undefined, if no match was found. If no `routes` are
+   * [Segment][] or `undefined`, if no match was found. If no `routes` are
    * supplied, routes previously added to the *Router* will be used. The
    * **match** method represents the backbone of the *Router* class, as it,
    * given a list of `routes` and a `path`, will determine wether this path
@@ -480,7 +480,7 @@ export class Router extends Set<Route> implements Router.Task {
    *
    * @param path - Path to **match** against.
    * @param routes - [Route][]s to use for **match**ing.
-   * @returns **Match**ing [Segment][] or undefined.
+   * @returns **Match**ing [Segment][] or `undefined`.
    *
    * @example
    * Test if path `'example/route'` **match**es `child` or `route`:

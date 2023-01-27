@@ -102,6 +102,7 @@ export class StateHandler extends Map<BusHandle, Store> {
    * @param store -
    * @param state -
    * @param transient -
+   * @typeParam T -
    * @returns .
    */
   public deploy<T extends Store>(

@@ -43,7 +43,7 @@ declare global {
   /**
    * Global [SGRUD][] namespace.
    *
-  * [SGRUD]: https://sgrud.github.io
+   * [SGRUD]: https://sgrud.github.io
    */
   namespace sgrud {
 
@@ -55,6 +55,7 @@ declare global {
     const bin: typeof module;
 
   }
+
 }
 
 const module = {

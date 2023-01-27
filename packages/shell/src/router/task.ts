@@ -62,12 +62,14 @@ export abstract class RouterTask {
    * navigated to. This method provides the possibility to intercept these
    * upcoming [State][]s and, e.g., mutate or redirect them.
    *
+   * [Router]: https://sgrud.github.io/client/classes/shell.Router
    * [State]: https://sgrud.github.io/client/interfaces/shell.Router-1.State
+   * [Task]: https://sgrud.github.io/client/interfaces/shell.Router-1.Task
    *
-   * @param prev - Previously active router state.
-   * @param next - Next router state to be activated.
-   * @param handler - Next task handler.
-   * @returns Next handled router state.
+   * @param prev - Previously active [Router][] [State][].
+   * @param next - Next [Router][] [State][] to be activated.
+   * @param handler - Next [Router][] [Task][] handler.
+   * @returns Next handled [Router][] [State][].
    */
   public abstract handle(
     prev: Router.State,

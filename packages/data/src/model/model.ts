@@ -205,7 +205,7 @@ export namespace Model.Filter {
 
     /**
      * Shape the requested data [Model][]s are matched against. Supplying this
-     * parameter requires the *conjunction* sibling parameter to be undefined.
+     * parameter requires the *conjunction* sibling parameter to be `undefined`.
      * By specifying the **entity** shape to match data [Model][]s against,
      * simple filter operations can be compiled.
      *
@@ -693,7 +693,7 @@ export abstract class Model<M extends Model = any> {
    * Static **serialize** method. Calling this method on a class extending the
    * *Model*, while supplying a `model` which to **serialize** and optionally
    * enabling `shallow` serialization, will return the [Shape][] of the *Model*,
-   * i.e., a plain JSON representation of all *Model* fields, or undefined, if
+   * i.e., a plain JSON representation of all *Model* fields, or `undefined`, if
    * the supplied `model` does not contain any fields or values. By serializing
    * `shallow`ly, only properties defined on the supplied `model` are included
    * (which means, all one-to-one and one-to-many associations are ignored).
@@ -706,7 +706,7 @@ export abstract class Model<M extends Model = any> {
    * @param model - *Model* which is to be **serialize**d.
    * @param shallow - Whether to **serialize** shallowly.
    * @typeParam T - Extending *Model* instance type.
-   * @returns [Shape][] of the *Model* or undefined.
+   * @returns [Shape][] of the *Model* or `undefined`.
    *
    * @example
    * **Serialize** a model:
@@ -764,12 +764,12 @@ export abstract class Model<M extends Model = any> {
    * abstract *Model* base class, while supplying a `model` which to **treemap**
    * and optionally enabling `shallow` **treemap**ping, will return a [Graph][]
    * describing the fields which are declared and defined on the supplied
-   * `model`, or undefined, if the supplied `model` does not contain any fields
-   * or values. By **treemap**ping `shallow`ly, only properties defined on the
-   * supplied `model` are included (which means, all one-to-one and one-to-many
-   * associations are ignored). Through this method, the [Graph][] for one
-   * specific *Model* instance from the respective *Model* repository can be
-   * retrieved.
+   * `model`, or `undefined`, if the supplied `model` does not contain any
+   * fields or values. By **treemap**ping `shallow`ly, only properties defined
+   * on the supplied `model` are included (which means, all one-to-one and
+   * one-to-many associations are ignored). Through this method, the [Graph][]
+   * for one specific *Model* instance from the respective *Model* repository
+   * can be retrieved.
    *
    * [Graph]: https://sgrud.github.io/client/types/data.Model-1.Graph
    *
@@ -777,7 +777,7 @@ export abstract class Model<M extends Model = any> {
    * @param model - *Model* which is to be **treemap**ped.
    * @param shallow - Whether to **treemap** shallowly.
    * @typeParam T - Extending *Model* instance type.
-   * @returns [Graph][] of the *Model* or undefined.
+   * @returns [Graph][] of the *Model* or `undefined`.
    *
    * @example
    * **Treemap** a *Model*:
@@ -1147,7 +1147,7 @@ export abstract class Model<M extends Model = any> {
    * a list of `keys` which are to be **clear**ed, will set the value of the
    * properties described by either the supplied `keys` or, if no `keys` were
    * supplied, all enumerable properties of the class extending the abstract
-   * *Model* base class to undefined, effectively **clear**ing them.
+   * *Model* base class to `undefined`, effectively **clear**ing them.
    *
    * [Observable]: https://rxjs.dev/api/index/class/Observable
    *
@@ -1360,7 +1360,7 @@ export abstract class Model<M extends Model = any> {
    * @param this - Polymorphic `this`.
    * @param shallow - Whether to **serialize** shallowly.
    * @typeParam T - Extending *Model* instance type.
-   * @returns [Shape][] of this instance or undefined.
+   * @returns [Shape][] of this instance or `undefined`.
    *
    * @example
    * **Serialize** a *Model* instance:

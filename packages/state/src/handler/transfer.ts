@@ -4,6 +4,14 @@ import { transferHandlers } from 'comlink';
 import { Effect } from '../effect/effect';
 import { Store } from '../store/store';
 
+/**
+ * [Comlink][] **transferHandler** for values of type [Effect][]. This custom
+ * implementation of a [Comlink][] **transferHandler** transparently transfers
+ * [Effect][]s between two [Comlink][] endpoints.
+ *
+ * [Effect]: https://sgrud.github.io/client/classes/state.Effect
+ * [Comlink]: https://www.npmjs.com/package/comlink
+ */
 transferHandlers.set('effect', {
   canHandle: (value: unknown): value is typeof Effect => {
     return value instanceof Function && value.prototype instanceof Effect;
@@ -24,6 +32,14 @@ transferHandlers.set('effect', {
   }
 });
 
+/**
+ * [Comlink][] **transferHandler** for values of type [Store][]. This custom
+ * implementation of a [Comlink][] **transferHandler** transparently transfers
+ * [Store][] classes between two [Comlink][] endpoints.
+ *
+ * [Comlink]: https://www.npmjs.com/package/comlink
+ * [Store]: https://sgrud.github.io/client/classes/state.Store
+ */
 transferHandlers.set('store', {
   canHandle: (value: unknown): value is Store.Type<any> => {
     return value instanceof Function && value.prototype instanceof Store;
