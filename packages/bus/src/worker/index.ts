@@ -1,6 +1,8 @@
-import { BusHandle, BusValue } from '@sgrud/bus';
-import { Singleton, Thread } from '@sgrud/core';
 import { BehaviorSubject, finalize, map, merge, Observable, shareReplay, switchMap } from 'rxjs';
+import { Thread } from '../../../core/src/thread/thread';
+import '../../../core/src/thread/transfer';
+import { Singleton } from '../../../core/src/utility/singleton';
+import { BusHandle, BusValue } from '../handler/handler';
 
 /**
  * The **BusWorker** is a [Worker][] process, [Spawn][]ed by the [BusHandler][]

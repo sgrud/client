@@ -1,7 +1,7 @@
-import { BusHandle, BusWorker } from '@sgrud/bus';
-import { Singleton } from '@sgrud/core';
 import { expose, Remote, wrap } from 'comlink';
 import { BehaviorSubject, defer, tap } from 'rxjs';
+import { BusHandle, BusWorker } from '../../../bus/src/handler/handler';
+import { Singleton } from '../../../core/src/utility/singleton';
 import '../handler/transfer';
 import { Store } from '../store/store';
 import { name, version } from './package.json';
