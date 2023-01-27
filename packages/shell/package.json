@@ -1,6 +1,6 @@
 {
   "name": "@sgrud/shell",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "source": "./index.ts",
   "types": "./index.d.ts",
   "main": "../../dist/shell/index.js",
