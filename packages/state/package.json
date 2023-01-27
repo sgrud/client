@@ -7,13 +7,16 @@
   "exports": "../../dist/state/index.modern.js",
   "unpkg": "../../dist/state/index.umd.js",
   "amdNames": {
-    "@babel/runtime/helpers/createClass": null,
+    "@babel/runtime/helpers/assertThisInitialized": null,
     "@babel/runtime/helpers/createForOfIteratorHelperLoose": null,
+    "@babel/runtime/helpers/extends": null,
     "@babel/runtime/helpers/inheritsLoose": null,
     "@babel/runtime/helpers/wrapNativeSuper": null,
     "@sgrud/bus": null,
     "@sgrud/core": null,
     "@sgrud/state": null,
+    "comlink": "Comlink",
+    "rxjs": null,
     "tslib": "globalThis"
   },
   "sgrud": {

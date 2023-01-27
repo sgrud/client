@@ -9,7 +9,6 @@
   "amdNames": {
     "@babel/runtime/helpers/assertThisInitialized": null,
     "@babel/runtime/helpers/construct": null,
-    "@babel/runtime/helpers/createClass": null,
     "@babel/runtime/helpers/createForOfIteratorHelperLoose": null,
     "@babel/runtime/helpers/extends": null,
     "@babel/runtime/helpers/inheritsLoose": null,

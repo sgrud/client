@@ -9,7 +9,6 @@
   "amdNames": {
     "@babel/runtime/helpers/createClass": null,
     "@babel/runtime/helpers/createForOfIteratorHelperLoose": null,
-    "@babel/runtime/helpers/extends": null,
     "@babel/runtime/helpers/inheritsLoose": null,
     "@babel/runtime/helpers/objectWithoutPropertiesLoose": null,
     "@babel/runtime/helpers/toPropertyKey": null,
