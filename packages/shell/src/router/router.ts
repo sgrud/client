@@ -192,6 +192,11 @@ export namespace Router {
 export class Router extends Set<Route> implements Router.Task {
 
   /**
+   *
+   */
+  declare public readonly [Symbol.iterator]: never;
+
+  /**
    * Absolute **baseHref** for navigation.
    */
   public readonly baseHref: string;
@@ -425,6 +430,39 @@ export class Router extends Set<Route> implements Router.Task {
     } while (segment = segment.child!);
 
     return parts.join('/');
+  }
+
+  /**
+   * **Lookup** helper method. Calling this method while supplying a `selector`
+   * and optionally an iterable of `routes` will return the **lookup**ed
+   * [Route][] path for the supplied `selector` or `undefined`, if it does not
+   * occur within at least one route. When multiple occurrences of the same
+   * `selector` exist, the [Route][] path to its first occurrence is returned.
+   *
+   * [Component]: https://sgrud.github.io/client/interfaces/shell.Component-1
+   * [Route]: https://sgrud.github.io/client/interfaces/shell.Route-1
+   *
+   * @param selector - [Component][] tag name.
+   * @param routes - Routes to use for **lookup**.
+   * @returns Resolved [Route][] path or `undefined`.
+   */
+  public lookup(
+    selector: string,
+    routes: Iterable<Route> = this
+  ): string | undefined {
+    for (const route of routes) {
+      if (route.component === selector) {
+        return route.path;
+      } else if (route.children?.length) {
+        const path = this.lookup(selector, route.children);
+
+        if (TypeOf.string(path)) {
+          return path ? `${route.path}/${path}` : route.path;
+        }
+      }
+    }
+
+    return undefined;
   }
 
   /**

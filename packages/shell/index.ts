@@ -28,3 +28,5 @@ export * from './src/router/outlet';
 export * from './src/router/route';
 export * from './src/router/router';
 export * from './src/router/task';
+export * from './src/task/catch';
+export * from './src/task/resolve';
