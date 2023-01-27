@@ -105,10 +105,10 @@ export class HttpQuerier
     return HttpClient.post<any>(this.endpoint, {
       query: operation,
       variables
-    }).pipe(switchMap(({ response }) => {
-      return response.errors?.length
-        ? throwError(() => new AggregateError(response.errors))
-        : of(response.data);
+    }).pipe(switchMap((next) => {
+      return next.response.errors?.length
+        ? throwError(() => new AggregateError(next.response.errors))
+        : of(next.response.data);
     }));
   }
 

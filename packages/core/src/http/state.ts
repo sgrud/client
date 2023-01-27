@@ -120,10 +120,10 @@ export class HttpState
         this.running.set(request, event);
         this.changes.next(this);
       }),
-      filter(({ type }) => {
-        return Boolean(type === 'download_load' ||
-          includeDownloadProgress && type.startsWith('download_') ||
-          includeUploadProgress && type.startsWith('upload_'));
+      filter((event) => {
+        return Boolean(event.type === 'download_load' ||
+          includeDownloadProgress && event.type.startsWith('download_') ||
+          includeUploadProgress && event.type.startsWith('upload_'));
       }),
       finalize(() => {
         this.running.delete(request);

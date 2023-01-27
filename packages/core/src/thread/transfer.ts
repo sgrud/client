@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-import { expose, proxy, ProxyMarked, transferHandlers, wrap } from 'comlink';
+import { expose, proxy, ProxyMarked, proxyMarker, transferHandlers, wrap } from 'comlink';
 import { Observable, Observer, Subscribable, Subscriber } from 'rxjs';
 import { TypeOf } from '../utility/type-of';
 
@@ -65,7 +65,7 @@ transferHandlers.set('subscriber', {
 
 if (TypeOf.process(globalThis.process)) {
   const { MessageChannel } = require('worker_threads');
-  const nodeEndpoint = require('comlink/dist/umd/node-adapter.min');
+  const nodeEndpoint = require('comlink/dist/umd/node-adapter');
 
   /**
    * Overridden default [Comlink][] *proxyTransferHandler* **transferHandler**.
@@ -77,8 +77,9 @@ if (TypeOf.process(globalThis.process)) {
    * @remarks https://github.com/GoogleChromeLabs/comlink/issues/313
    */
   transferHandlers.set('proxy', {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    canHandle: transferHandlers.get('proxy')!.canHandle,
+    canHandle: (value: unknown): value is ProxyMarked => {
+      return value instanceof Object && proxyMarker in value;
+    },
     deserialize: (value: unknown) => {
       return wrap(nodeEndpoint(value));
     },

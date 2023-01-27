@@ -306,7 +306,7 @@ export class Kernel {
     }
 
     HttpClient.get<Kernel.Module>(`${endpoint}/insmod`).pipe(
-      switchMap(({ response }) => this.insmod(response, undefined, true))
+      switchMap((next) => this.insmod(next.response, undefined, true))
     ).subscribe();
   }
 
@@ -496,12 +496,14 @@ export class Kernel {
     name: string,
     source: string = `${this.nodeModules}/${name}`
   ): Observable<Kernel.Module> {
-    if (this.loaders.has(name)) {
-      return this.loaders.get(name)!;
+    const loader = this.loaders.get(name);
+
+    if (loader) {
+      return loader;
     }
 
     return HttpClient.get<Kernel.Module>(`${source}/package.json`).pipe(
-      map(({ response }) => response)
+      map((next) => next.response)
     );
   }
 
