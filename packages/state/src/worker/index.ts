@@ -2,6 +2,7 @@ import { expose, Remote, wrap } from 'comlink';
 import { BehaviorSubject, defer, tap } from 'rxjs';
 import { BusHandle, BusWorker } from '../../../bus/src/handler/handler';
 import { Singleton } from '../../../core/src/utility/singleton';
+import { Effect } from '../effect/effect';
 import '../handler/transfer';
 import { Store } from '../store/store';
 import { name, version } from './package.json';
@@ -46,6 +47,16 @@ export interface StateWorker {
     action: Store.Action<any>
   ): Promise<Store.State<any>>;
 
+  /**
+   * @param locate -
+   * @param effect -
+   * @returns .
+   */
+  implant(
+    locate: keyof Store.Effects,
+    effect: new () => Effect<any>
+  ): Promise<void>;
+
 }
 
 /**
@@ -62,6 +73,10 @@ export class StateWorker {
    *
    */
   static {
+    self.sgrud = self.sgrud || { };
+    self.sgrud.state = self.sgrud.state || { };
+    self.sgrud.state.effects = self.sgrud.state.effects || { };
+
     self.addEventListener('activate', (event) => this.activate(event));
     self.addEventListener('install', (event) => this.install(event));
     self.addEventListener('message', (event) => this.message(event));
@@ -99,6 +114,11 @@ export class StateWorker {
   /**
    *
    */
+  private readonly effects: Map<keyof Store.Effects, Function>;
+
+  /**
+   *
+   */
   private readonly remotes: Map<object, Remote<BusWorker>>;
 
   /**
@@ -125,9 +145,18 @@ export class StateWorker {
         .createIndex('handle', 'handle', { unique: true });
     });
 
+    this.effects = new Map<keyof Store.Effects, Function>();
     this.remotes = new Map<object, Remote<BusWorker>>();
     this.states = new Map<BusHandle, Map<object, BehaviorSubject<any>>>();
     this.stores = new Map<BusHandle, Store.Type<any>>();
+
+    sgrud.state.effects = new Proxy(sgrud.state.effects, {
+      get: (target, propertyKey: keyof Store.Effects, receiver) => {
+        return source
+          ? this.effects.get(propertyKey)?.call(this.proxy(source))
+          : Reflect.get(target, propertyKey, receiver);
+      }
+    });
 
     return source ? this.proxy(source) : this;
   }
@@ -158,7 +187,7 @@ export class StateWorker {
     const deployed = this.stores.get(handle);
     let remote = this.remotes.get(source);
     let states = this.states.get(handle);
-    let value = states?.get(this);
+    let value = states?.get(self);
 
     if (!deployed) {
       this.stores.set(handle, store);
@@ -184,7 +213,7 @@ export class StateWorker {
     }
 
     if (!value) {
-      if (!transient && (source = this)) {
+      if (!transient && (source = self)) {
         const database = await this.database;
 
         state = await new Promise((resolve) => {
@@ -227,20 +256,41 @@ export class StateWorker {
     handle: BusHandle,
     action: Store.Action<any>
   ): Promise<Store.State<any>> {
-    const store = this.stores.get(handle);
+    const store = this.stores.get(handle)?.prototype;
     const state = this.states.get(handle)?.has(source)
       ? this.states.get(handle)?.get(source)
-      : this.states.get(handle)?.get(this);
+      : this.states.get(handle)?.get(self);
 
     if (!state || !store) {
       throw new ReferenceError(handle);
     }
 
-    const method = store.prototype[action[0] as keyof Store] as Function;
-    const result = await method.call(state.value, ...action[1] as unknown[]);
+    const method = store[action[0] as keyof Store] as Function;
+    const result = await method.call(state.value, ...action[1] || []);
 
     state.next(result);
     return result;
+  }
+
+  /**
+   * @param _source -
+   * @param locate -
+   * @param effect -
+   * @returns .
+   * @throws ReferenceError.
+   */
+  private async _implant(
+    _source: object,
+    locate: keyof Store.Effects,
+    effect: new () => Effect<any>
+  ): Promise<void> {
+    const implanted = this.effects.get(locate)?.toString();
+
+    if (!implanted) {
+      this.effects.set(locate, effect.prototype.function);
+    } else if (implanted !== effect.prototype.function.toString()) {
+      throw new ReferenceError(locate);
+    }
   }
 
   /**
@@ -254,6 +304,7 @@ export class StateWorker {
           case 'connect': return this._connect.bind(this, source);
           case 'deploy': return this._deploy.bind(this, source);
           case 'dispatch': return this._dispatch.bind(this, source);
+          case 'implant': return this._implant.bind(this, source);
           default: return Reflect.get(target, propertyKey, receiver);
         }
       }

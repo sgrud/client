@@ -24,6 +24,11 @@ export namespace Store {
   /**
    *
    */
+  export type Effects = typeof sgrud.state.effects;
+
+  /**
+   *
+   */
   export type State<T extends Store> = {
     readonly [P in {
       [K in Exclude<keyof T, keyof Store<T>>]:

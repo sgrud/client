@@ -1,7 +1,8 @@
 import { BusHandle, BusHandler } from '@sgrud/bus';
-import { assign, Factor, Kernel, Singleton, Symbol, Thread } from '@sgrud/core';
+import { Factor, Kernel, Singleton, Symbol, Thread } from '@sgrud/core';
 import { createEndpoint, transfer, wrap } from 'comlink';
-import { firstValueFrom, from, fromEvent, map, Observable, of, switchMap, tap } from 'rxjs';
+import { firstValueFrom, from, fromEvent, map, Observable, of, ReplaySubject, Subscribable, switchMap, tap } from 'rxjs';
+import { Effect } from '../effect/effect';
 import { Store } from '../store/store';
 import { StateWorker } from '../worker';
 import { name } from '../worker/package.json';
@@ -13,6 +14,25 @@ import { name } from '../worker/package.json';
  */
 @Singleton<typeof StateHandler>()
 export class StateHandler extends Map<BusHandle, Store> {
+
+  /**
+   *
+   */
+  private static changes: ReplaySubject<StateHandler>;
+
+  /**
+   *
+   */
+  static {
+    this.changes = new ReplaySubject<StateHandler>();
+  }
+
+  /**
+   * @returns .
+   */
+  public static [Symbol.observable](): Subscribable<StateHandler> {
+    return this.changes.asObservable();
+  }
 
   /**
    *
@@ -72,6 +92,9 @@ export class StateHandler extends Map<BusHandle, Store> {
       await worker.connect(transfer(thread, [thread]));
       return worker;
     })();
+
+    StateHandler.changes.next(this);
+    StateHandler.changes.complete();
   }
 
   /**
@@ -90,13 +113,17 @@ export class StateHandler extends Map<BusHandle, Store> {
     let deployed = super.get(handle);
 
     if (!deployed) {
-      deployed = assign(Object.create(store.prototype), {
-        [Symbol.observable]: () => this.busHandler.get(handle).pipe(
-          map(({ value }) => value)
-        ),
-        dispatch: (...action: Store.Action<any>) => from(this.worker).pipe(
-          switchMap((worker) => worker.dispatch(handle, action))
-        )
+      deployed = Object.defineProperties(Object.create(store.prototype), {
+        [Symbol.observable]: {
+          value: () => this.busHandler.get(handle).pipe(
+            map((next) => next.value)
+          )
+        },
+        dispatch: {
+          value: (...action: Store.Action<any>) => from(this.worker).pipe(
+            switchMap((worker) => worker.dispatch(handle, action))
+          )
+        }
       });
 
       return from(this.worker).pipe(
@@ -107,6 +134,36 @@ export class StateHandler extends Map<BusHandle, Store> {
     }
 
     return of(deployed);
+  }
+
+  /**
+   * @param handle -
+   * @param action -
+   * @typeParam T -
+   * @returns .
+   */
+  public dispatch<T extends Store>(
+    handle: BusHandle,
+    ...action: Store.Action<T>
+  ): Observable<Store.State<T>> {
+    return from(this.worker).pipe(switchMap((worker) => {
+      return worker.dispatch(handle, action as Store.Action<any>);
+    }));
+  }
+
+  /**
+   * @param locate -
+   * @param effect -
+   * @typeParam K -
+   * @returns .
+   */
+  public implant<K extends keyof Store.Effects>(
+    locate: K,
+    effect: new () => Effect<K>
+  ): Observable<void> {
+    return from(this.worker).pipe(switchMap((worker) => {
+      return worker.implant(locate, effect);
+    }));
   }
 
 }

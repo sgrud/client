@@ -68,7 +68,7 @@ const module = {
 if (process.argv[1]?.endsWith('sgrud')) {
   cli.parse(process.argv);
 } else {
-  global.sgrud = { bin: module };
+  global.sgrud = { bin: module } as typeof sgrud;
 }
 
 export {
