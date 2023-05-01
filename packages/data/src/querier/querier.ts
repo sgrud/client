@@ -3,22 +3,17 @@ import { Observable } from 'rxjs';
 import { Model } from '../model/model';
 
 /**
- * Namespace containing types and interfaces used and intended to be used in
- * conjunction with the abstract [Querier][] base class and in context of the
- * [Model][] data handling.
+ * **Querier** namespace containing types and interfaces used and intended to be
+ * used in conjunction with the abstract {@link Querier} base class and in
+ * context of the {@link Model} data handling.
  *
- * [Model]: https://sgrud.github.io/client/classes/data.Model
- * [Querier]: https://sgrud.github.io/client/classes/data.Querier
- *
- * @see [Querier][]
+ * @see {@link Querier}
  */
 export namespace Querier {
 
   /**
-   * Type alias for a string union type of all known [Operation][] types:
-   * `'mutation'`, `'query'` and `'subscription'`.
-   *
-   * [Operation]: https://sgrud.github.io/client/types/data.Querier-1.Operation
+   * Type alias for a string union type of all known {@link Operation}
+   * **Type**s: `'mutation'`, `'query'` and `'subscription'`.
    */
   export type Type =
     'mutation' |
@@ -27,50 +22,48 @@ export namespace Querier {
 
   /**
    * String literal helper type. Enforces any assigned string to conform to the
-   * standard form of an operation: A string, starting with the [Type][],
+   * standard form of an **Operation**: A string starting with the {@link Type},
    * followed by one whitespace and the operation content.
-   *
-   * [Type]: https://sgrud.github.io/client/types/data.Querier-1.Type
    */
-  export type Operation = `${Querier.Type} ${string}`;
+  export type Operation = `${Type} ${string}`;
 
   /**
-   * Interface describing the shape of variables which may be embedded within
-   * [Operation][]s. Variables are a simple key-value map, which can be deeply
-   * nested.
-   *
-   * [Operation]: https://sgrud.github.io/client/types/data.Querier-1.Operation
+   * Interface describing the shape of **Variables** which may be embedded
+   * within {@link Operation}s. **Variables** are a simple key-value map, which
+   * can be deeply nested.
    */
   export interface Variables {
+
+    /**
+     * Index signature allowing keys to be of type `string` and values of type
+     * {@link Variables} or `undefined`.
+     */
     readonly [key: string]: Variables | unknown;
+
   }
 
 }
 
 /**
- * Abstract **Querier** base class to implement [Model][] data queriers. By
+ * Abstract **Querier** base class to implement {@link Model} **Querier**s. By
  * extending this abstract base class and providing the extending class to the
- * [Linker][], e.g., by [Target][]ing it, the respective classes *priority*
- * method will be called whenever the [Model][] *commits* data and, if this
- * class claims the highest priority, its *commit* method will be called.
+ * {@link Linker}, e.g., by {@link Target}ing it, the {@link priority} method of
+ * the resulting class will be called whenever the {@link Model} requests or
+ * persists data and, if this class claims the highest priority, its
+ * {@link commit} method will be called.
  *
- * [Linker]: https://sgrud.github.io/client/classes/core.Linker
- * [Model]: https://sgrud.github.io/client/classes/data.Model
- * [Provide]: https://sgrud.github.io/client/functions/core.Provide-1
- * [Target]: https://sgrud.github.io/client/functions/core.Target
- *
- * @decorator [Provide][]
+ * @decorator {@link Provide}
  *
  * @example
  * Simple **Querier** stub:
  * ```ts
- * import type { Model, Querier } from '@sgrud/data';
- * import type { Observable } from 'rxjs';
  * import { Provider, Target } from '@sgrud/core';
+ * import { type Querier } from '@sgrud/data';
+ * import { type Observable } from 'rxjs';
  *
- * ⁠@Target<typeof ExampleQuerier>()
+ * ⁠@Target()
  * export class ExampleQuerier
- *   extends Provider<typeof Querier>('sgrud.data.querier.Querier') {
+ *   extends Provider<typeof Querier>('sgrud.data.Querier') {
  *
  *   public override readonly types: Set<Querier.Type> = new Set<Querier.Type>([
  *     'query'
@@ -79,82 +72,65 @@ export namespace Querier {
  *   public override commit(
  *     operation: Querier.Operation,
  *     variables: Querier.Variables
- *   ): Observable<any> {
+ *   ): Observable<unknown> {
  *     throw new Error('Stub!');
  *   }
  *
- *   public override priority(model: Model.Type<any>): number {
+ *   public override priority(): number {
  *     return 0;
  *   }
  *
  * }
  * ```
  *
- * @see [Model][]
+ * @see {@link Model}
  */
-@Provide<typeof Querier>()
+@Provide()
 export abstract class Querier {
 
   /**
-   * Magic string by which this class is [provide][]d.
+   * Magic string by which this class is {@link provide}d.
    *
-   * [provide]: https://sgrud.github.io/client/variables/core.provide-2
-   *
-   * @see [provide][]
+   * @see {@link provide}
    */
-  public static readonly [provide]:
-  'sgrud.data.querier.Querier' = 'sgrud.data.querier.Querier' as const;
+  public static readonly [provide]: 'sgrud.data.Querier' = 'sgrud.data.Querier';
 
   /**
-   * A set containing all [Type][]s of queries this class can handle. May
-   * contain none to all of `'mutation'`, `'query'` and `'subscription'`.
-   *
-   * [Type]: https://sgrud.github.io/client/types/data.Querier-1.Type
+   * A set containing all **types** of queries this {@link Querier} can handle.
+   * May contain any of the `'mutation'`, `'query'` and `'subscription'`
+   * {@link Type}s.
    */
   public abstract readonly types: Set<Querier.Type>;
 
   /**
-   * The overridden **commit** method of [Target][]ed queriers is called by the
-   * [Model][] to **commit** operations. The invocation arguments are the
-   * `operation`, unraveled into a string, and all `variables` embedded within
-   * this operation. The extending class has to serialize the [Variables][] and
-   * transfer the operation. It's the callers responsibility to unravel the
-   * [Operation][] prior to invoking this method, and to deserialize and (error)
-   * handle whatever response is received.
+   * The overridden **commit** method of {@link Target}ed {@link Querier}s is
+   * called by the {@link Model} to execute {@link Operation}s. The invocation
+   * arguments are the `operation`, unraveled into a string, and all `variables`
+   * embedded within this operation. The extending class has to serialize the
+   * {@link Variables} and handle the operation. It's the callers responsibility
+   * to unravel the {@link Operation} prior to invoking this method, and to
+   * deserialize and (error) handle whatever response is received.
    *
-   * [Model]: https://sgrud.github.io/client/classes/data.Model
-   * [Observable]: https://rxjs.dev/api/index/class/Observable
-   * [Operation]: https://sgrud.github.io/client/types/data.Querier-1.Operation
-   * [Target]: https://sgrud.github.io/client/functions/core.Target
-   * [Variables]: https://sgrud.github.io/client/interfaces/data.Querier-1.Variables
-   *
-   * @param operation - Querier [Operation][] to be committed.
-   * @param variables - [Variables][] within the [Operation][].
-   * @returns [Observable][] of the committed [Operation][].
+   * @param operation - The {@link Operation} to be **commit**ted.
+   * @param variables - Any {@link Variables} within the {@link Operation}.
+   * @returns An {@link Observable} of the **commit**ted {@link Operation}.
    */
   public abstract commit(
     operation: Querier.Operation,
     variables?: Querier.Variables
-  ): Observable<any>;
+  ): Observable<unknown>;
 
   /**
-   * Whenever the *commit* method of the [Model][] is invoked, all [Target][]ed
-   * and compatible queriers, i.e., implementations of the this class capable of
-   * handling the specific [Type][] of the to be committed [Operation][], will
-   * be asked to prioritize themselves regarding the respective [Model][]. The
-   * querier claiming the highest **priority** will be chosen and its *commit*
-   * method called.
+   * When the {@link Model} executes {@link Operation}s, all {@link Target}ed
+   * and compatible {@link Querier}s, i.e., implementations of the this class
+   * capable of handling the specific {@link Type} of the {@link Operation} to
+   * {@link commit}, will be asked to prioritize themselves regarding the
+   * respective {@link Model}. The querier claiming the highest **priority**
+   * will be chosen and its {@link commit} method called.
    *
-   * [Model]: https://sgrud.github.io/client/classes/data.Model
-   * [Operation]: https://sgrud.github.io/client/types/data.Querier-1.Operation
-   * [Target]: https://sgrud.github.io/client/functions/core.Target
-   * [Type]: https://sgrud.github.io/client/types/data.Querier-1.Type
-   *
-   * @param model - [Model][] to be committed.
-   * @returns Priority of this implementation.
+   * @param model - The {@link Model} to be {@link commit}ted.
+   * @returns The numeric **priority** of this {@link Querier} implementation.
    */
-  public abstract priority(
-    model: Model.Type<any>
-  ): number;
+  public abstract priority(model: Model.Type<Model>): number;
 
 }

@@ -1,121 +1,214 @@
+/* @jest-environment-options { "url": "ws://127.0.0.1:58081" } */
+
 import { BusHandler } from '@sgrud/bus';
-import { BehaviorSubject, catchError, of, Subject, throwError, timeout } from 'rxjs';
+import express from 'express';
+import { BehaviorSubject, delay, from, fromEvent, map, materialize, Subject, switchMap, takeWhile, throwError, timeout, TimeoutError, timer } from 'rxjs';
+import { WebSocketServer } from 'ws';
 
 describe('@sgrud/bus/handler/handler', () => {
 
-  describe('instantiating a handler', () => {
-    const handler = new BusHandler();
+  /*
+   * Fixtures
+   */
 
-    it('returns the singleton handler', () => {
+  let server: WebSocketServer;
+  afterAll(() => server.close());
+  beforeAll(() => (server = new WebSocketServer({
+    server: express().listen(location.port)
+  })).on('connection', (socket) => {
+    fromEvent(socket, 'message').pipe(delay(250)).subscribe((next) => {
+      socket.send(JSON.stringify({
+        handle: 'sgrud.test.bus.socket',
+        kind: 'N',
+        value: JSON.parse((next as MessageEvent).data)
+      }));
+    });
+  }));
+
+  /*
+   * Unittests
+   */
+
+  describe('constructing an instance', () => {
+    const handler = new BusHandler();
+    const worker = from(handler.worker);
+
+    it('returns the singleton instance', () => {
       expect(handler).toBe(new BusHandler());
     });
-  });
 
-  describe('subscribing to a Subject bus', () => {
-    const bus = new Subject<string>();
-    const handler = new BusHandler();
-
-    it('observes values emitted within its parent handle', (done) => {
-      const subscription = handler.get<string>(
-        'sgrud.test.bus'
-      ).subscribe(({
-        handle,
-        value
-      }) => {
-        expect(handle).toBe('sgrud.test.bus.subject');
-        expect(value).toBe('done');
-        subscription.unsubscribe();
+    it('spawns the corresponding worker', (done) => {
+      worker.pipe(map((next) => {
+        expect(next).toBeInstanceOf(Function);
+      })).subscribe({
+        complete: done,
+        error: done
       });
-
-      subscription.add(() => {
-        bus.complete();
-        done();
-      });
-
-      handler.set('sgrud.test.bus.subject', bus).subscribe();
-      setTimeout(() => bus.next('done'), 250);
     });
   });
 
-  describe('subscribing to a BehaviorSubject bus', () => {
-    const bus = new BehaviorSubject<string>('default');
+  describe('observing a stream by handle', () => {
     const handler = new BusHandler();
+    const stream = new Subject();
 
-    it('observes values emitted within its parent handle', (done) => {
-      const subscription = handler.get<string>(
-        'sgrud.test.bus'
-      ).subscribe(({
-        handle,
-        value
-      }) => {
-        expect(handle).toBe('sgrud.test.bus.behaviorSubject');
-        expect(value).toBe(bus.value);
-
-        if (value === 'done') {
-          subscription.unsubscribe();
+    it('observes values emitted under the handle', (done) => {
+      handler.observe('sgrud.test.bus').pipe(takeWhile((next, index) => {
+        switch (index) {
+          case 0: expect(next).toMatchObject({
+            handle: 'sgrud.test.bus.stream',
+            kind: 'N',
+            value: 'done'
+          }); break;
+          case 1: expect(next).toMatchObject({
+            handle: 'sgrud.test.bus.stream',
+            kind: 'C'
+          }); break;
         }
+
+        return next.kind !== 'C';
+      })).subscribe({
+        complete: done,
+        error: done
       });
 
-      subscription.add(() => {
-        bus.complete();
-        done();
-      });
-
-      handler.set('sgrud.test.bus.behaviorSubject', bus).subscribe();
-      setTimeout(() => bus.next('done'), 250);
+      timer(250).pipe(map(() => 'done')).subscribe(stream);
+      handler.publish('sgrud.test.bus.stream', stream).subscribe();
     });
   });
 
-  describe('subscribing to an empty bus', () => {
-    const bus = new Subject<string>();
+  describe('observing a immediately emitting stream by handle', () => {
     const handler = new BusHandler();
+    const stream = new BehaviorSubject('default');
 
-    it('does not emit any values', (done) => {
-      const subscription = handler.get<never>(
-        'sgrud.test.bus.nonexistent'
-      ).pipe(
-        timeout(250),
-        catchError((error) => of({
-          handle: null,
-          value: error
-        }))
-      ).subscribe(({
-        handle,
-        value
-      }) => {
-        expect(handle).toBeNull();
-        expect(value).toBeInstanceOf(Error);
-        bus.complete();
+    it('observes values emitted under the handle', (done) => {
+      handler.observe('sgrud.test.bus').pipe(takeWhile((next, index) => {
+        switch (index) {
+          case 0: expect(next).toMatchObject({
+            handle: 'sgrud.test.bus.stream',
+            kind: 'N',
+            value: 'default'
+          }); break;
+          case 1: expect(next).toMatchObject({
+            handle: 'sgrud.test.bus.stream',
+            kind: 'N',
+            value: 'done'
+          }); break;
+          case 2: expect(next).toMatchObject({
+            handle: 'sgrud.test.bus.stream',
+            kind: 'C'
+          }); break;
+        }
+
+        return next.kind !== 'C';
+      })).subscribe({
+        complete: done,
+        error: done
       });
 
-      subscription.add(done);
-      handler.set('sgrud.test.bus.subject', bus).subscribe();
-      setTimeout(() => bus.next('done'), 250);
+      timer(250).pipe(map(() => 'done')).subscribe(stream);
+      handler.publish('sgrud.test.bus.stream', stream).subscribe();
     });
   });
 
-  describe('pushing an error through a bus', () => {
-    const bus = throwError(() => null);
+  describe('observing an empty stream by handle', () => {
     const handler = new BusHandler();
+    const stream = new Subject();
 
-    it('emits the error to the observer', (done) => {
-      const subscription = handler.get<never>(
-        'sgrud.test.bus.error'
-      ).pipe(
-        catchError((error) => of({
-          handle: null,
-          value: error
-        }))
-      ).subscribe(({
-        handle,
-        value
-      }) => {
-        expect(handle).toBeNull();
-        expect(value).toBeNull();
+    it('does not emit any values under the handle', (done) => {
+      handler.observe('sgrud.test.bus.empty').pipe(
+        timeout(500),
+        materialize(),
+        takeWhile((next, index) => {
+          switch (index) {
+            case 0: expect(next).toMatchObject({
+              error: expect.any(TimeoutError),
+              kind: 'E'
+            }); break;
+          }
+
+          return next.kind !== 'E';
+        })
+      ).subscribe({
+        complete: done,
+        error: done
       });
 
-      subscription.add(done);
-      handler.set('sgrud.test.bus.error', bus).subscribe();
+      timer(250).pipe(map(() => 'done')).subscribe(stream);
+      handler.publish('sgrud.test.bus.stream', stream).subscribe();
+    });
+  });
+
+  describe('observing an erroring stream by handle', () => {
+    const handler = new BusHandler();
+    const stream = timer(250).pipe(switchMap(() => throwError(() => 'error')));
+
+    it('observes errors emitted under the handle', (done) => {
+      handler.observe('sgrud.test.bus').pipe(takeWhile((next, index) => {
+        switch (index) {
+          case 0: expect(next).toMatchObject({
+            error: 'error',
+            handle: 'sgrud.test.bus.error',
+            kind: 'E'
+          }); break;
+        }
+
+        return next.kind !== 'E';
+      })).subscribe({
+        complete: done,
+        error: done
+      });
+
+      handler.publish('sgrud.test.bus.error', stream).subscribe();
+    });
+  });
+
+  describe('observing an uplinked stream by handle', () => {
+    const handler = new BusHandler();
+    const stream = new Subject();
+
+    it('observes values emitted under the handle', (done) => {
+      handler.uplink('sgrud.test.bus', location.href).subscribe({
+        error: done
+      });
+
+      handler.observe('sgrud.test.bus').pipe(takeWhile((next: any, index) => {
+        switch (index) {
+          case 0: expect(next).toMatchObject({
+            handle: 'sgrud.test.bus.stream',
+            kind: 'N',
+            value: 'done'
+          }); break;
+          case 1: expect(next).toMatchObject({
+            handle: 'sgrud.test.bus.stream',
+            kind: 'C'
+          }); break;
+          case 2: expect(next).toMatchObject({
+            handle: 'sgrud.test.bus.socket',
+            kind: 'N',
+            value: {
+              handle: 'sgrud.test.bus.stream',
+              kind: 'N',
+              value: 'done'
+            }
+          }); break;
+          case 3: expect(next).toMatchObject({
+            handle: 'sgrud.test.bus.socket',
+            kind: 'N',
+            value: {
+              handle: 'sgrud.test.bus.stream',
+              kind: 'C'
+            }
+          }); break;
+        }
+
+        return next.value?.kind !== 'C';
+      })).subscribe({
+        complete: done,
+        error: done
+      });
+
+      timer(250).pipe(map(() => 'done')).subscribe(stream);
+      handler.publish('sgrud.test.bus.stream', stream).subscribe();
     });
   });
 

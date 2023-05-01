@@ -1,43 +1,37 @@
 /**
- * Abstract **Enum** helper class. This class is used by the [Model][] to detect
- * enumerations within a [Graph][], as enumerations (in contrast to plain
- * strings) must not be quoted. This class should never be instantiated
- * manually, but instead is used internally by the [enumerate][] function.
+ * Abstract **Enum** helper class. This class is used by the {@link Model} to
+ * detect **Enum**erations within a {@link Model.Graph}, as **Enum**erations (in
+ * contrast to plain strings) must not be quoted. This class should never be
+ * instantiated manually, but instead is used internally by the
+ * {@link enumerate} function.
  *
- * [enumerate]: https://sgrud.github.io/client/functions/data.enumerate
- * [Graph]: https://sgrud.github.io/client/types/data.Model-1.Graph
- * [Model]: https://sgrud.github.io/client/classes/data.Model
- *
- * @see [enumerate][]
+ * @see {@link enumerate}
  */
 export abstract class Enum extends String {
 
   /**
    * Private **constructor** (which should never be called).
    *
-   * @throws TypeError.
+   * @throws A {@link TypeError} upon construction.
    */
   // @ts-expect-error missing super call
   private constructor() {
-    throw new TypeError();
+    throw new TypeError('Enum.constructor');
   }
 
 }
 
 /**
- * **Enumerate** helper function. Enumerations are special objects and all used
- * TypeScript [enums][] have to be looped through this helper function before
- * they can be utilized in conjunction with the [Model][].
+ * **enumerate** helper function. Enumerations are special objects and all used
+ * TypeScript `enum`s have to be looped through this helper function before they
+ * can be utilized in conjunction with the {@link Model}.
  *
- * [enums]: https://www.typescriptlang.org/docs/handbook/enums.html
- * [Model]: https://sgrud.github.io/client/classes/data.Model
- *
- * @param enumerator - TypeScript enumeration.
- * @typeParam T - Enumeration type.
- * @returns Processed enumeration.
+ * @param enumerator - The TypeScript `enum` to **enumerate**.
+ * @typeParam T - The type of TypeScript `enum`.
+ * @returns The processed enumeration to be used by the {@link Model}.
  *
  * @example
- * **Enumerate** a TypeScript enumeration:
+ * **enumerate** a TypeScript enumeration:
  * ```ts
  * import { enumerate } from '@sgrud/data';
  *
@@ -50,10 +44,10 @@ export abstract class Enum extends String {
  * export const ExampleEnum = enumerate(Enumeration);
  * ```
  *
- * @see [Model][]
+ * @see {@link Model}
  */
 export function enumerate<T extends object>(enumerator: T): T {
-  const enumeration = { } as Record<string, Enum>;
+  const enumeration = {} as Record<string, Enum>;
 
   for (const key in enumerator) {
     const value = new String(enumerator[key]);

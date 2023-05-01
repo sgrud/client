@@ -2,22 +2,30 @@ import { customElements, route, Route } from '@sgrud/shell';
 
 describe('@sgrud/shell/router/route', () => {
 
-  class EntryElement extends HTMLElement { }
-  class ParentElement extends HTMLElement { }
-  class ChildElement extends HTMLElement { }
-  class GrandchildElement extends HTMLElement { }
-  class SlotElement extends HTMLElement { }
-  class UnboundElement extends HTMLElement { }
+  /*
+   * Variables
+   */
 
-  customElements.define('entry-element', EntryElement);
+  class RootElement extends HTMLElement {}
+  customElements.define('root-element', RootElement);
+
+  class ParentElement extends HTMLElement {}
   customElements.define('parent-element', ParentElement);
+
+  class ChildElement extends HTMLElement {}
   customElements.define('child-element', ChildElement);
-  customElements.define('grandchild-element', GrandchildElement);
+
+  class FinalElement extends HTMLElement {}
+  customElements.define('final-element', FinalElement);
+
+  class SlotElement extends HTMLElement {}
   customElements.define('slot-element', SlotElement);
 
-  const entry = {
+  class UnknownElement extends HTMLElement {}
+
+  const root = {
     parent: HTMLElement,
-    path: 'entry',
+    path: 'root',
     slots: {
       slot: HTMLElement
     }
@@ -29,8 +37,8 @@ describe('@sgrud/shell/router/route', () => {
       {
         path: ''
       },
-      EntryElement,
-      UnboundElement
+      RootElement,
+      UnknownElement
     ]
   };
 
@@ -42,24 +50,28 @@ describe('@sgrud/shell/router/route', () => {
     }
   };
 
-  const grandchild = {
-    parent: child as unknown as Route,
-    path: 'grandchild',
+  const final = {
+    parent: child as any,
+    path: 'final',
     slots: {
-      slot: 'slot-element' as CustomElementTagName
+      slot: 'slot-element' as const
     }
   };
 
-  const unbound = {
+  const unknown = {
     path: 'two'
   };
 
+  /*
+   * Unittests
+   */
+
   describe('applying the decorator', () => {
-    Route(entry)(EntryElement);
+    Route(root)(RootElement);
     Route(parent)(ParentElement);
     Route(child)(ChildElement);
-    Route(grandchild)(GrandchildElement);
-    Route(unbound)(UnboundElement);
+    Route(final)(FinalElement);
+    Route(unknown)(UnknownElement);
 
     it('exposes the processed route on the constructor', () => {
       expect((ParentElement as { [route]?: Route })[route]).toMatchObject({
@@ -70,16 +82,16 @@ describe('@sgrud/shell/router/route', () => {
             path: ''
           },
           {
-            path: 'entry',
-            component: 'entry-element'
+            path: 'root',
+            component: 'root-element'
           },
           {
             path: 'child',
             component: 'child-element',
             children: [
               {
-                path: 'grandchild',
-                component: 'grandchild-element'
+                path: 'final',
+                component: 'final-element'
               }
             ]
           }

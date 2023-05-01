@@ -1,117 +1,184 @@
-import { BehaviorSubject, finalize, map, merge, Observable, shareReplay, switchMap } from 'rxjs';
-import { Thread } from '../../../core/src/thread/thread';
-import '../../../core/src/thread/transfer';
-import { Singleton } from '../../../core/src/utility/singleton';
-import { BusHandle, BusValue } from '../handler/handler';
+import { Bus } from '@sgrud/bus/src/bus/bus';
+import '@sgrud/bus/src/bus/transfer';
+import { Thread } from '@sgrud/core/src/thread/thread';
+import '@sgrud/core/src/thread/transfer';
+import { assign } from '@sgrud/core/src/utility/assign';
+import { Singleton } from '@sgrud/core/src/utility/singleton';
+import { TypeOf } from '@sgrud/core/src/utility/type-of';
+import { BehaviorSubject, connectable, distinctUntilChanged, filter, finalize, map, materialize, merge, Observable, ObservableInput, ReplaySubject, Subscription, switchMap } from 'rxjs';
+import { WebSocketSubject } from 'rxjs/webSocket';
 
 /**
- * The **BusWorker** is a [Worker][] process, [Spawn][]ed by the [BusHandler][]
- * to handle all published and subscribed to busses and the aggregation of their
- * values depending on their hierarchy.
+ * The **BusWorker** is a background {@link Thread} which is {@link Spawn}ed by
+ * the {@link BusHandler} to handle all {@link publish}ed and {@link observe}d
+ * {@link streams}, {@link uplinks} and their aggregation depending on their
+ * hierarchy.
  *
- * [BusHandler]: https://sgrud.github.io/client/classes/bus.BusHandler
- * [Singleton]: https://sgrud.github.io/client/functions/core.Singleton
- * [Spawn]: https://sgrud.github.io/client/functions/core.Spawn
- * [Thread]: https://sgrud.github.io/client/functions/core.Thread-1
- * [Worker]: https://developer.mozilla.org/docs/Web/API/Worker/Worker
+ * @decorator {@link Thread}
+ * @decorator {@link Singleton}
  *
- * @decorator [Thread][]
- * @decorator [Singleton][]
- *
- * @see [BusHandler][]
+ * @see {@link BusHandler}
  */
 @Thread()
-@Singleton<typeof BusWorker>()
+@Singleton()
 export class BusWorker {
 
   /**
-   * Internal mapping containing all established **busses**. Updating this
-   * mapping should always be accompanied by an emittance of *changes*.
-   */
-  private readonly busses: Map<BusHandle, Observable<BusValue<any>>>;
-
-  /**
-   * [BehaviorSubject][] emitting every time a bus is added or deleted from the
-   * internal *busses* mapping, i.e., when **changes** occur on the *busses*
-   * mapping. This emittance is used to recompile the open [Subscription][]s
-   * previously obtained to through use of the *get* method.
-   *
-   * [BehaviorSubject]: https://rxjs.dev/api/index/class/BehaviorSubject
-   * [Subscription]: https://rxjs.dev/api/index/class/Subscription
+   * {@link BehaviorSubject} emitting every time when **changes** occur on the
+   * internal {@link streams} or {@link uplinks} mappings. This emittance is
+   * used to recombine the {@link Observable} streams which were previously
+   * obtained to through use of the {@link observe} method.
    */
   private readonly changes: BehaviorSubject<this>;
 
   /**
+   * Internal {@link Map}ping containing all established **streams**. Updating
+   * this map should always be accompanied by an emittance of {@link changes}.
+   */
+  private readonly streams: Map<Bus.Handle, Observable<Bus.Value<unknown>>>;
+
+  /**
+   * Internal {@link Map}ping containing all established **uplinks**. Updating
+   * this map should always be accompanied by an emittance of {@link changes}.
+   */
+  private readonly uplinks: Map<Bus.Handle, Observable<Bus.Value<unknown>>>;
+
+  /**
    * Public **constructor**. This **constructor** is called once when the
-   * [BusHandler][] [Spawn][]s the [Worker][] running this class.
+   * {@link BusHandler} {@link Spawn}s this {@link BusWorker}.
    *
-   * [BusHandler]: https://sgrud.github.io/client/classes/bus.BusHandler
-   * [BusWorker]: https://sgrud.github.io/client/classes/bus.BusWorker
-   * [Singleton]: https://sgrud.github.io/client/functions/core.Singleton
-   * [Spawn]: https://sgrud.github.io/client/functions/core.Spawn
-   * [Thread]: https://sgrud.github.io/client/functions/core.Thread-1
-   * [Worker]: https://developer.mozilla.org/docs/Web/API/Worker/Worker
+   * @remarks This method should only be invoked by the {@link BusHandler}.
    */
   public constructor() {
-    this.busses = new Map<BusHandle, Observable<BusValue<any>>>();
     this.changes = new BehaviorSubject<this>(this);
+    this.streams = new Map<Bus.Handle, Observable<Bus.Value<unknown>>>();
+    this.uplinks = new Map<Bus.Handle, Observable<Bus.Value<unknown>>>();
   }
 
   /**
-   * Invoking this method **get**s the [Observable][] bus represented by the
-   * supplied `handle`. This method is called by the [BusHandler][] and is only
-   * then proxied to the [Worker][] running this class.
+   * Invoking this method **observe**s all {@link Observable} {@link streams}
+   * under the supplied `handle` by {@link merge}ing all {@link streams} which
+   * are {@link publish}ed under the supplied `handle`.
    *
-   * [BusHandle]: https://sgrud.github.io/client/types/bus.BusHandle
-   * [BusHandler]: https://sgrud.github.io/client/classes/bus.BusHandler
-   * [Observable]: https://rxjs.dev/api/index/class/Observable
-   * [Worker]: https://developer.mozilla.org/docs/Web/API/Worker/Worker
+   * @param handle - The {@link Bus.Handle} to **observe**.
+   * @returns An {@link Observable} stream for `handle`.
    *
-   * @param handle - [BusHandle][] to **get**.
-   * @returns [Observable][] bus for `handle`.
-
+   * @remarks This method should only be invoked by the {@link BusHandler}.
    */
-  public get(handle: BusHandle): Observable<BusValue<any>> {
-    return this.changes.pipe(switchMap(() => {
-      const busses = [];
+  public async observe<T>(
+    handle: Bus.Handle
+  ): Promise<Observable<Bus.Value<T>>> {
+    return this.changes.pipe(
+      map(() => {
+        const streams = [];
 
-      for (const [key, value] of this.busses) {
-        if (key.startsWith(handle)) {
-          busses.push(value);
+        for (const [key, value] of this.streams) {
+          if (key.startsWith(handle)) {
+            streams.push(value as Observable<Bus.Value<T>>);
+          }
         }
-      }
 
-      return merge(...busses);
-    }));
+        for (const [key, value] of this.uplinks) {
+          if (key.startsWith(handle)) {
+            streams.push(value as Observable<Bus.Value<T>>);
+          }
+        }
+
+        return streams;
+      }),
+      distinctUntilChanged((a, b) => {
+        return a.every((i) => b.includes(i)) && b.every((i) => a.includes(i));
+      }),
+      switchMap((streams) => {
+        return merge(...streams);
+      })
+    );
   }
 
   /**
-   * Invoking this method **set**s the supplied [Observable][] `bus` for the
-   * supplied `handle`. This method is called by the [BusHandler][] and is only
-   * then proxied to the [Worker][] running this class.
+   * Invoking this method **publish**es the supplied {@link ObservableInput}
+   * `stream` under the supplied `handle`. Any emittance of the **publish**ed
+   * `stream` will be {@link materialize}d into {@link Bus.Value}s and replayed
+   * once to every {@link observe}r.
    *
-   * [BusHandle]: https://sgrud.github.io/client/types/bus.BusHandle
-   * [BusHandler]: https://sgrud.github.io/client/classes/bus.BusHandler
-   * [Observable]: https://rxjs.dev/api/index/class/Observable
-   * [Worker]: https://developer.mozilla.org/docs/Web/API/Worker/Worker
+   * @param handle - The {@link Bus.Handle} to **publish** under.
+   * @param stream - The {@link ObservableInput} `stream` for `handle`.
+   * @returns A {@link Promise} of the `stream` **publish**ment.
+   * @throws A {@link ReferenceError} on collision of `handle`s.
    *
-   * @param handle - [BusHandle][] to **set**.
-   * @param bus - [Observable][] bus for `handle`.
+   * @remarks This method should only be invoked by the {@link BusHandler}.
    */
-  public set(handle: BusHandle, bus: Observable<any>): void {
-    this.busses.set(handle, bus.pipe(
-      map((value) => ({
-        handle,
-        value
-      })),
-      finalize(() => {
-        this.busses.delete(handle);
+  public async publish<T>(
+    handle: Bus.Handle,
+    stream: ObservableInput<T>
+  ): Promise<void> {
+    if (this.streams.has(handle)) {
+      throw new ReferenceError(handle);
+    } else {
+      (stream = connectable(stream, {
+        connector: () => new ReplaySubject<T>(1),
+        resetOnDisconnect: false
+      })).connect().add(() => {
+        this.streams.delete(handle);
         this.changes.next(this);
-      }),
-      shareReplay()
-    ));
+      });
 
-    this.changes.next(this);
+      this.streams.set(handle, stream.pipe(materialize(), map((value) => {
+        return assign(value, { handle });
+      })));
+
+      this.changes.next(this);
+    }
+  }
+
+  /**
+   * Invoking this method **uplink**s the supplied `handle` to the supplied
+   * `url` by establishing a {@link WebSocket} connection between the endpoint
+   * behind the supplied `url` and this {@link BusWorker}. It is assumed, that
+   * all messages emanating from the {@link WebSocket} endpoint conform to the
+   * {@link Bus.Value} type and are therefore treated as such. This treatment
+   * includes the filtering of all received and submitted messages by comparing
+   * their corresponding {@link Bus.Handle} and the supplied `handle`.
+   *
+   * @param handle - The {@link Bus.Handle} to **uplink**.
+   * @param url - The endpoint `url` to establish an **uplink** to.
+   * @returns A {@link Promise} of the {@link Subscription} to the **uplink**.
+   * @throws A {@link ReferenceError} on collision of `handle`s.
+   *
+   * @remarks This method should only be invoked by the {@link BusHandler}.
+   */
+  public async uplink(handle: Bus.Handle, url: string): Promise<Subscription> {
+    if (this.uplinks.has(handle)) {
+      throw new ReferenceError(handle);
+    } else {
+      const buffer = new Set<unknown>();
+      const socket = new WebSocketSubject<Bus.Value<unknown>>({
+        url, WebSocketCtor: TypeOf.process(globalThis.process)
+          ? require('ws').WebSocket as typeof WebSocket
+          : WebSocket
+      });
+
+      const stream = await this.observe(handle);
+      const uplink = socket.pipe(filter((value) => {
+        if (value.handle.startsWith(handle)) {
+          buffer.add(value);
+          return true;
+        }
+
+        return false;
+      }));
+
+      this.uplinks.set(handle, uplink);
+      this.changes.next(this);
+
+      return stream.pipe(filter((value) => {
+        return !buffer.delete(value);
+      }), finalize(() => {
+        this.uplinks.delete(handle);
+        this.changes.next(this);
+        socket.complete();
+      })).subscribe(socket);
+    }
   }
 
 }

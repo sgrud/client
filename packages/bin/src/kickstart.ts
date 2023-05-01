@@ -1,9 +1,7 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-
-import { removeSync } from 'fs-extra';
+import { rmSync } from 'fs';
 import { join, resolve } from 'path';
 import simpleGit from 'simple-git';
-import { cli, _b, _g, __ } from './.cli';
+import { __, _b, _g, cli } from './.cli';
 
 cli.command('kickstart [library]')
   .describe('Kickstarts a SGRUD-based project using `simple-git`')
@@ -13,7 +11,8 @@ cli.command('kickstart [library]')
   .action((library, opts) => kickstart({ ...opts, library }));
 
 /**
- * **Kickstart**s a [SGRUD][]-based project using [simple-git][].
+ * **kickstart**s a [SGRUD](https://sgrud.github.io)-based project using
+ * [simple-git](https://github.com/steveukx/git-js).
  *
  * ```text
  * Description
@@ -31,11 +30,8 @@ cli.command('kickstart [library]')
  *   $ sgrud kickstart preact --prefix ./module # Kickstart preact in ./module
  * ```
  *
- * [SGRUD]: https://sgrud.github.io
- * [simple-git]: https://github.com/steveukx/git-js
- *
- * @param options - Options object.
- * @returns Execution promise.
+ * @param options - The `options` object.
+ * @returns An execution {@link Promise}.
  *
  * @example
  * Run with default options:
@@ -46,7 +42,7 @@ cli.command('kickstart [library]')
  * ```
  *
  * @example
- * **Kickstart** `preact` in `./module`:
+ * **kickstart** `preact` in `./module`:
  * ```js
  * require('@sgrud/bin');
  *
@@ -75,7 +71,7 @@ export async function kickstart({
    */
   prefix?: string;
 
-} = { }): Promise<void> {
+} = {}): Promise<void> {
   const { repository } = require(resolve(__dirname, 'package.json'));
 
   console.log(
@@ -97,5 +93,5 @@ export async function kickstart({
     library
   ]);
 
-  removeSync(join(prefix, '.git'));
+  rmSync(join(prefix, '.git'));
 }

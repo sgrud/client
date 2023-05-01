@@ -7,11 +7,9 @@
   "exports": "../../dist/state/index.modern.js",
   "unpkg": "../../dist/state/index.umd.js",
   "amdNames": {
-    "@babel/runtime/helpers/assertThisInitialized": null,
+    "@babel/runtime/helpers/createClass": null,
     "@babel/runtime/helpers/createForOfIteratorHelperLoose": null,
-    "@babel/runtime/helpers/extends": null,
     "@babel/runtime/helpers/inheritsLoose": null,
-    "@babel/runtime/helpers/wrapNativeSuper": null,
     "@sgrud/bus": null,
     "@sgrud/core": null,
     "@sgrud/state": null,
@@ -27,18 +25,20 @@
       "./src/worker"
     ],
     "resources": [
-      "./README.md"
+      "./README.md",
+      "../../.gitignore"
     ],
     "runtimify": [
       "@babel/runtime:helpers.umd"
     ]
   },
   "dependencies": {
-    "@babel/runtime": "^7.20.13",
+    "@babel/runtime": "^7.21.5",
     "@sgrud/bus": "latest",
     "@sgrud/core": "latest",
-    "comlink": "^4.3.1",
-    "rxjs": "^7.8.0",
+    "better-sqlite3": "^8.3.0",
+    "comlink": "^4.4.1",
+    "rxjs": "^7.8.1",
     "tslib": "^2.5.0"
   },
   "sgrudDependencies": {

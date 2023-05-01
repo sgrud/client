@@ -2,32 +2,48 @@ import { Linker } from '@sgrud/core';
 
 describe('@sgrud/core/linker/linker', () => {
 
+  /*
+   * Variables
+   */
+
   class Service {
-    public constructor(public readonly param?: string) { }
+
+    public constructor(
+      public readonly param?: string
+    ) {}
+
   }
 
   class ServiceOne extends Service {
+
     public constructor(param: string = 'one') {
       super(param);
     }
+
   }
 
   class ServiceTwo extends Service {
+
     public constructor(param: string = 'two') {
       super(param);
     }
+
   }
 
-  describe('instantiating a linker', () => {
-    const linker = new Linker<typeof Service>();
+  /*
+   * Unittests
+   */
 
-    it('returns the singleton linker', () => {
-      expect(linker).toBe(new Linker<typeof Service>());
+  describe('constructing an instance', () => {
+    const linker = new Linker();
+
+    it('returns the singleton instance', () => {
+      expect(linker).toBe(new Linker());
     });
   });
 
   describe('resolving a target constructor', () => {
-    const linker = new Linker<typeof ServiceOne | typeof ServiceTwo>();
+    const linker = new Linker();
 
     it('returns the linked instance', () => {
       expect(linker.get(ServiceOne)).toBeInstanceOf(ServiceOne);
@@ -37,8 +53,8 @@ describe('@sgrud/core/linker/linker', () => {
     });
   });
 
-  describe('programmatically inserting an instance', () => {
-    const linker = new Linker<typeof ServiceTwo>();
+  describe('programmatically linking an instance', () => {
+    const linker = new Linker();
 
     it('links the target constructor to the inserted instance', () => {
       linker.set(ServiceTwo, new ServiceTwo('three'));
@@ -49,7 +65,7 @@ describe('@sgrud/core/linker/linker', () => {
   });
 
   describe('resolving all extending constructors', () => {
-    const linker = new Linker<typeof Service>();
+    const linker = new Linker();
 
     it('returns all extending linked instance', () => {
       const links = linker.getAll(Service);

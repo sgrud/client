@@ -3,7 +3,8 @@
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
-    "plugin:@typescript-eslint/recommended-requiring-type-checking"
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "plugin:@typescript-eslint/strict"
   ],
   "ignorePatterns": [
     "*.js"
@@ -41,23 +42,30 @@
         ]
       }
     ],
+    "@typescript-eslint/no-dynamic-delete": "off",
     "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-extraneous-class": "off",
     "@typescript-eslint/no-inferrable-types": "off",
     "@typescript-eslint/no-namespace": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/no-shadow": "error",
     "@typescript-eslint/no-this-alias": "off",
+    "@typescript-eslint/no-unnecessary-condition": "off",
     "@typescript-eslint/no-unsafe-argument": "off",
     "@typescript-eslint/no-unsafe-assignment": "off",
     "@typescript-eslint/no-unsafe-call": "off",
     "@typescript-eslint/no-unsafe-member-access": "off",
     "@typescript-eslint/no-unsafe-return": "off",
     "@typescript-eslint/no-unused-vars": "error",
+    "@typescript-eslint/no-var-requires": "off",
     "@typescript-eslint/object-curly-spacing": [
       "error",
       "always"
     ],
+    "@typescript-eslint/prefer-as-const": "off",
+    "@typescript-eslint/prefer-nullish-coalescing": "off",
     "@typescript-eslint/prefer-readonly": "error",
+    "@typescript-eslint/prefer-return-this-type": "error",
     "@typescript-eslint/quotes": [
       "error",
       "single"
@@ -92,12 +100,13 @@
     "max-len": [
       "error",
       {
-        "ignorePattern": "^(import| +\\* \\[[^\\]]+\\]: https?:\\/\\/\\S+)",
+        "ignorePattern": "^import",
         "code": 80
       }
     ],
     "no-case-declarations": "off",
     "no-cond-assign": "off",
+    "no-multi-spaces": "error",
     "no-multiple-empty-lines": [
       "error",
       {

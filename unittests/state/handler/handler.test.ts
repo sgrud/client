@@ -1,222 +1,218 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable @typescript-eslint/unbound-method */
 
-import { BusHandler } from '@sgrud/bus';
 import { Mutable } from '@sgrud/core';
 import { Effect, StateHandler, Store } from '@sgrud/state';
-import { expose } from 'comlink';
-import nodeEndpoint from 'comlink/dist/umd/node-adapter';
 import express from 'express';
 import { Server } from 'http';
-import { from, Subject, switchMap } from 'rxjs';
-import { MessageChannel } from 'worker_threads';
-
-declare global {
-  namespace sgrud.state.effects {
-    function test(): void;
-  }
-}
-
-globalThis.MessageChannel = new Proxy<any>(MessageChannel, {
-  construct: (...args) => {
-    const messageChannel = Reflect.construct(...args);
-    messageChannel.port1 = nodeEndpoint(messageChannel.port1);
-    messageChannel.port2 = nodeEndpoint(messageChannel.port2);
-    return messageChannel;
-  }
-});
+import { from, map } from 'rxjs';
 
 describe('@sgrud/state/handler/handler', () => {
+
+  /*
+   * Fixtures
+   */
 
   let server: Server;
   afterAll(() => server.close());
   beforeAll(() => server = express()
-    .use('/api/sgrud/v1/insmod', (_, r) => r.send({ }))
     .use('/node_modules/@sgrud/state/worker', (_, r) => r.send(module))
     .listen(location.port));
 
-  const container = {
+  (navigator as Mutable<Navigator>).serviceWorker = {
     register: jest.fn(),
     controller: {
-      postMessage: jest.fn((message) => {
-        expose(module, message[module.name]);
-      })
+      postMessage: jest.fn()
     }
-  };
+  } as unknown as ServiceWorkerContainer;
 
-  (navigator as Mutable<Navigator>).serviceWorker = (
-    container as unknown as ServiceWorkerContainer
-  );
-
-  const module = {
-    name: '@sgrud/state/worker',
-    exports: './worker.esmod.js' as string | undefined,
-    unpkg: './worker.unpkg.js' as string | undefined,
-
-    connect: jest.fn(),
-    deploy: jest.fn(),
-    dispatch: jest.fn(),
-    implant: jest.fn()
-  };
+  /*
+   * Variables
+   */
 
   class EffectClass extends Effect {
+
     public function(): Store.Effects['test'] {
-      return Function.prototype as () => void;
+      return Function.prototype as (...args: any[]) => any;
     }
+
   }
 
   class StoreClass extends Store<StoreClass> {
+
     public readonly param?: string;
+
     public setParam(param: string): Store.State<this> {
-      return { ...this, param };
+      return Object.assign({}, this, { param });
     }
+
   }
 
-  describe('instantiating a handler', () => {
+  const module = {
+    name: '@sgrud/state/worker',
+    exports: './worker.esmod.js',
+    unpkg: './worker.unpkg.js',
+
+    connect: jest.fn(() => Promise.resolve()),
+    deploy: jest.fn(() => Promise.resolve()),
+    implant: jest.fn(() => Promise.resolve())
+  };
+
+  /*
+   * Unittests
+   */
+
+  describe('constructing an instance', () => {
     const handler = new StateHandler();
 
-    const registered = [
-      [
-        location.origin,
-        'node_modules',
-        module.name,
-        module.exports
-      ].join('/'),
-      {
-        scope: location.origin,
-        type: 'module'
-      }
-    ];
-
-    it('registers and connects the service worker', async() => {
-      await handler.worker;
-
-      expect(container.register).toHaveBeenCalledWith(...registered);
-      expect(module.connect).toHaveBeenCalled();
+    it('returns the singleton instance', () => {
+      expect(handler).toBe(new StateHandler());
     });
 
-    it('returns the singleton handler', () => {
-      expect(handler).toBe(new StateHandler());
+    it('constructs the corresponding worker', (done) => {
+      from(handler.worker).pipe(map((next) => {
+        expect(next).toBeInstanceOf(Function);
+      })).subscribe({
+        complete: done,
+        error: done
+      });
     });
   });
 
-  describe('deploying a store and dispatching an action', () => {
-    const handle = 'sgrud.test.state.class';
+  describe('deploying a store', () => {
     const handler = new StateHandler();
-    const state = { param: undefined };
 
-    const deployed = [
-      handle,
-      expect.any(Function),
-      state,
-      false
-    ];
-
-    const dispatched = [
-      'setParam',
-      ['next']
-    ] as Store.Action<StoreClass>;
-
-    it('correctly deploys the store and dispatches the action', (done) => {
-      handler.deploy(handle, StoreClass, state).pipe(
-        switchMap((store) => store.dispatch(...dispatched))
-      ).subscribe(() => {
-        expect(module.dispatch).toHaveBeenCalledWith(handle, dispatched);
-        expect(module.deploy).toHaveBeenCalledWith(...deployed);
-        done();
+    it('correctly deploys the store', (done) => {
+      handler.deploy('sgrud.test.state.class', StoreClass, {
+        param: undefined
+      }).pipe(map((next) => {
+        expect(next).toBeUndefined();
+      })).subscribe({
+        complete: done,
+        error: done
       });
     });
   });
 
   describe('dispatching an action', () => {
-    const handle = 'sgrud.test.state.class';
     const handler = new StateHandler();
 
-    const dispatched = [
-      'setParam',
-      ['next']
-    ] as Store.Action<any>;
-
     it('correctly dispatches the action', (done) => {
-      handler.dispatch(handle, ...dispatched).subscribe(() => {
-        expect(module.dispatch).toHaveBeenCalledWith(handle, dispatched);
-        done();
+      handler.dispatch<StoreClass>('sgrud.test.state.class', 'setParam', [
+        'done'
+      ]).pipe(map((next) => {
+        expect(next.param).toBe('done');
+      })).subscribe({
+        complete: done,
+        error: done
       });
     });
   });
 
-  describe('deploying a store again and subscribing to its state', () => {
-    const bus = new Subject<string>();
-    const handle = 'sgrud.test.state.class';
+  describe('deprecating a store', () => {
     const handler = new StateHandler();
-    const state = { param: undefined };
 
-    it('correctly re-deploys the store and emits state changes', (done) => {
-      const subscription = handler.deploy(handle, StoreClass, state).pipe(
-        switchMap((store) => from(store))
-      ).subscribe((value) => {
-        expect(value).toBe('done');
-        subscription.unsubscribe();
+    it('correctly deprecates the store', (done) => {
+      handler.deprecate('sgrud.test.state.class').pipe(map((next) => {
+        expect(next).toBeUndefined();
+      })).subscribe({
+        complete: done,
+        error: done
       });
-
-      subscription.add(() => {
-        bus.complete();
-        done();
-      });
-
-      new BusHandler().set(handle, bus).subscribe();
-      setTimeout(() => bus.next('done'), 250);
     });
   });
 
   describe('implanting an effect', () => {
     const handler = new StateHandler();
-    const locate = 'test';
-
-    const implantd = [
-      locate,
-      expect.any(Function)
-    ];
 
     it('correctly implants the effect', (done) => {
-      handler.implant(locate, EffectClass).subscribe(() => {
-        expect(module.implant).toHaveBeenLastCalledWith(...implantd);
-        done();
+      handler.implant('test', EffectClass).pipe(map((next) => {
+        expect(next).toBeUndefined();
+      })).subscribe({
+        complete: done,
+        error: done
       });
     });
   });
 
-  describe('instantiating a handler in a legacy environment', () => {
-    const register = [
-      [
-        location.origin,
-        'node_modules',
-        module.name,
-        module.unpkg
-      ].join('/'),
-      {
-        scope: location.origin,
-        type: 'classic'
-      }
-    ];
+  describe('invalidating an effect', () => {
+    const handler = new StateHandler();
 
-    it('returns the singleton handler', async() => {
-      jest.resetModules();
-      Object.assign(globalThis, { sgrud: true });
-
-      const handler = new (require('@sgrud/state').StateHandler)();
-      await expect(handler.worker).resolves.toBeInstanceOf(Function);
-      expect(container.register).toHaveBeenCalledWith(...register);
-      expect(module.connect).toHaveBeenCalled();
+    it('correctly invalidates the effect', (done) => {
+      handler.invalidate('test').pipe(map((next) => {
+        expect(next).toBeUndefined();
+      })).subscribe({
+        complete: done,
+        error: done
+      });
     });
   });
 
-  describe('instantiating a handler in an incompatible environment', () => {
-    it('throws an error', async() => {
+  describe('constructing an instance in an node environment', () => {
+    it('constructs a node worker through the factory', async() => {
       jest.resetModules();
-      delete module.unpkg;
 
-      const handler = new (require('@sgrud/state').StateHandler)();
-      await expect(handler.worker).rejects.toThrowError(ReferenceError);
+      jest.mock('comlink', () => ({
+        ...jest.requireActual('comlink'),
+        transfer: jest.fn(),
+        wrap: jest.fn(() => module)
+      }));
+
+      jest.mock('@sgrud/bus', () => ({
+        ...jest.requireActual('@sgrud/bus'),
+        BusHandler: jest.fn(() => ({
+          worker: {
+            [require('comlink').createEndpoint]: Function.prototype
+          }
+        }))
+      }));
+
+      const { StateHandler: Handler } = require('@sgrud/state');
+      await expect(new Handler().worker).resolves.toBe(module);
+    });
+  });
+
+  describe('constructing an instance in an esm environment', () => {
+    it('constructs an esm worker through the factory', async() => {
+      jest.resetModules();
+      globalThis.process = undefined!;
+
+      const { StateHandler: Handler } = require('@sgrud/state');
+      await expect(new Handler().worker).resolves.toBe(module);
+
+      expect(navigator.serviceWorker.register).toBeCalledWith(
+        `/node_modules/${module.name}/${module.exports}`, {
+          scope: `/node_modules/${module.name}`,
+          type: 'module'
+        }
+      );
+    });
+  });
+
+  describe('constructing an instance in an umd environment', () => {
+    it('constructs an umd worker through the factory', async() => {
+      jest.resetModules();
+      globalThis.sgrud = undefined! || true;
+
+      const { StateHandler: Handler } = require('@sgrud/state');
+      await expect(new Handler().worker).resolves.toBe(module);
+
+      expect(navigator.serviceWorker.register).toBeCalledWith(
+        `/node_modules/${module.name}/${module.unpkg}`, {
+          scope: `/node_modules/${module.name}`,
+          type: 'classic'
+        }
+      );
+    });
+  });
+
+  describe('constructing an instance in an incompatible environment', () => {
+    it('throws an error on worker construction', async() => {
+      jest.resetModules();
+      module.exports = undefined!;
+      module.unpkg = undefined!;
+
+      const { StateHandler: Handler } = require('@sgrud/state');
+      await expect(new Handler().worker).rejects.toThrow();
     });
   });
 

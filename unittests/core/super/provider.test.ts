@@ -2,51 +2,71 @@ import { Provide, provide, Provider } from '@sgrud/core';
 
 describe('@sgrud/core/super/provider', () => {
 
-  @Provide<typeof Base>()
+  /*
+   * Variables
+   */
+
+  @Provide()
   abstract class Base {
-    public static readonly [provide]:
-    'sgrud.test.Base' = 'sgrud.test.Base' as const;
-    public constructor(public readonly baseParam: string) { }
-    public baseSelf: () => this = () => this;
+
+    public static readonly [provide]: 'sgrud.test.Base' = 'sgrud.test.Base';
+
+    public constructor(
+      public readonly baseParam: string
+    ) {}
+
+    public base: () => this = () => this;
+
     public self: () => this = () => this;
+
   }
 
-  class Class extends Provider<typeof Base>('sgrud.test.Base') {
-    public constructor(public readonly classParam: string) {
-      super(classParam);
+  class Service extends Provider('sgrud.test.Base') {
+
+    public constructor(
+      public readonly serviceParam: string
+    ) {
+      super(serviceParam);
     }
-    public classSelf: () => this = () => this;
-    public override self: () => this = () => this;
+
+    public self: () => this = () => this;
+
+    public service: () => this = () => this;
+
   }
+
+  /*
+   * Unittests
+   */
 
   describe('extending a provider by magic string', () => {
-    const extending = new class extends Class { }('extending');
-    const instance = new Class('instance');
-    const unknown = new class { };
+    const extended = new class extends Service {}('extended');
+    const instance = new Service('instance');
+    const unknown = new class {};
 
     it('calls the super constructor', () => {
-      expect(instance.classParam).toBe('instance');
+      expect(instance.base()).toBeInstanceOf(Base);
+      expect(instance.self()).toBeInstanceOf(Service);
+      expect(instance.service()).toBeInstanceOf(Service);
       expect(instance.baseParam).toBe('instance');
-      expect(instance.classSelf()).toBeInstanceOf(Class);
-      expect(instance.baseSelf()).toBeInstanceOf(Base);
-      expect(instance.self()).toBeInstanceOf(Class);
-    });
-
-    it('simulates the prototype chain', () => {
-      expect(instance).toBeInstanceOf(Base);
-      expect(instance).toBeInstanceOf(Class);
-      expect(extending).toBeInstanceOf(Base);
-      expect(extending).toBeInstanceOf(Class);
-      expect(unknown).not.toBeInstanceOf(Base);
-      expect(unknown).not.toBeInstanceOf(Class);
+      expect(instance.serviceParam).toBe('instance');
     });
 
     it('does not interfere with downstream inheritance', () => {
-      expect(extending.classParam).toBe('extending');
-      expect(extending.baseParam).toBe('extending');
-      expect(extending.classSelf()).toBeInstanceOf(Class);
-      expect(extending.baseSelf()).toBeInstanceOf(Base);
-      expect(extending.self()).toBeInstanceOf(Class);
+      expect(extended.base()).toBeInstanceOf(Base);
+      expect(extended.self()).toBeInstanceOf(Service);
+      expect(extended.service()).toBeInstanceOf(Service);
+      expect(extended.baseParam).toBe('extended');
+      expect(extended.serviceParam).toBe('extended');
+    });
+
+    it('simulates the prototype chain', () => {
+      expect(extended).toBeInstanceOf(Base);
+      expect(extended).toBeInstanceOf(Service);
+      expect(instance).toBeInstanceOf(Base);
+      expect(instance).toBeInstanceOf(Service);
+      expect(unknown).not.toBeInstanceOf(Base);
+      expect(unknown).not.toBeInstanceOf(Service);
     });
   });
 

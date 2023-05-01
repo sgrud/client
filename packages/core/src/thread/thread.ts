@@ -1,31 +1,22 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-
 import { expose, Remote } from 'comlink';
 import { TypeOf } from '../utility/type-of';
 
 /**
- * Type alias describing an exposed class in a remote context. Created by
- * wrapping a [Comlink][] *Remote* in a *Promise*. Used and intended to be used
- * in conjunction with the [Thread][] decorator.
+ * Type alias describing an exposed class in a remote context. Represented by
+ * wrapping a {@link Remote} in a {@link Promise}. Used and intended to be used
+ * in conjunction with the {@link Thread} decorator.
  *
- * [Comlink]: https://www.npmjs.com/package/comlink
- * [Thread]: https://sgrud.github.io/client/functions/core.Thread-1
+ * @typeParam T - The {@link Remote} **Thread** type.
  *
- * @typeParam T - Instance type.
- *
- * @see [Thread][]
+ * @see {@link Thread}
  */
 export type Thread<T> = Promise<Remote<T>>;
 
 /**
- * Class decorator factory. Exposes an instance of the decorated class as
- * [Worker][] **Thread** via [Comlink][].
+ * Class decorator factory. {@link expose}s an instance of the decorated class
+ * as {@link Worker} **Thread**.
  *
- * @returns Class decorator.
- *
- * [Comlink]: https://www.npmjs.com/package/comlink
- * [Spawn]: https://sgrud.github.io/client/functions/core.Spawn
- * [Worker]: https://developer.mozilla.org/docs/Web/API/Worker/Worker
+ * @returns A class constructor decorator.
  *
  * @example
  * ExampleWorker **Thread**:
@@ -33,33 +24,32 @@ export type Thread<T> = Promise<Remote<T>>;
  * import { Thread } from '@sgrud/core';
  *
  * ⁠@Thread()
- * export class ExampleWorker { }
+ * export class ExampleWorker {}
  * ```
  *
- * @see [Spawn][]
+ * @see {@link Spawn}
  */
 export function Thread() {
 
-  // eslint-disable-next-line valid-jsdoc
   /**
-   * @param constructor - Class constructor to be decorated.
-   * @throws ReferenceError.
+   * @param constructor - The class `constructor` to be decorated.
+   * @throws A {@link ReferenceError} when the environment is incompatible.
    */
-  return function(
-    constructor: new () => any
-  ): void {
+  return function(constructor: new () => any): void {
     if (TypeOf.function(globalThis.importScripts)) {
-      return expose(new constructor());
+      expose(new constructor());
     } else if (TypeOf.process(globalThis.process)) {
       const { isMainThread, parentPort } = require('worker_threads');
 
       if (!isMainThread) {
         const nodeEndpoint = require('comlink/dist/umd/node-adapter');
-        return expose(new constructor(), nodeEndpoint(parentPort));
+        expose(new constructor(), nodeEndpoint(parentPort));
+      } else {
+        throw new TypeError(constructor.name);
       }
+    } else {
+      throw new TypeError(constructor.name);
     }
-
-    throw new ReferenceError(constructor.name);
   };
 
 }

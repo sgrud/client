@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-
 import { Spawn, Thread } from '@sgrud/core';
 import { createEndpoint, wrap } from 'comlink';
 import express from 'express';
@@ -7,163 +5,199 @@ import { Server } from 'http';
 import { from, map, switchMap } from 'rxjs';
 import { Worker } from 'worker_threads';
 
-globalThis.Worker = jest.fn();
-
 describe('@sgrud/core/thread/spawn', () => {
+
+  /*
+   * Fixtures
+   */
 
   let server: Server;
   afterAll(() => server.close());
   beforeAll(() => server = express()
-    .use('/api/sgrud/v1/insmod', (_, r) => r.send({ }))
     .use('/node_modules/@sgrud/bus/worker', (_, r) => r.send(module))
     .listen(location.port));
 
-  const module = {
-    name: '@sgrud/bus/worker',
-    exports: './busWorker.esmod.js' as string | undefined,
-    unpkg: './busWorker.unpkg.js' as string | undefined
-  };
+  afterEach(() => (globalThis.Worker as jest.Mock).mockClear());
+  globalThis.Worker = jest.fn();
 
-  class Class {
+  /*
+   * Variables
+   */
+
+  class Handler {
+
     @Spawn(new Worker('(' + (() => {
-      require('./dist/core').Thread()(class {
+      const Module = require('module');
+      const { _resolveFilename } = Module;
+
+      // @ts-expect-error implicit any
+      Module._resolveFilename = (id, parent) => {
+        if (id.startsWith('@sgrud/')) {
+          return require.resolve(id.replace('@sgrud', './dist'));
+        }
+
+        return _resolveFilename(id, parent);
+      };
+
+      require('@sgrud/core').Thread()(class {
         /* eslint-disable @typescript-eslint/explicit-member-accessibility */
         /* eslint-disable @typescript-eslint/typedef */
-        thirteen = 13;
+        property = [{}];
         // @ts-expect-error implicit any
-        callable = (...args) => args.length;
+        method = (param) => param;
         /* eslint-enable @typescript-eslint/explicit-member-accessibility */
         /* eslint-enable @typescript-eslint/typedef */
       });
     }) + ')()', { eval: true }))
     public readonly worker!: Thread<{
-      callable: (...args: any[]) => number;
-      thirteen: number;
+      readonly property: [{}];
+      readonly method: (param: unknown) => unknown;
     }>;
-    public readonly error!: Thread<any>;
-    public readonly esm!: Thread<any>;
-    public readonly umd!: Thread<any>;
+
+    public readonly cjs!: Thread<unknown>;
+
+    public readonly esm!: Thread<unknown>;
+
+    public readonly err!: Thread<unknown>;
+
+    public readonly umd!: Thread<unknown>;
+
   }
 
+  const module = {
+    name: '@sgrud/bus/worker',
+    exports: './worker.esmod.js',
+    unpkg: './worker.unpkg.js'
+  };
+
+  /*
+   * Unittests
+   */
+
   describe('applying the decorator', () => {
+    const spawn = from(Handler.prototype.worker);
+
     it('spawns the worker through the factory', (done) => {
-      from(Class.prototype.worker).subscribe((worker) => {
-        expect(worker).toBeInstanceOf(Function);
-        done();
+      spawn.pipe(map((next) => {
+        expect(next).toBeInstanceOf(Function);
+      })).subscribe({
+        complete: done,
+        error: done
       });
     });
   });
 
-  describe('getting a primitive', () => {
+  describe('getting a value', () => {
+    const spawn = from(Handler.prototype.worker).pipe(
+      switchMap((worker) => Promise.resolve(worker.property)),
+      switchMap((next) => Promise.resolve(next[0]))
+    );
+
     it('returns the promisified value', (done) => {
-      from(Class.prototype.worker).pipe(
-        switchMap((worker) => Promise.resolve(worker.thirteen))
-      ).subscribe((thirteen) => {
-        expect(thirteen).toBe(13);
-        done();
+      spawn.pipe(map((next) => {
+        expect(next).toMatchObject({});
+      })).subscribe({
+        complete: done,
+        error: done
       });
     });
   });
 
-  describe('calling a function', () => {
+  describe('calling a method', () => {
+    const spawn = from(Handler.prototype.worker).pipe(
+      switchMap((worker) => Promise.resolve(worker.method([{}])))
+    );
+
     it('returns the promisified return value', (done) => {
-      from(Class.prototype.worker).pipe(
-        switchMap((worker) => Promise.resolve(worker.callable([], 1, '2')))
-      ).subscribe((length) => {
-        expect(length).toBe(3);
-        done();
+      spawn.pipe(map((next) => {
+        expect(next).toMatchObject({});
+      })).subscribe({
+        complete: done,
+        error: done
       });
     });
   });
 
-  describe('getting a primitive from a new endpoint', () => {
+  describe('getting a value from a new endpoint', () => {
+    const spawn = from(Handler.prototype.worker).pipe(
+      switchMap((worker) => worker[createEndpoint]()),
+      map((messagePort) => wrap<any>(messagePort)),
+      switchMap((worker) => Promise.resolve(worker.property)),
+      switchMap((next) => Promise.resolve(next[0]))
+    );
+
     it('returns the promisified value from the new endpoint', (done) => {
-      from(Class.prototype.worker).pipe(
-        switchMap((worker) => worker[createEndpoint]()),
-        map((messagePort) => wrap<any>(messagePort)),
-        switchMap((worker) => Promise.resolve(worker.thirteen))
-      ).subscribe((thirteen) => {
-        expect(thirteen).toBe(13);
-        done();
+      spawn.pipe(map((next) => {
+        expect(next).toMatchObject({});
+      })).subscribe({
+        complete: done,
+        error: done
       });
     });
   });
 
-  describe('calling a function on a new endpoint', () => {
+  describe('calling a method on a new endpoint', () => {
+    const spawn = from(Handler.prototype.worker).pipe(
+      switchMap((worker) => worker[createEndpoint]()),
+      map((messagePort) => wrap<any>(messagePort)),
+      switchMap((worker) => Promise.resolve(worker.method([{}])))
+    );
+
     it('returns the promisified return value from the new endpoint', (done) => {
-      from(Class.prototype.worker).pipe(
-        switchMap((worker) => worker[createEndpoint]()),
-        map((messagePort) => wrap<any>(messagePort)),
-        switchMap((worker) => Promise.resolve(worker.callable([], 1, '2')))
-      ).subscribe((length) => {
-        expect(length).toBe(3);
-        done();
+      spawn.pipe(map((next) => {
+        expect(next).toMatchObject({});
+      })).subscribe({
+        complete: done,
+        error: done
       });
+    });
+  });
+
+  describe('spawning a worker by string in an node environment', () => {
+    it('spawns the node worker through the factory', async() => {
+      jest.resetModules();
+
+      require('@sgrud/core').Spawn(module.name)(Handler.prototype, 'cjs');
+      await expect(Handler.prototype.cjs).resolves.toBeInstanceOf(Function);
     });
   });
 
   describe('spawning a worker by string in an esm environment', () => {
-    const worker = [
-      [
-        location.origin,
-        'node_modules',
-        module.name,
-        module.exports
-      ].join('/'),
-      {
-        type: 'module'
-      }
-    ];
-
     it('spawns the esm worker through the factory', async() => {
+      globalThis.process = undefined!;
       jest.resetModules();
-      Object.assign(globalThis, { process: false });
 
-      const { Spawn: Decorator } = require('@sgrud/core');
-      Decorator('@sgrud/bus/worker')(Class.prototype, 'esm');
+      require('@sgrud/core').Spawn(module.name)(Handler.prototype, 'esm');
+      await expect(Handler.prototype.esm).resolves.toBeInstanceOf(Function);
 
-      await expect(Class.prototype.esm).resolves.toBeInstanceOf(Function);
-      expect(globalThis.Worker).toBeCalledWith(...worker);
+      expect(globalThis.Worker).toBeCalledWith(
+        `/node_modules/${module.name}/${module.exports}`, { type: 'module' }
+      );
     });
   });
 
   describe('spawning a worker by string in an umd environment', () => {
-    const worker = [
-      [
-        location.origin,
-        'node_modules',
-        module.name,
-        module.unpkg
-      ].join('/'),
-      {
-        type: 'classic'
-      }
-    ];
-
     it('spawns the umd worker through the factory', async() => {
+      globalThis.sgrud = undefined! || true;
       jest.resetModules();
-      Object.assign(globalThis, { process: false });
-      Object.assign(globalThis, { sgrud: true });
 
-      const { Spawn: Decorator } = require('@sgrud/core');
-      Decorator('@sgrud/bus/worker')(Class.prototype, 'umd');
+      require('@sgrud/core').Spawn(module.name)(Handler.prototype, 'umd');
+      await expect(Handler.prototype.umd).resolves.toBeInstanceOf(Function);
 
-      await expect(Class.prototype.umd).resolves.toBeInstanceOf(Function);
-      expect(globalThis.Worker).toBeCalledWith(...worker);
+      expect(globalThis.Worker).toBeCalledWith(
+        `/node_modules/${module.name}/${module.unpkg}`, { type: 'classic' }
+      );
     });
   });
 
   describe('spawning a worker by string in an incompatible environment', () => {
     it('throws an error', async() => {
+      module.exports = undefined!;
+      module.unpkg = undefined!;
       jest.resetModules();
-      Object.assign(globalThis, { process: false });
-      delete module.exports;
-      delete module.unpkg;
 
-      const { Spawn: Decorator } = require('@sgrud/core');
-      Decorator('@sgrud/bus/worker')(Class.prototype, 'error');
-
-      await expect(Class.prototype.error).rejects.toThrowError(ReferenceError);
+      require('@sgrud/core').Spawn(module.name)(Handler.prototype, 'err');
+      await expect(Handler.prototype.err).rejects.toThrowError(ReferenceError);
     });
   });
 

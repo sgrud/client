@@ -1,86 +1,20 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-
-import { expose, proxy, ProxyMarked, proxyMarker, transferHandlers, wrap } from 'comlink';
-import { Observable, Observer, Subscribable, Subscriber } from 'rxjs';
+import { expose, ProxyMarked, transferHandlers, wrap } from 'comlink';
 import { TypeOf } from '../utility/type-of';
 
-/**
- * [Comlink][] **transferHandler** for values of type [Observable][]. This
- * custom implementation of a [Comlink][] **transferHandler** transparently
- * proxies [Observable][] streams between two [Comlink][] endpoints.
- *
- * [Comlink]: https://www.npmjs.com/package/comlink
- * [Observable]: https://rxjs.dev/api/index/class/Observable
- *
- * @remarks https://github.com/GoogleChromeLabs/comlink/issues/219
- */
-transferHandlers.set('observable', {
-  canHandle: (value: unknown): value is Observable<unknown> => {
-    return value instanceof Observable;
-  },
-  deserialize: (value: unknown) => {
-    return new Observable<unknown>((observer) => {
-      value = transferHandlers.get('proxy')!.deserialize(value);
-      (value as Subscribable<unknown>).subscribe(proxy({
-        next: (next: unknown) => observer.next(next),
-        error: (error: unknown) => observer.error(error),
-        complete: () => observer.complete()
-      }));
-    });
-  },
-  serialize: (value: Observable<unknown>) => {
-    return transferHandlers.get('proxy')!.serialize({
-      subscribe: (observer: Observer<unknown>) => {
-        return value.subscribe({
-          next: (next: unknown) => observer.next(next),
-          error: (error: unknown) => observer.error(error),
-          complete: () => observer.complete()
-        });
-      }
-    });
-  }
-});
-
-/**
- * [Comlink][] **transferHandler** for values of type [Subscriber][]. This
- * custom implementation of a [Comlink][] **transferHandler** transparently
- * proxies the [Subscriber][] to a previously proxied [Observable][] stream
- * between two [Comlink][] endpoints.
- *
- * [Comlink]: https://www.npmjs.com/package/comlink
- * [Observable]: https://rxjs.dev/api/index/class/Observable
- * [Subscriber]: https://rxjs.dev/api/index/class/Subscriber
- */
-transferHandlers.set('subscriber', {
-  canHandle: (value: unknown): value is Subscriber<unknown> => {
-    return value instanceof Subscriber;
-  },
-  deserialize: (value: unknown) => {
-    return transferHandlers.get('proxy')!.deserialize(value);
-  },
-  serialize: (value: Subscriber<unknown>) => {
-    return transferHandlers.get('proxy')!.serialize(value);
-  }
-});
-
 if (TypeOf.process(globalThis.process)) {
-  const { MessageChannel } = require('worker_threads');
   const nodeEndpoint = require('comlink/dist/umd/node-adapter');
+  const { MessageChannel } = require('worker_threads');
 
   /**
-   * Overridden default [Comlink][] *proxyTransferHandler* **transferHandler**.
-   * This custom implementation of a [Comlink][] **transferHandler** adopts the
-   * default [Comlink][] *proxyTransferHandler* for usage under NodeJS.
-   *
-   * [Comlink]: https://www.npmjs.com/package/comlink
+   * Alteration of the {@link transferHandlers}, allowing values to be proxied
+   * between endpoints under NodeJS.
    *
    * @remarks https://github.com/GoogleChromeLabs/comlink/issues/313
    */
   transferHandlers.set('proxy', {
-    canHandle: (value: unknown): value is ProxyMarked => {
-      return value instanceof Object && proxyMarker in value;
-    },
-    deserialize: (value: unknown) => {
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    canHandle: transferHandlers.get('proxy')!.canHandle,
+    deserialize: (value: MessagePort) => {
       return wrap(nodeEndpoint(value));
     },
     serialize: (value: ProxyMarked) => {

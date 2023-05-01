@@ -1,8 +1,8 @@
 /**
- * **Pluralize**s words of the English language.
+ * **pluralize**s words of the English language.
  *
- * @param singular - English word in singular form.
- * @returns **Pluralize**d form of `singular`.
+ * @param singular - An English word in `singular` form.
+ * @returns The **pluralize**d form of `singular`.
  *
  * @example
  * **Pluralize** `'money'`:
@@ -21,7 +21,7 @@
  * ```
  */
 export function pluralize(singular: string): string {
-  if (uncountables.indexOf(singular.toLowerCase()) === -1) {
+  if (!uncountables.includes(singular.toLowerCase())) {
     for (const word in irregulars) {
       const pattern = new RegExp(`${word}$`, 'i');
 

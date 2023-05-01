@@ -1,94 +1,105 @@
 import { BusHandler, Publish } from '@sgrud/bus';
-import { Subject } from 'rxjs';
+import { Subject, map, takeWhile, timer } from 'rxjs';
 
 describe('@sgrud/bus/handler/publish', () => {
 
+  /*
+   * Variables
+   */
+
   class ClassOne {
+
     @Publish('sgrud.test.bus.one')
-    public readonly bus!: Subject<string>;
+    public readonly publish!: Subject<string>;
+
   }
 
   class ClassTwo {
-    @Publish('sgrud.test.bus', 'handle')
-    public readonly bus: Subject<string>;
-    public handle?: string;
-    public constructor(handle?: string) {
-      if (handle) this.handle = handle;
-      this.bus = new Subject<string>();
-    }
+
+    @Publish('sgrud.test.bus', 'suffix')
+    public readonly publish!: Subject<string>;
+
+    public constructor(
+      public readonly suffix: string
+    ) {}
+
   }
 
+  /*
+   * Unittests
+   */
+
   describe('applying the decorator', () => {
-    const assign = () => Object.assign(classOne, { bus: undefined });
     const classOne = new ClassOne();
 
-    it('freezes the bus on the prototype', () => {
-      expect(classOne.bus).toBeInstanceOf(Subject);
-      expect(classOne.bus).toBe(new ClassOne().bus);
-      expect(assign).toThrowError(TypeError);
+    it('freezes the property on the prototype', () => {
+      expect(classOne.publish).toBeInstanceOf(Subject);
+      expect(classOne.publish).toBe(new ClassOne().publish);
     });
   });
 
-  describe('applying the scoped decorator', () => {
-    const assign = () => Object.assign(classTwo, { bus: undefined });
-    const classTwo = new ClassTwo('two');
+  describe('applying the suffixed decorator', () => {
+    const classTwo = new ClassTwo('test');
 
-    it('freezes the bus on the instance', () => {
-      expect(classTwo.bus).toBeInstanceOf(Subject);
-      expect(assign).toThrowError(TypeError);
-      classTwo.bus.complete();
+    it('freezes the property on the instance', () => {
+      expect(classTwo.publish).toBeInstanceOf(Subject);
+      expect(classTwo.publish).not.toBe(new ClassTwo('null').publish);
     });
   });
 
   describe('calling next on the decorated prototype property', () => {
-    const classOne = new ClassOne();
     const handler = new BusHandler();
+    const classOne = new ClassOne();
 
     it('emits values through the supplied handle', (done) => {
-      const subscription = handler.get<string>(
-        'sgrud.test.bus'
-      ).subscribe(({
-        handle,
-        value
-      }) => {
-        expect(handle).toBe('sgrud.test.bus.one');
-        expect(value).toBe('one');
-        subscription.unsubscribe();
+      handler.observe('sgrud.test.bus').pipe(takeWhile((next, index) => {
+        switch (index) {
+          case 0: expect(next).toMatchObject({
+            handle: 'sgrud.test.bus.one',
+            kind: 'N',
+            value: 'done'
+          }); break;
+          case 1: expect(next).toMatchObject({
+            handle: 'sgrud.test.bus.one',
+            kind: 'C'
+          }); break;
+        }
+
+        return next.kind !== 'C';
+      })).subscribe({
+        complete: done,
+        error: done
       });
 
-      subscription.add(() => {
-        classOne.bus.complete();
-        done();
-      });
-
-      setTimeout(() => classOne.bus.next('one'), 250);
+      timer(250).pipe(map(() => 'done')).subscribe(classOne.publish);
     });
   });
 
   describe('calling next on the decorated instance property', () => {
-    const classTwo = new ClassTwo();
     const handler = new BusHandler();
+    const classTwo = new ClassTwo('two');
 
-    it('emits values through the scoped handle', (done) => {
-      classTwo.handle = 'two';
+    it('emits values through the suffixed handle', (done) => {
+      handler.observe('sgrud.test.bus').pipe(takeWhile((next, index) => {
+        switch (index) {
+          case 0: expect(next).toMatchObject({
+            handle: 'sgrud.test.bus.two',
+            kind: 'N',
+            value: 'done'
+          }); break;
+          case 1: expect(next).toMatchObject({
+            handle: 'sgrud.test.bus.two',
+            kind: 'C'
+          }); break;
+        }
 
-      const subscription = handler.get<string>(
-        'sgrud.test.bus'
-      ).subscribe(({
-        handle,
-        value
-      }) => {
-        expect(handle).toBe('sgrud.test.bus.two');
-        expect(value).toBe('two');
-        subscription.unsubscribe();
+        return next.kind !== 'C';
+      })).subscribe({
+        complete: done,
+        error: done
       });
 
-      subscription.add(() => {
-        classTwo.bus.complete();
-        done();
-      });
-
-      setTimeout(() => classTwo.bus.next('two'), 250);
+      timer(250).pipe(map(() => 'done')).subscribe(classTwo.publish);
     });
   });
 

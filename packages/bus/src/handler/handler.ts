@@ -1,231 +1,162 @@
-import { Singleton, Spawn, Thread } from '@sgrud/core';
-import { from, Observable, switchMap } from 'rxjs';
+/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
+
+import { Singleton, Spawn, Target, Thread } from '@sgrud/core';
+import { Observable, ObservableInput, ReplaySubject, Subscription, connectable, from, switchMap } from 'rxjs';
+import { Bus } from '../bus/bus';
 import { BusWorker } from '../worker';
 import { name } from '../worker/package.json';
 
 /**
- * The **BusHandle** is a string literal helper type which enforces any assigned
- * value to contain at least three dots. It represents a type constraint which
- * should be thought of as domain name in reverse notation. All **BusHandle**s
- * thereby designate a hierarchical structure, which the [BusHandler][] in
- * conjunction with the [BusWorker][] operate upon.
- *
- * [BusHandler]: https://sgrud.github.io/client/classes/bus.BusHandler
- * [BusWorker]: https://sgrud.github.io/client/classes/bus.BusWorker
- *
- * @example
- * Library-wide **BusHandle**:
- * ```ts
- * import { BusHandle } from '@sgrud/bus';
- *
- * const busHandle: BusHandle = 'io.github.sgrud';
- * ```
- *
- * @example
- * An invalid **BusHandle**:
- * ```ts
- * import { BusHandle } from '@sgrud/bus';
- *
- * const busHandle: BusHandle = 'org.example';
- * // Type [...] is not assignable to type 'BusHandle'.
- * ```
- *
- * @see [BusHandler][]
- */
-export type BusHandle = `${string}.${string}.${string}`;
-
-/**
- * The **BusValue** is an interface describing the shape of all values emitted
- * by any bus. As busses are [Observable][] streams, which are dynamically
- * merged through their hierarchical structure and therefore may emit more than
- * one `value` from more than one `handle`, each value emitted by any bus
- * contains its originating `handle` and its typed internal `value`.
- *
- * [BusHandler]: https://sgrud.github.io/client/classes/bus.BusHandler
- * [Observable]: https://rxjs.dev/api/index/class/Observable
- *
- * @typeParam T - Bus type.
- *
- * @example
- * Logging emitted **BusValue**s.
- * ```ts
- * import { BusHandler } from '@sgrud/bus';
- *
- * const busHandler = new BusHandler();
- * busHandler.get('io.github.sgrud').subscribe(console.log);
- * // { handle: 'io.github.sgrud.example', value: 'published' }
- * ```
- *
- * @see [BusHandler][]
- */
-export interface BusValue<T> {
-
-  /**
-   * Emitting [BusHandle][].
-   *
-   * [BusHandle]: https://sgrud.github.io/client/types/bus.BusHandle
-   */
-  readonly handle: BusHandle;
-
-  /**
-   * Emitted `value`.
-   */
-  readonly value: T;
-
-}
-
-/**
- * The **BusHandler** is a [Singleton][] class, implementing and orchestrating
- * the establishment, transferral and deconstruction of busses in conjunction
- * with the [BusWorker][] process. To designate different busses, the string
- * literal helper type [BusHandle][] is employed. As an example, let the
- * following hierarchical structure be given:
+ * The **BusHandler** is a {@link Target}ed {@link Singleton} class implementing
+ * and orchestrating the establishment, transferral and deconstruction of any
+ * number of {@link Observable} streams. It operates in conjunction with the
+ * {@link BusWorker} {@link Thread} to run in the background. To designate and
+ * organize the different {@link Observable} streams, the string literal helper
+ * type {@link Bus.Handle} is employed. As an example, let the following
+ * hierarchical structure be given:
  *
  * ```text
  * io.github.sgrud
  * ├── io.github.sgrud.core
- * │   ├── io.github.sgrud.core.httpState
- * │   └── io.github.sgrud.core.kernel
+ * │   ├── io.github.sgrud.core.kernel
+ * │   └── io.github.sgrud.core.transit
  * ├── io.github.sgrud.data
  * │   ├── io.github.sgrud.data.model.current
  * │   └── io.github.sgrud.data.model.global
  * └── io.github.sgrud.shell
- *     └── io.github.sgrud.shell.route
+ * │   └── io.github.sgrud.shell.route
+ * └── io.github.sgrud.store
+ *     ├── io.github.sgrud.store.global
+ *     └── io.github.sgrud.store.local
  * ```
  *
- * Depending on the [BusHandle][], one may subscribe to all established busses
- * beneath the root `io.github.sgrud` handle or only to a specific bus, e.g.,
- * `io.github.sgrud.core.kernel`. The resulting [Observable][] will either emit
- * all values passed through all busses with their corresponding [BusHandle][]s,
- * or only the specific scoped values, corresponding to the [BusHandle][].
+ * Depending on the {@link Bus.Handle}, one may {@link observe} all established
+ * streams beneath the root `io.github.sgrud` {@link Bus.Handle} or only one
+ * specific stream, e.g., `io.github.sgrud.core.kernel`. The {@link Observable}
+ * returned from the {@link observe} method will emit all {@link Bus.Value}s
+ * originating from all streams beneath the root {@link Bus.Handle} in the first
+ * case, or only {@link Bus.Value}s from one stream, in the second case.
  *
- * [BusHandle]: https://sgrud.github.io/client/types/bus.BusHandle
- * [BusWorker]: https://sgrud.github.io/client/classes/bus.BusWorker
- * [Observable]: https://rxjs.dev/api/index/class/Observable
- * [Singleton]: https://sgrud.github.io/client/functions/core.Singleton
+ * @decorator {@link Target}
+ * @decorator {@link Singleton}
  *
- * @decorator [Singleton][]
- *
- * @see [BusWorker][]
+ * @see {@link BusWorker}
  */
-@Singleton<typeof BusHandler>((busHandler, [tuples]) => {
-  if (tuples) {
-    for (const [key, value] of tuples) {
-      busHandler.set(key, value).subscribe();
-    }
-  }
-
-  return busHandler;
-})
+@Target()
+@Singleton()
 export class BusHandler {
 
   /**
-   * [Spawn][]ed **worker** process and main bus workhorse. The underlying
-   * [BusWorker][] is run inside a [Worker][] context and handles all published
-   * and subscribed busses and the aggregation of their values depending on
-   * their [BusHandle][], i.e., hierarchy.
+   * {@link Spawn}ed **worker** {@link Thread} and main background workhorse.
+   * The underlying {@link BusWorker} is run inside a {@link Worker} context and
+   * handles {@link publish}ed and {@link observe}d streams and the aggregation
+   * of their values depending on their {@link Bus.Handle}, i.e., hierarchy.
    *
-   * [BusHandle]: https://sgrud.github.io/client/types/bus.BusHandle
-   * [BusWorker]: https://sgrud.github.io/client/classes/bus.BusWorker
-   * [Spawn]: https://sgrud.github.io/client/functions/core.Spawn
-   * [Worker]: https://developer.mozilla.org/docs/Web/API/Worker/Worker
+   * @decorator {@link Spawn}
    *
-   * @decorator [Spawn][]
+   * @see {@link BusWorker}
    */
   @Spawn(name)
   public readonly worker!: Thread<BusWorker>;
 
   /**
-   * Public **constructor**. As this class is a transparent [Singleton][],
-   * calling the `new` operator on it will always yield the same instance. The
-   * `new` operator can therefore be used to bulk-publish busses.
+   * Invoking this method **observe**s the {@link Observable} stream represented
+   * by the supplied `handle`. The method will return an {@link Observable}
+   * originating from the {@link BusWorker} which emits all {@link Bus.Value}s
+   * published under the supplied `handle`. When the **observe** method is
+   * invoked with `'io.github.sgrud'`, all streams hierarchically beneath this
+   * {@link Bus.Handle}, e.g., `'io.github.bus.status'`, will also be emitted by
+   * the returned {@link Observable}.
    *
-   * [Singleton]: https://sgrud.github.io/client/functions/core.Singleton
-   *
-   * @param tuples - List of busses to publish.
-   *
-   * @example
-   * Set the `'io.github.sgrud.example'` bus:
-   * ```ts
-   * import { BusHandler } from '@sgrud/bus';
-   * import { of } from 'rxjs';
-   *
-   * new BusHandler([
-   *   ['io.github.sgrud.example', of('published')]
-   * ]);
-   * ```
-   */
-  public constructor(tuples?: Iterable<[BusHandle, Observable<any>]>) {
-    if (tuples) {
-      for (const [key, value] of tuples) {
-        this.set(key, value).subscribe();
-      }
-    }
-  }
-
-  /**
-   * Invoking this method **get**s the [Observable][] bus represented by the
-   * supplied `handle`. The method will return an [Observable][] originating
-   * from the [BusWorker][] which emits all [BusValue][]s published under the
-   * supplied `handle`. When **get**ting `'io.github.sgrud'`, all busses
-   * hierarchically beneath this `handle`, e.g., `'io.github.bus.status'`, will
-   * also be emitted by the returned [Observable][].
-   *
-   * [BusHandle]: https://sgrud.github.io/client/types/bus.BusHandle
-   * [BusValue]: https://sgrud.github.io/client/interfaces/bus.BusValue
-   * [BusWorker]: https://sgrud.github.io/client/classes/bus.BusWorker
-   * [Observable]: https://rxjs.dev/api/index/class/Observable
-   *
-   * @param handle - [BusHandle][] to **get**.
-   * @typeParam T - Bus type.
-   * @returns [Observable][] bus for `handle`.
+   * @param handle - The {@link Bus.Handle} to **observe**.
+   * @typeParam T - The type of the **observe**d {@link Observable} stream.
+   * @returns An {@link Observable} bus for `handle`.
    *
    * @example
-   * **Get** the `'io.github.sgrud'` bus:
+   * **observe** the `'io.github.sgrud'` stream:
    * ```ts
    * import { BusHandler } from '@sgrud/bus';
    *
    * const busHandler = new BusHandler();
-   * busHandler.get('io.github.sgrud.example').subscribe(console.log);
+   * const handle = 'io.github.sgrud.example';
+   *
+   * busHandler.observe(handle).subscribe(console.log);
    * ```
    */
-  public get<T>(handle: BusHandle): Observable<BusValue<T>> {
+  public observe<T>(handle: Bus.Handle): Observable<Bus.Value<T>> {
     return from(this.worker).pipe(
-      switchMap((worker) => worker.get(handle)),
-      switchMap((value) => value)
+      switchMap((worker) => worker.observe(handle)),
+      switchMap((value) => value as Observable<Bus.Value<T>>)
     );
   }
 
   /**
-   * Publishes the supplied [Observable][] `bus` under the supplied `handle`.
-   * Calling this method registers the supplied [Observable][] with the
-   * [BusWorker][]. When the [Observable][] completes, the registration will
-   * self-destruct. When overwriting a registration by supplying a previously
-   * used `handle` in conjunction with a different [Observable][] `bus`, the
-   * previously supplied [Observable][] will be unsubscribed.
+   * Invoking this method **publish**es the supplied {@link Observable} `stream`
+   * under the supplied `handle`. This method returns an {@link Observable} of
+   * the **publish**ment of the supplied {@link Observable} `stream` under the
+   * supplied `handle` with the {@link BusWorker}. When the **publish**ed
+   * `source` {@link Observable} completes, the registration within the
+   * {@link BusWorker} will automatically self-destruct.
    *
-   * [BusHandle]: https://sgrud.github.io/client/types/bus.BusHandle
-   * [BusWorker]: https://sgrud.github.io/client/classes/bus.BusWorker
-   * [Observable]: https://rxjs.dev/api/index/class/Observable
-   *
-   * @param handle - [BusHandle][] to **set**.
-   * @param bus - [Observable][] bus for `handle`.
-   * @typeParam T - Bus type.
-   * @returns [Observable][].
+   * @param handle - The {@link Bus.Handle} to **publish** under.
+   * @param stream - The {@link Observable} `stream` for `handle`.
+   * @typeParam T - The type of the **publish**ed {@link Observable} stream.
+   * @returns An {@link Observable} of the `stream` **publish**ment.
    *
    * @example
-   * **Set** the `'io.github.sgrud.example'` bus:
+   * **publish** a stream under `'io.github.sgrud.example'`:
    * ```ts
    * import { BusHandler } from '@sgrud/bus';
    * import { of } from 'rxjs';
    *
    * const busHandler = new BusHandler();
-   * busHandler.set('io.github.sgrud.example', of('published'));
+   * const handle = 'io.github.sgrud.example';
+   * const stream = of('published');
+   *
+   * busHandler.publish(handle, stream).subscribe();
    * ```
    */
-  public set<T>(handle: BusHandle, bus: Observable<T>): Observable<void> {
+  public publish<T>(
+    handle: Bus.Handle,
+    stream: ObservableInput<T>
+  ): Observable<void> {
+    (stream = connectable(stream, {
+      connector: () => new ReplaySubject<T>(),
+      resetOnDisconnect: false
+    })).connect();
+
     return from(this.worker).pipe(
-      switchMap((worker) => worker.set(handle, bus))
+      switchMap((worker) => worker.publish(handle, stream))
+    );
+  }
+
+  /**
+   * Invoking this method **uplink**s the supplied `handle` to the supplied
+   * `url` by establishing a {@link WebSocket} connection between the endpoint
+   * behind the supplied `url` and the {@link BusWorker}. This method returns an
+   * {@link Observable} of the **uplink** {@link Subscription} which can be used
+   * to cancel the **uplink**. When the **uplink**ed {@link WebSocket} is closed
+   * or throws an error, it is automatically cleaned up and unsubscribed from.
+   *
+   * @param handle - The {@link Bus.Handle} to **uplink**.
+   * @param url - The endpoint `url` to establish an **uplink** to.
+   * @returns An {@link Observable} of the **uplink** {@link Subscription}.
+   *
+   * @example
+   * **uplink** the `'io.github.sgrud.uplink'` {@link Bus.Handle}:
+   * ```ts
+   * import { BusHandler } from '@sgrud/bus';
+   *
+   * const busHandler = new BusHandler();
+   * const handle = 'io.github.sgrud.example';
+   * const url = 'https://example.com/websocket';
+   *
+   * const uplink = busHandler.uplink(handle, url).subscribe();
+   * ```
+   */
+  public uplink(handle: Bus.Handle, url: string): Observable<Subscription> {
+    return from(this.worker).pipe(
+      switchMap((worker) => worker.uplink(handle, url))
     );
   }
 

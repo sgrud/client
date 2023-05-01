@@ -2,6 +2,10 @@ import { pluralize } from '@sgrud/core';
 
 describe('@sgrud/core/utility/pluralize', () => {
 
+  /*
+   * Variables
+   */
+
   const table = [
     ['boy', 'boys'],
     ['girl', 'girls'],
@@ -10,6 +14,10 @@ describe('@sgrud/core/utility/pluralize', () => {
     ['woman', 'women'],
     ['you', 'you']
   ];
+
+  /*
+   * Unittests
+   */
 
   describe.each(table)('pluralizing %s', (singular, plural) => {
     it('returns ' + plural, () => {

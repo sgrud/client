@@ -1,29 +1,34 @@
 import { assign, Linker, Mutable, Singleton, Symbol, Target, TypeOf } from '@sgrud/core';
-import { BehaviorSubject, defer, Observable, of, onErrorResumeNext, Subscribable, throwError, throwIfEmpty } from 'rxjs';
+import { asyncScheduler, BehaviorSubject, defer, first, Observable, onErrorResumeNext, ReplaySubject, Subscribable, throwError, throwIfEmpty } from 'rxjs';
 import { createElement, render } from '../component/runtime';
+import { Queue } from '../queue/queue';
 import { Route } from './route';
-import { RouterTask } from './task';
 
 /**
  * Namespace containing types and interfaces used and intended to be used in
- * conjunction with the [Singleton][] [Router][] class.
+ * conjunction with the {@link Singleton} {@link Router} class.
  *
- * [Router]: https://sgrud.github.io/client/classes/shell.Router
- * [Singleton]: https://sgrud.github.io/client/functions/core.Singleton
- *
- * @see [Router][]
+ * @see {@link Router}
  */
 export namespace Router {
 
   /**
-   * String literal helper type. Represents the **left** part of a path.
+   * Type alias constraining the possible {@link Router} **Action**s to `'pop'`,
+   * `'push'` and `'replace'`. These **Action**s correspond loosely to possible
+   * {@link History} events.
+   */
+  export type Action = 'pop' | 'push' | 'replace';
+
+  /**
+   * String literal helper type. Represents the **Left**est part of a
+   * {@link Route} path.
    *
-   * @typeParam S - Route path string type.
+   * @typeParam S - The {@link Route} path string type.
    *
    * @example
    * **Left** of `'nested/route/path'`:
    * ```ts
-   * import type { Router } from '@sgrud/shell';
+   * import { type Router } from '@sgrud/shell';
    *
    * const left: Router.Left<'nested/route/path'>; // 'nested'
    * ```
@@ -31,19 +36,17 @@ export namespace Router {
   export type Left<S extends string> = S extends `${infer I}/${string}` ? I : S;
 
   /**
-   * Type helper representing the (optional) **Params** of a [Route][] path. By
-   * extracting string literals starting with a colon (and optionally ending on
-   * a question mark), a union type of a key/value pair for each parameter is
+   * Type helper representing the (optional) **Params** of a {@link Route} path.
+   * By extracting string literals starting with a colon (and optionally ending
+   * on a question mark), a union type of a key/value pair for each parameter is
    * created.
    *
-   * [Route]: https://sgrud.github.io/client/interfaces/shell.Route-1
-   *
-   * @typeParam S - Route path string type.
+   * @typeParam S - The {@link Route} path string type.
    *
    * @example
-   * Extract parameters from `'item/:id/field/:name?'`:
+   * Extract **Params** from `'item/:id/field/:name?'`:
    * ```ts
-   * import type { Router } from '@sgrud/shell';
+   * import { type Router } from '@sgrud/shell';
    *
    * const params: Router.Params<'item/:id/field/:name?'>;
    * // { id: string; name?: string; }
@@ -57,188 +60,193 @@ export namespace Router {
     Left<P> extends `${infer I}?`
       ? { [K in I]?: string }
       : { [K in Left<P>]: string }
-  ) : { };
+  ) : {};
 
   /**
-   * Interface describing the shape of a [Router][] **Segment**. A **Segment**
-   * represents a navigated [Route][] and its corresponding [Params][]. As
-   * [Route][]s are represented in a tree-like structure and one **Segment**
-   * represents one layer within the [Route][]-tree, each **Segment** may have a
-   * *parent* and/or a *child*. The resulting graph of **Segment**s represents
-   * the navigated path through the underlying [Route][]-tree.
+   * Interface describing the shape of a **Queue**. These **Queue**s are run
+   * whenever a navigation is triggered and may intercept and mutate the next
+   * {@link State} or completely block or redirect a navigation.
    *
-   * [Params]: https://sgrud.github.io/client/types/shell.Router-1.Params
-   * [Route]: https://sgrud.github.io/client/interfaces/shell.Route-1
-   * [Router]: https://sgrud.github.io/client/classes/shell.Router
+   * @see {@link Queue}
+   */
+  export interface Queue {
+
+    /**
+     * **handle** method, called when a navigation was triggered.
+     *
+     * @param next - The `next` {@link State} to be **handle**d.
+     * @returns An {@link Observable} of the **handle**d {@link State}.
+     */
+    handle(next: State): Observable<State>;
+
+  }
+
+  /**
+   * Interface describing the shape of a {@link Router} **Segment**. A
+   * **Segment** represents a {@link Router.navigate}d {@link Route} and its
+   * corresponding {@link Params}. As {@link Route}s are represented in a
+   * tree-like structure and one **Segment** represents one layer within the
+   * {@link Route}-tree, each **Segment** may have a {@link Segment.parent}
+   * and/or a {@link child}. The resulting graph of **Segment**s represents the
+   * {@link Router.navigate}d path through the underlying {@link Route}-tree.
    *
-   * @typeParam S - Route path string type.
+   * @typeParam S - The {@link Route} path string type.
    */
   export interface Segment<S extends string = string> {
 
     /**
-     * Optional **child** of this *Segment*.
+     * Optional **child** of this {@link Segment}.
      */
     readonly child?: Segment;
 
     /**
-     * [Route][] path [Params][] and corresponding values.
-     *
-     * [Params]: https://sgrud.github.io/client/types/shell.Router-1.Params
-     * [Route]: https://sgrud.github.io/client/interfaces/shell.Route-1
+     * {@link Route} path {@link Params} and their corresponding values.
      */
     readonly params: Params<S>;
 
     /**
-     * Optional **parent** of this *Segment*.
+     * Optional **parent** of this {@link Segment}.
      */
     readonly parent?: Segment;
 
     /**
-     * [Route][] associated to this *Segment*.
-     *
-     * [Route]: https://sgrud.github.io/client/interfaces/shell.Route-1
+     * {@link Route} associated with this {@link Segment}.
      */
     readonly route: Route<S>;
 
   }
 
   /**
-   * Interface describing the shape of a [Router][] **State**. [Router][]
-   * **State**s correspond to the browser history, as each navigation results in
-   * a new **State** being created. Each navigated **State** is represented by
-   * its absolute *path*, a [Segment][] as entrypoint to the graph-like
-   * representation of the navigated path through the route-tree and *search*
-   * parameters.
+   * Interface describing the shape of a **State** of the {@link Router}.
+   * **State**s correspond to the {@link History}, as each navigation results in
+   * a new **State** being created. Each {@link Router.navigate}d **State** is
+   * represented by its absolute {@link path} its {@link search} parameters and
+   * a {@link segment} as entrypoint to the graph-like representation of the
+   * {@link Router.navigate}d path through the route-tree.
    *
-   * [Router]: https://sgrud.github.io/client/classes/shell.Router
-   * [Segment]: https://sgrud.github.io/client/interfaces/shell.Router-1.Segment
-   *
-   * @typeParam S - Route path string type.
+   * @typeParam S - The {@link Route} path string type.
    */
   export interface State<S extends string = string> {
 
     /**
-     * Absolute **path** of the [Router][] *State*.
-     *
-     * [Router]: https://sgrud.github.io/client/classes/shell.Router
+     * Absolute **path** of the {@link State}.
      */
     readonly path: S;
 
     /**
-     * **Search** parameters of the [Router][] *State*.
-     *
-     * [Router]: https://sgrud.github.io/client/classes/shell.Router
+     * **search** parameters of the {@link State}.
      */
     readonly search: string;
 
     /**
-     * [Segment][] of the [Router][] *State*.
-     *
-     * [Router]: https://sgrud.github.io/client/classes/shell.Router
-     * [Segment]: https://sgrud.github.io/client/interfaces/shell.Router-1.Segment
+     * {@link Segment} of the {@link State}.
      */
     readonly segment: Segment<S>;
-
-  }
-
-  /**
-   * Interface describing the shape of a [RouterTask][]. These **Task**s are run
-   * whenever a navigation is triggered and may intercept and mutate the next
-   * [State][] or completely block or redirect a navigation.
-   *
-   * [RouterTask]: https://sgrud.github.io/client/classes/shell.RouterTask
-   * [State]: https://sgrud.github.io/client/interfaces/shell.Router-1.State
-   *
-   * @see [RouterTask][]
-   */
-  export interface Task {
-
-    /**
-     * Method called when a navigation was triggered.
-     *
-     * [Observable]: https://rxjs.dev/api/index/class/Observable
-     * [State]: https://sgrud.github.io/client/interfaces/shell.Router-1.State
-     *
-     * @param next - Next [State][] to be handled.
-     * @returns [Observable][] of handled [State][].
-     */
-    handle(next: State): Observable<State>;
 
   }
 
 }
 
 /**
- * [Target][]ed [Singleton][] Router class extending the built-in *Set*. This
- * [Singleton][] class provides routing and rendering capabilities. Routing is
- * primarily realized by maintaining (inheriting) a *Set* of [Route][]s and
- * (recursively) *match*ing paths against those [Route][]s, when instructed so
- * by calling *navigate*. When a matching [Segment][] is found, the
- * corresponding [Component][]s are rendered by the *handle* method (which is
- * part of the implemented [Task][] contract).
+ * {@link Target}ed {@link Singleton} **Router** class extending the built-in
+ * {@link Set}. This {@link Singleton} class provides routing and rendering
+ * capabilities. Routing is primarily realized by maintaining the inherited
+ * {@link Set} of {@link Route}s and (recursively) {@link match}ing paths
+ * against those {@link Route}s, when instructed so by the {@link navigate}
+ * method. When a matching {@link Segment} is found, the corresponding
+ * {@link Component}s are rendered by the {@link handle} method (which is part
+ * of the implemented {@link Queue} contract).
  *
- * [Component]: https://sgrud.github.io/client/interfaces/shell.Component-1
- * [Route]: https://sgrud.github.io/client/interfaces/shell.Route-1
- * [Segment]: https://sgrud.github.io/client/interfaces/shell.Router-1.Segment
- * [Singleton]: https://sgrud.github.io/client/functions/core.Singleton
- * [Target]: https://sgrud.github.io/client/functions/core.Target
- * [Task]: https://sgrud.github.io/client/interfaces/shell.Router-1.Task
- *
- * @decorator [Target][]
- * @decorator [Singleton][]
+ * @decorator {@link Target}
+ * @decorator {@link Singleton}
  */
-@Target<typeof Router>()
-@Singleton<typeof Router>()
-export class Router extends Set<Route> implements Router.Task {
+@Target()
+@Singleton()
+export class Router extends Set<Route> implements Router.Queue {
 
   /**
+   * Private static {@link ReplaySubject} used as the {@link Router} **loader**.
+   * This **loader** emits every time {@link Route}s are {@link add}ed, whilst
+   * the {@link size} being `0`, so either for the first time after construction
+   * or after the {@link Router} was {@link clear}ed.
+   */
+  private static loader: ReplaySubject<Router>;
+
+  /**
+   * Static `Symbol.observable` method returning a {@link Subscribable}. The
+   * returned {@link Subscribable} mirrors the private {@link loader} and is
+   * used for initializations after a new global {@link Route} tree was
+   * {@link add}ed to the {@link Router}.
    *
+   * @returns A {@link Subscribable} emitting this {@link Router}.
+   *
+   * @example
+   * Subscribe to the {@link Router}:
+   * ```ts
+   * import { Router } from '@sgrud/shell';
+   * import { from } from 'rxjs';
+   *
+   * from(Router).subscribe(console.log);
+   * ```
+   */
+  public static [Symbol.observable](): Subscribable<Router> {
+    return this.loader.asObservable();
+  }
+
+  /**
+   * Static initialization block.
+   */
+  static {
+    this.loader = new ReplaySubject<Router>(1);
+  }
+
+  /**
+   * `declare`d well-known `Symbol.iterator` property. This declaration enforces
+   * correct typing when retrieving the {@link Subscribable} from the well-known
+   * `Symbol.observable` method by voiding the inherited `Symbol.iterator`.
    */
   declare public readonly [Symbol.iterator]: never;
 
   /**
-   * Absolute **baseHref** for navigation.
+   * An absolute **baseHref** for navigation.
+   *
+   * @defaultValue `'/'`
    */
   public readonly baseHref: string;
 
   /**
    * Wether to employ **hashBased** routing.
+   *
+   * @defaultValue `false`
    */
   public readonly hashBased: boolean;
 
   /**
-   * Rendering **outlet** for navigated [Route][]s.
+   * The rendering **outlet** for {@link navigate}d {@link Route}s.
    *
-   * [Route]: https://sgrud.github.io/client/interfaces/shell.Route-1
+   * @defaultValue `document.body`
    */
   public readonly outlet: DocumentFragment | Element;
 
   /**
-   * Internally used [BehaviorSubject][] containing and emitting every navigated
-   * [State][].
-   *
-   * [BehaviorSubject]: https://rxjs.dev/api/index/class/BehaviorSubject
-   * [State]: https://sgrud.github.io/client/interfaces/shell.Router-1.State
+   * Internally used {@link BehaviorSubject} containing and emitting every
+   * {@link navigate}d {@link State}.
    */
   private readonly changes: BehaviorSubject<Router.State>;
 
   /**
-   * Getter mirroring the current value of the *changes* [BehaviorSubject][].
-   *
-   * [BehaviorSubject]: https://rxjs.dev/api/index/class/BehaviorSubject
+   * Getter mirroring the current value of the internal {@link changes}
+   * {@link BehaviorSubject}.
    */
   public get state(): Router.State {
     return this.changes.value;
   }
 
   /**
-   * [Singleton][] *Router* class **constructor**. This **constructor** is
-   * called once by the [Target][] decorator and sets initial values on the
-   * instance. All subsequent calls will return the previously constructed
-   * [Singleton][] instance of this class.
-   *
-   * [Singleton]: https://sgrud.github.io/client/functions/core.Singleton
-   * [Target]: https://sgrud.github.io/client/functions/core.Target
+   * Public {@link Singleton} {@link Router} class **constructor**. This
+   * **constructor** is called once by the {@link Target} decorator and sets
+   * initial values on this instance. All subsequent calls will return the
+   * previously constructed {@link Singleton} instance of this class.
    */
   public constructor() {
     super();
@@ -251,7 +259,7 @@ export class Router extends Set<Route> implements Router.Task {
       path: '',
       search: '',
       segment: {
-        params: { },
+        params: {},
         route: {
           path: ''
         }
@@ -260,17 +268,14 @@ export class Router extends Set<Route> implements Router.Task {
   }
 
   /**
-   * Well-known `Symbol.observable` method returning a [Subscribable][]. The
-   * returned [Subscribable][] emits the current [State][] and every time this
-   * *changes*.
+   * Well-known `Symbol.observable` method returning a {@link Subscribable}. The
+   * returned {@link Subscribable} emits the current {@link State} and every
+   * time this {@link changes}.
    *
-   * [State]: https://sgrud.github.io/client/interfaces/shell.Router-1.State
-   * [Subscribable]: https://rxjs.dev/api/index/interface/Subscribable
-   *
-   * @returns [Subscribable][] emitting [State][] changes.
+   * @returns A {@link Subscribable} emitting {@link State}s.
    *
    * @example
-   * Subscribe to the *Router*:
+   * Subscribe to upcoming {@link State}s:
    * ```ts
    * import { Router } from '@sgrud/shell';
    * import { from } from 'rxjs';
@@ -284,14 +289,12 @@ export class Router extends Set<Route> implements Router.Task {
 
   /**
    * Overridden **add** method. Invoking this method while supplying a `route`
-   * will **add** the supplied `route` to the *Router* after deleting its child
-   * [Route][]s from the *Router*, thereby ensuring that only top-most/root
-   * `route`s remain part of the *Router*.
+   * will **add** the supplied `route` to the {@link Router} after deleting its
+   * child {@link Route}s from the {@link Router}, thereby ensuring that only
+   * root `route`s remain part of the {@link Router}.
    *
-   * [Route]: https://sgrud.github.io/client/interfaces/shell.Route-1
-   *
-   * @param route - [Route][] to **add**.
-   * @returns This instance.
+   * @param route - The {@link Route} to **add** to the {@link Router}.
+   * @returns This instance of the {@link Router}.
    */
   public override add(route: Route): this {
     if (route.children?.length) {
@@ -300,26 +303,32 @@ export class Router extends Set<Route> implements Router.Task {
       }
     }
 
+    if (!this.size) {
+      asyncScheduler.schedule(() => {
+        Router.loader.next(this);
+        Router.loader.complete();
+      });
+    }
+
     return super.add(route);
   }
 
   /**
-   * **Bind**ing helper method. Calling this method will **bind** a handler to
-   * the global `onpopstate` event, invoking *navigate* with the appropriate
-   * arguments. This method furthermore allows the properties *baseHref*,
-   * *hashBased* and *outlet* to be overridden. Invoking the **bind** method
-   * throws an error if called more than once, without invoking the *unbind*
-   * method in between.
+   * **connect**ing helper method. Calling this method will **connect** a
+   * handler to the global `onpopstate` event, invoking {@link navigate} with
+   * the appropriate arguments. This method furthermore allows the properties
+   * {@link Router.baseHref}, {@link Router.hashBased} and {@link Router.outlet}
+   * to be overridden. Invoking the **connect** method throws an error if called
+   * more than once, without invoking the {@link disconnect} method in between
+   * invocations.
    *
-   * [Route]: https://sgrud.github.io/client/interfaces/shell.Route-1
-   *
-   * @param this - Mutable polymorphic `this`.
-   * @param outlet - Rendering outlet for navigated [Route][]s.
-   * @param baseHref - Absolute baseHref for navigation.
-   * @param hashBased - Wether to employ hashBased routing.
-   * @throws ReferenceError.
+   * @param this - The {@link Mutable} explicit polymorphic `this` parameter.
+   * @param outlet - The rendering `outlet` for {@link Route}s.
+   * @param baseHref - An absolute `baseHref` for navigation.
+   * @param hashBased - Wether to employ `hashBased` routing.
+   * @throws A {@link ReferenceError} if already **connect**ed.
    */
-  public bind(
+  public connect(
     this: Mutable<this>,
     outlet: DocumentFragment | Element = this.outlet,
     baseHref: string = this.baseHref,
@@ -330,8 +339,13 @@ export class Router extends Set<Route> implements Router.Task {
     }
 
     window.onpopstate = (event) => {
-      const { search, segment } = event.state as Router.State;
-      this.navigate(segment, search).subscribe();
+      if (event.state) {
+        const { search, segment } = event.state as Router.State;
+        this.navigate(segment, search, 'pop').subscribe();
+      } else {
+        const { hash, pathname, search } = location;
+        this.navigate(pathname + hash, search, 'pop').subscribe();
+      }
     };
 
     if ((
@@ -345,32 +359,51 @@ export class Router extends Set<Route> implements Router.Task {
   }
 
   /**
-   * Implementation of the **handle** method as required by the [Task][]
-   * interface contract. This method is called internally by the *match* method
-   * after all [RouterTask][]s have been invoked. It is therefore considered the
-   * default or fallback [RouterTask][] and handles the rendering of the
-   * supplied `state`.
+   * **disconnect**ing helper method. Calling this method (after calling
+   * {@link connect}) will **disconnect** the previously {@link connect}ed
+   * handler from the global `onpopstate` event. Further, the arguments passed
+   * to {@link connect} are revoked, meaning the default values of the
+   * properties {@link baseHref}, {@link hashBased} and {@link outlet} are
+   * restored. Calling this method without previously {@link connect}ing the
+   * {@link Router} throws an error.
    *
-   * [Observable]: https://rxjs.dev/api/index/class/Observable
-   * [RouterTask]: https://sgrud.github.io/client/classes/shell.RouterTask
-   * [State]: https://sgrud.github.io/client/interfaces/shell.Router-1.State
-   * [Task]: https://sgrud.github.io/client/interfaces/shell.Router-1.Task
+   * @param this - The {@link Mutable} explicit polymorphic `this` parameter.
+   * @throws A {@link ReferenceError} if already **disconnect**ed.
+   */
+  public disconnect(this: Mutable<this>): void {
+    if (!TypeOf.window(globalThis.window) || !window.onpopstate) {
+      throw new ReferenceError('window.onpopstate');
+    }
+
+    this.baseHref = '/';
+    this.hashBased = false;
+    this.outlet = document.body;
+
+    window.onpopstate = null;
+  }
+
+  /**
+   * Implementation of the **handle** method as required by the {@link Queue}
+   * interface contract. It is called internally by the {@link navigate} method
+   * after all {@link Queue}s have been invoked. It is therefore considered the
+   * default or fallback {@link Queue} and handles the rendering of the supplied
+   * `state`.
    *
-   * @param state - *Router* [State][] to handle.
-   * @param replace - Wether to replace the [State][].
-   * @returns [Observable][] of the handled [State][].
+   * @param state - The next {@link State} to handle.
+   * @param action - The {@link Action} to apply to the {@link History}.
+   * @returns An {@link Observable} of the handled {@link State}.
    */
   public handle(
     state: Router.State,
-    replace: boolean = false
+    action: Router.Action = 'push'
   ): Observable<Router.State> {
-    return defer(() => {
+    return new Observable((observer) => {
       let segment = this.spool(state.segment, false);
       let template = [] as JSX.Element;
 
       do {
         if (segment.route.component) {
-          const params = assign({ }, segment.params, { children: template });
+          const params = assign({}, segment.params, { children: template });
 
           for (const key in segment.route.slots) {
             params.children.unshift(...createElement(segment.route.slots[key], {
@@ -382,42 +415,34 @@ export class Router extends Set<Route> implements Router.Task {
         }
       } while (segment = segment.parent!);
 
-      render(this.outlet, template);
-
-      if (replace) {
-        history.replaceState(state, '', this.rebase(state.path));
-      } else {
-        history.pushState(state, '', this.rebase(state.path));
-      }
-
       this.changes.next(state);
-      return of(state);
+      render(this.outlet, template);
+      this.changes.pipe(first()).subscribe(observer);
+
+      if (action !== 'pop') {
+        history[`${action}State`](state, '', this.rebase(state.path));
+      }
     });
   }
 
   /**
-   * [Segment][] **join**ing helper. The supplied `segment` is converted to a
-   * string by *spool*ing to its top-most parent and iterating through all
-   * children while concatenating every encountered path. If said path is an
+   * {@link Segment} **join**ing helper. The supplied `segment` is converted to
+   * a string by {@link spool}ing to its top-most parent and iterating through
+   * all children while concatenating every encountered path. If said path is an
    * (optional) parameter, this portion of the returned string is replaced by
-   * the respective [Params][] value.
+   * the respective {@link Params} value.
    *
-   * [Params]: https://sgrud.github.io/client/types/shell.Router-1.Params
-   * [Segment]: https://sgrud.github.io/client/interfaces/shell.Router-1.Segment
-   *
-   * @param segment - [Segment][] to be **join**ed.
-   * @returns **Join**ed [Segment][] as string.
+   * @param segment - The {@link Segment} to be **join**ed.
+   * @returns The **join**ed {@link Segment} in string form.
    */
   public join(segment: Router.Segment): string {
-    const parts = [] as string[];
+    const parts = [];
     segment = this.spool(segment);
 
     do {
       const paths = segment.route.path.split('/');
 
-      for (let i = 0; i < paths.length; i++) {
-        let path = paths[i];
-
+      for (let path of paths) {
         if (path.startsWith(':')) {
           const key = path.replace(/^:(.+?)\??$/, '$1');
           path = segment.params[key as keyof typeof segment.params];
@@ -434,21 +459,19 @@ export class Router extends Set<Route> implements Router.Task {
 
   /**
    * **Lookup** helper method. Calling this method while supplying a `selector`
-   * and optionally an iterable of `routes` will return the **lookup**ed
-   * [Route][] path for the supplied `selector` or `undefined`, if it does not
-   * occur within at least one route. When multiple occurrences of the same
-   * `selector` exist, the [Route][] path to its first occurrence is returned.
+   * and optionally an array of `routes` to iterate will return the **lookup**ed
+   * {@link Route} path for the supplied `selector` or `undefined`, if it does
+   * not occur within at least one route. When multiple occurrences of the same
+   * `selector` exist, the {@link Route} path to its first occurrence is
+   * returned.
    *
-   * [Component]: https://sgrud.github.io/client/interfaces/shell.Component-1
-   * [Route]: https://sgrud.github.io/client/interfaces/shell.Route-1
-   *
-   * @param selector - [Component][] tag name.
-   * @param routes - Routes to use for **lookup**.
-   * @returns Resolved [Route][] path or `undefined`.
+   * @param selector - The {@link Component} `selector` to **lookup**.
+   * @param routes - An array of `routes` to use for **lookup**.
+   * @returns The **lookup**ed {@link Route} path or `undefined`.
    */
   public lookup(
     selector: string,
-    routes: Iterable<Route> = this
+    routes: Route[] = Array.from(this)
   ): string | undefined {
     for (const route of routes) {
       if (route.component === selector) {
@@ -466,21 +489,18 @@ export class Router extends Set<Route> implements Router.Task {
   }
 
   /**
-   * Main *Router* **match**ing method. Calling this method while supplying a
-   * `path` and optionally an array of `routes` will return a **match**ing
-   * [Segment][] or `undefined`, if no match was found. If no `routes` are
-   * supplied, routes previously added to the *Router* will be used. The
-   * **match** method represents the backbone of the *Router* class, as it,
-   * given a list of `routes` and a `path`, will determine wether this path
-   * represents a **match** within the list of `routes`, thereby effectively
-   * determining navigational integrity.
+   * Main {@link Router} **match**ing method. Calling this method while
+   * supplying a `path` and optionally an array of `routes` will return the
+   * first **match**ing {@link Segment} or `undefined`, if nothing **match**es.
+   * If no `routes` are supplied, routes previously added to the {@link Router}
+   * will be used. The **match** method represents the backbone of this
+   * {@link Router} class, as it, given a list of `routes` and a `path`, will
+   * determine wether this path represents a **match** within the list of
+   * `routes`, thereby effectively determining navigational integrity.
    *
-   * [Route]: https://sgrud.github.io/client/interfaces/shell.Route-1
-   * [Segment]: https://sgrud.github.io/client/interfaces/shell.Router-1.Segment
-   *
-   * @param path - Path to **match** against.
-   * @param routes - [Route][]s to use for **match**ing.
-   * @returns **Match**ing [Segment][] or `undefined`.
+   * @param path - The `path` to **match** `routes` against.
+   * @param routes - An array of `routes` to use for **match**ing.
+   * @returns The first **match**ing {@link Segment} or `undefined`.
    *
    * @example
    * Test if path `'example/route'` **match**es `child` or `route`:
@@ -511,7 +531,7 @@ export class Router extends Set<Route> implements Router.Task {
       const parts = route.path.split('/');
       const paths = path.split('/');
       const segment = {
-        params: { },
+        params: {},
         route
       };
 
@@ -549,7 +569,7 @@ export class Router extends Set<Route> implements Router.Task {
 
           if (paths[i]) {
             assign(segment.params, {
-              [key]: paths[i]
+              [key]: decodeURI(paths[i])
             });
 
             continue;
@@ -583,108 +603,104 @@ export class Router extends Set<Route> implements Router.Task {
   }
 
   /**
-   * Main navigation method. Calling this method while supplying either a path
-   * or [Segment][] as navigation `target` (and optional `search` parameters)
-   * will normalize the path by trying to *match* a respective [Segment][] or
-   * directly use the supplied [Segment][] as next [State][]. This upcoming
-   * [State][] is looped through all linked [RouterTask][]s and finally
-   * *handle*d by the *Router* itself to render the resulting, possibly
-   * intercepted and mutated [State][].
+   * Main **navigate** method. Calling this method while supplying either a path
+   * or {@link Segment} as navigation `target` and optional `search` parameters
+   * will normalize the supplied path by trying to {@link match} a respective
+   * {@link Segment} or directly use the supplied {@link Segment} for the next
+   * {@link State}. This upcoming {@link State} is looped through all linked
+   * {@link Queue}s and finally {@link handle}d by the {@link Router} itself to
+   * render the resulting, possibly intercepted and mutated {@link State}.
    *
-   * [Observable]: https://rxjs.dev/api/index/class/Observable
-   * [RouterTask]: https://sgrud.github.io/client/classes/shell.RouterTask
-   * [Segment]: https://sgrud.github.io/client/interfaces/shell.Router-1.Segment
-   * [State]: https://sgrud.github.io/client/interfaces/shell.Router-1.State
-   *
-   * @param target - Path or [Segment][] to **navigate** to.
-   * @param search - Optional search parameters.
-   * @param replace - Wether to replace the [State][].
-   * @returns [Observable][] of the *Router* [State][].
-   * @throws [Observable][] of an URIError.
+   * @param target - Path or {@link Segment} to **navigate** to.
+   * @param search - Optional `search` parameters in string form.
+   * @param action - The {@link Action} to apply to the {@link History}.
+   * @returns An {@link Observable} of the **navigate**d {@link State}.
+   * @throws An {@link Observable} {@link URIError}, if nothing {@link match}es.
    */
   public navigate(
     target: string | Router.Segment,
     search?: string,
-    replace: boolean = false
+    action: Router.Action = 'push'
   ): Observable<Router.State> {
-    const prev = this.changes.value;
-    const task = (next: Router.State) => this.handle(next, replace);
-    const tasks = new Linker<typeof RouterTask>().getAll(RouterTask);
+    return defer(() => {
+      const prev = this.changes.value;
+      const queue = (next: Router.State) => this.handle(next, action);
+      const queues = new Linker<typeof Queue>().getAll(Queue);
 
-    if (TypeOf.string(target)) {
-      const url = new URL(target, location.origin);
-      const { hash, pathname: path, search: params } = url;
-      const match = this.match(this.rebase(path + hash, false));
+      if (TypeOf.string(target)) {
+        const url = new URL(target, location.origin);
+        const { hash, pathname, search: params } = url;
+        const match = this.match(this.rebase(pathname + hash, false));
 
-      if (!match) {
-        const error = () => new URIError(path + hash);
-        const handle = () => throwError(error);
-        const next = {
-          path: path + hash,
-          search: params,
-          segment: {
-            params: { },
-            route: {
-              path: path + hash
+        if (!match) {
+          const error = () => new URIError(pathname + hash);
+          const handle = () => throwError(error);
+          const next = {
+            path: pathname + hash,
+            search: params,
+            segment: {
+              params: {},
+              route: {
+                path: pathname + hash
+              }
             }
-          }
-        };
+          };
 
-        return onErrorResumeNext(tasks.map((handler) => {
-          return handler.handle(prev, next, { handle });
-        })).pipe(throwIfEmpty(error));
+          return onErrorResumeNext(queues.map((handler) => {
+            return handler.handle(prev, next, { handle });
+          })).pipe(throwIfEmpty(error));
+        }
+
+        target = match;
+        search ??= params;
+      } else {
+        target = this.spool(target);
       }
 
-      target = match;
-      search ??= params;
-    } else {
-      target = this.spool(target);
-    }
-
-    return (function handle(next: Router.State): Observable<Router.State> {
-      return tasks.shift()?.handle(prev, next, { handle }) || task(next);
-    })({
-      path: this.join(target),
-      search: search ?? '',
-      segment: target
+      return (function handle(next: Router.State): Observable<Router.State> {
+        return queues.shift()?.handle(prev, next, { handle }) || queue(next);
+      })({
+        path: this.join(target),
+        search: search ?? '',
+        segment: target
+      });
     });
   }
 
   /**
-   * Rebasing helper method. **Rebase**s the supplied `path` against the current
-   * *baseHref*, by either prepending the *baseHref* to the supplied `path` or
-   * stripping it, depending on the `prefix` argument.
+   * **rebase** helper method. **rebase**s the supplied `path` against the
+   * current {@link baseHref}, by either `prefix`ing the {@link baseHref} to the
+   * supplied `path` or stripping it, depending on the `prefix` argument.
    *
-   * @param path - Path to **rebase** against the *baseHref*.
-   * @param prefix - Wether to prepend or strip the *baseHref*.
-   * @returns **Rebase**d `path`.
+   * @param path - The `path` to **rebase** against the {@link baseHref}.
+   * @param prefix - Wether to `prefix` or strip the {@link baseHref}.
+   * @returns The `path` **rebase**d against the {@link baseHref}.
    */
-  public rebase(
-    path: string,
-    prefix: boolean = true
-  ): string {
+  public rebase(path: string, prefix: boolean = true): string {
     if (prefix) {
       if (!path.startsWith(this.baseHref)) {
         return path.replace(/^\/?/, this.baseHref.replace(/\/?$/, '/'));
       }
     } else {
-      let n = 0; while (n < path.length && path[n] === this.baseHref[n]) n++;
-      return path.slice(n);
+      const paths = path.split('/');
+      const parts = this.baseHref.split('/');
+      let index = 0;
+
+      while (index < paths.length && paths[index] === parts[index]) index++;
+      return paths.slice(index).join('/');
     }
 
     return path;
   }
 
   /**
-   * **Spool**ing helper method. Given a `segment` (and wether to `rewind`), the
-   * top-most parent (or deepest child) of the graph-link [Segment][] is
+   * **spool**ing helper method. Given a `segment` (and wether to `rewind`), the
+   * top-most parent (or deepest child) of the graph-link {@link Segment} is
    * returned.
    *
-   * [Segment]: https://sgrud.github.io/client/interfaces/shell.Router-1.Segment
-   *
-   * @param segment - [Segment][] to **spool**.
-   * @param rewind - **Spool** direction.
-   * @returns **Spool**ed [Segment][].
+   * @param segment - The {@link Segment} to **spool**.
+   * @param rewind - Wether to `rewind` the **spool** direction.
+   * @returns The **spool**ed {@link Segment}.
    */
   public spool(
     segment: Router.Segment,
@@ -701,31 +717,6 @@ export class Router extends Set<Route> implements Router.Task {
     }
 
     return segment;
-  }
-
-  /**
-   * **Unbind**ing helper method. Calling this method (after calling *bind*)
-   * will **unbind** the previously bound handler from the global `onpopstate`
-   * event. Further, the arguments passed to *bind* are revoked, meaning the
-   * default values of the properties *baseHref*, *hashBased* and *outlet* are
-   * restored. Calling this method without previously *bind*ing the *Router*
-   * will throw an error.
-   *
-   * @param this - Mutable polymorphic `this`.
-   * @throws ReferenceError.
-   */
-  public unbind(
-    this: Mutable<this>
-  ): void {
-    if (!TypeOf.window(globalThis.window) || !window.onpopstate) {
-      throw new ReferenceError('window.onpopstate');
-    }
-
-    this.baseHref = '/';
-    this.hashBased = false;
-    this.outlet = document.body;
-
-    window.onpopstate = null;
   }
 
 }

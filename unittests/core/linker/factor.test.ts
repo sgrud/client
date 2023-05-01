@@ -1,48 +1,59 @@
-import { Factor } from '@sgrud/core';
+import { Factor, Linker } from '@sgrud/core';
 
 describe('@sgrud/core/linker/factor', () => {
 
+  /*
+   * Variables
+   */
+
   class ClassOne {
-    @Factor(() => ClassTwo) public readonly class!: ClassTwo;
-    @Factor(() => Service) public readonly service!: Service;
+
+    @Factor(() => ClassTwo)
+    public readonly class!: ClassTwo;
+
+    @Factor(() => Service, true)
+    public readonly service?: Service;
+
   }
 
   class ClassTwo {
-    @Factor(() => ClassOne) public readonly class!: ClassOne;
-    @Factor(() => Service) public readonly service!: Service;
+
+    @Factor(() => ClassOne)
+    public readonly class!: ClassOne;
+
+    @Factor(() => Service, true)
+    public readonly service?: Service;
+
   }
 
-  class Service {
-    public readonly member: Date = new Date();
-  }
+  class Service {}
+
+  /*
+   * Unittests
+   */
 
   describe('applying the decorator', () => {
     const classOne = new ClassOne();
     const classTwo = new ClassTwo();
 
-    it('links the instance to the prototype', () => {
-      expect(classOne.service).toBeInstanceOf(Service);
-      expect(classTwo.service).toBeInstanceOf(Service);
-    });
-  });
-
-  describe('applying the decorator again', () => {
-    const classOne = new ClassOne();
-    const classTwo = new ClassTwo();
-
-    it('links the same instance to the prototype', () => {
-      expect(classOne.service).toBe(classTwo.service);
-      expect(classOne.service.member).toBe(classTwo.service.member);
-    });
-  });
-
-  describe('creating circular dependencies', () => {
-    const classOne = new ClassOne();
-    const classTwo = new ClassTwo();
-
-    it('correctly resolves each dependency', () => {
+    it('links an instance and resolves circular dependencies', () => {
       expect(classOne.class).toBeInstanceOf(ClassTwo);
       expect(classTwo.class).toBeInstanceOf(ClassOne);
+    });
+  });
+
+  describe('applying the decorator transiently', () => {
+    const linker = new Linker();
+    const classOne = new ClassOne();
+    const classTwo = new ClassTwo();
+
+    it('only links if an instance already exists', () => {
+      expect(classOne.service).toBeUndefined();
+      expect(classTwo.service).toBeUndefined();
+
+      const service = linker.get(Service);
+      expect(classOne.service).toBe(service);
+      expect(classTwo.service).toBe(service);
     });
   });
 

@@ -1,48 +1,59 @@
 import { Linker } from './linker';
 
 /**
- * Prototype property decorator factory. Replaces the decorated prototype
- * property with a getter, which looks up the linked instance of a target
- * constructor forwarded-referenced by the `targetFactory`.
+ * Prototype property decorator factory. Applying this decorator replaces the
+ * decorated prototype property with a getter, which returns the linked instance
+ * of a {@link Target}ed constructor, referenced by the `targetFactory`.
+ * Depending on the supplied `transient` value, the target constructor is
+ * invoked to construct (and link) an instance, if none is linked beforehand.
  *
- * [Linker]: https://sgrud.github.io/client/classes/core.Linker
- * [Target]: https://sgrud.github.io/client/functions/core.Target
- *
- * @param targetFactory - Forward reference to the target constructor.
- * @typeParam K - Constructor type.
- * @returns Prototype property decorator.
+ * @param targetFactory - A forward reference to the target constructor.
+ * @param transient - Wether an instance is constructed if none is linked.
+ * @typeParam K - The {@link Target}ed constructor type.
+ * @returns A prototype property decorator.
  *
  * @example
- * **Factor** a service:
+ * **Factor** an eager and lazy service:
  * ```ts
  * import { Factor } from '@sgrud/core';
- * import { Service } from './service';
+ * import { EagerService, LazyService } from './services';
  *
  * export class ServiceHandler {
  *
- *   ⁠@Factor(() => Service)
- *   private readonly service!: Service;
+ *   ⁠@Factor(() => EagerService)
+ *   private readonly service!: EagerService;
+ *
+ *   ⁠@Factor(() => LazyService, true)
+ *   private readonly service?: LazyService;
  *
  * }
  * ```
  *
- * @see [Linker][]
- * @see [Target][]
+ * @see {@link Linker}
+ * @see {@link Target}
  */
-export function Factor<K extends new () => any>(targetFactory: () => K) {
+export function Factor<K extends new () => any>(
+  targetFactory: () => K,
+  transient: boolean = false
+) {
 
   /**
-   * @param prototype - Prototype to be decorated.
-   * @param propertyKey - Prototype property to be decorated.
+   * @param prototype - The `prototype` to be decorated.
+   * @param propertyKey - The `prototype` property to be decorated.
    */
-  return function(
-    prototype: object,
-    propertyKey: PropertyKey
-  ): void {
+  return function(prototype: object, propertyKey: PropertyKey): void {
     Object.defineProperty(prototype, propertyKey, {
       enumerable: true,
-      get: () => new Linker<K>().get(targetFactory()),
-      set: Function.prototype as (...args: any[]) => void
+      get: (): InstanceType<K> | undefined => {
+        const linker = new Linker<K>();
+
+        if (transient && !linker.has(targetFactory())) {
+          return undefined;
+        }
+
+        return linker.get(targetFactory());
+      },
+      set: Function.prototype as (...args: any[]) => any
     });
   };
 

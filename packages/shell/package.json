@@ -26,7 +26,8 @@
       "./src/jsx-runtime"
     ],
     "resources": [
-      "./README.md"
+      "./README.md",
+      "../../.gitignore"
     ],
     "runtimify": [
       "@babel/runtime:helpers.umd",
@@ -34,10 +35,10 @@
     ]
   },
   "dependencies": {
-    "@babel/runtime": "^7.20.13",
+    "@babel/runtime": "^7.21.5",
     "@sgrud/core": "latest",
     "incremental-dom": "^0.7.0",
-    "rxjs": "^7.8.0",
+    "rxjs": "^7.8.1",
     "tslib": "^2.5.0"
   },
   "sgrudDependencies": {

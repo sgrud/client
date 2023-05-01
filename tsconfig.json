@@ -14,11 +14,11 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "inlineSources": true,
-    "noEmitOnError": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "sourceMap": true,
 
+    "exactOptionalPropertyTypes": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
@@ -42,60 +42,5 @@
 
   "include": [
     "./packages/**/*.ts"
-  ],
-
-  "typedocOptions": {
-    "name": "@sgrud",
-    "gitRevision": "main",
-
-    "excludeExternals": true,
-    "treatWarningsAsErrors": true,
-
-    "compilerOptions": {
-      "noUnusedParameters": false
-    },
-
-    "entryPoints": [
-      "./packages/bin/index.ts",
-      "./packages/bus/index.ts",
-      "./packages/core/index.ts",
-      "./packages/data/index.ts",
-      "./packages/shell/index.ts",
-      "./packages/state/index.ts"
-    ],
-
-    "externalSymbolLinkMappings": {
-      "comlink": {
-        "*": "https://www.npmjs.com/package/comlink#api",
-      },
-      "rxjs": {
-        "AjaxConfig": "https://rxjs.dev/api/ajax/AjaxConfig",
-        "AjaxResponse": "https://rxjs.dev/api/ajax/AjaxResponse",
-        "BehaviorSubject": "https://rxjs.dev/api/index/class/BehaviorSubject",
-        "Observable": "https://rxjs.dev/api/index/class/Observable",
-        "ReplaySubject": "https://rxjs.dev/api/index/class/ReplaySubject",
-        "Subscribable": "https://rxjs.dev/api/index/interface/Subscribable"
-      }
-    },
-
-    "intentionallyNotExported": [
-      "global.sgrud.state.effects"
-    ],
-
-    "plugin": [
-      "typedoc-plugin-mdn-links",
-      "@sgrud/typedoc-plugin"
-    ],
-
-    "sort": [
-      "static-first",
-      "visibility",
-      "alphabetical"
-    ],
-
-    "validation": {
-      "invalidLink": true,
-      "notExported": true
-    }
-  }
+  ]
 }

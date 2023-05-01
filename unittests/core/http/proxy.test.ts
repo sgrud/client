@@ -1,39 +1,64 @@
-import { HttpClient, HttpHandler, HttpProxy, Linker, Target } from '@sgrud/core';
-import { map, Observable, of } from 'rxjs';
-import { AjaxConfig as Request, AjaxResponse as Response } from 'rxjs/ajax';
+import { Http, Linker, Proxy, Target } from '@sgrud/core';
+import { Observable, map, of } from 'rxjs';
 
 describe('@sgrud/core/http/proxy', () => {
 
-  new Linker<typeof HttpProxy>().clear();
+  /*
+   * Fixtures
+   */
 
-  @Target<typeof ProxyOne>()
-  class ProxyOne extends HttpProxy {
-    public override proxy<T>(
-      request: Request,
-      handler: HttpHandler
-    ): Observable<Response<T>> {
-      if (request.url === 'one') {
-        return of({ response: request.url } as Response<T>);
+  new Linker().clear();
+
+  /*
+   * Variables
+   */
+
+  @Target()
+  class ProxyOne extends Proxy {
+
+    public override handle<T>(
+      request: Http.Request,
+      handler: Http.Handler
+    ): Observable<Http.Response<T>> {
+      if (request.url !== 'one') {
+        return handler.handle(Object.assign(request, {
+          headers: {
+            next: request.url
+          }
+        })).pipe(map((response) => Object.assign(response, {
+          responseHeaders: {
+            prev: 'one'
+          }
+        })));
       }
 
-      return handler.handle<T>({
-        ...request, headers: { next: request.url }
-      }).pipe(map((response) => ({
-        ...response, responseHeaders: { prev: 'one' }
-      })));
+      return of({
+        response: request.url
+      } as Http.Response<T>);
     }
+
   }
 
-  @Target<typeof ProxyTwo>()
-  class ProxyTwo extends HttpProxy {
-    public override proxy<T>(request: Request): Observable<Response<T>> {
-      return of({ response: request.headers!.next } as Response<T>);
+  @Target()
+  class ProxyTwo extends Proxy {
+
+    public override handle<T>(
+      request: Http.Request
+    ): Observable<Http.Response<T>> {
+      return of({
+        response: request.headers!.next
+      } as Http.Response<T>);
     }
+
   }
 
-  describe('targeting HttpProxy subclasses', () => {
-    const linker = new Linker<typeof HttpProxy>();
-    const links = linker.getAll(HttpProxy);
+  /*
+   * Unittests
+   */
+
+  describe('targeting proxy subclasses', () => {
+    const linker = new Linker();
+    const links = linker.getAll(Proxy);
 
     it('appends the targets to the proxy chain', () => {
       expect(links).toContain(linker.get(ProxyOne));
@@ -42,24 +67,29 @@ describe('@sgrud/core/http/proxy', () => {
   });
 
   describe('firing a request', () => {
-    const request = HttpClient.get('one');
+    const request = Http.get('one');
 
     it('intercepts the request with the proxy', (done) => {
-      request.subscribe((response) => {
-        expect(response.response).toBe('one');
-        done();
+      request.pipe(map((next) => {
+        expect(next.response).toBe('one');
+        expect(next.responseHeaders).toBeUndefined();
+      })).subscribe({
+        complete: done,
+        error: done
       });
     });
   });
 
   describe('firing a request', () => {
-    const request = HttpClient.get('two');
+    const request = Http.get('two');
 
     it('intercepts the request with the proxy chain', (done) => {
-      request.subscribe((response) => {
-        expect(response.responseHeaders.prev).toBe('one');
-        expect(response.response).toBe('two');
-        done();
+      request.pipe(map((next) => {
+        expect(next.response).toBe('two');
+        expect(next.responseHeaders).toStrictEqual({ prev: 'one' });
+      })).subscribe({
+        complete: done,
+        error: done
       });
     });
   });

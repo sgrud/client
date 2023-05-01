@@ -2,20 +2,28 @@ import { assign } from '@sgrud/core';
 
 describe('@sgrud/core/utility/assign', () => {
 
-  const values = Object.freeze([
-    Object.freeze({ 0: Object.freeze({ 1: Object.freeze({ 0: 1 }) }), 1: 1 }),
-    Object.freeze({ 0: Object.freeze({ 2: Object.freeze({ 0: 2 }) }), 2: 2 }),
-    Object.freeze({ 0: Object.freeze({ 3: Object.freeze({ 0: 3 }) }), 3: 3 })
-  ]);
+  /*
+   * Variables
+   */
+
+  const values = [
+    { 0: { 1: { 0: 1 } }, 1: 1 },
+    { 0: { 2: { 0: 2 } }, 2: 2 },
+    { 0: { 3: { 0: 3 } }, 3: 3 }
+  ];
+
+  /*
+   * Unittests
+   */
 
   describe.each(values)('assigning source %O', (source) => {
     describe.each(values)('to target %O', (target) => {
       if (values.indexOf(source) !== values.indexOf(target)) {
-        const mutate = { };
-        const result = assign(mutate, { ...target }, { ...source });
+        const object = {};
+        const result = assign(object, { ...target }, { ...source });
 
         it('mutates the target', () => {
-          expect(mutate).toBe(result);
+          expect(object).toBe(result);
         });
 
         it('deep copies the source to the target', () => {
@@ -27,11 +35,11 @@ describe('@sgrud/core/utility/assign', () => {
   });
 
   describe('assigning multiple sources', () => {
-    const mutate = { };
-    const result = assign(mutate, ...values);
+    const object = {};
+    const result = assign(object, ...values);
 
     it('mutates the target', () => {
-      expect(mutate).toBe(result);
+      expect(object).toBe(result);
     });
 
     it('deep copies all sources to the target', () => {

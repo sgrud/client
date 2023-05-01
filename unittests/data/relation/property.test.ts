@@ -1,164 +1,173 @@
-import { Symbol } from '@sgrud/core';
 import { Model, Property } from '@sgrud/data';
-import { auditTime, first, from } from 'rxjs';
+import { auditTime, from, map } from 'rxjs';
 
 describe('@sgrud/data/relation/property', () => {
 
-  const values = [
-    { bool: true },
-    { date: new Date() },
-    { num: 0 },
-    { str: 'string' },
-    { unset: undefined },
-    { unused: undefined }
-  ];
+  /*
+   * Variables
+   */
 
   class Class extends Model<Class> {
-    @Property(() => Boolean) public bool?: boolean;
-    @Property(() => Date) public date?: Date;
-    @Property(() => Number) public num?: number;
-    @Property(() => String) public str?: string;
-    @Property(() => null!) public unset?: null;
-    @Property(() => null!, true) public unused?: null;
+
+    @Property(() => Boolean)
+    public boolean?: boolean;
+
+    @Property(() => Date)
+    public date?: Date;
+
+    @Property(() => Number)
+    public number?: number;
+
+    @Property(() => String)
+    public string?: string;
+
+    @Property(() => null!, true)
+    public transient?: unknown;
+
+    @Property(() => null!)
+    public unknown?: unknown;
+
     protected readonly [Symbol.toStringTag]: string = 'Class';
+
   }
+
+  const values = [
+    { boolean: true },
+    { date: new Date() },
+    { number: 0 },
+    { string: 'string' },
+    { transient: undefined },
+    { unknown: undefined }
+  ];
+
+  /*
+   * Unittests
+   */
 
   describe('instantiating a model containing properties using parts', () => {
     const model = new Class(...values);
 
-    const validate = (value: Class) => {
-      expect(value.bool).toBe(values[0].bool);
-      expect(value.date).toBe(values[1].date!.valueOf());
-      expect(value.num).toBe(values[2].num);
-      expect(value.str).toBe(values[3].str);
-    };
-
     it('assigns all supplied parts to the model containing properties', () => {
-      validate(model);
+      expect(model.boolean).toBe(values[0].boolean);
+      expect(model.date).toBe(values[1].date!.valueOf());
+      expect(model.number).toBe(values[2].number);
+      expect(model.string).toBe(values[3].string);
     });
   });
 
   describe('assigning parts to a model containing properties', () => {
     const model = new Class();
 
-    const validate = (value: Class) => {
-      expect(value.bool).toBe(values[0].bool);
-      expect(value.date).toBe(values[1].date!.valueOf());
-      expect(value.num).toBe(values[2].num);
-      expect(value.str).toBe(values[3].str);
-    };
-
-    it('emits the changed model containing properties', (done) => {
-      from(model).pipe(
-        auditTime(250),
-        first()
-      ).subscribe((value) => {
-        validate(value);
-        done();
+    it('assigns all parts to the model containing properties', (done) => {
+      const changes = from(model).pipe(auditTime(250), map((next) => {
+        expect(next.boolean).toBe(values[0].boolean);
+        expect(next.date).toBe(values[1].date!.valueOf());
+        expect(next.number).toBe(values[2].number);
+        expect(next.string).toBe(values[3].string);
+      })).subscribe({
+        error: done
       });
 
-      model.assign(...values).subscribe(validate);
-    });
-
-    it('assigns all supplied parts to the model containing properties', () => {
-      validate(model);
+      model.assign(...values).pipe(map((next) => {
+        changes.unsubscribe();
+        expect(next).toBe(model);
+      })).subscribe({
+        complete: done,
+        error: done
+      });
     });
   });
 
   describe('assigning null-parts to a model containing properties', () => {
     const model = new Class();
 
-    const validate = (value: Class) => {
-      expect(value.bool).toBeNull();
-      expect(value.date).toBeNull();
-      expect(value.num).toBeNull();
-      expect(value.str).toBeNull();
-    };
-
-    it('emits the changed model containing properties', (done) => {
-      from(model).pipe(
-        auditTime(250),
-        first()
-      ).subscribe((value) => {
-        validate(value);
-        done();
+    it('assigns all null-parts to the model containing properties', (done) => {
+      const changes = from(model).pipe(auditTime(250), map((next) => {
+        expect(next.boolean).toBeNull();
+        expect(next.date).toBeNull();
+        expect(next.number).toBeNull();
+        expect(next.string).toBeNull();
+      })).subscribe({
+        error: done
       });
 
       model.assign(...values.flatMap((value) => {
-        return Object.keys(value).map((key) => ({
-          [key]: null
-        })) as Model.Shape<Class>;
-      })).subscribe(validate);
-    });
-
-    it('assigns all null-parts to the model containing properties', () => {
-      validate(model);
+        return Object.keys(value).map((key) => ({ [key]: null }));
+      })).pipe(map((next) => {
+        changes.unsubscribe();
+        expect(next).toBe(model);
+      })).subscribe({
+        complete: done,
+        error: done
+      });
     });
   });
 
   describe('clearing a model containing properties', () => {
     const model = new Class(...values);
 
-    const validate = (value: Class) => {
-      expect(value.bool).toBeUndefined();
-      expect(value.date).toBeUndefined();
-      expect(value.num).toBeUndefined();
-      expect(value.str).toBeUndefined();
-    };
-
-    it('emits the changed model containing properties', (done) => {
-      from(model).pipe(
-        auditTime(250),
-        first()
-      ).subscribe((value) => {
-        validate(value);
-        done();
+    it('clears the model containing properties', (done) => {
+      const changes = from(model).pipe(auditTime(250), map((next) => {
+        expect(next.boolean).toBeUndefined();
+        expect(next.date).toBeUndefined();
+        expect(next.number).toBeUndefined();
+        expect(next.string).toBeUndefined();
+      })).subscribe({
+        error: done
       });
 
-      model.clear().subscribe(validate);
-    });
-
-    it('clears the model containing properties', () => {
-      validate(model);
+      model.clear().pipe(map((next) => {
+        changes.unsubscribe();
+        expect(next).toBe(model);
+      })).subscribe({
+        complete: done,
+        error: done
+      });
     });
   });
 
   describe('serializing a model containing properties', () => {
-    const model = new Class(...values);
-
-    const validate = (value: Model.Shape<Class>) => {
-      expect(value.bool).toBe(values[0].bool);
-      expect(value.date).toContain('+');
-      expect(value.num).toBe(values[2].num);
-      expect(value.str).toBe(values[3].str);
-    };
+    const result = new Class(...values).serialize()!;
 
     it('returns the serialized model containing properties', () => {
-      validate(model.serialize()!);
+      expect(result.boolean).toBe(values[0].boolean);
+      expect(result.date).toContain('+');
+      expect(result.number).toBe(values[2].number);
+      expect(result.string).toBe(values[3].string);
+    });
+  });
+
+  describe('serializing a model which has null-parts', () => {
+    const result = new Class(...values.flatMap((value) => {
+      return Object.keys(value).map((key) => ({ [key]: null }));
+    })).serialize()!;
+
+    it('returns the serialized model which has null-parts', () => {
+      expect(result.boolean).toBeNull();
+      expect(result.date).toBeNull();
+      expect(result.number).toBeNull();
+      expect(result.string).toBeNull();
     });
   });
 
   describe('treemapping a model containing properties', () => {
-    const model = new Class(...values);
-
-    const validate = (value: Model.Graph<Class>) => {
-      expect(value).toStrictEqual(['bool', 'date', 'num', 'str']);
-    };
+    const result = new Class(...values).treemap()!;
 
     it('returns the treemapped model containing properties', () => {
-      validate(model.treemap()!);
+      expect(result).toStrictEqual([
+        'boolean',
+        'date',
+        'number',
+        'string'
+      ]);
     });
   });
 
   describe('unraveling a model containing properties', () => {
-    const model = new Class(...values);
-
-    const validate = (value: string) => {
-      expect(value).toBe('{bool date num str}');
-    };
+    const result = Class.unravel(new Class(...values).treemap()!);
 
     it('returns the unraveled model containing properties', () => {
-      validate(Class.unravel(model.treemap()!));
+      expect(result).toBe('{boolean date number string}');
     });
   });
 

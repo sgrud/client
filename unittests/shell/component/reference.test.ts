@@ -1,72 +1,85 @@
-globalThis.HTMLElement = new Proxy(HTMLElement, {
-  apply: (_, target, args) => {
-    return Reflect.construct(HTMLElement, args, target.constructor);
-  }
-});
-
-import { Component, customElements, Reference } from '@sgrud/shell';
-import { jsx } from '@sgrud/shell/jsx-runtime';
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'element-one': HTMLElement;
-    'element-two': HTMLElement;
-  }
-}
+import { Component, createElement, customElements, Reference } from '@sgrud/shell';
 
 describe('@sgrud/shell/component/reference', () => {
 
+  /*
+   * Variables
+   */
+
   class Element extends HTMLElement {
-    @Reference('unused', ['change']) public unused?: HTMLDivElement;
-  }
 
-  @Component('element-one')
-  class ElementOne extends HTMLElement implements Component {
-    @Reference('key') public reference!: HTMLDivElement;
-    @Reference('unused') public unused?: HTMLDivElement;
-    public readonly template: JSX.Element = jsx('div', { key: 'key' });
-  }
+    @Reference('unknown', ['change'])
+    public unknown?: HTMLDivElement;
 
-  @Component('element-two')
-  class ElementTwo extends HTMLElement implements Component {
-    @Reference('key', ['change']) public reference!: HTMLDivElement;
-    @Reference('unused', ['change']) public unused?: HTMLDivElement;
-    public readonly template: JSX.Element = jsx('div', { key: 'key' });
   }
 
   customElements.define('element-tag', Element);
 
+  @Component('element-one')
+  class ElementOne extends HTMLElement implements Component {
+
+    @Reference('key')
+    public reference?: HTMLDivElement;
+
+    @Reference('unknown')
+    public unknown?: HTMLDivElement;
+
+    public readonly template: JSX.Element = createElement('div', {
+      key: 'key'
+    });
+
+  }
+
+  @Component('element-two')
+  class ElementTwo extends HTMLElement implements Component {
+
+    @Reference('key', ['change'])
+    public reference?: HTMLDivElement;
+
+    @Reference('unknown', ['change'])
+    public unknown?: HTMLDivElement;
+
+    public readonly template: JSX.Element = createElement('div', {
+      key: 'key'
+    });
+
+  }
+
+  /*
+   * Unittests
+   */
+
   describe('binding a property on a component without template', () => {
     it('returns undefined as no template exists', () => {
       document.body.innerHTML = '<element-tag></element-tag>';
+      const element = document.querySelector<Element>('element-tag')!;
 
-      const classOne = document.querySelector('element-tag') as Element;
-      expect(classOne.unused).toBeUndefined();
+      expect(element.unknown).toBeUndefined();
     });
   });
 
   describe('binding a property to a template reference', () => {
     it('mirrors the referenced template element to the bound property', () => {
       document.body.innerHTML = '<element-one></element-one>';
-      const classOne = document.querySelector('element-one') as ElementOne;
+      const elementOne = document.querySelector<ElementOne>('element-one')!;
 
-      expect(classOne.reference).toBeInstanceOf(HTMLDivElement);
-      expect(classOne.unused).toBeUndefined();
+      expect(elementOne.reference).toBeInstanceOf(HTMLDivElement);
+      expect(elementOne.unknown).toBeUndefined();
     });
   });
 
   describe('observing events of a bound template reference', () => {
-    it('invokes the referenceChangedCallback', () => {
+    it('invokes the appropriate callback', () => {
       document.body.innerHTML = '<element-two></element-two>';
-      const classTwo = document.querySelector('element-two') as ElementTwo;
-      const spy = jest.spyOn(classTwo as Component, 'referenceChangedCallback');
+      const elementTwo = document.querySelector<ElementTwo>('element-two')!;
+      const spy = jest.spyOn(elementTwo, 'referenceChangedCallback' as any);
 
       const event = new Event('change');
-      classTwo.reference.dispatchEvent(event);
+      elementTwo.reference!.dispatchEvent(event);
 
-      expect(spy).toHaveBeenCalledWith('key', classTwo.reference, event);
-      expect(classTwo.reference).toBeInstanceOf(HTMLDivElement);
-      expect(classTwo.unused).toBeUndefined();
+      expect(spy).toBeCalledWith('key', elementTwo.reference, event);
+      expect(elementTwo.reference).toBeInstanceOf(HTMLDivElement);
+      expect(elementTwo.unknown).toBeUndefined();
     });
   });
 

@@ -41,42 +41,43 @@
     ]
   },
   "dependencies": {
-    "@babel/plugin-transform-runtime": "^7.19.6",
-    "@babel/runtime": "^7.20.13",
-    "comlink": "^4.3.1",
+    "@babel/plugin-transform-runtime": "^7.21.4",
+    "@babel/runtime": "^7.21.5",
+    "better-sqlite3": "^8.3.0",
+    "comlink": "^4.4.1",
     "express": "^4.18.2",
-    "fs-extra": "^11.1.0",
     "incremental-dom": "^0.7.0",
     "microbundle": "^0.15.1",
-    "puppeteer-core": "^19.6.1",
-    "rxjs": "^7.8.0",
+    "puppeteer-core": "^19.11.1",
+    "rxjs": "^7.8.1",
     "sade": "^1.8.1",
-    "simple-git": "^3.16.0",
+    "simple-git": "^3.18.0",
     "tslib": "^2.5.0"
   },
   "devDependencies": {
-    "@types/express": "^4.17.16",
-    "@types/fs-extra": "^11.0.1",
-    "@types/jest": "^29.4.0",
-    "@types/puppeteer": "^5.4.7",
-    "@typescript-eslint/eslint-plugin": "^5.49.0",
-    "@typescript-eslint/parser": "^5.49.0",
-    "eslint": "^8.32.0",
+    "@types/better-sqlite3": "^7.6.4",
+    "@types/express": "^4.17.17",
+    "@types/jest": "^29.5.1",
+    "@types/ws": "^8.5.4",
+    "@typescript-eslint/eslint-plugin": "^5.59.2",
+    "@typescript-eslint/parser": "^5.59.2",
+    "eslint": "^8.39.0",
     "eslint-plugin-tsdoc": "^0.2.17",
-    "jest": "^29.4.1",
-    "jest-environment-jsdom": "^29.4.1",
-    "ts-jest": "^29.0.5",
-    "typedoc": "^0.23.24",
-    "typedoc-plugin-mdn-links": "^2.0.2",
-    "typescript": "^4.9.4"
+    "fake-indexeddb": "^4.0.1",
+    "jest": "^29.5.0",
+    "jest-environment-jsdom": "^29.5.0",
+    "jsdom": "^21.1.2",
+    "ts-jest": "^29.1.0",
+    "typedoc": "^0.24.6",
+    "typedoc-plugin-mdn-links": "^3.0.3",
+    "typescript": "^5.0.4",
+    "ws": "^8.13.0"
   },
   "eslintConfig": {
     "extends": "@sgrud/eslint-config",
     "parserOptions": {
       "project": [
         "./tsconfig.json",
-        "./examples/*/tsconfig.json",
-        "./skeletons/*/tsconfig.json",
         "./unittests/tsconfig.json"
       ]
     }
@@ -97,8 +98,14 @@
     "roots": [
       "<rootDir>/unittests"
     ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/unittests/fixtures.ts"
+    ],
     "testEnvironmentOptions": {
-      "url": "http://127.0.0.1:58080"
+      "url": "http://127.0.0.1:58080",
+      "customExportConditions": [
+        "node"
+      ]
     },
     "transform": {
       "^.+\\.tsx?$": [
@@ -107,6 +114,44 @@
           "tsconfig": "<rootDir>/unittests/tsconfig.json"
         }
       ]
+    }
+  },
+  "typedocOptions": {
+    "name": "@sgrud",
+    "gitRevision": "main",
+    "includes": "./packages",
+    "excludeExternals": true,
+    "resolveUtilityTypes": true,
+    "treatWarningsAsErrors": true,
+    "compilerOptions": {
+      "noUnusedParameters": false
+    },
+    "entryPoints": [
+      "./packages/*/index.ts"
+    ],
+    "externalSymbolLinkMappings": {
+      "comlink": {
+        "*": "https://github.com/GoogleChromeLabs/comlink#api"
+      },
+      "incremental-dom": {
+        "*": "http://github.com/google/incremental-dom/#usage"
+      }
+    },
+    "navigation": {
+      "includeGroups": true
+    },
+    "plugin": [
+      "typedoc-plugin-mdn-links",
+      "@sgrud/typedoc-plugin"
+    ],
+    "sort": [
+      "static-first",
+      "visibility",
+      "alphabetical"
+    ],
+    "validation": {
+      "invalidLink": true,
+      "notExported": true
     }
   }
 }

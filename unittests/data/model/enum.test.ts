@@ -1,16 +1,33 @@
-import { Symbol } from '@sgrud/core';
 import { Enum, enumerate, Model } from '@sgrud/data';
 
 describe('@sgrud/data/model/enum', () => {
 
+  /*
+   * Variables
+   */
+
   class Class extends Model<Class> {
+
     protected readonly [Symbol.toStringTag]: string = 'Class';
+
   }
 
   enum Enumeration {
     One = 'ONE',
     Two = 'TWO'
   }
+
+  /*
+   * Unittests
+   */
+
+  describe('calling the abstract constructor', () => {
+    const construct = () => new (Enum as any)();
+
+    it('throws an error', () => {
+      expect(construct).toThrowError(TypeError);
+    });
+  });
 
   describe('enumerating an enum type', () => {
     type Enumerated = Enumeration;
@@ -51,28 +68,19 @@ describe('@sgrud/data/model/enum', () => {
   describe('statically unraveling a graph containing an enum', () => {
     type Enumerated = Enumeration;
     const Enumerated = enumerate(Enumeration);
-
-    const graph = [
-      'id',
-      { enum: () => ({
+    const result = Class.unravel([
+      'uuid',
+      { method: () => ({
         one: Enumerated.One,
         two: Enumerated.Two,
-        enum: ['value']
+        method: [
+          'property'
+        ]
       }) }
-    ] as Model.Graph<Class>;
+    ] as Model.Graph<Class>);
 
     it('returns the unraveled graph containing an enum', () => {
-      expect(Class.unravel(graph)).toBe(
-        '{id enum(one:ONE two:TWO){value}}'
-      );
-    });
-  });
-
-  describe('calling the abstract constructor', () => {
-    const construct = () => new (Enum as any)();
-
-    it('throws an error', () => {
-      expect(construct).toThrowError(TypeError);
+      expect(result).toBe('{uuid method(one:ONE two:TWO){property}}');
     });
   });
 

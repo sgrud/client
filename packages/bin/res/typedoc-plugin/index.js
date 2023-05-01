@@ -1,58 +1,75 @@
-const { JSX } = require('typedoc');
+const { readdirSync } = require('fs');
+const { join, sep } = require('path');
+const { Application, Converter, ReflectionKind } = require('typedoc');
 
-const source = /^\[([^\]]+)\]: (https?:\/\/\S+)$/gm;
-const target = /\[([^\]]+)\]\[\]/gm;
+/**
+ * Plugin for the [TypeDoc](https://typedoc.org) documentation processor. This
+ * plugin will align `@link` tags within the [SGRUD](https://sgrud.github.io)
+ * monorepo layout to top-level module exports. Furthermore, this plugin will
+ * retry resolving locally evaluated foreign module `@link`s in their own scope
+ * while utilizing any file found within the `'./resolver'` path relative to
+ * this file as external resolver.
+ *
+ * @param {import('typedoc').Application} app - A TypeDoc application reference.
+ */
+exports.load = function(app) {
+  const reflections = [];
 
-exports.load = (app) => {
-  app.converter.on('resolveBegin', (context) => resolveLinks(context));
-  app.converter.on('resolveEnd', (context) => resolveLinks(context, true));
+  app.converter.addUnknownSymbolResolver(resolveUnknownSymbols);
+  app.converter.on(Converter.EVENT_RESOLVE_END, collectReflections);
+  app.on(Application.EVENT_PROJECT_REVIVE, collectReflections);
 
-  app.renderer.hooks.on('head.end', () => {
-    return JSX.createElement('style', undefined, JSX.createElement(JSX.Raw, {
-      html: [
-        'a.external[target=_blank] { background: none; padding: 0 }',
-        'li[class^=tsd-kind]:not(.current) > ul { display: none; }'
-      ].join(' ')
-    }));
-  });
-};
-
-function resolveLinks(context, warn) {
-  for (const key in context.project.reflections) {
-    const { comment } = context.project.reflections[key];
-
-    if (comment) {
-      const { blockTags, summary } = comment;
-      const items = [...summary];
-      const links = { };
-
-      for (const { content } of blockTags) {
-        items.push(...content);
+  function collectReflections(context) {
+    for (const reflection of context.project.children) {
+      if (reflection.kind === ReflectionKind.Module) {
+        reflections.push(...reflection.children);
       }
+    }
 
-      for (const item of items) {
-        for (const [match, ref, url] of item.text.matchAll(source)) {
-          item.text = item.text.replace(match, '');
-          links[ref] = url;
+    for (let resolver of readdirSync(join(__dirname, 'resolver'))) {
+      resolver = require(join(__dirname, 'resolver', resolver));
+      app.converter.addUnknownSymbolResolver(resolver);
+    }
+  }
+
+  function resolveUnknownSymbols(ref, refl, part, symbolId) {
+    if (!ref.moduleSource && symbolId) {
+      const path = symbolId.fileName.split(sep);
+      let index = path.indexOf('node_modules');
+
+      if (index > 0) {
+        ref.moduleSource = path[++index];
+        ref.resolutionStart = 'global';
+
+        if (ref.moduleSource.startsWith('@')) {
+          ref.moduleSource += '/' + path[++index];
         }
-      }
 
-      for (const item of items) {
-        for (const [match, ref] of item.text.matchAll(target)) {
-          if (links[ref]) {
-            item.text = item.text.replace(match, () => {
-              return `<a href="${links[ref]}" target="${
-                links[ref].includes('://sgrud.github.io') ? '_top' : '_blank'
-              }">${ref}</a>`;
-            });
-          } else if (warn) {
-            context.logger.warn([
-              `Failed to resolve link to "${ref}" in comment for`,
-              context.project.reflections[key].getFullName()
-            ].join(' '));
+        return app.converter.resolveExternalLink(ref, refl, part, symbolId);
+      }
+    }
+
+    if (ref.resolutionStart === 'local') {
+      let symbols = reflections;
+
+      for (let index = 0; index < ref.symbolReference.path.length; index++) {
+        const children = [];
+
+        for (const symbol of symbols) {
+          if (symbol.name === ref.symbolReference.path[index].path) {
+            if (index === ref.symbolReference.path.length - 1) {
+              return {
+                caption: symbol.name,
+                target: symbol
+              };
+            } else if (symbol.children?.length) {
+              children.push(...symbol.children);
+            }
           }
         }
+
+        symbols = children;
       }
     }
   }
-}
+};

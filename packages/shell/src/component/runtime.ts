@@ -1,13 +1,13 @@
-import { TypeOf } from '@sgrud/core';
-import { elementClose, elementOpen, getKey, patch, text } from 'incremental-dom';
+import { Assign, TypeOf } from '@sgrud/core';
+import { elementClose, elementOpen, getKey, patch, skip, text } from 'incremental-dom';
 import { customElements } from './registry';
 
 declare global {
 
   /**
-   * Global string literal helper type. Enforces any assigned string to be a
-   * `keyof HTMLElementTagNameMap`, while excluding built-in tag names, i.e.,
-   * extracting all `${string}-${string}` keys of `HTMLElementTagNameMap`.
+   * String literal helper type. Enforces any assigned string to be a `keyof`
+   * {@link HTMLElementTagNameMap}, while excluding built-in tag names, i.e.,
+   * extracting `${string}-${string}` keys of the {@link HTMLElementTagNameMap}.
    *
    * @example
    * A valid **CustomElementTagName**:
@@ -19,9 +19,9 @@ declare global {
     Extract<keyof HTMLElementTagNameMap, `${string}-${string}`>;
 
   /**
-   * Global string literal helper type. Enforces any assigned string to be a
-   * `keyof HTMLElementTagNameMap`, while excluding custom element tag names,
-   * i.e., all `${string}-${string}` keys of `HTMLElementTagNameMap`.
+   * String literal helper type. Enforces any assigned string to be a `keyof`
+   * {@link HTMLElementTagNameMap}, while excluding custom element tag names,
+   * i.e., `${string}-${string}` keys of the {@link HTMLElementTagNameMap}.
    *
    * @example
    * A valid **HTMLElementTagName**:
@@ -33,39 +33,44 @@ declare global {
     Exclude<keyof HTMLElementTagNameMap, `${string}-${string}`>;
 
   /**
-   * Intrinsic [JSX][] namespace.
-   *
-   * [JSX]: https://www.typescriptlang.org/docs/handbook/jsx.html
+   * The intrinsic [JSX](https://www.typescriptlang.org/docs/handbook/jsx.html)
+   * namespace used by TypeScript to determine the {@link Element} type and all
+   * valid {@link IntrinsicElements}.
    */
   namespace JSX {
 
     /**
-     * Intrinsic [JSX][] **element** type helper representing an array of bound
-     * [incremental-dom][] calls.
-     *
-     * [incremental-dom]: https://google.github.io/incremental-dom
-     * [JSX]: https://www.typescriptlang.org/docs/handbook/jsx.html
+     * Intrinsic {@link JSX} **Element** type helper representing an array of
+     * bound {@link elementOpen} and {@link elementClose} calls.
      */
     type Element = (() => Node)[];
 
     /**
-     * Intrinsic list of known [JSX][] elements, comprised of the global
-     * `HTMLElementTagNameMap`.
-     *
-     * [JSX]: https://www.typescriptlang.org/docs/handbook/jsx.html
+     * List of known {@link JSX} **IntrinsicElements**, comprised of the global
+     * {@link HTMLElementTagNameMap}.
      */
     type IntrinsicElements = {
-      [K in keyof HTMLElementTagNameMap]: Partial<HTMLElementTagNameMap[K]> & {
+      [K in keyof HTMLElementTagNameMap]: Partial<Assign<{
 
         /**
-         * Intrinsic element extension.
+         * {@link Assign}ed **style** property allowing only {@link Partial}
+         * {@link CSSStyleDeclaration}s or primitive strings to be passed.
+         */
+        readonly style?: string | Partial<CSSStyleDeclaration>;
+
+      }, HTMLElementTagNameMap[K]>> & {
+
+        /**
+         * The **is** property specifies which custom element a built-in
+         * {@link HTMLElement} extends.
          */
         readonly is?: K extends HTMLElementTagName
           ? CustomElementTagName
           : never;
 
         /**
-         * Intrinsic element reference.
+         * The **key** property {@link references} elements and is later used to
+         * access them through the {@link Reference} decorator.
          */
         readonly key?: Key;
 
@@ -73,10 +78,8 @@ declare global {
     };
 
     /**
-     * Element reference **Key** type helper. Enforces any assigned value to
-     * to be a [incremental-dom][]-compatible **Key** type.
-     *
-     * [incremental-dom]: https://google.github.io/incremental-dom
+     * **Key** {@link references} type helper. Enforces any assigned values to
+     * be of a compatible **Key** type.
      */
     type Key = string | number;
 
@@ -94,23 +97,21 @@ declare global {
 }
 
 /**
- * [JSX][] element factory. Provides [JSX][] runtime-compliant bindings to the
- * [incremental-dom][] library. This factory function is meant to be implicitly
- * imported by the transpiler and returns an array of bound [incremental-dom][]
- * function calls, representing the created [JSX][] element. This array of bound
- * functions can be rendered into an element attached to the DOM through the
- * [render][] function.
+ * {@link JSX.Element} factory. Provides {@link JSX} runtime compliant bindings
+ * creating arrays of bound {@link elementOpen} and {@link elementClose} calls.
+ * This **createElement** factory function is meant to be implicitly imported by
+ * the TypeScript transpiler through its {@link JSX} bindings and returns an
+ * array of bound {@link elementOpen} and {@link elementClose} function calls,
+ * representing the created {@link JSX.Element}. This array of bound functions
+ * can be rendered into an element attached to the {@link Document} through the
+ * {@link render} function.
  *
- * [incremental-dom]: https://google.github.io/incremental-dom
- * [JSX]: https://www.typescriptlang.org/docs/handbook/jsx.html
- * [render]: https://sgrud.github.io/client/functions/shell.render
+ * @param type - The `type` of {@link JSX.Element} to create.
+ * @param props - Any properties to assign to the created {@link JSX.Element}.
+ * @param ref - An optional `ref`erence to the created  {@link JSX.Element}.
+ * @returns An array of bound functions representing the {@link JSX.Element}.
  *
- * @param type - Element type.
- * @param props - Element properties.
- * @param ref - Element reference.
- * @returns Array of bound calls.
- *
- * @see [render][]
+ * @see {@link render}
  */
 export function createElement(
   type: Function | keyof JSX.IntrinsicElements,
@@ -149,33 +150,31 @@ export function createElement(
     }
   }
 
-  element.push(
-    elementOpen.bind(undefined, type, ref, undefined, ...attributes)
-  );
+  element.push(elementOpen.bind({}, type, ref, undefined, ...attributes));
 
   for (const child of children) {
     if (TypeOf.string(child) || TypeOf.number(child)) {
-      element.push(text.bind(undefined, child));
+      element.push(text.bind({}, child));
     } else if (TypeOf.function(child)) {
       element.push(child);
     }
   }
 
-  element.push(
-    elementClose.bind(undefined, type as keyof JSX.IntrinsicElements)
-  );
+  element.push(elementClose.bind({}, type as keyof JSX.IntrinsicElements));
 
   return element;
 }
 
 /**
- * [JSX][] fragment factory. Provides a [JSX][] runtime-compliant helper
- * function used by the transpiler to create [JSX][] fragments.
+ * {@link JSX} fragment factory. Provides a {@link JSX} runtime compliant helper
+ * creating arrays of bound {@link elementOpen} and {@link elementClose} calls.
+ * This **createFragment** factory function is meant to be implicitly imported
+ * by the TypeScript transpiler through its {@link JSX} bindings and returns an
+ * {@link JSX.Element} which can be rendered into an element attached to the
+ * {@link Document} through the {@link render} function.
  *
- * [JSX]: https://www.typescriptlang.org/docs/handbook/jsx.html
- *
- * @param props - Fragment properties.
- * @returns Array of bound calls.
+ * @param props - Any properties to assign to the created {@link JSX.Element}.
+ * @returns An array of bound functions representing the {@link JSX.Element}.
  */
 export function createFragment(props?: Record<string, any>): JSX.Element {
   const children = [props?.children].flat(Infinity);
@@ -183,7 +182,7 @@ export function createFragment(props?: Record<string, any>): JSX.Element {
 
   for (const child of children) {
     if (TypeOf.string(child) || TypeOf.number(child)) {
-      fragment.push(text.bind(undefined, child));
+      fragment.push(text.bind({}, child));
     } else if (TypeOf.function(child)) {
       fragment.push(child);
     }
@@ -193,45 +192,59 @@ export function createFragment(props?: Record<string, any>): JSX.Element {
 }
 
 /**
- * [JSX][] **references** helper. Calling this function while supplying a viable
- * `target` will return all referenced [JSX][] elements mapped by their
- * corresponding [Key][]s known to the supplied `target`. A viable `target` may
- * be any element, which previously was `target` to the [render][] function.
+ * Raw **html** rendering helper function. As {@link JSX} is pre-processed by
+ * the TypeScript transpiler, assigning directly to the `innerHTML` property of
+ * an {@link JSX.Element} will not result in the `innerHTML` to be rendered in
+ * the {@link JSX.Element}. To insert raw **html** into an {@link JSX.Element}
+ * this helper function has to be employed.
  *
- * [JSX]: https://www.typescriptlang.org/docs/handbook/jsx.html
- * [Key]: https://sgrud.github.io/client/types/shell.JSX.Key
- * [render]: https://sgrud.github.io/client/functions/shell.render
- *
- * @param target - Element to lookup **references** for.
- * @returns Resolved **references**.
+ * @param contents - The raw **html** `contents` to {@link render}.
+ * @param ref - An optional `ref`erence to the created  {@link JSX.Element}.
+ * @returns An array of bound functions representing the {@link JSX.Element}.
  */
-export function references(
-  target: DocumentFragment | Element
-): Map<JSX.Key, Node> | undefined {
-  return rendered.get(target);
+export function html(contents: string, ref?: JSX.Key): JSX.Element {
+  return [() => {
+    elementOpen('inner-html', ref, [
+      'style', 'display: contents;'
+    ], 'innerHTML', new String(contents));
+
+    skip();
+    return elementClose('inner-html');
+  }];
 }
 
 /**
- * [JSX][] **render**ing helper. This helper is a wrapper around the *patch*
- * function from the [incremental-dom][] library and **render**s a [JSX][]
- * `element` created through [createElement][] into an `target` element or
- * fragment.
+ * {@link JSX} **references** helper. Calling this function while supplying a
+ * viable `outlet` will return all referenced {@link JSX.Element}s mapped by
+ * their corresponding {@link JSX.Key}s known to the supplied `outlet`. A viable
+ * `outlet` may be any element which previously was passed as `outlet` to the
+ * {@link render} function.
  *
- * [createElement]: https://sgrud.github.io/client/functions/shell.createElement
- * [incremental-dom]: https://google.github.io/incremental-dom
- * [JSX]: https://www.typescriptlang.org/docs/handbook/jsx.html
+ * @param outlet - The `outlet` to return **references** for.
+ * @returns Any **references** known to the supplied `outlet`.
+ */
+export function references(
+  outlet: DocumentFragment | Element
+): Map<JSX.Key, Node> | undefined {
+  return rendered.get(outlet);
+}
+
+/**
+ * {@link JSX} **render**ing helper. This helper is a small wrapper around the
+ * {@link patch} function and **render**s a {@link JSX.Element} created through
+ * the {@link createElement} factory into the supplied `outlet`.
  *
- * @param target - Element or fragment to **render** into.
- * @param element - [JSX][] element to be **render**ed.
- * @returns **Render**ed `target` element.
+ * @param outlet - The `outlet` to **render** the `element` into.
+ * @param element - {@link JSX} `element` to be **render**ed.
+ * @returns **Render**ed `outlet` element.
  *
- * @see [createElement][]
+ * @see {@link createElement}
  */
 export function render(
-  target: DocumentFragment | Element,
+  outlet: DocumentFragment | Element,
   element: JSX.Element
 ): Node {
-  return patch(target, () => {
+  return patch(outlet, () => {
     const refs = new Map<JSX.Key, Node>();
 
     for (const incrementalDom of element) {
@@ -244,16 +257,14 @@ export function render(
     }
 
     if (refs.size) {
-      rendered.set(target, refs);
+      rendered.set(outlet, refs);
     }
   });
 }
 
 /**
- * Internally used mapping of all rendered nodes containing element references
- * to those references, mapped by their respective [Key][]s.
- *
- * [Key]: https://sgrud.github.io/client/types/shell.JSX.Key
+ * Internally used {@link WeakMap} of all rendered nodes containing element
+ * references to those references, mapped by their respective {@link JSX.Key}s.
  */
 const rendered = new WeakMap<DocumentFragment | Element, Map<JSX.Key, Node>>();
 

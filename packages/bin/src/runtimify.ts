@@ -1,11 +1,9 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-
 import { Assign } from '@sgrud/core';
-import { createWriteStream, readFileSync } from 'fs-extra';
+import { createWriteStream, readFileSync } from 'fs';
 import { Module } from 'module';
 import { join, relative, resolve } from 'path';
 import { dependencies } from '../package.json';
-import { cli, _b, _g, __ } from './.cli';
+import { __, _b, _g, cli } from './.cli';
 
 cli.command('runtimify [...modules]')
   .describe('Creates ESM or UMD bundles for node modules using `microbundle`')
@@ -17,7 +15,8 @@ cli.command('runtimify [...modules]')
   .action((_ = [], opts) => runtimify({ ...opts, modules: opts._.concat(_) }));
 
 /**
- * Creates ESM or UMD bundles for node modules using [microbundle][].
+ * Creates ESM or UMD bundles for node modules using
+ * [microbundle](https://github.com/developit/microbundle).
  *
  * ```text
  * Description
@@ -37,13 +36,11 @@ cli.command('runtimify [...modules]')
  *   $ sgrud runtimify @microsoft/fast # Runtimify `@microsoft/fast`
  * ```
  *
- * [microbundle]: https://github.com/developit/microbundle
- *
- * @param options - Options object.
- * @returns Execution promise.
+ * @param options - The `options` object.
+ * @returns An execution {@link Promise}.
  *
  * @example
- * Run with default options:
+ * Run with default options (not recommended):
  * ```js
  * require('@sgrud/bin');
  *
@@ -51,7 +48,7 @@ cli.command('runtimify [...modules]')
  * ```
  *
  * @example
- * **Runtimify** `@microsoft/fast`:
+ * **runtimify** `@microsoft/fast`:
  * ```js
  * require('@sgrud/bin');
  *
@@ -68,7 +65,7 @@ export async function runtimify({
 }: {
 
   /**
-   * **Runtimify** bundle format (umd or esm).
+   * **runtimify** bundle format (umd or esm).
    *
    * @defaultValue `'umd'`
    */
@@ -95,7 +92,7 @@ export async function runtimify({
    */
   prefix?: string;
 
-} = { }): Promise<void> {
+} = {}): Promise<void> {
   const bundler = require.resolve('microbundle');
   const patched = readFileSync(bundler).toString().replace(
     /babelHelpers: 'bundled'/g,
@@ -126,7 +123,7 @@ export async function runtimify({
   }
 
   if (!modules.length) {
-    const sgrudDependencies = [] as [string, string][];
+    const sgrudDependencies = [];
     let module = require(resolve(prefix, 'package.json'));
     modules = module.sgrud?.runtimify || [];
 
@@ -196,12 +193,12 @@ export async function runtimify({
     if (Array.isArray(exports)) {
       exports.map((i) => write(id, join(id, i)));
     } else if (typeof exports === 'object' && exports) {
-      for (const [key, value] of Object.entries<any>(exports)) {
+      for (const [key, value] of Object.entries(exports)) {
         if (Array.isArray(value)) {
           const defaults = value.find((i) => i.default)?.default;
           if (defaults) write(join(id, key), join(id, defaults));
-        } else if (typeof value === 'object' && value?.default) {
-          write(join(id, key), join(id, value.default));
+        } else if (typeof value === 'object' && value && 'default' in value) {
+          write(join(id, key), join(id, value.default as string));
         }
       }
     } else if (typeof exports === 'string') {
@@ -236,7 +233,7 @@ export async function runtimify({
       workers: false
     }).then(({ output: result }) => {
       console.log(
-        _g, '[construct]',
+        _g, '[runtimify]',
         _b, result,
         __
       );

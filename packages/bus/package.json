@@ -7,9 +7,10 @@
   "exports": "../../dist/bus/index.modern.js",
   "unpkg": "../../dist/bus/index.umd.js",
   "amdNames": {
-    "@babel/runtime/helpers/createForOfIteratorHelperLoose": null,
+    "@babel/runtime/helpers/inheritsLoose": null,
     "@sgrud/bus": null,
     "@sgrud/core": null,
+    "comlink": "Comlink",
     "rxjs": null,
     "tslib": "globalThis"
   },
@@ -21,16 +22,18 @@
       "./src/worker"
     ],
     "resources": [
-      "./README.md"
+      "./README.md",
+      "../../.gitignore"
     ],
     "runtimify": [
       "@babel/runtime:helpers.umd"
     ]
   },
   "dependencies": {
-    "@babel/runtime": "^7.20.13",
+    "@babel/runtime": "^7.21.5",
     "@sgrud/core": "latest",
-    "rxjs": "^7.8.0",
+    "comlink": "^4.4.1",
+    "rxjs": "^7.8.1",
     "tslib": "^2.5.0"
   },
   "sgrudDependencies": {
@@ -45,9 +48,18 @@
         "./runtimify.umd.js"
       ]
     },
+    "comlink": {
+      "exports": {
+        "comlink": "./dist/esm/comlink.min.js"
+      },
+      "unpkg": [
+        "./dist/umd/comlink.min.js"
+      ]
+    },
     "rxjs": {
       "exports": {
-        "rxjs": "./dist/esm5/index.js"
+        "rxjs": "./dist/esm5/index.js",
+        "rxjs/webSocket": "./dist/esm5/webSocket/index.js"
       },
       "unpkg": [
         "./dist/bundles/rxjs.umd.min.js"

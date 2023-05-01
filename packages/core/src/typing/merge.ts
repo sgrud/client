@@ -1,7 +1,7 @@
 /**
  * Type helper to convert union types (`A | B`) to intersection types (`A & B`).
  *
- * @typeParam T - Union type.
+ * @typeParam T - The union type to **Merge**.
  *
  * @remarks https://github.com/microsoft/TypeScript/issues/29594
  */

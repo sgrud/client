@@ -3,53 +3,44 @@ import { Model } from '../model/model';
 
 /**
  * Type alias for a union type of all primitive constructors which may be used
- * as `typeFactory` argument for the [Property][] decorator.
+ * as `typeFactory` argument for the {@link Property} decorator.
  *
- * [Property]: https://sgrud.github.io/client/functions/data.Property-1
- *
- * @see [Property][]
+ * @see {@link Property}
  */
 export type Property =
-  Model.Type<any> |
   typeof Boolean |
   typeof Date |
   typeof Number |
+  typeof Object |
   typeof String;
 
 /**
- * Unique symbol used as property key by the [Property][] decorator to register
- * decorated [Model][] fields for further computation, e.g., serialization,
- * treemapping etc.
+ * Unique symbol used as property key by the {@link Property} decorator to
+ * register decorated {@link Model} fields for further computation, e.g.,
+ * serialization, treemapping etc.
  *
- * [Model]: https://sgrud.github.io/client/classes/data.Model
- * [Property]: https://sgrud.github.io/client/functions/data.Property-1
- *
- * @see [Property][]
+ * @see {@link Property}
  */
 export const property = Symbol('@sgrud/data/model/property');
 
 /**
- * [Model][] field decorator factory. Using this decorator, [Model][]s can be
- * enriched with primitive fields. The compatible primitives are the subset of
- * primitives JavaScript shares with JSON, i.e., *Boolean*, *Date* (serialized),
- * *Number* and *String*. *Objects* cannot be uses as a `typeFactory` argument
- * value, as [Model][] fields containing objects should be declared by the
- * [HasOne][] and [HasMany][] [Model][] field decorators. By employing this
- * decorator, the decorated field will (depending on the `transient` argument
- * value) be taken into account when serializing or treemapping the [Model][]
- * containing the decorated field.
+ * {@link Model} field decorator factory. Using this decorator, {@link Model}s
+ * can be enriched with primitive fields. The compatible primitives are the
+ * subset of primitives JavaScript shares with JSON, i.e., {@link Boolean},
+ * {@link Date} (serialized), {@link Number} and {@link String}. {@link Object}s
+ * cannot be uses as a `typeFactory` argument value, as {@link Model} fields
+ * containing objects should be declared by the {@link HasOne} and
+ * {@link HasMany} decorators. By employing this decorator, the decorated field
+ * will (depending on the `transient` argument value) be taken into account when
+ * serializing or treemapping the {@link Model} containing the decorated field.
  *
- * [HasMany]: https://sgrud.github.io/client/functions/data.HasMany
- * [HasOne]: https://sgrud.github.io/client/functions/data.HasOne
- * [Model]: https://sgrud.github.io/client/classes/data.Model
- *
- * @param typeFactory - Forward reference to the field value constructor.
- * @param transient - Whether the decorated field is transient.
- * @typeParam T - Field value constructor type.
- * @returns [Model][] field decorator.
+ * @param typeFactory - A forward reference to the field value constructor.
+ * @param transient - Whether the decorated field is `transient`.
+ * @typeParam T - The field value constructor type.
+ * @returns A {@link Model} field decorator.
  *
  * @example
- * [Model][] with a primitive field:
+ * {@link Model} with a primitive field:
  * ```ts
  * import { Model, Property } from '@sgrud/data';
  *
@@ -63,9 +54,9 @@ export const property = Symbol('@sgrud/data/model/property');
  * }
  * ```
  *
- * @see [Model][]
- * @see [HasOne][]
- * @see [HasMany][]
+ * @see {@link Model}
+ * @see {@link HasOne}
+ * @see {@link HasMany}
  */
 export function Property<T extends Property>(
   typeFactory: () => T,
@@ -73,17 +64,14 @@ export function Property<T extends Property>(
 ) {
 
   /**
-   * @param model - Model to be decorated.
-   * @param field - Model field to be decorated.
+   * @param model - The {@link Model} to be decorated.
+   * @param field - The {@link Model} `field` to be decorated.
    */
-  return function<M extends Model>(
-    model: M,
-    field: Model.Field<M>
-  ): void {
+  return function<M extends Model>(model: M, field: Model.Field<M>): void {
     const key = '#' + field as Model.Field<M>;
 
     if (!transient) {
-      assign((model as Mutable<M>)[property] ||= { }, {
+      assign((model as Mutable<M>)[property] ||= {}, {
         [field]: typeFactory
       });
     }
@@ -96,9 +84,9 @@ export function Property<T extends Property>(
         enumerable: true,
         get(this: M): InstanceType<T> | null | undefined {
           if (TypeOf.null(this[key])) return null;
-          else return (this[key] as any)?.valueOf();
+          else return this[key]?.valueOf() as InstanceType<T>;
         },
-        set(this: M, value?: any): void {
+        set(this: M, value?: InstanceType<T>): void {
           if (TypeOf.null(value)) {
             (this[key] as unknown) = null;
           } else if (!TypeOf.undefined(value)) {

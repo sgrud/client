@@ -1,22 +1,16 @@
 import { Singleton } from '../utility/singleton';
+import { Target } from './target';
 
 /**
- * The [Singleton][] **Linker** class provides the means to lookup instances of
- * [Target][]ed constructors. The **Linker** is used throughout the [SGRUD][]
- * client libraries, e.g., by the [Factor][] decorator, to provide and retrieve
- * different centrally provisioned class instances. To programmatically insert
- * some links, the inherited *constructor* or *set* methods can be used. The
- * former will insert all entries into this [Singleton][] link mapping,
- * internally calling the latter for each.
+ * The {@link Singleton} **Linker** class provides the means to lookup and
+ * retrieve instances of {@link Target}ed constructors. The **Linker** is used
+ * throughout the [SGRUD](https://sgrud.github.io) client libraries, e.g., by
+ * the {@link Factor} decorator, to provide and retrieve different centrally
+ * provisioned class instances.
  *
- * [Factor]: https://sgrud.github.io/client/functions/core.Factor
- * [Singleton]: https://sgrud.github.io/client/functions/core.Singleton
- * [SGRUD]: https://sgrud.github.io
- * [Target]: https://sgrud.github.io/client/functions/core.Target
- *
- * @decorator [Singleton][]
- * @typeParam K - Constructor type.
- * @typeParam V - Instance type.
+ * @decorator {@link Singleton}
+ * @typeParam K - The {@link Target}ed constructor type.
+ * @typeParam V - The {@link Target}ed {@link InstanceType}.
  *
  * @example
  * Preemptively link an instance:
@@ -29,7 +23,7 @@ import { Singleton } from '../utility/singleton';
  * ]);
  * ```
  */
-@Singleton<typeof Linker>((linker, [tuples]) => {
+@Singleton((linker, [tuples]) => {
   if (tuples) {
     for (const [key, value] of tuples) {
       linker.set(key, value);
@@ -49,8 +43,8 @@ export class Linker<
    * one is created by calling the `new` operator on the `target` constructor.
    * Therefor the `target` constructors must not require parameters.
    *
-   * @param target - Target constructor.
-   * @returns Linked instance.
+   * @param target - The `target` constructor for which to retrieve an instance.
+   * @returns The already linked or a newly constructed and linked instance.
    *
    * @example
    * Retrieve a linked instance:
@@ -65,23 +59,22 @@ export class Linker<
     let instance = super.get(target);
 
     if (!instance) {
-      instance = new (target as unknown as new () => V)();
-      this.set(target, instance);
+      this.set(target, instance = new (target as unknown as Target<V>)());
     }
 
     return instance;
   }
 
   /**
-   * Returns all linked instances, which satisfy `instanceof target`. Use this
-   * method when multiple linked `target` constructors extend the same base
-   * class and are to be retrieved.
+   * The **getAll** method returns all linked instances, which satisfy
+   * `instanceof target`. Use this method when multiple linked `target`
+   * constructors extend the same base class and are to be retrieved.
    *
-   * @param target - Target constructor.
-   * @returns All linked instances.
+   * @param target - The `target` constructor for which to retrieve instances.
+   * @returns All already linked instance of the `target` constructor.
    *
    * @example
-   * Retrieve all linked instances:
+   * Retrieve all linked instances of a `Service`:
    * ```ts
    * import { Linker } from '@sgrud/core';
    * import { Service } from './service';

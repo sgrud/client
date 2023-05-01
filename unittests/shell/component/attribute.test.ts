@@ -1,59 +1,72 @@
-globalThis.HTMLElement = new Proxy(HTMLElement, {
-  apply: (_, target, args) => {
-    return Reflect.construct(HTMLElement, args, target.constructor);
-  }
-});
-
 import { Attribute, customElements } from '@sgrud/shell';
 
 describe('@sgrud/shell/component/attribute', () => {
 
+  /*
+   * Fixtures
+   */
+
+  document.body.innerHTML = '<element-tag preset="default"></element-tag>';
+
+  /*
+   * Variables
+   */
+
   class Element extends HTMLElement {
-    @Attribute() public attribute?: string;
-    @Attribute('data-attr') public data?: string;
-    @Attribute() public preset?: string = null!;
-    @Attribute() public unused?: undefined;
+
+    @Attribute()
+    public attribute?: string;
+
+    @Attribute('data-attr')
+    public data?: string;
+
+    @Attribute()
+    public preset?: string = 'value';
+
+    @Attribute()
+    public unknown?: undefined;
+
   }
 
   customElements.define('element-tag', Element);
-  document.body.innerHTML = '<element-tag preset="value"></element-tag>';
+
+  /*
+   * Unittests
+   */
 
   describe('binding a property to an attribute', () => {
-    const testClass = document.querySelector('element-tag') as Element;
+    const element = document.querySelector<Element>('element-tag')!;
 
     it('mirrors the bound property to the attribute', () => {
-      testClass.attribute = 'value';
+      element.attribute = 'value';
 
-      expect(testClass.attribute).toBe(testClass.getAttribute('attribute'));
-      expect(testClass.attribute).not.toBeNull();
+      expect(element.attribute).toBe(element.getAttribute('attribute'));
     });
   });
 
   describe('binding a property to a data attribute', () => {
-    const testClass = document.querySelector('element-tag') as Element;
+    const element = document.querySelector<Element>('element-tag')!;
 
     it('mirrors the bound property to the dataset', () => {
-      testClass.data = 'value';
+      element.data = 'value';
 
-      expect(testClass.dataset.attr).toBe(testClass.getAttribute('data-attr'));
-      expect(testClass.dataset.attr).not.toBeUndefined();
+      expect(element.dataset.attr).toBe(element.getAttribute('data-attr'));
     });
   });
 
   describe('initializing a bound property in the constructor and dom', () => {
-    const testClass = document.querySelector('element-tag') as Element;
+    const element = document.querySelector<Element>('element-tag')!;
 
     it('prefers the value passed to the attribute through the dom', () => {
-      expect(testClass.preset).toBe(testClass.getAttribute('preset'));
-      expect(testClass.preset).not.toBeUndefined();
+      expect(element.preset).toBe(element.getAttribute('preset'));
     });
   });
 
   describe('retrieving a bound property when no attribute is present', () => {
-    const testClass = document.querySelector('element-tag') as Element;
+    const element = document.querySelector<Element>('element-tag')!;
 
     it('returns undefined', () => {
-      expect(testClass.unused).toBeUndefined();
+      expect(element.unknown).toBeUndefined();
     });
   });
 

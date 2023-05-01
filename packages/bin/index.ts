@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
 /**
- * `@sgrud/bin` - The [SGRUD][] CLI.
+ * **`@sgrud/bin`** - The [SGRUD](https://sgrud.github.io) CLI.
  *
  * ```text
  * Description
- *   @sgrud/bin - The SGRUD CLI
+ *   ⁠@sgrud/bin - The SGRUD CLI
  *
  * Usage
  *   $ sgrud <command> [options]
@@ -26,8 +26,6 @@
  *   -h, --help       Displays this message
  * ```
  *
- * [SGRUD]: https://sgrud.github.io
- *
  * @packageDocumentation
  */
 
@@ -41,16 +39,12 @@ import { universal } from './src/universal';
 declare global {
 
   /**
-   * Global [SGRUD][] namespace.
-   *
-   * [SGRUD]: https://sgrud.github.io
+   * Global [SGRUD](https://sgrud.github.io) namespace.
    */
   namespace sgrud {
 
     /**
-     * `@sgrud/bin` - The [SGRUD][] CLI.
-     *
-     * [SGRUD]: https://sgrud.github.io
+     * `@sgrud/bin` - The [SGRUD](https://sgrud.github.io) CLI.
      */
     const bin: typeof module;
 

@@ -1,4 +1,5 @@
-import { Linker } from '@sgrud/core';
+import { Factor } from '@sgrud/core';
+import { first, from, switchMap } from 'rxjs';
 import { customElements } from '../component/registry';
 import { Router } from './router';
 
@@ -6,9 +7,7 @@ declare global {
   interface HTMLElementTagNameMap {
 
     /**
-     * [RouterOutlet]: https://sgrud.github.io/client/classes/shell.RouterOutlet
-     *
-     * @see [RouterOutlet][]
+     * @see {@link RouterOutlet}
      */
     'router-outlet': RouterOutlet;
 
@@ -16,16 +15,12 @@ declare global {
 }
 
 /**
- * Custom element extending the [HTMLSlotElement][]. When this element is
- * constructed, it supplies the value of its *baseHref* attribute and the
- * presence of a *hashBased* attribute on itself to the [Router][] while
- * *bind*ing the [Router][] to itself. This element should only be used once, as
- * it will be used by the [Router][] as *outlet* to render the current
- * [State][].
- *
- * [HTMLSlotElement]: https://developer.mozilla.org/docs/Web/API/HTMLSlotElement
- * [Router]: https://sgrud.github.io/client/classes/shell.Router
- * [State]: https://sgrud.github.io/client/interfaces/shell.Router-1.State
+ * Custom element extending the {@link HTMLSlotElement}. When this element is
+ * constructed, it supplies the value of its {@link baseHref} attribute and the
+ * presence of a {@link hashBased} attribute on itself to the {@link Router}
+ * while {@link Router.connect}ing the {@link Router} to itself. This element
+ * should only be used once, as it will be used by the {@link Router} as
+ * {@link Router.outlet} to render the current {@link Router.State}.
  *
  * @example
  * A `router-outlet`:
@@ -33,48 +28,47 @@ declare global {
  * <slot baseHref="/example" is="router-outlet">Loading...</slot>
  * ```
  *
- * @see [Router][]
+ * @see {@link Router}
  */
 export class RouterOutlet extends HTMLSlotElement {
 
   /**
-   * Getter mirroring the **baseHref** attribute of the element.
+   * {@link Factor}ed-in **router** property linking the {@link Router}.
+   *
+   * @decorator {@link Factor}
+   */
+  @Factor(() => Router)
+  private readonly router!: Router;
+
+  /**
+   * Getter mirroring the **baseHref** attribute of this element.
    */
   public get baseHref(): string | undefined {
     return this.getAttribute('baseHref') || undefined;
   }
 
   /**
-   * Getter mirroring the presence of a **hashBased** attribute on the element.
+   * Getter mirroring the presence of a **hashBased** attribute on this element.
    */
   public get hashBased(): boolean {
     return this.hasAttribute('hashBased');
   }
 
   /**
-   * Custom element **constructor**. Supplies the value of its *baseHref*
-   * attribute and the presence of a *hashBased* attribute on itself to the
-   * [Router][] while *bind*ing the [Router][] to itself. It furthermore invokes
-   * a `setTimeout` loop, running until the number of routes the router contains
-   * evaluates truthy, which in turn triggers an initial navigation.
-   *
-   * [Router]: https://sgrud.github.io/client/classes/shell.Router
+   * Public **constructor** of this custom {@link RouterOutlet} element.
+   * Supplies the value of its {@link baseHref} attribute and the presence of a
+   * {@link hashBased} attribute on itself to the {@link Router} while
+   * {@link Router.connect}ing the {@link Router} to itself.
    */
   public constructor() {
     super();
 
     const { hash, pathname, search } = location;
-    const router = new Linker<typeof Router>().get(Router);
+    this.router.connect(this, this.baseHref, this.hashBased);
 
-    router.bind(this, this.baseHref, this.hashBased);
-
-    (function navigate(): void {
-      if (router.size) {
-        router.navigate(pathname + hash, search, true).subscribe();
-      } else {
-        setTimeout(navigate);
-      }
-    })();
+    from(Router).pipe(first(), switchMap(() => {
+      return this.router.navigate(pathname + hash, search, 'replace');
+    })).subscribe();
   }
 
 }

@@ -1,37 +1,25 @@
-import { Store } from '@sgrud/state';
 import express from 'express';
 import { Server } from 'http';
 import { join } from 'path';
 import { Browser, launch, Page } from 'puppeteer-core';
-import { Observable } from 'rxjs';
-import { setImmediate } from 'timers';
+import { Worker } from 'worker_threads';
 
-declare class Transient extends Store<Transient> {
-  public transiently(param: unknown): Promise<Store.State<this>>;
-}
+/*
+ * Declarations
+ */
 
-declare class Universal extends Store<Universal> {
-  public universally(param: unknown): Promise<Store.State<this>>;
-}
-
-declare class Versatile extends Store<Versatile> {
-  public versatilely(param: unknown): Promise<Store.State<this>>;
-}
-
-declare global {
-  interface Window {
-    transient: { param: unknown };
-    universal: { param: unknown };
-    versatile: { param: unknown };
-    transiently(...args: Store.Action<Transient>): Observable<unknown>;
-    universally(...args: Store.Action<Universal>): Observable<unknown>;
-    versatilely(...args: Store.Action<Versatile>): Observable<unknown>;
-  }
-}
-
-globalThis.setImmediate = setImmediate;
+declare const window: Window & typeof globalThis & {
+  unittest: Promise<unknown>;
+  transient: { state: unknown; action(...args: unknown[]): Promise<unknown> };
+  universal: { state: unknown; action(...args: unknown[]): Promise<unknown> };
+  versatile: { state: unknown; action(...args: unknown[]): Promise<unknown> };
+};
 
 describe('@sgrud/state/worker', () => {
+
+  /*
+   * Fixtures
+   */
 
   let pageOne: Page;
   let pageTwo: Page;
@@ -53,8 +41,7 @@ describe('@sgrud/state/worker', () => {
     pageTwo = await puppeteer.newPage();
 
     server = express()
-      .use('/api/sgrud/v1/insmod', (_, r) => r.send({ }))
-      .use('/fetch', (_, r) => r.send({ param: null }))
+      .use('/fetch', (_, r) => r.send('fetch'))
       .use('/node_modules/@sgrud', express.static('./dist', {
         setHeaders: (res) => res.setHeader('service-worker-allowed', '/')
       }))
@@ -65,72 +52,169 @@ describe('@sgrud/state/worker', () => {
       }))
       .use('/', (_, r) => r.sendFile(join(__dirname, 'index.test.html')))
       .listen(location.port);
-  }, 50000);
+  }, 60000);
 
-  describe('initializing the state machine within a browser', () => {
-    it('correctly initializes the state machine', async() => {
+  /*
+   * Unittests
+   */
+
+  describe('requiring the module as worker thread', () => {
+    const worker = new Worker(require.resolve('@sgrud/state/worker'));
+
+    it('creates a worker thread', () => {
+      expect(worker).toBeInstanceOf(Worker);
+    });
+  });
+
+  describe('initializing the module as service worker', () => {
+    it('correctly initializes the module as service worker', async() => {
       await pageOne.goto(location.href, { waitUntil: 'networkidle0' });
       await pageTwo.goto(location.href, { waitUntil: 'networkidle0' });
-      await new Promise((resolve) => setTimeout(() => resolve(null), 500));
 
-      expect(await pageOne.evaluate(() => window.transient.param)).toBeNull();
-      expect(await pageTwo.evaluate(() => window.transient.param)).toBeNull();
+      await pageOne.evaluate(() => window.unittest);
+      await pageTwo.evaluate(() => window.unittest);
 
-      expect(await pageOne.evaluate(() => window.universal.param)).toBeNull();
-      expect(await pageTwo.evaluate(() => window.universal.param)).toBeNull();
+      await expect(pageOne.evaluate(() => ({
+        transient: window.transient.state,
+        universal: window.universal.state,
+        versatile: window.versatile.state
+      }))).resolves.toMatchObject({
+        transient: { property: 'transient' },
+        universal: { property: 'universal' },
+        versatile: { property: 'versatile' }
+      });
+
+      await expect(pageTwo.evaluate(() => ({
+        transient: window.transient.state,
+        universal: window.universal.state,
+        versatile: window.versatile.state
+      }))).resolves.toMatchObject({
+        transient: { property: 'transient' },
+        universal: { property: 'universal' },
+        versatile: { property: 'versatile' }
+      });
     });
   });
 
   describe('dispatching transient state changes', () => {
-    it('correctly mutates the transient browser state', async() => {
-      await pageOne.evaluate(() => window.transiently('transiently', ['one']));
-      await pageTwo.evaluate(() => window.transiently('transiently', ['two']));
-      await new Promise((resolve) => setTimeout(() => resolve(null), 500));
+    it('correctly mutates the transient state', async() => {
+      await expect(pageOne.evaluate(() => {
+        return window.transient.action('action', [
+          'one'
+        ]);
+      })).resolves.toMatchObject({
+        property: 'one'
+      });
 
-      expect(await pageOne.evaluate(() => window.transient.param)).toBe('one');
-      expect(await pageTwo.evaluate(() => window.transient.param)).toBe('two');
+      await expect(pageTwo.evaluate(() => {
+        return window.transient.action('action', [
+          'two'
+        ]);
+      })).resolves.toMatchObject({
+        property: 'two'
+      });
+
+      await expect(pageOne.evaluate(() => ({
+        transient: window.transient.state
+      }))).resolves.toMatchObject({
+        transient: { property: 'one' }
+      });
+
+      await expect(pageTwo.evaluate(() => ({
+        transient: window.transient.state
+      }))).resolves.toMatchObject({
+        transient: { property: 'two' }
+      });
     });
   });
 
   describe('dispatching universal state changes', () => {
-    it('correctly mutates the universal browser state', async() => {
-      await pageOne.evaluate(() => window.universally('universally', ['one']));
-      await new Promise((resolve) => setTimeout(() => resolve(null), 500));
-      expect(await pageTwo.evaluate(() => window.universal.param)).toBe('one');
+    it('correctly mutates the universal state', async() => {
+      await expect(pageOne.evaluate(() => {
+        return window.universal.action('action', [
+          'one'
+        ]);
+      })).resolves.toMatchObject({
+        property: 'one'
+      });
 
-      await pageTwo.evaluate(() => window.universally('universally', ['two']));
-      await new Promise((resolve) => setTimeout(() => resolve(null), 500));
-      expect(await pageOne.evaluate(() => window.universal.param)).toBe('two');
+      await expect(pageTwo.evaluate(() => ({
+        universal: window.universal.state
+      }))).resolves.toMatchObject({
+        universal: { property: 'one' }
+      });
+
+      await expect(pageTwo.evaluate(() => {
+        return window.universal.action('action', [
+          'two'
+        ]);
+      })).resolves.toMatchObject({
+        property: 'two'
+      });
+
+      await expect(pageOne.evaluate(() => ({
+        universal: window.universal.state
+      }))).resolves.toMatchObject({
+        universal: { property: 'two' }
+      });
+    });
+  });
+
+  describe('re-initializing the module as service worker', () => {
+    it('correctly re-initializing the module as service worker', async() => {
+      await expect(pageOne.evaluate(() => {
+        return window.universal.action('action', [
+          'next'
+        ]);
+      })).resolves.toMatchObject({
+        property: 'next'
+      });
+
+      pageTwo = await pageTwo.close().then(() => puppeteer.newPage());
+      await pageTwo.goto(location.href, { waitUntil: 'networkidle0' });
+      await pageTwo.evaluate(() => window.unittest);
+
+      await expect(pageOne.evaluate(() => ({
+        universal: window.universal.state
+      }))).resolves.toMatchObject({
+        universal: { property: 'next' }
+      });
+
+      await expect(pageTwo.evaluate(() => ({
+        universal: window.universal.state
+      }))).resolves.toMatchObject({
+        universal: { property: 'next' }
+      });
     });
   });
 
   describe('dispatching versatile state changes', () => {
-    it('correctly mutates the browser state', async() => {
-      await pageOne.evaluate(() => window.versatilely('versatilely', ['all']));
-      await new Promise((resolve) => setTimeout(() => resolve(null), 500));
+    it('correctly mutates the state', async() => {
+      await expect(pageOne.evaluate(() => {
+        return window.versatile.action('apply', [
+          'sgrud.test.state.universal',
+          'action',
+          ['done']
+        ]);
+      })).resolves.toMatchObject({
+        property: 'done'
+      });
 
-      expect(await pageOne.evaluate(() => window.transient.param)).toBe('all');
-      expect(await pageOne.evaluate(() => window.universal.param)).toBe('all');
+      await expect(pageOne.evaluate(() => {
+        return window.versatile.action('fetch', [
+          '/fetch'
+        ]);
+      })).resolves.toMatchObject({
+        property: 'fetch'
+      });
 
-      expect(await pageTwo.evaluate(() => window.transient.param)).toBe('two');
-      expect(await pageTwo.evaluate(() => window.universal.param)).toBe('all');
-
-      expect(await pageOne.evaluate(() => window.versatile.param)).toBe(null);
-    });
-  });
-
-  describe('re-initializing the state machine within a browser', () => {
-    it('correctly re-initializes the state machine', async() => {
-      await pageOne.close();
-      await pageTwo.evaluate(() => window.universally('universally', ['next']));
-      await new Promise((resolve) => setTimeout(() => resolve(null), 500));
-
-      pageOne = await puppeteer.newPage();
-      await pageOne.goto(location.href, { waitUntil: 'networkidle0' });
-      await new Promise((resolve) => setTimeout(() => resolve(null), 500));
-
-      expect(await pageOne.evaluate(() => window.universal.param)).toBe('next');
-      expect(await pageTwo.evaluate(() => window.universal.param)).toBe('next');
+      await expect(pageTwo.evaluate(() => {
+        return window.versatile.action('state', [
+          'sgrud.test.state.universal'
+        ]);
+      })).resolves.toMatchObject({
+        property: 'done'
+      });
     });
   });
 

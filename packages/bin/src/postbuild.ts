@@ -1,10 +1,8 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-
 import { createHash } from 'crypto';
-import { copySync, existsSync, readFileSync, statSync, writeFileSync } from 'fs-extra';
+import { cpSync, existsSync, readFileSync, statSync, writeFileSync } from 'fs';
 import { basename, dirname, join, normalize, relative, resolve } from 'path';
 import simpleGit from 'simple-git';
-import { cli, _b, _g, __ } from './.cli';
+import { __, _b, _g, cli } from './.cli';
 
 cli.command('postbuild [...modules]')
   .describe('Replicates exported package metadata for SGRUD-based projects')
@@ -15,7 +13,8 @@ cli.command('postbuild [...modules]')
   .action((_ = [], opts) => postbuild({ ...opts, modules: opts._.concat(_) }));
 
 /**
- * Replicates exported package metadata for [SGRUD][]-based projects.
+ * Replicates exported package metadata for
+ * [SGRUD](https://sgrud.github.io)-based projects.
  *
  * ```text
  * Description
@@ -34,10 +33,8 @@ cli.command('postbuild [...modules]')
  *   $ sgrud postbuild --prefix ./module # Run in ./module
  * ```
  *
- * [SGRUD]: https://sgrud.github.io
- *
- * @param options - Options object.
- * @returns Execution promise.
+ * @param options - The `options` object.
+ * @returns An execution {@link Promise}.
  *
  * @example
  * Run with default options:
@@ -48,7 +45,7 @@ cli.command('postbuild [...modules]')
  * ```
  *
  * @example
- * **Postbuild** `./project/module`:
+ * **postbuild** `./project/module`:
  * ```js
  * require('@sgrud/bin');
  *
@@ -86,7 +83,7 @@ export async function postbuild({
    */
   prefix?: string;
 
-} = { }): Promise<void> {
+} = {}): Promise<void> {
   const commit = await simpleGit(prefix).revparse('HEAD');
   const module = require(resolve(prefix, 'package.json'));
   const operations = [];
@@ -101,7 +98,7 @@ export async function postbuild({
     const runtimify = [];
 
     const source = require(resolve(operation[0]));
-    const target = { } as Record<string, string>;
+    const target = {} as Record<string, string>;
 
     for (const key in source) {
       switch (key) {
@@ -169,7 +166,7 @@ export async function postbuild({
       const [a, b] = [sorted[0], sorted[sorted.length - 1]];
       let n = 0; while (n < a.length && a[n] === b[n]) n++;
 
-      const hashes = { } as Record<string, string>;
+      const hashes = {} as Record<string, string>;
       const path = join(modules[i], sorted[0].slice(0, n));
       operation.push(join(prefix, path, 'package.json'));
 
@@ -188,7 +185,7 @@ export async function postbuild({
         ...target,
         digest: Object.keys(hashes).length ? hashes : undefined,
         sgrud: runtimify.length ? { runtimify } : undefined
-      }, undefined, 2)));
+      }, undefined, 2) + '\n'));
 
       for (const resource of resources) {
         operations.push([
@@ -217,7 +214,7 @@ export async function postbuild({
     if (content) {
       writeFileSync(target, content);
     } else {
-      copySync(source, target);
+      cpSync(source, target, { recursive: true });
     }
   }
 }

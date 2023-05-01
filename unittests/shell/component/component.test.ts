@@ -1,101 +1,126 @@
-globalThis.HTMLElement = new Proxy(HTMLElement, {
-  apply: (_, target, args) => {
-    return Reflect.construct(HTMLElement, args, target.constructor);
-  }
-});
-
-import { Attribute, Component, Reference, render } from '@sgrud/shell';
-import { jsxs } from '@sgrud/shell/jsx-runtime';
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'element-one': HTMLElement;
-    'element-two': HTMLElement;
-    'main-element': HTMLElement;
-  }
-}
+import { Attribute, Component, createElement, Fluctuate, Reference, render } from '@sgrud/shell';
+import { BehaviorSubject } from 'rxjs';
 
 describe('@sgrud/shell/component/component', () => {
 
+  /*
+   * Variables
+   */
+
   @Component('element-one')
   class ElementOne extends HTMLElement implements Component {
+
     public constructor() {
       super();
       this.attachShadow({ mode: 'open' });
     }
+
   }
 
   @Component('element-two')
   class ElementTwo extends HTMLElement implements Component {
-    @Attribute() public attribute?: string;
-    @Reference('key', ['change']) public reference!: HTMLDivElement;
+
+    @Attribute()
+    public attribute?: string;
+
+    @Fluctuate(() => fluctuate)
+    public fluctuate?: string;
+
+    @Reference('key', ['change'])
+    public reference?: HTMLDivElement;
+
     public readonly styles: string[] = [':host { color: green; }'];
-    public readonly template: JSX.Element = jsxs('div', { key: 'key' });
+
+    public readonly template: JSX.Element = createElement('div', {
+      key: 'key'
+    });
+
   }
 
-  @Component('main-element', 'main')
+  @Component('element-tag', 'main')
   class MainElement extends HTMLElement implements Component {
-    @Attribute() public attribute?: string;
-    @Reference('key', ['change']) public reference!: HTMLDivElement;
-    public readonly template: JSX.Element = jsxs('div', { key: 'key' });
+
+    @Attribute()
+    public attribute?: string;
+
+    @Fluctuate(() => fluctuate)
+    public fluctuate?: string;
+
+    @Reference('key', ['change'])
+    public reference?: HTMLDivElement;
+
+    public readonly template: JSX.Element = createElement('div', {
+      key: 'key'
+    });
+
     public connectedCallback(): void {
       this.renderComponent();
     }
-    public adoptedCallback(): void {
-      this.renderComponent();
-    }
+
     public attributeChangedCallback(): void {
       this.renderComponent();
     }
+
+    public fluctuationChangedCallback(): void {
+      this.renderComponent();
+    }
+
     public referenceChangedCallback(): void {
       this.renderComponent();
     }
+
     public renderComponent(): void {
       render(this.shadowRoot!, this.template);
     }
+
   }
+
+  const fluctuate = new BehaviorSubject<string>('default');
+
+  /*
+   * Unittests
+   */
 
   describe('declaring a component without styles and template', () => {
     it('renders a slot element', () => {
       document.body.innerHTML = '<element-one></element-one>';
-      const classOne = document.querySelector('element-one') as ElementOne;
+      const elementOne = document.querySelector<ElementOne>('element-one')!;
 
-      expect(classOne).toBeInstanceOf(ElementOne);
-      expect(classOne.shadowRoot?.innerHTML).toBe('<slot></slot>');
+      expect(elementOne).toBeInstanceOf(ElementOne);
+      expect(elementOne.shadowRoot!.innerHTML).toBe('<slot></slot>');
     });
   });
 
   describe('declaring a component with styles and template', () => {
     it('renders the component styles and template', () => {
       document.body.innerHTML = '<element-two></element-two>';
-      const doc = document.implementation.createHTMLDocument();
-      const classTwo = document.querySelector('element-two') as ElementTwo;
+      const elementTwo = document.querySelector<ElementTwo>('element-two')!;
 
-      doc.adoptNode(classTwo);
-      classTwo.attribute = 'value';
-      classTwo.reference.dispatchEvent(new Event('change'));
+      elementTwo.attribute = 'value';
+      elementTwo.reference!.dispatchEvent(new Event('change'));
 
-      expect(classTwo).toBeInstanceOf(ElementTwo);
-      expect(classTwo.attribute).toBe(classTwo.getAttribute('attribute'));
-      expect(classTwo.shadowRoot?.innerHTML).toContain(classTwo.styles[0]);
-      expect(classTwo.shadowRoot?.innerHTML).toContain('<div></div>');
+      expect(elementTwo).toBeInstanceOf(ElementTwo);
+      expect(elementTwo.attribute).toBe(elementTwo.getAttribute('attribute'));
+      expect(elementTwo.fluctuate).toBe(fluctuate.value);
+      expect(elementTwo.shadowRoot!.innerHTML).toContain(elementTwo.styles[0]);
+      expect(elementTwo.shadowRoot!.innerHTML).toContain('<div></div>');
     });
   });
 
   describe('declaring a component extending an element', () => {
     it('renders the extended element as the component', () => {
-      document.body.innerHTML = '<main is="main-element"></main>';
-      const doc = document.implementation.createHTMLDocument();
-      const classMain = document.querySelector('main[is]') as MainElement;
+      document.body.innerHTML = '<main is="element-tag"></main>';
+      const elementMain = document.querySelector<MainElement>('main[is]')!;
 
-      doc.adoptNode(classMain);
-      classMain.attribute = 'value';
-      classMain.reference.dispatchEvent(new Event('change'));
+      fluctuate.next('done');
+      elementMain.setAttribute('attribute', 'value');
+      elementMain.reference!.dispatchEvent(new Event('change'));
 
-      expect(classMain).toBeInstanceOf(MainElement);
-      expect(classMain.attribute).toBe(classMain.getAttribute('attribute'));
-      expect(classMain.outerHTML).toContain('attribute="value"');
-      expect(classMain.outerHTML).toContain('is="main-element"');
+      expect(elementMain).toBeInstanceOf(MainElement);
+      expect(elementMain.attribute).toBe(elementMain.getAttribute('attribute'));
+      expect(elementMain.fluctuate).toBe(fluctuate.value);
+      expect(elementMain.outerHTML).toContain('attribute="value"');
+      expect(elementMain.outerHTML).toContain('is="element-tag"');
     });
   });
 

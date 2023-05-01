@@ -1,130 +1,115 @@
-import { Observable, Subject } from 'rxjs';
-import { BusHandle, BusHandler } from './handler';
+import { Subject } from 'rxjs';
+import { Bus } from '../bus/bus';
+import { BusHandler } from './handler';
 
 /**
- * Prototype property decorator factory. This decorator **publish**es the
- * decorated property value under the supplied `handle`. If the supplied
- * `source` isn't an [Observable][] it is assumed to reference a property key of
- * the prototype containing the decorated property. The first instance value
- * assigned to this `source` property is assigned as readonly on the instance
- * and appended to the supplied `handle`, thus creating an *instance-scoped
- * handle*. This *scoped handle* is then used to **publish** the first instance
- * value assigned to the decorated property. This implies that the publication
- * to the underlying bus will wait until both the decorated property and the
- * referenced `source` property are assigned values. If the supplied `source` is
- * of an [Observable][] type, this [Observable][] is **publish**ed under the
- * supplied `handle` and assigned as readonly to the decorated prototype
- * property. If no `source` is supplied, a new [Subject][] will be created and
- * implicitly supplied as `source`. This decorator is more or less the opposite
- * of the [Subscribe][] decorator, while both rely on the [BusHandler][] to
- * fulfill contracts.
+ * Prototype property decorator factory. This decorator **Publish**es a newly
+ * instantiated {@link Subject} under the supplied `handle` and assigns it to
+ * the decorated property. Depending on the value of the `suffix` parameter,
+ * this newly instantiated {@link Subject} is either assigned directly to the
+ * prototype and **Publish**ed using the supplied `handle`, or, if a truthy
+ * value is supplied for the `suffix` parameter, this value is assumed to
+ * reference another property of the class containing this decorated property.
+ * The first truthy value assigned to this `suffix` property on an instance of
+ * the class containing this **Publish** decorator will then be used to suffix
+ * the supplied `handle` upon **Publish**ment of the newly instantiated
+ * {@link Subject}, which is assigned to the decorated instance property.
  *
- * Precautions should be taken to ensure completion of the supplied
- * [Observable][] `source` as otherwise memory leaks may occur due to dangling
- * subscriptions.
+ * Through these two different modes of operation, the {@link Subject} that will
+ * be **Publish**ed can be assigned statically to the prototype of the class
+ * containing the decorated property, or this assignment can be deferred until
+ * an instance of the class containing the decorated property is constructed and
+ * a truthy value is assigned to its `suffix` property.
  *
- * [BusHandle]: https://sgrud.github.io/client/types/bus.BusHandle
- * [BusHandler]: https://sgrud.github.io/client/classes/bus.BusHandler
- * [Observable]: https://rxjs.dev/api/index/class/Observable
- * [Subject]: https://rxjs.dev/api/index/class/Subject
- * [Subscribe]: https://sgrud.github.io/client/functions/bus.Subscribe
+ * This decorator is more or less the opposite of the {@link Observe} decorator,
+ * while both rely on the {@link BusHandler} to fulfill contracts. Furthermore,
+ * precautions should be taken to ensure the completion of the **Publish**ed
+ * {@link Subject} as memory leaks may occur due to dangling subscriptions.
  *
- * @param handle - [BusHandle][] to **publish**.
- * @param source - Property key or [Observable][].
- * @returns Prototype property decorator.
+ * @param handle - The {@link Bus.Handle} to **Publish**.
+ * @param suffix - An optional `suffix` property for the `handle`.
+ * @returns A prototype property decorator.
  *
  * @example
- * **Publish** the `'io.github.sgrud.example'` bus:
+ * **Publish** the `'io.github.sgrud.example'` stream:
  * ```ts
- * import type { Subject } from 'rxjs';
  * import { Publish } from '@sgrud/bus';
+ * import { type Subject } from 'rxjs';
  *
  * export class Publisher {
  *
  *   ⁠@Publish('io.github.sgrud.example')
- *   public readonly bus!: Subject<any>;
+ *   public readonly stream!: Subject<unknown>;
  *
  * }
  *
- * Publisher.prototype.bus.complete();
+ * Publisher.prototype.stream.next('value');
+ * Publisher.prototype.stream.complete();
  * ```
  *
  * @example
- * **Publish** the `'io.github.sgrud.example'` bus:
+ * **Publish** the `'io.github.sgrud.example'` stream:
  * ```ts
  * import { Publish } from '@sgrud/bus';
- * import { Subject } from 'rxjs';
+ * import { type Subject } from 'rxjs';
  *
  * export class Publisher {
  *
- *   ⁠@Publish('io.github.sgrud', 'scope')
- *   public readonly bus: Subject<any> = new Subject<any>();
+ *   ⁠@Publish('io.github.sgrud', 'suffix')
+ *   public readonly stream: Subject<unknown>;
  *
  *   public constructor(
- *     private readonly scope: string
- *   ) { }
+ *     private readonly suffix: string
+ *   ) {}
  *
  * }
  *
  * const publisher = new Publisher('example');
- * publisher.bus.complete();
+ * publisher.stream.next('value');
+ * publisher.stream.complete();
  * ```
  *
- * @see [BusHandler][]
- * @see [Subscribe][]
+ * @see {@link BusHandler}
+ * @see {@link Observe}
+ * @see {@link Stream}
  */
-export function Publish(
-  handle: BusHandle,
-  source: Observable<any> | PropertyKey = new Subject<any>()
-) {
+export function Publish(handle: Bus.Handle, suffix?: PropertyKey) {
 
   /**
-   * @param prototype - Prototype to be decorated.
-   * @param propertyKey - Prototype property to be decorated.
+   * @param prototype - The `prototype` to be decorated.
+   * @param propertyKey - The `prototype` property to be decorated.
    */
-  return function(
-    prototype: object,
-    propertyKey: PropertyKey
-  ): void {
-    if (source instanceof Observable) {
+  return function(prototype: object, propertyKey: PropertyKey): void {
+    const handler = new BusHandler();
+
+    if (!suffix) {
+      const stream = new Subject<unknown>();
+      handler.publish(handle, stream).subscribe();
+
       Object.defineProperty(prototype, propertyKey, {
         enumerable: true,
-        value: source
+        get: (): Subject<unknown> => stream,
+        set: Function.prototype as (...args: any[]) => any
       });
-
-      new BusHandler([
-        [handle, source]
-      ]);
     } else {
-      Object.defineProperties(prototype, {
-        [source]: {
-          enumerable: true,
-          set(this: any, value: string): void {
-            Object.defineProperty(this, source, {
-              enumerable: true,
-              value
-            });
+      Object.defineProperty(prototype, suffix, {
+        enumerable: true,
+        set(this: object, value: string): void {
+          if (value) {
+            const stream = new Subject();
+            handler.publish(`${handle}.${value}`, stream).subscribe();
 
-            if (this[propertyKey]) {
-              new BusHandler([
-                [`${handle}.${value}`, this[propertyKey]]
-              ]);
-            }
-          }
-        },
-        [propertyKey]: {
-          enumerable: true,
-          set(this: any, value: Observable<any>): void {
-            Object.defineProperty(this, propertyKey, {
-              enumerable: true,
-              value
+            Object.defineProperties(this, {
+              [suffix]: {
+                enumerable: true,
+                value
+              },
+              [propertyKey]: {
+                enumerable: true,
+                get: (): Subject<unknown> => stream,
+                set: Function.prototype as (...args: any[]) => any
+              }
             });
-
-            if (this[source]) {
-              new BusHandler([
-                [`${handle}.${this[source]}`, value]
-              ]);
-            }
           }
         }
       });

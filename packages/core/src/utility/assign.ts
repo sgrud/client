@@ -2,19 +2,18 @@ import { Merge } from '../typing/merge';
 import { TypeOf } from './type-of';
 
 /**
- * **Assign**s (deep copies) the values of all of the enumerable own properties
- * from one or more `source` objects to a `target` object. The last value within
- * the last `source` object takes precedence over any previously encountered
- * values. Returns the `target` object.
+ * **assign**s (deep copies) the values of all of the enumerable own properties
+ * from one or more `sources` to a `target`. The last value within the last
+ * `sources` object takes precedence over any previously encountered values.
  *
- * @param target - Object to **assign** properties to.
- * @param sources - Objects from which to deep copy properties.
- * @typeParam T - Target type.
- * @typeParam S - Source types.
- * @returns **Assign**ed object.
+ * @param target - The `target` object to **assign** properties to.
+ * @param sources - An array of `sources` from which to deep copy properties.
+ * @typeParam T - The type of the `target` object.
+ * @typeParam S - The types of the `sources` objects.
+ * @returns The **assign**ed-to `target` object.
  *
  * @example
- * **Assign** nested properties:
+ * **assign** nested properties:
  * ```ts
  * import { assign } from '@sgrud/core';
  *
@@ -34,9 +33,9 @@ export function assign<
   for (const source of sources) {
     for (const key in source) {
       if (TypeOf.object(target[key]) && TypeOf.object(source[key])) {
-        target[key] = assign({ ...target[key] }, source[key]);
+        target[key] = assign({} as any, target[key], source[key]);
       } else {
-        target[key] = source[key] as T[S[number][PropertyKey]];
+        target[key] = source[key];
       }
     }
   }

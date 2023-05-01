@@ -1,11 +1,9 @@
 /**
- * Best-effort [semver][] matcher. The supplied `version` will be tested against
+ * Best-effort **semver** matcher. The supplied `version` will be tested against
  * the supplied `range`.
  *
- * [semver]: https://semver.org
- *
- * @param version - Tested semantic version string.
- * @param range - Range to test the `version` against.
+ * @param version - The to-be tested semantic `version` string.
+ * @param range - The `range` to test the `version` against.
  * @returns Wether `version` satisfies `range`.
  *
  * @example
@@ -14,6 +12,14 @@
  * import { semver } from '@sgrud/core';
  *
  * semver('1.2.3', '>2 <1 || ~1.2.*'); // true
+ * ```
+ *
+ * @example
+ * Test `'1.2.3'` against `'~1.1'`:
+ * ```ts
+ * import { semver } from '@sgrud/core';
+ *
+ * semver('1.2.3', '~1.1'); // false
  * ```
  */
 export function semver(version: string, range: string): boolean {
@@ -26,7 +32,9 @@ export function semver(version: string, range: string): boolean {
     let valid = true;
 
     for (let part of parts) {
+      let index;
       let mode = '=';
+
       part = part.replace(/^[<>=~^]*/, (match) => {
         if (match) mode = match;
         return '';
@@ -37,7 +45,6 @@ export function semver(version: string, range: string): boolean {
         break;
       }
 
-      let index;
       const split = part.replace(/\+.*$/, '').split(/[-.]/);
 
       if (mode === '^') {

@@ -1,20 +1,22 @@
-import { BusValue } from '@sgrud/bus';
 import express from 'express';
 import { Server } from 'http';
 import { join } from 'path';
 import { Browser, launch, Page } from 'puppeteer-core';
-import { setImmediate } from 'timers';
 import { Worker } from 'worker_threads';
 
-declare global {
-  interface Window {
-    busValue: BusValue<string>;
-  }
-}
+/*
+ * Declarations
+ */
 
-globalThis.setImmediate = setImmediate;
+declare const window: Window & typeof globalThis & {
+  readonly unittest: Promise<unknown>;
+};
 
 describe('@sgrud/bus/worker', () => {
+
+  /*
+   * Fixtures
+   */
 
   let page: Page;
   let puppeteer: Browser;
@@ -32,7 +34,6 @@ describe('@sgrud/bus/worker', () => {
     })).newPage();
 
     server = express()
-      .use('/api/sgrud/v1/insmod', (_, r) => r.send({ }))
       .use('/node_modules/@sgrud', express.static('./dist'))
       .use('/node_modules', express.static('./node_modules', {
         index: ['index.js'],
@@ -41,7 +42,11 @@ describe('@sgrud/bus/worker', () => {
       }))
       .use('/', (_, r) => r.sendFile(join(__dirname, 'index.test.html')))
       .listen(location.port);
-  }, 50000);
+  }, 60000);
+
+  /*
+   * Unittests
+   */
 
   describe('requiring the module as worker thread', () => {
     const worker = new Worker(require.resolve('@sgrud/bus/worker'));
@@ -51,14 +56,15 @@ describe('@sgrud/bus/worker', () => {
     });
   });
 
-  describe('requiring the module as browser worker', () => {
-    it('creates a browser worker', async() => {
+  describe('initializing the module as browser worker', () => {
+    it('correctly initializes the module as browser worker', async() => {
       await page.goto(location.href, { waitUntil: 'networkidle0' });
-      const value = await page.evaluate(() => window.busValue);
 
-      expect(value).toMatchObject({
-        handle: 'sgrud.test.bus',
-        value: '@sgrud/bus/worker'
+      await expect(page.evaluate(() => {
+        return window.unittest;
+      })).resolves.toMatchObject({
+        handle: 'sgrud.test.bus.stream',
+        kind: 'C'
       });
     });
   });

@@ -1,11 +1,9 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-
 import { Assign } from '@sgrud/core';
-import { readFileSync } from 'fs-extra';
+import { readFileSync } from 'fs';
 import { Module } from 'module';
 import { join, resolve } from 'path';
 import { dependencies } from '../package.json';
-import { cli, _b, _g, __ } from './.cli';
+import { __, _b, _g, cli } from './.cli';
 
 cli.command('construct [...modules]')
   .describe('Constructs a SGRUD-based project using `microbundle`')
@@ -18,7 +16,8 @@ cli.command('construct [...modules]')
   .action((_ = [], opts) => construct({ ...opts, modules: opts._.concat(_) }));
 
 /**
- * **Construct**s a [SGRUD][]-based project using [microbundle][].
+ * **construct**s a [SGRUD](https://sgrud.github.io)-based project using
+ * [microbundle](https://github.com/developit/microbundle).
  *
  * ```text
  * Description
@@ -39,11 +38,8 @@ cli.command('construct [...modules]')
  *   $ sgrud construct ./module --format umd # Build ./module as umd
  * ```
  *
- * [microbundle]: https://github.com/developit/microbundle
- * [SGRUD]: https://sgrud.github.io
- *
- * @param options - Options object.
- * @returns Execution promise.
+ * @param options - The `options` object.
+ * @returns An execution {@link Promise}.
  *
  * @example
  * Run with default options:
@@ -54,7 +50,7 @@ cli.command('construct [...modules]')
  * ```
  *
  * @example
- * **Construct** `./project/module`:
+ * **construct** `./project/module`:
  * ```js
  * require('@sgrud/bin');
  *
@@ -64,7 +60,7 @@ cli.command('construct [...modules]')
  * ```
  *
  * @example
- * **Construct** `./module` as `umd`:
+ * **construct** `./module` as `umd`:
  * ```js
  * require('@sgrud/bin');
  *
@@ -89,7 +85,7 @@ export async function construct({
   compress?: boolean;
 
   /**
-   * **Construct** specified formats.
+   * **construct** specified formats.
    *
    * @defaultValue `'commonjs,modern,umd'`
    */
@@ -109,7 +105,7 @@ export async function construct({
    */
   prefix?: string;
 
-} = { }): Promise<void> {
+} = {}): Promise<void> {
   const bundler = require.resolve('microbundle');
   const patched = readFileSync(bundler).toString().replace(
     /babelHelpers: 'bundled'/g,

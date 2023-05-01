@@ -1,40 +1,33 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-
-import { Endpoint, wrap } from 'comlink';
+import { Endpoint, Remote, wrap } from 'comlink';
 import { NodeEndpoint } from 'comlink/dist/umd/node-adapter';
 import { firstValueFrom } from 'rxjs';
 import { Kernel } from '../kernel/kernel';
 import { TypeOf } from '../utility/type-of';
 
 /**
- * This prototype property decorator factory **Spawn**s a [Worker][], wraps it
- * with [Comlink][] and assigns it to the decorated prototype property.
+ * This prototype property decorator factory **Spawn**s a {@link Worker} and
+ * {@link wrap}s and assigns the resulting {@link Remote} to the decorated
+ * prototype property.
  *
- * [Comlink]: https://www.npmjs.com/package/comlink
- * [Module]: https://sgrud.github.io/client/interfaces/core.Kernel-1.Module
- * [Thread]: https://sgrud.github.io/client/functions/core.Thread-1
- * [Worker]: https://developer.mozilla.org/docs/Web/API/Worker/Worker
- *
- * @param worker - Worker constructor to **Spawn**.
- * @param source - Optional [Module][] source.
- * @typeParam T - Constructor type.
- * @returns Class property decorator.
+ * @param worker - The `worker` module name or {@link Endpoint} to **Spawn**.
+ * @param source - An optional {@link Kernel.Module} `source`.
+ * @returns A prototype property decorator.
  *
  * @example
- * **Spawn** a [Worker][]:
+ * **Spawn** a {@link Worker}:
  * ```ts
- * import { Spawn, Thread } from '@sgrud/core';
- * import { ExampleWorker } from 'example-worker';
+ * import { Spawn, type Thread } from '@sgrud/core';
+ * import { type ExampleWorker } from 'example-worker';
  *
  * export class ExampleWorkerHandler {
  *
  *   ⁠@Spawn('example-worker')
- *   private static readonly worker: Thread<ExampleWorker>;
+ *   public readonly worker!: Thread<ExampleWorker>;
  *
  * }
  * ```
  *
- * @see [Thread][]
+ * @see {@link Thread}
  */
 export function Spawn(
   worker: string | Endpoint | NodeEndpoint,
@@ -42,19 +35,16 @@ export function Spawn(
 ) {
 
   /**
-   * @param prototype - Prototype to be decorated.
-   * @param propertyKey - Prototype property to be decorated.
-   * @throws ReferenceError.
+   * @param prototype - The `prototype` to be decorated.
+   * @param propertyKey - The `prototype` property to be decorated.
+   * @throws A {@link ReferenceError} when the environment is incompatible.
    */
-  return function(
-    prototype: object,
-    propertyKey: PropertyKey
-  ): void {
+  return function(prototype: object, propertyKey: PropertyKey): void {
     let thread;
 
     Object.defineProperty(prototype, propertyKey, {
       enumerable: true,
-      get: () => thread ||= (async() => {
+      get: (): Remote<unknown> => thread ||= (async() => {
         if (TypeOf.process(globalThis.process)) {
           if (TypeOf.string(worker)) {
             const { Worker } = require('worker_threads');
@@ -83,7 +73,7 @@ export function Spawn(
 
         return wrap(worker as Endpoint);
       })(),
-      set: Function.prototype as (...args: any[]) => void
+      set: Function.prototype as (...args: any[]) => any
     });
   };
 

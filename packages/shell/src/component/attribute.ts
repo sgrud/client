@@ -2,23 +2,22 @@ import { Mutable } from '@sgrud/core';
 import { Component } from './component';
 
 /**
- * [Component][] prototype property decorator factory. Applying the
- * **Attribute** decorator to a property of a [Component][] binds the decorated
- * property to the corresponding attribute of the respective [Component][]. This
- * implies that the attribute `name` is added to the *observedAttributes* array
- * of the [Component][] and the decorated property is replaced with a getter and
- * setter deferring those operations to the attribute. If no `name` supplied,
- * the name of the decorated property will be used instead. Further, if both, a
- * parameter initializer and an initial attribute value are supplied, the
- * attribute value takes precedence.
+ * {@link Component} prototype property decorator factory. Applying the
+ * **Attribute** decorator to a property of a {@link Component} binds the
+ * decorated property to the corresponding **Attribute** of the respective
+ * {@link Component}. This implies that the **Attribute** `name` is appended to
+ * the {@link Component.observedAttributes} array of the {@link Component} and
+ * the decorated property is replaced with a getter and setter deferring those
+ * operations to the **Attribute**. If no `name` supplied, the name of the
+ * decorated property will be used instead. Further, if both, a parameter
+ * initializer and an initial **Attribute** value are supplied, the
+ * **Attribute** value takes precedence.
  *
- * [Component]: https://sgrud.github.io/client/interfaces/shell.Component-1
- *
- * @param name - [Component][] attribute name.
- * @returns [Component][] prototype property decorator.
+ * @param name - The {@link Component} **Attribute** `name`.
+ * @returns A {@link Component} prototype property decorator.
  *
  * @example
- * Decorate a property:
+ * Bind a property to an **Attribute**:
  * ```tsx
  * import { Attribute, Component } from '@sgrud/shell';
  *
@@ -41,20 +40,15 @@ import { Component } from './component';
  * }
  * ```
  *
- * @see [Component][]
+ * @see {@link Component}
  */
 export function Attribute(name?: string) {
 
   /**
-   * @param prototype - [Component][] prototype to be decorated.
-   * @param propertyKey - [Component][] property to be decorated.
-   *
-   * [Component]: https://sgrud.github.io/client/interfaces/shell.Component-1
+   * @param prototype - The {@link Component} `prototype` to be decorated.
+   * @param propertyKey - The {@link Component} property to be decorated.
    */
-  return function(
-    prototype: Component,
-    propertyKey: PropertyKey
-  ): void {
+  return function(prototype: Component, propertyKey: PropertyKey): void {
     const key = name || propertyKey as string;
     ((prototype as Mutable<Component>).observedAttributes ||= []).push(key);
 
@@ -64,7 +58,7 @@ export function Attribute(name?: string) {
         return this.getAttribute(key) ?? undefined;
       },
       set(this: Component, value: string): void {
-        if (this.readyState || !this.hasAttribute(key)) {
+        if (this.isConnected || !this.hasAttribute(key)) {
           this.setAttribute(key, value);
         }
       }

@@ -9,17 +9,17 @@
  * the `apply` callback is fired with the **Singleton** instance and the `new`
  * invocation parameters.
  *
- * @param apply - Construct function.
- * @typeParam T - Constructor type.
- * @returns Class decorator.
+ * @param apply - The callback to `apply` on subsequent `new` invocations.
+ * @typeParam T - The type of the decorated constructor.
+ * @returns A class constructor decorator.
  *
  * @example
  * **Singleton** class:
  * ```ts
  * import { Singleton } from '@sgrud/core';
  *
- * ⁠@Singleton<typeof Service>()
- * export class Service { }
+ * ⁠@Singleton()
+ * export class Service {}
  *
  * new Service() === new Service(); // true
  * ```
@@ -32,24 +32,22 @@ export function Singleton<T extends new (...args: any[]) => any>(
 ) {
 
   /**
-   * @param constructor - Class constructor to be decorated.
-   * @returns Decorated class constructor.
+   * @param constructor - The class `constructor` to be decorated.
+   * @returns The decorated class `constructor`.
    */
-  return function(
-    constructor: T
-  ): T {
+  return function(constructor: T): T {
     class Class extends constructor {
 
       public constructor(...args: any[]) {
         if (!self) {
           super(...args);
           self = this;
+        } else {
+          return apply?.(
+            self as InstanceType<T>,
+            args as ConstructorParameters<T>
+          ) || self;
         }
-
-        return apply?.(
-          self as InstanceType<T>,
-          args as ConstructorParameters<T>
-        ) || self;
       }
 
     }

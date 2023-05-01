@@ -2,45 +2,62 @@ import { Factor, Linker, Target } from '@sgrud/core';
 
 describe('@sgrud/core/linker/target', () => {
 
-  @Target<typeof Service>(['target'])
-  class Service {
-    public constructor(public readonly param: string) { }
+  /*
+   * Variables
+   */
+
+  @Target(['base'])
+  class Base {
+
+    public constructor(
+      public readonly param: string
+    ) {}
+
   }
 
-  class Override extends Service {
+  class Service extends Base {
+
     public constructor(param: string) {
-      super(param + '-override');
+      super(param + '-service');
     }
+
   }
 
   class Class {
-    @Factor<Target<Service>>(() => Service) public readonly service!: Service;
+
+    @Factor<Target<Base>>(() => Base)
+    public readonly property!: Base;
+
   }
 
+  /*
+   * Unittests
+   */
+
   describe('applying the decorator', () => {
-    const service = new Linker<Target<Service>>().get(Service);
+    const base = new Linker<Target<Base>>().get(Base);
 
     it('creates the instance from provided constructor parameters', () => {
-      expect(service.param).toBe('target');
+      expect(base.param).toBe('base');
     });
 
     it('links the instance to the target constructor', () => {
-      expect(service).toBeInstanceOf(Service);
+      expect(base).toBeInstanceOf(Base);
     });
   });
 
   describe('factoring the target constructor', () => {
     it('links the instance to the prototype', () => {
-      expect(Class.prototype.service).toBeInstanceOf(Service);
+      expect(Class.prototype.property).toBeInstanceOf(Base);
     });
   });
 
   describe('overriding a targeted constructor', () => {
     it('links the overridden instance to the targeted constructor', () => {
-      Target<typeof Service>(['target'], Service)(Override);
+      Target(['target'], Base)(Service);
 
-      expect(Class.prototype.service).toBeInstanceOf(Override);
-      expect(Class.prototype.service.param).toBe('target-override');
+      expect(Class.prototype.property).toBeInstanceOf(Service);
+      expect(Class.prototype.property.param).toBe('target-service');
     });
   });
 

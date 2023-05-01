@@ -1,8 +1,8 @@
 import express, { NextFunction, Request, Response } from 'express';
-import { existsSync, readFileSync } from 'fs-extra';
+import { existsSync, readFileSync } from 'fs';
 import { extname, join, resolve } from 'path';
 import { launch } from 'puppeteer-core';
-import { cli, _b, _g, __ } from './.cli';
+import { __, _b, _g, cli } from './.cli';
 
 cli.command('universal [entry]')
   .describe('Runs SGRUD in universal (SSR) mode using `puppeteer`')
@@ -16,7 +16,8 @@ cli.command('universal [entry]')
   .action((entry, opts) => universal({ ...opts, entry }));
 
 /**
- * Runs [SGRUD][] in **universal** (SSR) mode using [puppeteer][].
+ * Runs [SGRUD](https://sgrud.github.io) in **universal** (SSR) mode using
+ * [puppeteer](https://github.com/puppeteer/puppeteer).
  *
  * ```text
  * Description
@@ -38,11 +39,8 @@ cli.command('universal [entry]')
  *   $ sgrud universal -H 192.168.0.10 -p 4040 # Listen on 192.168.0.10:4040
  * ```
  *
- * [puppeteer]: https://pptr.dev
- * [SGRUD]: https://sgrud.github.io
- *
- * @param options - Options object.
- * @returns Execution promise.
+ * @param options - The `options` object.
+ * @returns An execution {@link Promise}.
  *
  * @example
  * Run with default options:
@@ -116,7 +114,7 @@ export async function universal({
    */
   prefix?: string;
 
-} = { }): Promise<void> {
+} = {}): Promise<void> {
   const app = express();
   const buffer = readFileSync(resolve(prefix, entry));
   const caches = new Map<string, Promise<string>>();
@@ -129,21 +127,16 @@ export async function universal({
   });
 
   app.use('/', express.static(prefix, {
-    index: ['index.js'],
-    extensions: ['js'],
+    index: ['index.html', 'index.js'],
+    extensions: ['html', 'js'],
     fallthrough: false
   }));
 
-  app.use((
-    _: Record<string, any>,
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
+  app.use((_: unknown, req: Request, res: Response, next: NextFunction) => {
     let cache = caches.get(req.url);
 
     if (!cache || req.headers.pragma === 'no-cache') {
-      cache = puppeteer.newPage().then(async(page) => {
+      caches.set(req.url, cache = puppeteer.newPage().then(async(page) => {
         await page.setRequestInterception(true);
 
         page.on('domcontentloaded', () => void page.evaluate(() => {
@@ -152,7 +145,7 @@ export async function universal({
         }));
 
         page.on('request', (event) => {
-          const initiator = event.initiator().type;
+          const initiator = event.initiator()?.type;
           const type = event.resourceType();
           const url = new URL(event.url());
 
@@ -200,9 +193,7 @@ export async function universal({
         await page.close();
 
         return html;
-      });
-
-      caches.set(req.url, cache);
+      }));
     }
 
     return void cache

@@ -1,14 +1,12 @@
 /**
- * Internal mapping of all registered **elements** to their name.
+ * Internal {@link Map}ping of all registered **elements** to their name.
  */
 const elements = new Map<CustomElementConstructor, string>();
 
 /**
- * Proxy around the built-in [customElements][] object, maintaining a mapping of
- * all registered elements and their corresponding names, which can be queried
- * by calling *getName*.
- *
- * [customElements]: https://developer.mozilla.org/docs/Web/API/Window/customElements
+ * {@link Proxy} around the built-in {@link CustomElementRegistry}, maintaining
+ * a mapping of all registered elements and their corresponding names, which can
+ * be queried by calling {@link registry.getName}.
  *
  * @remarks https://github.com/WICG/webcomponents/issues/566
  */
@@ -48,12 +46,10 @@ const registry = new Proxy(customElements, {
 
   /**
    * Retrieve the name under which the supplied `constructor` was registered
-   * with the [customElements][] registry.
+   * with the {@link CustomElementRegistry}.
    *
-   * [customElements]: https://developer.mozilla.org/docs/Web/API/Window/customElements
-   *
-   * @param constructor - Class constructor to be looked up.
-   * @returns Name under which the `constructor` was registered, if.
+   * @param constructor - The class `constructor` to get the name for.
+   * @returns The name under which the `constructor` was registered, if.
    */
   getName(constructor: CustomElementConstructor): string | undefined;
 

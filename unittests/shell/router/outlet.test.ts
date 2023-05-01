@@ -1,18 +1,23 @@
-globalThis.HTMLSlotElement = new Proxy(HTMLSlotElement, {
-  apply: (_, target, args) => {
-    return Reflect.construct(HTMLSlotElement, args, target.constructor);
-  }
-});
-
 import { Router, RouterOutlet } from '@sgrud/shell';
+import { from, takeWhile } from 'rxjs';
 
 describe('@sgrud/shell/router/outlet', () => {
 
-  jest.useFakeTimers();
+  /*
+   * Fixtures
+   */
+
+  afterEach(() => navigate.mockClear());
+  const navigate = jest.spyOn(Router.prototype, 'navigate');
+
   document.body.innerHTML = '<slot is="router-outlet">';
 
+  /*
+   * Unittests
+   */
+
   describe('inserting a router outlet into the dom', () => {
-    const routerOutlet = document.querySelector('slot[is]') as RouterOutlet;
+    const routerOutlet = document.querySelector<RouterOutlet>('slot[is]')!;
 
     it('renders the router outlet component', () => {
       expect(routerOutlet).toBeInstanceOf(RouterOutlet);
@@ -20,11 +25,20 @@ describe('@sgrud/shell/router/outlet', () => {
   });
 
   describe('inserting a route into the router', () => {
-    const navigate = jest.spyOn(Router.prototype, 'navigate');
+    const routing = from(new Router().add({ path: '' }));
 
-    it('renders the router outlet component', () => {
-      new Router().add({ path: '' }) && jest.runAllTimers();
-      expect(navigate).toHaveBeenCalledWith('/', '', true);
+    it('renders the router outlet component', (done) => {
+      routing.pipe(takeWhile((_, index) => {
+        switch (index) {
+          case 0: expect(navigate).not.toBeCalled(); break;
+          case 1: expect(navigate).toBeCalledWith('/', '', 'replace'); break;
+        }
+
+        return !index;
+      })).subscribe({
+        complete: done,
+        error: done
+      });
     });
   });
 

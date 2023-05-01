@@ -3,37 +3,59 @@ import * as comlink from 'comlink';
 
 describe('@sgrud/core/thread/thread', () => {
 
-  describe('applying the decorator', () => {
-    const decorate = () => Thread()(class { });
+  /*
+   * Fixtures
+   */
 
-    it('throws an error in the main thread', () => {
-      expect(decorate).toThrowError(ReferenceError);
+  jest.mock('comlink/dist/umd/node-adapter');
+
+  afterEach(() => expose.mockClear());
+  const expose = jest.spyOn(comlink, 'expose');
+
+  /*
+   * Unittests
+   */
+
+  describe('applying the decorator in the main thread', () => {
+    const decorate = () => Thread()(class {});
+
+    it('throws an error', () => {
+      expect(decorate).toThrowError(TypeError);
+      expect(expose).not.toBeCalled();
     });
   });
 
   describe('applying the decorator in a browser environment', () => {
-    const decorate = () => Thread()(class { });
-    const expose = jest.spyOn(comlink, 'expose');
+    const decorate = () => Thread()(class {});
 
     it('correctly decorates the threading class', () => {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
       require('worker_threads').isMainThread = false;
-      jest.mock('comlink/dist/umd/node-adapter');
 
       expect(decorate).not.toThrow();
-      expect(expose).toHaveBeenCalled();
+      expect(expose).toBeCalled();
     });
   });
 
   describe('applying the decorator in a node environment', () => {
-    const decorate = () => Thread()(class { });
-    const expose = jest.spyOn(comlink, 'expose');
+    const decorate = () => Thread()(class {});
 
     it('correctly decorates the threading class', () => {
-      globalThis.importScripts = Function.prototype as any;
+      globalThis.importScripts = () => undefined;
 
       expect(decorate).not.toThrow();
-      expect(expose).toHaveBeenCalled();
+      expect(expose).toBeCalled();
+    });
+  });
+
+  describe('applying the decorator in an incompatible environment', () => {
+    const decorate = () => Thread()(class {});
+
+    it('throws an error', () => {
+      globalThis.importScripts = undefined!;
+      globalThis.process = undefined!;
+
+      expect(decorate).toThrow();
+      expect(expose).not.toBeCalled();
     });
   });
 

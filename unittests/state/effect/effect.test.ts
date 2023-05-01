@@ -2,16 +2,26 @@ import { Effect } from '@sgrud/state';
 
 describe('@sgrud/state/effect/effect', () => {
 
+  /*
+   * Variables
+   */
+
   class Class extends Effect {
-    public function() {
+
+    public function(): any {
       return;
     }
+
   }
+
+  /*
+   * Unittests
+   */
 
   describe('constructing a new instance of an effect', () => {
     const construct = () => new Class();
 
-    it('correctly throws a TypeError', () => {
+    it('correctly throws an error', () => {
       expect(construct).toThrowError(TypeError);
     });
   });

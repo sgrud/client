@@ -1,104 +1,105 @@
+import { Subscription } from 'rxjs';
 import { customElements } from './registry';
 import { createElement, render } from './runtime';
 
 /**
- * Unique symbol used as property key by the [Component][] decorator to
+ * Unique symbol used as property key by the {@link Component} decorator to
  * associate the supplied constructor with its wrapper.
- *
- * [Component]: https://sgrud.github.io/client/functions/shell.Component
  */
 export const component = Symbol('@sgrud/shell/component/component');
 
 /**
- * Interface describing the shape of a **Component**. Mostly adheres to the
- * [WebComponents][] specification while providing rendering and change
- * detection capabilities.
- *
- * [WebComponents]: https://developer.mozilla.org/docs/Web/Web_Components
+ * An interface describing the shape of a **Component**. Mostly adheres to the
+ * [Web Components](https://developer.mozilla.org/docs/Web/API/Web_components)
+ * specification while providing rendering and change detection capabilities.
  */
 export interface Component extends HTMLElement {
 
   /**
-   * Array of [Attribute][] names, which should be observed for changes, which
-   * will trigger the *attributeChangedCallback*.
-   *
-   * [Attribute]: https://sgrud.github.io/client/functions/shell.Attribute
+   * Array of {@link Attribute} names, which should be observed for changes,
+   * which will trigger the {@link attributeChangedCallback}.
    */
   readonly observedAttributes?: string[];
 
   /**
-   * Mapping of [Reference][]s to observed events, which, when emitted by the
-   * referenced node, trigger the *referenceChangedCallback*.
-   *
-   * [Reference]: https://sgrud.github.io/client/functions/shell.Reference
+   * A {@link Record} of {@link Subscription}s opened by the {@link Fluctuate}
+   * decorator which trigger the {@link fluctuationChangedCallback} upon each
+   * emission, while subscribed to.
+   */
+  readonly observedFluctuations?: Record<PropertyKey, Subscription>;
+
+  /**
+   * A {@link Record} of {@link Reference}s and observed events, which, when
+   * emitted by the reference, trigger the {@link referenceChangedCallback}.
    */
   readonly observedReferences?: Record<JSX.Key, (keyof HTMLElementEventMap)[]>;
 
   /**
-   * Internal readiness indication. Initially resolves to `undefined` and will
-   * mirror the *isConnected* state, when ready.
-   */
-  readonly readyState?: boolean;
-
-  /**
    * Array of CSS **styles** in string form, which should be included within the
-   * shadow dom of the *Component*.
+   * {@link ShadowRoot} of the {@link Component}.
    */
   readonly styles?: string[];
 
   /**
-   * [JSX][] representation of the *Component* **template**. If no template is
-   * supplied, an [HTMLSlotElement][] will be rendered instead.
-   *
-   * [HTMLSlotElement]: https://developer.mozilla.org/docs/Web/API/HTMLSlotElement
-   * [JSX]: https://www.typescriptlang.org/docs/handbook/jsx.html
+   * {@link JSX} representation of the {@link Component} **template**. If no
+   * template is supplied, an {@link HTMLSlotElement} will be rendered instead.
    */
   readonly template?: JSX.Element;
 
   /**
-   * Called when the *Component* is moved between documents.
+   * Called when the {@link Component} is moved between {@link Document}s.
    */
   adoptedCallback?(): void;
 
   /**
-   * Called when one of the *Component*'s observed [Attribute][]s is added,
-   * removed or changed. Which *Component* attributes are observed depends on
-   * the contents of the *observedAttributes* array.
+   * Called when one of the {@link Component}'s observed {@link Attribute}s is
+   * added, removed or changed. Which {@link Component} attributes are observed
+   * depends on the contents of the {@link observedAttributes} array.
    *
-   * [Attribute]: https://sgrud.github.io/client/functions/shell.Attribute
-   *
-   * @param name - Attribute name.
-   * @param prev - Previous value.
-   * @param next - Next value.
+   * @param name - The `name` of the changed attribute.
+   * @param prev - The `prev`ious value of the changed attribute.
+   * @param next - The `next` value of the changed attribute.
    */
   attributeChangedCallback?(name: string, prev?: string, next?: string): void;
 
   /**
-   * Called when the *Component* is appended to or moved within the dom.
+   * Called when the {@link Component} is appended to the {@link Document}.
    */
   connectedCallback?(): void;
 
   /**
-   * Called when the *Component* is removed from the dom.
+   * Called when the {@link Component} is removed from the {@link Document}.
    */
   disconnectedCallback?(): void;
 
   /**
-   * Called when one of the *Component*'s [Reference][]d and observed nodes
-   * emits an event. Which [Reference][]d nodes are observed for which events
-   * depends on the contents of the *observedReferences* mapping.
+   * This callback is invoked whenever a {@link Component} {@link Fluctuate}s,
+   * i.e., if the any of its decorated `propertyKey`s is assigned the `next`
+   * value emitted by one of the {@link observedFluctuations}.
    *
-   * [Reference]: https://sgrud.github.io/client/functions/shell.Reference
-   *
-   * @param name - [Reference][] name.
-   * @param event - Emitted event.
+   * @param propertyKey - The `propertyKey` that {@link Fluctuate}d.
+   * @param next - The `prev`ious value of the {@link Fluctuate}d `propertyKey`.
+   * @param next - The `next` value of the {@link Fluctuate}d `propertyKey`.
    */
-  referenceChangedCallback?(name: string, node: Node, event: Event): void;
+  fluctuationChangedCallback?(
+    propertyKey: PropertyKey,
+    prev: unknown,
+    next: unknown
+  ): void;
 
   /**
-   * Called when the *Component* has changed and should be (re-)[render][]ed.
+   * Called when one of the {@link Component}'s {@link Reference}d and observed
+   * nodes emits an event. Which {@link Reference}d nodes are observed for which
+   * events depends on the contents of the {@link observedReferences} mapping.
    *
-   * [render]: https://sgrud.github.io/client/functions/shell.render
+   * @param key - The `key` used to {@link Reference} the `node`.
+   * @param node - The {@link Reference}d `node`.
+   * @param event - The `event` emitted by the `node`.
+   */
+  referenceChangedCallback?(key: JSX.Key, node: Node, event: Event): void;
+
+  /**
+   * Called when the {@link Component} has changed and should {@link render}.
    */
   renderComponent?(): void;
 
@@ -106,26 +107,22 @@ export interface Component extends HTMLElement {
 
 /**
  * Class decorator factory. Registers the decorated class as **Component**
- * through the [customElements][] registry. Registered **Component**s can be
- * used in conjunction with the [Attribute][] and [Reference][] prototype
- * property decorators which will trigger the **Component** to re-[render][],
- * when one of the *observedAttributes* or *observedReferences* changes. While
- * any **Component** which is registered by this decorator is enriched with
- * basic rendering functionality, any implemented method will cancel out its
- * `super` logic.
+ * through the {@link customElements} registry. Registered **Component**s can be
+ * used in conjunction with any of the {@link Attribute}, {@link Fluctuate} and
+ * {@link Reference} prototype property decorators which will trigger their
+ * respective callbacks or {@link Component.renderComponent} whenever one of the
+ * {@link Component.observedAttributes}, {@link Component.observedFluctuations}
+ * or {@link Component.observedReferences} changes. While any **Component**
+ * registered by this decorator is enriched with basic rendering functionality,
+ * any implemented method will cancel out its `super` logic.
  *
- * [customElements]: https://sgrud.github.io/client/variables/shell.customElements
- * [Attribute]: https://sgrud.github.io/client/functions/shell.Attribute
- * [Reference]: https://sgrud.github.io/client/functions/shell.Reference
- * [render]: https://sgrud.github.io/client/functions/shell.render
- *
- * @param selector - **Component** tag name.
- * @param inherits - Extended tag name.
- * @typeParam S - **Component** tag type.
- * @returns Class decorator.
+ * @param selector - The custom **Component** tag name `selector`.
+ * @param inherits - The {@link HTMLElement} this **Component** `inherits` from.
+ * @typeParam S - The custom **Component** tag name `selector` type.
+ * @returns A class constructor decorator.
  *
  * @example
- * Register a component:
+ * Register a **Component**:
  * ```tsx
  * import { Component } from '@sgrud/shell';
  *
@@ -151,8 +148,8 @@ export interface Component extends HTMLElement {
  * }
  * ```
  *
- * @see [Attribute][]
- * @see [Reference][]
+ * @see {@link Attribute}
+ * @see {@link Reference}
  */
 export function Component<
   S extends CustomElementTagName,
@@ -160,8 +157,8 @@ export function Component<
 >(selector: S, inherits?: K) {
 
   /**
-   * @param constructor - Class constructor to be decorated.
-   * @returns Decorated class constructor.
+   * @param constructor - The class `constructor` to be decorated.
+   * @returns The decorated class `constructor`.
    */
   return function<T extends new () => Component & (
     HTMLElementTagNameMap[S] & HTMLElementTagNameMap[K]
@@ -172,35 +169,24 @@ export function Component<
 
       public static readonly [component]: T = constructor;
 
-      public static get observedAttributes(): string[] {
-        return this.prototype.observedAttributes || [];
+      public static get observedAttributes(): string[] | undefined {
+        return this.prototype.observedAttributes;
       }
 
       public constructor() {
         super();
 
         if (!this.shadowRoot) {
-          this.attachShadow({ mode: 'open' });
-        }
-
-        Object.defineProperty(this, 'readyState', {
-          enumerable: true,
-          get: () => this.isConnected
-        });
-      }
-
-      public override adoptedCallback(): void {
-        if (super.adoptedCallback) {
-          super.adoptedCallback();
-        } else {
-          this.renderComponent();
+          this.attachShadow({
+            mode: 'open'
+          });
         }
       }
 
       public override connectedCallback(): void {
         if (super.connectedCallback) {
           super.connectedCallback();
-        } else {
+        } else if (this.isConnected) {
           this.renderComponent();
         }
       }
@@ -212,19 +198,31 @@ export function Component<
       ): void {
         if (super.attributeChangedCallback) {
           super.attributeChangedCallback(name, prev, next);
-        } else {
+        } else if (this.isConnected) {
+          this.renderComponent();
+        }
+      }
+
+      public override fluctuationChangedCallback(
+        propertyKey: PropertyKey,
+        prev: unknown,
+        next: unknown
+      ): void {
+        if (super.fluctuationChangedCallback) {
+          super.fluctuationChangedCallback(propertyKey, prev, next);
+        } else if (this.isConnected) {
           this.renderComponent();
         }
       }
 
       public override referenceChangedCallback(
-        name: string,
+        key: JSX.Key,
         node: Node,
         event: Event
       ): void {
         if (super.referenceChangedCallback) {
-          super.referenceChangedCallback(name, node, event);
-        } else {
+          super.referenceChangedCallback(key, node, event);
+        } else if (this.isConnected) {
           this.renderComponent();
         }
       }
@@ -232,7 +230,7 @@ export function Component<
       public override renderComponent(): void {
         if (super.renderComponent) {
           super.renderComponent();
-        } else {
+        } else if (this.isConnected) {
           const { styles = [], template = [] } = this;
 
           if (!template.length) {

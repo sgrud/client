@@ -17,9 +17,8 @@ export const [
 ];
 
 /**
- * [sade][] instance providing the SGRUD **CLI**.
- *
- * [sade]: https://github.com/lukeed/sade
+ * [sade](https://github.com/lukeed/sade) instance providing the
+ * [SGRUD](https://sgrud.github.io) CLI.
  */
 export const cli = sade('sgrud')
   .describe('@sgrud/bin - The SGRUD CLI')

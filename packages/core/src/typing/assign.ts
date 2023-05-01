@@ -1,14 +1,14 @@
 /**
- * Type helper **assign**ing the own property types of all of the enumerable own
+ * Type helper **Assign**ing the own property types of all of the enumerable own
  * properties from a source type to a target type.
  *
- * @typeParam S - Source type.
- * @typeParam T - Target type.
+ * @typeParam S - The source type to **Assign** from.
+ * @typeParam T - The target type to **Assign** to.
  *
  * @example
  * **Assign** `valueOf()` to `string`:
  * ```ts
- * import type { Assign } from '@sgrud/core';
+ * import { type Assign } from '@sgrud/core';
  *
  * const str = 'Hello world' as Assign<{
  *   valueOf(): 'Hello world';

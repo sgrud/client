@@ -1,64 +1,70 @@
-import { Symbol, TypeOf } from '@sgrud/core';
+/* eslint-disable @typescript-eslint/unbound-method */
+
+import { TypeOf } from '@sgrud/core';
 
 describe('@sgrud/core/utility/type-of', () => {
 
+  /*
+   * Variables
+   */
+
   const methods = [
-    TypeOf.array.bind(TypeOf),
-    TypeOf.boolean.bind(TypeOf),
-    TypeOf.date.bind(TypeOf),
-    TypeOf.function.bind(TypeOf),
-    TypeOf.global.bind(TypeOf),
-    TypeOf.null.bind(TypeOf),
-    TypeOf.number.bind(TypeOf),
-    TypeOf.object.bind(TypeOf),
-    TypeOf.process.bind(TypeOf),
-    TypeOf.promise.bind(TypeOf),
-    TypeOf.regex.bind(TypeOf),
-    TypeOf.string.bind(TypeOf),
-    TypeOf.undefined.bind(TypeOf),
-    TypeOf.url.bind(TypeOf),
-    TypeOf.window.bind(TypeOf)
+    TypeOf.array,
+    TypeOf.boolean,
+    TypeOf.date,
+    TypeOf.function,
+    TypeOf.null,
+    TypeOf.number,
+    TypeOf.object,
+    TypeOf.process,
+    TypeOf.promise,
+    TypeOf.regex,
+    TypeOf.string,
+    TypeOf.undefined,
+    TypeOf.url,
+    TypeOf.window
   ];
 
   const values = [
     [],
     true,
     new Date(),
-    Function.prototype,
-    { [Symbol.toStringTag]: 'global' },
+    () => undefined,
     null,
     0,
-    { },
+    {},
     Object.create(process),
-    Object.create(Promise.resolve()),
-    /-/,
+    Object.create(Promise.prototype),
+    /./,
     '',
     undefined,
-    new URL('url://'),
-    { [Symbol.toStringTag]: 'Window' }
+    Object.create(URL.prototype),
+    Object.create(Window.prototype)
   ];
 
-  describe.each(methods)('applying method %O', (method) => {
-    const index = methods.indexOf(method);
-
-    describe.each(values)('to value %O', (value) => {
-      if (index === values.indexOf(value)) {
-        it('returns true', () => {
-          expect(method(value)).toBe(true);
-        });
-      } else {
-        it('returns false', () => {
-          expect(method(value)).toBe(false);
-        });
-      }
-    });
-  });
+  /*
+   * Unittests
+   */
 
   describe('calling the abstract constructor', () => {
     const construct = () => new (TypeOf as any)();
 
     it('throws an error', () => {
       expect(construct).toThrowError(TypeError);
+    });
+  });
+
+  describe.each(methods)('applying method %O', (method) => {
+    describe.each(values)('to value %O', (value) => {
+      if (methods.indexOf(method) === values.indexOf(value)) {
+        it('returns true', () => {
+          expect(method.call(TypeOf, value)).toBeTruthy();
+        });
+      } else {
+        it('returns false', () => {
+          expect(method.call(TypeOf, value)).toBeFalsy();
+        });
+      }
     });
   });
 

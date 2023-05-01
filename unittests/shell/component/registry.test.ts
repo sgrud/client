@@ -2,11 +2,19 @@ import { customElements } from '@sgrud/shell';
 
 describe('@sgrud/shell/component/registry', () => {
 
-  class ElementOne extends HTMLElement { }
-  class ElementTwo extends HTMLElement { }
+  /*
+   * Variables
+   */
 
+  class ElementOne extends HTMLElement {}
   customElements.define('element-one', ElementOne);
+
+  class ElementTwo extends HTMLElement {}
   globalThis.customElements.define('element-two', ElementTwo);
+
+  /*
+   * Unittests
+   */
 
   describe('registering a custom component with the proxied registry', () => {
     it('registers the custom component with the native registry', () => {
@@ -27,7 +35,7 @@ describe('@sgrud/shell/component/registry', () => {
   });
 
   describe('getting the name of a unknown custom component', () => {
-    const unknown = class extends HTMLElement { };
+    const unknown = class extends HTMLElement {};
 
     it('returns undefined', () => {
       expect(customElements.getName(unknown)).toBeUndefined();

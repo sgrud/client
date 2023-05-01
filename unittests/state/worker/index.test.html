@@ -9,6 +9,7 @@
       "@sgrud/core": "/node_modules/@sgrud/core/index.modern.js",
       "@sgrud/state": "/node_modules/@sgrud/state/index.modern.js",
       "comlink": "/node_modules/comlink/dist/esm/comlink.min.js",
+      "puppeteer-core/": "/node_modules/puppeteer-core/lib/esm/puppeteer/",
       "rxjs": "/node_modules/rxjs/dist/esm5/index.js",
       "rxjs/ajax": "/node_modules/rxjs/dist/esm5/ajax/index.js",
       "tslib": "/node_modules/tslib/tslib.es6.js"
@@ -17,57 +18,98 @@
 </script>
 
 <script type="module">
-  import { StateHandler, Store } from '@sgrud/state';
-  import { from } from 'rxjs';
+  import { StateHandler, Stateful, Store } from '@sgrud/state';
+  import { assert } from 'puppeteer-core/util/assert.js';
+  import { first, firstValueFrom, forkJoin, from } from 'rxjs';
 
-  const handler = new StateHandler();
-  const state = { param: null };
+  /*
+  * Variables
+  */
 
-  class Transient extends Store {
+  let Transient = class extends Store {
+
     static handle = 'sgrud.test.state.transient';
-    async transiently(param) {
-      return { ...this, param };
+
+    static state = { property: 'transient' };
+
+    async action(param) {
+      return { ...this, property: param };
     }
+
   }
 
-  class Universal extends Store {
+  let Universal = class extends Store {
+
     static handle = 'sgrud.test.state.universal';
-    async universally(param) {
-      return { ...this, param };
+
+    static state = { property: 'universal' };
+
+    async action(param) {
+      return { ...this, property: param };
     }
+
   }
 
-  class Versatile extends Store {
+  let Versatile = class extends Store {
+
     static handle = 'sgrud.test.state.versatile';
-    async versatilely(param) {
-      await sgrud.state.effects.dispatch(
-        'sgrud.test.state.transient',
-        'transiently',
-        [param]
-      );
 
-      await sgrud.state.effects.dispatch(
-        'sgrud.test.state.universal',
-        'universally',
-        [param]
-      );
+    static state = { property: 'versatile' };
 
-      return (await sgrud.state.effects.fetch('/fetch')).json();
+    async apply(...args) {
+      const effect = await sgrud.state.effects.dispatch(...args);
+      return { ...this, property: await effect.property };
     }
+
+    async fetch(...args) {
+      const effect = await sgrud.state.effects.fetch(...args);
+      return { ...this, property: await effect.text() };
+    }
+
+    async state(...args) {
+      const effect = await sgrud.state.effects.state(...args);
+      return { ...this, property: await effect.property };
+    }
+
   }
 
-  handler.deploy(Transient.handle, Transient, state, !0).subscribe((store) => {
-    window.transiently = (...action) => store.dispatch(...action).subscribe();
-    from(store).subscribe((next) => window.transient = next);
-  });
+  const handler = new StateHandler(undefined, '/');
+  Transient = Stateful(Transient.handle, Transient.state, true)(Transient);
+  Universal = Stateful(Universal.handle, Universal.state, false)(Universal);
+  Versatile = Stateful(Versatile.handle, Versatile.state, true)(Versatile);
 
-  handler.deploy(Universal.handle, Universal, state, !1).subscribe((store) => {
-    window.universally = (...action) => store.dispatch(...action).subscribe();
-    from(store).subscribe((next) => window.universal = next);
-  });
+  const transient = new Transient();
+  const universal = new Universal();
+  const versatile = new Versatile();
 
-  handler.deploy(Versatile.handle, Versatile, { }, true).subscribe((store) => {
-    window.versatilely = (...action) => store.dispatch(...action).subscribe();
-    from(store).subscribe((next) => window.versatile = next);
+
+  /*
+  * Unittests
+  */
+
+  window.unittest = firstValueFrom(forkJoin({
+    transient: from(transient).pipe(first()),
+    universal: from(universal).pipe(first()),
+    versatile: from(versatile).pipe(first())
+  })).then((next) => {
+    assert(next.transient.property);
+    assert(next.universal.property);
+    assert(next.versatile.property);
+
+    window.transient = {
+      action: (...args) => firstValueFrom(transient.dispatch(...args))
+    };
+
+    window.universal = {
+      action: (...args) => firstValueFrom(universal.dispatch(...args))
+    };
+
+    window.versatile = {
+      action: (...args) => firstValueFrom(versatile.dispatch(...args))
+    };
+
+    from(transient).subscribe((next) => window.transient.state = next);
+    from(universal).subscribe((next) => window.universal.state = next);
+    from(versatile).subscribe((next) => window.versatile.state = next);
   });
 </script>

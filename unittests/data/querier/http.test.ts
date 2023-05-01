@@ -1,140 +1,104 @@
-import { Linker, Symbol, Target } from '@sgrud/core';
+import { Linker, Target } from '@sgrud/core';
 import { HttpQuerier, Model } from '@sgrud/data';
 import express from 'express';
 import { Server } from 'http';
-import { catchError, of } from 'rxjs';
+import { catchError, map, of } from 'rxjs';
 
 describe('@sgrud/data/querier/http', () => {
+
+  /*
+   * Fixtures
+   */
 
   let server: Server;
   afterAll(() => server.close());
   beforeAll(() => server = express()
-    .use('/api/sgrud/v1/insmod', (_, r) => r.send({ }))
-    .use('/exception', (_, r) => r.send({ errors: [null] }))
-    .use('/', (_, r) => r.send({ }))
+    .use('/error', (_, r) => r.send({ errors: [null] }))
+    .use('/', (_, r) => r.send({}))
     .listen(location.port));
 
   afterEach(() => [open, send].forEach((i) => i.mockClear()));
   const open = jest.spyOn(XMLHttpRequest.prototype, 'open');
   const send = jest.spyOn(XMLHttpRequest.prototype, 'send');
 
+  /*
+   * Variables
+   */
+
   class Class extends Model<Class> {
+
     protected readonly [Symbol.toStringTag]: string = 'Class';
+
   }
 
-  new Linker<Target<HttpQuerier>>([
-    [HttpQuerier, new HttpQuerier('/api')]
-  ]);
+  /*
+   * Unittests
+   */
 
-  describe('instantiating a HttpQuerier without arguments', () => {
-    const querier = new HttpQuerier();
+  describe('committing an operation through the http querier', () => {
+    const linker = new Linker<Target<HttpQuerier>>();
+    const commit = Class.commit('query test', { query: 'test' });
 
-    const opened = [
-      [
-        'GET',
-        location.origin + '/api/sgrud/v1/insmod',
-        true
-      ]
-    ];
+    it('commits the operation through the http querier', (done) => {
+      linker.set(HttpQuerier, new HttpQuerier('/path'));
 
-    it('instanitates a kernel to retreive the api endpoint', () => {
-      expect(querier).toBeInstanceOf(HttpQuerier);
-
-      opened.forEach((n, i) => {
-        expect(open).toHaveBeenNthCalledWith(++i, ...n);
+      commit.pipe(map(() => {
+        expect(open).toBeCalledWith('POST', '/path', true);
+        expect(send).toBeCalledWith(JSON.stringify({
+          query: 'query test',
+          variables: {
+            query: 'test'
+          }
+        }));
+      })).subscribe({
+        complete: done,
+        error: done
       });
     });
   });
 
-  describe('targeting the HttpQuerier', () => {
+  describe('re-targeting the http querier', () => {
     const linker = new Linker<Target<HttpQuerier>>();
-    const links = linker.getAll(HttpQuerier);
+    const commit = Class.commit('mutation test', { mutation: 'test' });
 
-    it('appends the HttpQuerier to the queriers', () => {
-      expect(links).toContain(linker.get(HttpQuerier));
-    });
-  });
+    it('overrides the previously targeted http querier', (done) => {
+      linker.set(HttpQuerier, new HttpQuerier('/path', new Map([
+        [Class, 50]
+      ])));
 
-  describe('statically committing an operation through the HttpQuerier', () => {
-    const operation = 'query test';
-    const variables = { query: 'test' };
-
-    const opened = [
-      'POST',
-      '/api',
-      true
-    ];
-
-    const requested = JSON.stringify({
-      query: operation,
-      variables
-    });
-
-    it('commits the operation through the HttpQuerier', (done) => {
-      Class.commit(operation, variables).subscribe(() => {
-        expect(open).toHaveBeenCalledWith(...opened);
-        expect(send).toHaveBeenCalledWith(requested);
-        done();
+      commit.pipe(map(() => {
+        expect(open).toBeCalledWith('POST', '/path', true);
+        expect(send).toBeCalledWith(JSON.stringify({
+          query: 'mutation test',
+          variables: {
+            mutation: 'test'
+          }
+        }));
+      })).subscribe({
+        complete: done,
+        error: done
       });
     });
   });
 
-  describe('re-targeting the HttpQuerier', () => {
+  describe('receiving an error through the http querier', () => {
     const linker = new Linker<Target<HttpQuerier>>();
-    const operation = 'mutation test';
-    const variables = { mutation: 'test' };
-
-    const opened = [
-      'POST',
-      '/path',
-      true
-    ];
-
-    const requested = JSON.stringify({
-      query: operation,
-      variables
-    });
-
-    it('overrides the previously targeted HttpQuerier', () => {
-      linker.set(HttpQuerier, new HttpQuerier('/path', new Map([[Class, 50]])));
-
-      const links = linker.getAll(HttpQuerier);
-      expect(links).toContain(linker.get(HttpQuerier));
-    });
-
-    it('overrides the previously targeted HttpQuerier', (done) => {
-      Class.commit(operation, variables).subscribe(() => {
-        expect(open).toHaveBeenCalledWith(...opened);
-        expect(send).toHaveBeenCalledWith(requested);
-        done();
-      });
-    });
-  });
-
-  describe('receiving an exception through the HttpQuerier', () => {
-    const linker = new Linker<Target<HttpQuerier>>();
-    const operation = 'query exception';
-
-    const opened = [
-      'POST',
-      '/exception',
-      true
-    ];
-
-    const requested = JSON.stringify({
-      query: operation
-    });
+    const commit = Class.commit('query error').pipe(
+      catchError((error) => of(error))
+    );
 
     it('emits the error to the observer', (done) => {
-      linker.set(HttpQuerier, new HttpQuerier('/exception', new Map()));
+      linker.set(HttpQuerier, new HttpQuerier('/error', new Map()));
 
-      Class.commit(operation).pipe(
-        catchError((error) => of(error))
-      ).subscribe((error) => {
-        expect(error).toBeInstanceOf(AggregateError);
-        expect(open).toHaveBeenCalledWith(...opened);
-        expect(send).toHaveBeenCalledWith(requested);
-        done();
+      commit.pipe(map((next) => {
+        expect(next).toBeInstanceOf(AggregateError);
+        expect(open).toBeCalledWith('POST', '/error', true);
+        expect(send).toBeCalledWith(JSON.stringify({
+          query: 'query error'
+        }));
+      })).subscribe({
+        complete: done,
+        error: done
       });
     });
   });

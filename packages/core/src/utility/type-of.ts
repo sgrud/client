@@ -15,27 +15,27 @@
 export abstract class TypeOf {
 
   /**
-   * Type-check `value` for `Array<any>`.
+   * Type-check `value` for `unknown[]`.
    *
-   * @param value - Value to type-check.
-   * @returns Whether `value` is of type `Array<any>`.
+   * @param value - The `value` to type-check.
+   * @returns Whether `value` is of type `unknown[]`.
    *
    * @example
-   * Type-check `null` for `Array<any>`:
+   * Type-check `null` for `unknown[]`:
    * ```ts
    * import { TypeOf } from '@sgrud/core';
    *
    * TypeOf.array(null); // false
    * ```
    */
-  public static array(value: unknown): value is Array<any> {
+  public static array(value: unknown): value is unknown[] {
     return this.test('Array', value);
   }
 
   /**
    * Type-check `value` for `boolean`.
    *
-   * @param value - Value to type-check.
+   * @param value - The `value` to type-check.
    * @returns Whether `value` is of type `boolean`.
    *
    * @example
@@ -53,7 +53,7 @@ export abstract class TypeOf {
   /**
    * Type-check `value` for `Date`.
    *
-   * @param value - Value to type-check.
+   * @param value - The `value` to type-check.
    * @returns Whether `value` is of type `Date`.
    *
    * @example
@@ -71,7 +71,7 @@ export abstract class TypeOf {
   /**
    * Type-check `value` for `Function`.
    *
-   * @param value - Value to type-check.
+   * @param value - The `value` to type-check.
    * @returns Whether `value` is of type `Function`.
    *
    * @example
@@ -87,27 +87,9 @@ export abstract class TypeOf {
   }
 
   /**
-   * Type-check `value` for `global`.
-   *
-   * @param value - Value to type-check.
-   * @returns Whether `value` is of type `typeof globalThis`.
-   *
-   * @example
-   * Type-check `null` for `typeof globalThis`:
-   * ```ts
-   * import { TypeOf } from '@sgrud/core';
-   *
-   * TypeOf.global(null); // false
-   * ```
-   */
-  public static global(value: unknown): value is typeof globalThis {
-    return this.test('global', value);
-  }
-
-  /**
    * Type-check `value` for `null`.
    *
-   * @param value - Value to type-check.
+   * @param value - The `value` to type-check.
    * @returns Whether `value` is of type `null`.
    *
    * @example
@@ -125,7 +107,7 @@ export abstract class TypeOf {
   /**
    * Type-check `value` for `number`.
    *
-   * @param value - Value to type-check.
+   * @param value - The `value` to type-check.
    * @returns Whether `value` is of type `number`.
    *
    * @example
@@ -143,7 +125,7 @@ export abstract class TypeOf {
   /**
    * Type-check `value` for `object`.
    *
-   * @param value - Value to type-check.
+   * @param value - The `value` to type-check.
    * @returns Whether `value` is of type `object`.
    *
    * @example
@@ -161,7 +143,7 @@ export abstract class TypeOf {
   /**
    * Type-check `value` for `NodeJS.Process`.
    *
-   * @param value - Value to type-check.
+   * @param value - The `value` to type-check.
    * @returns Whether `value` is of type `NodeJS.Process`.
    *
    * @example
@@ -177,27 +159,27 @@ export abstract class TypeOf {
   }
 
   /**
-   * Type-check `value` for `Promise<any>`.
+   * Type-check `value` for `Promise<unknown>`.
    *
-   * @param value - Value to type-check.
-   * @returns Whether `value` is of type `Promise<any>`.
+   * @param value - The `value` to type-check.
+   * @returns Whether `value` is of type `Promise<unknown>`.
    *
    * @example
-   * Type-check `null` for `Promise<any>`:
+   * Type-check `null` for `Promise<unknown>`:
    * ```ts
    * import { TypeOf } from '@sgrud/core';
    *
    * TypeOf.promise(null); // false
    * ```
    */
-  public static promise(value: unknown): value is Promise<any> {
+  public static promise(value: unknown): value is Promise<unknown> {
     return this.test('Promise', value);
   }
 
   /**
    * Type-check `value` for `RegExp`.
    *
-   * @param value - Value to type-check.
+   * @param value - The `value` to type-check.
    * @returns Whether `value` is of type `RegExp`.
    *
    * @example
@@ -215,7 +197,7 @@ export abstract class TypeOf {
   /**
    * Type-check `value` for `string`.
    *
-   * @param value - Value to type-check.
+   * @param value - The `value` to type-check.
    * @returns Whether `value` is of type `string`.
    *
    * @example
@@ -233,7 +215,7 @@ export abstract class TypeOf {
   /**
    * Type-check `value` for `undefined`.
    *
-   * @param value - Value to type-check.
+   * @param value - The `value` to type-check.
    * @returns Whether `value` is of type `undefined`.
    *
    * @example
@@ -251,7 +233,7 @@ export abstract class TypeOf {
   /**
    * Type-check `value` for `URL`.
    *
-   * @param value - Value to type-check.
+   * @param value - The `value` to type-check.
    * @returns Whether `value` is of type `URL`.
    *
    * @example
@@ -269,7 +251,7 @@ export abstract class TypeOf {
   /**
    * Type-check `value` for `Window`.
    *
-   * @param value - Value to type-check.
+   * @param value - The `value` to type-check.
    * @returns Whether `value` is of type `Window`.
    *
    * @example
@@ -287,8 +269,8 @@ export abstract class TypeOf {
   /**
    * Type-check `value` for `type`.
    *
-   * @param type - Type to check for.
-   * @param value - Value to type-check.
+   * @param type - The `type` to check for.
+   * @param value - The `value` to type-check.
    * @returns Whether `value` is `type`.
    */
   private static test(type: string, value: unknown): boolean {
@@ -298,10 +280,10 @@ export abstract class TypeOf {
   /**
    * Private **constructor** (which should never be called).
    *
-   * @throws TypeError.
+   * @throws A {@link TypeError} upon construction.
    */
   private constructor() {
-    throw new TypeError();
+    throw new TypeError('TypeOf.constructor');
   }
 
 }

@@ -1,7 +1,7 @@
 /**
- * Type helper marking the supplied type as **Mutable** (opposed to *readonly*).
+ * Type helper marking the supplied type as **Mutable** (opposed to `readonly`).
  *
- * @typeParam T - Readonly type.
+ * @typeParam T - The readonly type to make **Mutable**.
  *
  * @remarks https://github.com/Microsoft/TypeScript/issues/24509
  */

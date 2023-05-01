@@ -1,175 +1,162 @@
-import { Symbol } from '@sgrud/core';
 import { HasOne, Model, Property } from '@sgrud/data';
-import { auditTime, first, from } from 'rxjs';
+import { auditTime, from, map } from 'rxjs';
 
 describe('@sgrud/data/relation/has-one', () => {
+
+  /*
+   * Variables
+   */
+
+  class Owned extends Model<Owned> {
+
+    @Property(() => String)
+    public property?: string;
+
+    protected readonly [Symbol.toStringTag]: string = 'Owned';
+
+  }
+
+  class Owner extends Model<Owner> {
+
+    @HasOne(() => Owned)
+    public owned?: Owned;
+
+    @Property(() => String)
+    public property?: string;
+
+    @HasOne(() => null!, true)
+    public transient?: unknown;
+
+    @HasOne(() => null!)
+    public unknown?: unknown;
+
+    protected readonly [Symbol.toStringTag]: string = 'Owner';
+
+  }
 
   const values = [
     { owned: { property: 'owned' } },
     { property: 'owner' },
-    { unset: undefined },
-    { unused: undefined }
+    { transient: undefined },
+    { unknown: undefined }
   ];
 
-  class Owner extends Model<Owner> {
-    @HasOne(() => Owned) public owned?: Owned;
-    @Property(() => String) public property?: string;
-    @HasOne(() => null!) public unset?: null;
-    @HasOne(() => null!, true) public unused?: null;
-    protected readonly [Symbol.toStringTag]: string = 'Owner';
-  }
-
-  class Owned extends Model<Owned> {
-    @Property(() => String) public property?: string;
-    protected readonly [Symbol.toStringTag]: string = 'Owned';
-  }
+  /*
+   * Unittests
+   */
 
   describe('instantiating a model which has one model using parts', () => {
     const owner = new Owner(...values);
 
-    const validate = (value: Owner) => {
-      expect(value.property).toBe(values[1].property);
-      expect(value.owned!.property).toBe(values[0].owned!.property);
-    };
-
     it('assigns all supplied parts to the model which has one model', () => {
-      validate(owner);
+      expect(owner.owned!.property).toBe(values[0].owned!.property);
+      expect(owner.property).toBe(values[1].property);
     });
   });
 
   describe('assigning parts to a model which has one model', () => {
     const owner = new Owner();
 
-    const validate = (value: Owner) => {
-      expect(value.property).toBe(values[1].property);
-      expect(value.owned!.property).toBe(values[0].owned!.property);
-    };
-
-    it('emits the changed model which has one model', (done) => {
-      from(owner).pipe(
-        auditTime(250),
-        first()
-      ).subscribe((value) => {
-        validate(value);
-        done();
+    it('assigns all parts to the model which has one model', (done) => {
+      const changes = from(owner).pipe(auditTime(250), map((next) => {
+        expect(next.owned!.property).toBe(values[0].owned!.property);
+        expect(next.property).toBe(values[1].property);
+      })).subscribe({
+        error: done
       });
 
-      owner.assign(...values).subscribe(validate);
-    });
-
-    it('assigns all supplied parts to the model which has one model', () => {
-      validate(owner);
+      owner.assign(...values).pipe(map((next) => {
+        changes.unsubscribe();
+        expect(next).toBe(owner);
+      })).subscribe({
+        complete: done,
+        error: done
+      });
     });
   });
 
   describe('assigning null-parts to a model which has one model', () => {
     const owner = new Owner();
 
-    const validate = (value: Owner) => {
-      expect(value.property).toBeNull();
-      expect(value.owned).toBeNull();
-    };
-
-    it('emits the changed model which has one model', (done) => {
-      from(owner).pipe(
-        auditTime(250),
-        first()
-      ).subscribe((value) => {
-        validate(value);
-        done();
+    it('assigns all null-parts to the model which has one model', (done) => {
+      const changes = from(owner).pipe(auditTime(250), map((next) => {
+        expect(next.owned).toBeNull();
+        expect(next.property).toBeNull();
+      })).subscribe({
+        error: done
       });
 
       owner.assign(...values.flatMap((value) => {
-        return Object.keys(value).map((key) => ({
-          [key]: null
-        }));
-      })).subscribe(validate);
-    });
-
-    it('assigns all null-parts to the model which has one model', () => {
-      validate(owner);
+        return Object.keys(value).map((key) => ({ [key]: null }));
+      })).pipe(map((next) => {
+        changes.unsubscribe();
+        expect(next).toBe(owner);
+      })).subscribe({
+        complete: done,
+        error: done
+      });
     });
   });
 
   describe('clearing a model which has one model', () => {
     const owner = new Owner(...values);
 
-    const validate = (value: Owner) => {
-      expect(value.property).toBeUndefined();
-      expect(value.owned).toBeUndefined();
-    };
-
-    it('emits the changed model which has one model', (done) => {
-      from(owner).pipe(
-        auditTime(250),
-        first()
-      ).subscribe((value) => {
-        validate(value);
-        done();
+    it('clears the model which has one model', (done) => {
+      const changes = from(owner).pipe(auditTime(250), map((next) => {
+        expect(next.owned).toBeUndefined();
+        expect(next.property).toBeUndefined();
+      })).subscribe({
+        error: done
       });
 
-      owner.clear().subscribe(validate);
-    });
-
-    it('clears the model which has one model', () => {
-      validate(owner);
+      owner.clear().pipe(map((next) => {
+        changes.unsubscribe();
+        expect(next).toBe(owner);
+      })).subscribe({
+        complete: done,
+        error: done
+      });
     });
   });
 
   describe('serializing a model which has one model', () => {
-    const owner = new Owner(...values);
-
-    const validate = (value: Model.Shape<Owner>) => {
-      expect(value.property).toBe(values[1].property);
-      expect(value.owned!.property).toBe(values[0].owned!.property);
-    };
+    const result = new Owner(...values).serialize()!;
 
     it('returns the serialized model which has one model', () => {
-      validate(owner.serialize()!);
+      expect(result.owned!.property).toBe(values[0].owned!.property);
+      expect(result.property).toBe(values[1].property);
     });
   });
 
   describe('serializing a model which has null-parts', () => {
-    const owner = new Owner(...values.flatMap((value) => {
+    const result = new Owner(...values.flatMap((value) => {
       return Object.keys(value).map((key) => ({ [key]: null }));
-    }));
-
-    const validate = (value: Model.Shape<Owner>) => {
-      expect(value.property).toBe(null);
-      expect(value.owned).toBe(null);
-    };
+    })).serialize()!;
 
     it('returns the serialized model which has null-parts', () => {
-      validate(owner.serialize()!);
+      expect(result.owned).toBeNull();
+      expect(result.property).toBeNull();
     });
   });
 
   describe('treemapping a model which has one model', () => {
-    const owner = new Owner(...values);
+    const result = new Owner(...values).treemap();
 
-    const validate = (value: Model.Graph<Owner>) => {
-      expect(value).toStrictEqual([
+    it('returns the treemapped model which has one model', () => {
+      expect(result).toStrictEqual([
         'property',
         { owned: [
           'property'
         ] }
       ]);
-    };
-
-    it('returns the treemapped model which has one model', () => {
-      validate(owner.treemap()!);
     });
   });
 
   describe('unraveling a model which has one model', () => {
-    const owner = new Owner(...values);
-
-    const validate = (value: string) => {
-      expect(value).toBe('{property owned{property}}');
-    };
+    const result = Owner.unravel(new Owner(...values).treemap()!);
 
     it('returns the unraveled model which has one model', () => {
-      validate(Owner.unravel(owner.treemap()!));
+      expect(result).toBe('{property owned{property}}');
     });
   });
 

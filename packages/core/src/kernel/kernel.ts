@@ -1,5 +1,5 @@
-import { concat, defaultIfEmpty, defer, forkJoin, ignoreElements, map, Observable, of, ReplaySubject, Subscribable, switchMap, throwError } from 'rxjs';
-import { HttpClient } from '../http/client';
+import { asyncScheduler, concat, defaultIfEmpty, defer, forkJoin, ignoreElements, map, Observable, of, ReplaySubject, Subscribable, switchMap, throwError } from 'rxjs';
+import { Http } from '../http/http';
 import { Mutable } from '../typing/mutable';
 import { assign } from '../utility/assign';
 import { Singleton } from '../utility/singleton';
@@ -7,45 +7,39 @@ import { Symbol } from '../utility/symbols';
 import { semver } from './semver';
 
 /**
- * **Kernel** namespace containing types and interfaces used and intended to be
- * used in conjunction with the [Singleton][] [Kernel][] class.
+ * The **Kernel** namespace contains types and interfaces used and intended to
+ * be used in conjunction with the {@link Singleton} {@link Kernel} class.
  *
- * [Kernel]: https://sgrud.github.io/client/classes/core.Kernel
- * [Singleton]: https://sgrud.github.io/client/functions/core.Singleton
- *
- * @see [Kernel][]
+ * @see {@link Kernel}
  */
 export namespace Kernel {
 
   /**
    * String literal helper type. Enforces any assigned string to represent a
-   * browser-parsable **Digest** hash.
+   * browser-parsable **Digest** hash. A **Digest** hash is used to represent a
+   * hash for [Subresource Integrity](https://www.w3.org/TR/SRI) validation.
    *
    * @example
    * A valid **Digest**:
    * ```ts
-   * import type { Digest } from '@sgrud/core';
+   * import { type Kernel } from '@sgrud/core';
    *
-   * const digest: Digest = 'sha256-[...]';
+   * const digest: Kernel.Digest = 'sha256-[...]';
    * ```
    */
   export type Digest = `sha${256 | 384 | 512}-${string}`;
 
   /**
    * Interface describing the shape of a **Module** while being aligned with
-   * well-known [package.json][] fields. This interface additionally specifies
+   * well-known `package.json` fields. This interface additionally specifies
    * optional `sgrudDependencies` and `webDependencies` mappings, which both are
-   * used by the [Kernel][] to determine [SGRUD][] module dependencies and
-   * runtime (web) dependencies.
-   *
-   * [Kernel]: https://sgrud.github.io/client/classes/core.Kernel
-   * [package.json]: https://docs.npmjs.com/cli/configuring-npm/package-json
-   * [SGRUD]: https://sgrud.github.io
+   * used by the {@link Kernel} to determine [SGRUD](https://sgrud.github.io)
+   * module dependencies and runtime dependencies.
    *
    * @example
    * An exemplary **Module** definition:
    * ```ts
-   * import type { Kernel } from '@sgrud/core';
+   * import { type Kernel } from '@sgrud/core';
    *
    * const module: Kernel.Module = {
    *   name: 'module',
@@ -71,69 +65,58 @@ export namespace Kernel {
   export interface Module {
 
     /**
-     * Name of the **Module**.
+     * The **name** of the {@link Module}.
      */
     readonly name: string;
 
     /**
-     * **Module** version, formatted as [semver][].
-     *
-     * [semver]: https://semver.org
+     * The {@link Module} version, formatted as according to the
+     * [semver](https://semver.org) specifications.
      */
     readonly version: string;
 
     /**
-     * ESM entry point.
+     * Optional ESM entry point.
      */
     readonly exports?: string;
 
     /**
-     * UMD entry point.
+     * Optional UMD entry point.
      */
     readonly unpkg?: string;
 
     /**
-     * Optional bundle [Digest][]s. If hashes are supplied, they will be used to
-     * verify the [Subresource Integrity][] of the respective bundles.
-     *
-     * [Digest]: https://sgrud.github.io/client/types/core.Kernel-1.Digest
-     * [Subresource Integrity]: https://developer.mozilla.org/docs/Web/Security/Subresource_Integrity
+     * Optional bundle {@link Digest}s. If hashes are supplied, they will be
+     * used to verify the [Subresource Integrity](https://www.w3.org/TR/SRI) of
+     * the respective bundles.
      */
     readonly digest?: Record<string, Digest>;
 
     /**
-     * Optional [SGRUD][] dependencies.
-     *
-     * [SGRUD]: https://sgrud.github.io
+     * Optional [SGRUD](https://sgrud.github.io) {@link Module} dependencies.
      */
     readonly sgrudDependencies?: Record<string, string>;
 
     /**
-     * Optional [WebDependency][] mapping.
-     *
-     * [WebDependency]: https://sgrud.github.io/client/interfaces/core.Kernel-1.WebDependency
+     * Optional {@link WebDependency} mapping.
      */
     readonly webDependencies?: Record<string, WebDependency>;
 
   }
 
   /**
-   * Interface describing runtime dependencies of a [Module][]. A [Module][] may
-   * specify an array of UMD bundles to be loaded by the [Kernel][] through the
-   * `unpkg` property. A [Module][] may also specify a mapping of [import][]
-   * specifiers to [Module][]-relative paths through the `exports` property.
-   * Every specified **WebDependency** is loaded before respective bundles of
-   * the [Module][], which depends on the specified **WebDependency**, will be
-   * loaded themselves.
-   *
-   * [import]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/import
-   * [Kernel]: https://sgrud.github.io/client/classes/core.Kernel
-   * [Module]: https://sgrud.github.io/client/interfaces/core.Kernel-1.Module
+   * Interface describing runtime dependencies of a {@link Module}. A
+   * {@link Module} may specify an array of UMD bundles to be loaded by the
+   * {@link Kernel} through the `unpkg` property. A {@link Module} may also
+   * specify a mapping of `import` specifiers to {@link Module}-relative paths
+   * through the `exports` property. Every specified **WebDependency** is loaded
+   * before respective bundles of the {@link Module}, which depends on the
+   * specified **WebDependency**, will be loaded themselves.
    *
    * @example
    * An exemplary **webDependency** definition:
    * ```ts
-   * import type { Kernel } from '@sgrud/core';
+   * import { type Kernel } from '@sgrud/core';
    *
    * const webDependency: Kernel.WebDependency = {
    *   exports: {
@@ -162,139 +145,95 @@ export namespace Kernel {
 }
 
 /**
- * [Singleton][] **Kernel** class. The **Kernel** is essentially a dependency
- * loader for ESM bundles (and their respective `importmap`s) or, depending on
- * the runtime context and capabilities, UMD bundles and their transitive
- * dependencies. By making use of the **Kernel**, applications based on the
- * [SGRUD][] client libraries may be comprised of multiple, optionally loaded
- * [Module][]s, which, depending on the application structure and configuration,
- * can be loaded initially, by supplying them as dependencies through the
- * corresponding API endpoint (which can be customized through the second
- * parameter to the *constructor*), or later on, manually.
+ * {@link Singleton} **Kernel** class. The **Kernel** is essentially a
+ * dependency loader for ESM bundles (and their respective `importmap`s) or,
+ * depending on the runtime context and capabilities, UMD bundles and their
+ * transitive dependencies. By making use of the **Kernel**, applications based
+ * on the [SGRUD](https://sgrud.github.io) client libraries may be comprised of
+ * multiple, optionally loaded {@link Kernel.Module}s.
  *
- * [Module]: https://sgrud.github.io/client/interfaces/core.Kernel-1.Module
- * [SGRUD]: https://sgrud.github.io
- * [Singleton]: https://sgrud.github.io/client/functions/core.Singleton
- *
- * @decorator [Singleton][]
- *
- * @see [Module][]
+ * @decorator {@link Singleton}
  */
-@Singleton<typeof Kernel>()
+@Singleton()
 export class Kernel {
 
   /**
-   * Internal mapping of all via `importmap`s defined [Module][] identifiers to
-   * their corresponding paths. This mapping is used for housekeeping, e.g., to
-   * prevent the same [Module][] identifier to be defined multiple times.
-   *
-   * [Module]: https://sgrud.github.io/client/interfaces/core.Kernel-1.Module
+   * Internal {@link ReplaySubject} tracking the loading state and therefore
+   * **changes** of loaded {@link Kernel.Module}s. An {@link Observable} form of
+   * this internal {@link ReplaySubject} may be retrieved by invoking the
+   * well-known `Symbol.observable` method and subscribing to the returned
+   * {@link Subscribable}. The internal **changes** {@link ReplaySubject} emits
+   * all {@link Kernel.Module} definitions loaded throughout the lifespan of
+   * this class.
+   */
+  private readonly changes: ReplaySubject<Kernel.Module>;
+
+  /**
+   * Internal {@link Map}ping to keep track of all via `importmap`s declared
+   * {@link Kernel.Module} identifiers to their corresponding paths. This map is
+   * used for housekeeping, e.g., to prevent the same {@link Kernel.Module}
+   * identifier to be defined multiple times.
    */
   private readonly imports: Map<string, string>;
 
   /**
-   * Internal mapping of all [Module][]s **loaders** to a [ReplaySubject][].
-   * This [ReplaySubject][] tracks the [Module][] loading process as such, that
-   * it emits the [Module][] definition once the respective [Module][] is fully
-   * loaded (including dependencies etc.) and then completes.
-   *
-   * [Module]: https://sgrud.github.io/client/interfaces/core.Kernel-1.Module
-   * [ReplaySubject]: https://rxjs.dev/api/index/class/ReplaySubject
+   * Internal {@link Map}ping of all {@link Kernel.Module}s **loaders** to a
+   * {@link ReplaySubject}. This {@link ReplaySubject} tracks the loading
+   * process as such, that it emits the {@link Kernel.Module} definition once
+   * the respective {@link Kernel.Module} is fully loaded (including
+   * dependencies etc.) and then completes.
    */
   private readonly loaders: Map<string, ReplaySubject<Kernel.Module>>;
 
   /**
-   * Internal [ReplaySubject][] tracking the **loading** state of [Module][]s.
-   * An [Observable][] form of this [ReplaySubject][] may be retrieved by
-   * subscribing to the [Subscribable][] returned by the interop getter. The
-   * internal [ReplaySubject][] (and the retrievable [Observable][]) emits all
-   * [Module][] definitions loaded throughout the lifespan of this class.
-   *
-   * [Module]: https://sgrud.github.io/client/interfaces/core.Kernel-1.Module
-   * [Observable]: https://rxjs.dev/api/index/class/Observable
-   * [ReplaySubject]: https://rxjs.dev/api/index/class/ReplaySubject
-   * [Subscribable]: https://rxjs.dev/api/index/interface/Subscribable
-   */
-  private readonly loading: ReplaySubject<Kernel.Module>;
-
-  /**
    * Internally used string to suffix the `importmap` and `module` types of
-   * [HTMLScriptElement][]s with, if applicable. This string is set to whatever
-   * trails the type of [HTMLScriptElement][]s encountered upon initialization,
-   * iff their type starts with `importmap`.
-   *
-   * [HTMLScriptElement]: https://developer.mozilla.org/docs/Web/API/HTMLScriptElement
+   * {@link HTMLScriptElement}s with, if applicable. This string is set to
+   * whatever trails the type of {@link HTMLScriptElement}s encountered upon
+   * initialization, iff their type starts with `importmap`.
    */
   private readonly shimmed: string;
 
   /**
-   * [Singleton][] **constructor**. The first time, this **constructor** is
-   * called, it will retrieve the list of modules which should be loaded and
-   * then call *insmod* on all those modules and their transitive dependencies.
-   * Every subsequent **constructor** call will ignore all arguments and return
-   * the [Singleton][] instance. Through subscribing to the [Subscribable][]
-   * returned by the [observable][] interop getter, the initial [Module][]
-   * loading progress can be tracked.
+   * {@link Singleton} **constructor**. The first time, this **constructor** is
+   * called, it will persist the {@link nodeModules} path {@link Kernel.Module}s
+   * should be loaded from. Subsequent **constructor** calls will ignore this
+   * argument and return the {@link Singleton} instance. Through subscribing to
+   * the {@link Subscribable} returned by the well-known `Symbol.observable`
+   * method, the {@link Kernel.Module} loading progress can be tracked.
    *
-   * [Module]: https://sgrud.github.io/client/interfaces/core.Kernel-1.Module
-   * [observable]: https://rxjs.dev/api/index/const/observable
-   * [SGRUD]: https://sgrud.github.io
-   * [Singleton]: https://sgrud.github.io/client/functions/core.Singleton
-   * [Subscribable]: https://rxjs.dev/api/index/interface/Subscribable
-   *
-   * @param baseHref - Base href for building URLs.
-   * @param endpoint - Href of the [SGRUD][] API endpoint.
-   * @param nodeModules - Href to load node modules from.
+   * @param nodeModules - Optional location to load node modules from.
    *
    * @example
-   * Instantiate the **Kernel**:
+   * Instantiate the **Kernel** and require {@link Kernel.Module}s:
    * ```ts
    * import { Kernel } from '@sgrud/core';
+   * import { forkJoin } from 'rxjs';
    *
-   * const kernel = new Kernel(
-   *   'https://example.com',
-   *   '/context/api/sgrud',
-   *   'https://unpkg.com'
-   * );
+   * const kernel = new Kernel('https://unpkg.com');
+   *
+   * forkJoin([
+   *   kernel.require('example-module'),
+   *   kernel.require('/static/local-module')
+   * ]).subscribe(console.log);
    * ```
    */
   public constructor(
 
     /**
-     * Base href for building, e.g., the *endpoint* and *nodeModule* URLs.
+     * Optional location to load node modules from.
      *
-     * @defaultValue `location.origin`
+     * @defaultValue `'/node_modules'`
      */
-    public readonly baseHref: string = location.origin,
-
-    /**
-     * Href of the [SGRUD][] API **endpoint**. [Module][]s to be initially
-     * loaded (by their names) are requested from the URL `${endpoint}/insmod`
-     * when this class is constructed for the first time.
-     *
-     * [Module]: https://sgrud.github.io/client/interfaces/core.Kernel-1.Module
-     * [SGRUD]: https://sgrud.github.io
-     *
-     * @defaultValue `baseHref + '/api/sgrud/v1'`
-     */
-    public readonly endpoint: string = baseHref + '/api/sgrud/v1',
-
-    /**
-     * Href to load node modules from. All JavaScript assets belonging to
-     * packages installed via NPM should be located here.
-     *
-     * @defaultValue `baseHref + '/node_modules'`
-     */
-    public readonly nodeModules: string = baseHref + '/node_modules'
+    public readonly nodeModules: string = '/node_modules'
 
   ) {
+    this.changes = new ReplaySubject<Kernel.Module>();
     this.imports = new Map<string, string>();
     this.loaders = new Map<string, ReplaySubject<Kernel.Module>>();
-    this.loading = new ReplaySubject<Kernel.Module>();
     this.shimmed = '';
 
     const queried = document.querySelectorAll('script[type^="importmap"]');
-    const scripts = Array.from(queried) as HTMLScriptElement[];
+    const scripts = Array.from(queried as NodeListOf<HTMLScriptElement>);
 
     for (const script of scripts) {
       this.shimmed ||= script.type.replace('importmap', '');
@@ -304,24 +243,17 @@ export class Kernel {
         this.imports.set(key, imports[key]);
       }
     }
-
-    HttpClient.get<Kernel.Module>(`${endpoint}/insmod`).pipe(
-      switchMap((next) => this.insmod(next.response, undefined, true))
-    ).subscribe();
   }
 
   /**
-   * Well-known `Symbol.observable` method returning a [Subscribable][]. The
-   * returned [Subscribable][] emits every [Module][] that is successfully
-   * loaded.
+   * Well-known `Symbol.observable` method returning a {@link Subscribable}. The
+   * returned {@link Subscribable} emits every {@link Kernel.Module} that is
+   * successfully loaded.
    *
-   * [Module]: https://sgrud.github.io/client/interfaces/core.Kernel-1.Module
-   * [Subscribable]: https://rxjs.dev/api/index/interface/Subscribable
-   *
-   * @returns [Subscribable][] emitting loaded [Module][]s.
+   * @returns A {@link Subscribable} emitting loaded {@link Kernel.Module}s.
    *
    * @example
-   * Subscribe to the stream of loaded [Module][]s:
+   * Subscribe to the loaded {@link Kernel.Module}s:
    * ```ts
    * import { Kernel } from '@sgrud/core';
    * import { from } from 'rxjs';
@@ -330,35 +262,34 @@ export class Kernel {
    * ```
    */
   public [Symbol.observable](): Subscribable<Kernel.Module> {
-    return this.loading.asObservable();
+    return this.changes.asObservable();
   }
 
   /**
-   * Insert modules. Calling this method while supplying a valid `module`
-   * definition will chain the `module` dependencies and the `module` itself
-   * into an [Observable][], which is then returned. When multiple `module`s are
-   * inserted, their dependencies are deduplicated by internally tracking all
-   * `module`s and their transitive dependencies as separate *loaders*.
-   * Depending on the browser context, either the UMD or ESM bundles (and their
-   * respective `importmap`s) are loaded via calling the *script* method. When
-   * inserting [Module][]s which contain transitive *sgrudDependencies*, their
-   * compatibility is checked. Should a dependency version mismatch, the
-   * returned [Observable][] will throw.
+   * Calling this method while supplying a valid `module` definition will chain
+   * the **ins**ert **mod**ule operations of the `module` dependencies and the
+   * `module` itself into an {@link Observable}, which is then returned. When
+   * multiple {@link Kernel.Module}s are inserted, their dependencies are
+   * deduplicated by internally tracking all {@link Kernel.Module}s and their
+   * transitive dependencies as separate {@link loaders}. Depending on the
+   * browser context, either the UMD or ESM bundles (and their respective
+   * `importmap`s) are loaded via calling the {@link script} method. When
+   * **insmod**ding {@link Kernel.Module}s which contain transitive
+   * {@link Kernel.Module.sgrudDependencies}, their compatibility is checked.
+   * Should a dependency version mismatch, the {@link Observable} returned by
+   * this method will throw.
    *
-   * [Module]: https://sgrud.github.io/client/interfaces/core.Kernel-1.Module
-   * [Observable]: https://rxjs.dev/api/index/class/Observable
-   *
-   * @param module - [Module][] definition.
-   * @param source - Optional [Module][] source.
-   * @param entryModule - Wether to run the [Module][].
-   * @returns [Observable][] of the [Module][] loading.
-   * @throws [Observable][] of a RangeError or ReferenceError.
+   * @param module - The {@link Kernel.Module} definition to **insmod**.
+   * @param source - An optional {@link Kernel.Module} `source`.
+   * @param execute - Wether to `execute` the {@link Kernel.Module}.
+   * @returns An {@link Observable} of the {@link Kernel.Module} definition.
+   * @throws An {@link Observable} {@link RangeError} or {@link ReferenceError}.
    *
    * @example
-   * Insert a module by definition:
+   * **insmod** a {@link Kernel.Module} by definition:
    * ```ts
    * import { Kernel } from '@sgrud/core';
-   * import packageJson from 'module/package.json';
+   * import packageJson from './module/package.json';
    *
    * new Kernel().insmod(packageJson).subscribe(console.log);
    * ```
@@ -366,126 +297,160 @@ export class Kernel {
   public insmod(
     module: Kernel.Module,
     source: string = `${this.nodeModules}/${module.name}`,
-    entryModule: boolean = false
+    execute: boolean = false
   ): Observable<Kernel.Module> {
-    let loader = this.loaders.get(module.name);
+    return defer(() => {
+      let loader = this.loaders.get(module.name);
 
-    if (!loader) {
-      loader = new ReplaySubject<Kernel.Module>(1);
-      this.loaders.set(module.name, loader);
+      if (!loader) {
+        loader = new ReplaySubject<Kernel.Module>(1);
+        this.loaders.set(module.name, loader);
 
-      const chain = [] as Observable<any>[];
-      const dependencies = { } as Mutable<Kernel.WebDependency>;
+        const chain = [] as Observable<unknown>[];
+        const dependencies = {} as Mutable<Kernel.WebDependency>;
 
-      if (module.sgrudDependencies) {
-        const entries = Object.entries(module.sgrudDependencies);
+        if (module.sgrudDependencies) {
+          const entries = Object.entries(module.sgrudDependencies);
 
-        chain.push(forkJoin(entries.map(([name, version]) => {
-          const path = /^([./]|http)/.test(version) ? version : undefined;
+          chain.push(forkJoin(entries.map(([name, version]) => {
+            const path = /^([./]|https?:)/.test(version) ? version : undefined;
 
-          return this.resolve(name, path).pipe(switchMap((dependency) => {
-            if (!path && !semver(dependency.version, version)) {
-              return throwError(() => new RangeError(dependency.name));
+            return this.resolve(name, path).pipe(switchMap((dependency) => {
+              if (!path && !semver(dependency.version, version)) {
+                return throwError(() => new RangeError(dependency.name));
+              }
+
+              execute &&= !module.exports && !module.unpkg;
+              return this.insmod(dependency, path, execute);
+            }));
+          })));
+        }
+
+        if (module.exports && !this.imports.has(module.name)) {
+          const src = `${source}/${module.exports}`;
+
+          dependencies.exports = { [module.name]: src };
+          this.imports.set(module.name, src);
+        }
+
+        for (const name in module.webDependencies) {
+          const { exports, unpkg } = module.webDependencies[name];
+
+          if (exports) {
+            for (const key in exports) {
+              const src = `${this.nodeModules}/${name}/${exports[key]}`;
+
+              if (!this.imports.has(key)) {
+                this.imports.set(key, (dependencies.exports ||= {})[key] = src);
+              }
             }
+          }
 
-            entryModule &&= !module.exports && !module.unpkg;
-            return this.insmod(dependency, path, entryModule);
+          if (unpkg) {
+            for (const bundle of unpkg) {
+              const src = `${this.nodeModules}/${name}/${bundle}`;
+
+              if (!dependencies.unpkg?.includes(src)) {
+                (dependencies.unpkg ||= []).push(src);
+              }
+            }
+          }
+        }
+
+        if (!globalThis.sgrud && module.exports) {
+          chain.push(this.verify({
+            href: `${source}/${module.exports}`,
+            integrity: module.digest?.exports || '',
+            rel: 'modulepreload' + this.shimmed
           }));
-        })));
-      }
 
-      if (module.exports && !this.imports.has(module.name)) {
-        const src = `${source}/${module.exports}`;
-
-        dependencies.exports = { [module.name]: src };
-        this.imports.set(module.name, src);
-      }
-
-      for (const name in module.webDependencies) {
-        const { exports, unpkg } = module.webDependencies[name];
-
-        if (exports) {
-          for (const key in exports) {
-            const src = `${this.nodeModules}/${name}/${exports[key]}`;
-
-            if (!this.imports.has(key)) {
-              this.imports.set(key, (dependencies.exports ||= { })[key] = src);
-            }
+          if (dependencies.exports) {
+            chain.push(this.script({
+              innerHTML: JSON.stringify({ imports: dependencies.exports }),
+              type: 'importmap' + this.shimmed
+            }));
           }
-        }
 
-        if (unpkg) {
-          for (const bundle of unpkg) {
-            const src = `${this.nodeModules}/${name}/${bundle}`;
-
-            if (!dependencies.unpkg?.includes(src)) {
-              (dependencies.unpkg ||= []).push(src);
-            }
+          if (execute) {
+            chain.push(defer(() => import(module.name)));
           }
-        }
-      }
+        } else if (globalThis.sgrud && module.unpkg) {
+          if (dependencies.unpkg?.length) {
+            chain.push(forkJoin(dependencies.unpkg.map((bundle) => this.script({
+              src: bundle,
+              type: 'text/javascript'
+            }))));
+          }
 
-      if (!globalThis.sgrud && module.exports) {
-        if (dependencies.exports) {
           chain.push(this.script({
-            innerHTML: JSON.stringify({ imports: dependencies.exports }),
-            type: 'importmap' + this.shimmed
-          }));
-        }
-
-        chain.push(this.verify({
-          href: `${source}/${module.exports}`,
-          integrity: module.digest?.exports || '',
-          rel: 'modulepreload' + this.shimmed
-        }));
-
-        if (entryModule) {
-          chain.push(defer(() => import(module.name)));
-        }
-      } else if (globalThis.sgrud && module.unpkg) {
-        if (dependencies.unpkg?.length) {
-          chain.push(forkJoin(dependencies.unpkg.map((bundle) => this.script({
-            src: bundle,
+            integrity: module.digest?.unpkg || '',
+            src: `${source}/${module.unpkg}`,
             type: 'text/javascript'
-          }))));
+          }));
+        } else if (this.loaders.size > 1) {
+          return throwError(() => ReferenceError(module.name));
         }
 
-        chain.push(this.script({
-          integrity: module.digest?.unpkg || '',
-          src: `${source}/${module.unpkg}`,
-          type: 'text/javascript'
-        }));
-      } else if (this.loaders.size > 1) {
-        return throwError(() => ReferenceError(module.name));
+        concat(...chain).pipe(
+          ignoreElements(),
+          defaultIfEmpty(module)
+        ).subscribe(loader).add(() => {
+          this.changes.next(module);
+        });
       }
 
-      concat(...chain).pipe(
-        ignoreElements(),
-        defaultIfEmpty(module)
-      ).subscribe(loader).add(() => {
-        this.loading.next(module);
-      });
-    }
-
-    return loader;
+      return loader;
+    });
   }
 
   /**
-   * **Resolve**s a [Module][] definition by its `name`. The [Module][] `name`
-   * is appended to the *nodeModules* path and the [package.json][] file therein
-   * retrieved via HTTP GET. The parsed [package.json][] is then emitted by the
-   * returned [Observable][].
+   * **require**s a {@link Kernel.Module} by name or source. If the supplied
+   * `id` is a relative path starting with `./`, an absolute path starting with
+   * `/` or an URL starting with `http`, the `id` is used as-is, otherwise it is
+   * appended to the {@link nodeModules} path and the `package.json` file within
+   * this path is retrieved via {@link Http} GET. The {@link Kernel.Module}
+   * definition is then passed to the {@link insmod} method and returned.
    *
-   * [Module]: https://sgrud.github.io/client/interfaces/core.Kernel-1.Module
-   * [Observable]: https://rxjs.dev/api/index/class/Observable
-   * [package.json]: https://docs.npmjs.com/cli/configuring-npm/package-json
-   *
-   * @param name - [Module][] name.
-   * @param source - Optional [Module][] source.
-   * @returns [Observable][] of the [Module][] definition.
+   * @param id - The {@link Kernel.Module} name or source to **require**.
+   * @param execute - Wether to `execute` the {@link Kernel.Module}.
+   * @returns An {@link Observable} of the {@link Kernel.Module} definition.
    *
    * @example
-   * Resolve a [Module][] definition:
+   * **require** a {@link Kernel.Module} by `id`:
+   * ```ts
+   * import { Kernel } from '@sgrud/core';
+   *
+   * new Kernel().require('/static/lazy-module').subscribe(console.log);
+   * ```
+   */
+  public require(
+    id: string,
+    execute: boolean = true
+  ): Observable<Kernel.Module> {
+    if (/^([./]|https?:)/.test(id)) {
+      return Http.get<Kernel.Module>(`${id}/package.json`).pipe(
+        switchMap((next) => this.insmod(next.response, id, execute))
+      );
+    }
+
+    return this.resolve(id).pipe(
+      switchMap((module) => this.insmod(module, undefined, execute))
+    );
+  }
+
+  /**
+   * **resolve**s a {@link Kernel.Module} definition by its `name`. The
+   * {@link Kernel.Module} `name` is appended to the `source` path or, of none
+   * is supplied, the {@link nodeModules} path and the `package.json` file
+   * therein retrieved via {@link Http} GET. The parsed `package.json` is then
+   * emitted by the returned {@link Observable}.
+   *
+   * @param name - The {@link Kernel.Module} `name` to **resolve**.
+   * @param source - An optional {@link Kernel.Module} `source`.
+   * @returns An {@link Observable} of the {@link Kernel.Module} definition.
+   *
+   * @example
+   * **resolve** a {@link Kernel.Module} definition:
    * ```ts
    * import { Kernel } from '@sgrud/core';
    *
@@ -496,33 +461,30 @@ export class Kernel {
     name: string,
     source: string = `${this.nodeModules}/${name}`
   ): Observable<Kernel.Module> {
-    const loader = this.loaders.get(name);
+    let loader = this.loaders.get(name)?.asObservable();
 
-    if (loader) {
-      return loader;
+    if (!loader) {
+      loader = Http.get<Kernel.Module>(`${source}/package.json`).pipe(
+        map((next) => next.response)
+      );
     }
 
-    return HttpClient.get<Kernel.Module>(`${source}/package.json`).pipe(
-      map((next) => next.response)
-    );
+    return loader;
   }
 
   /**
-   * Inserts an [HTMLScriptElement][] and applies the supplied `props` to it.
-   * The returned [Observable][] emits and completes when the *onload* handler
-   * is called on the [HTMLScriptElement][]. If no external *src* is supplied
-   * through the `props`, the *onload* handler is called asynchronously. When
-   * the returned [Observable][] completes, the inserted [HTMLScriptElement][]
-   * is removed.
+   * Inserts an {@link HTMLScriptElement} and applies the supplied `props` to
+   * it. The returned {@link Observable} emits and completes when the `onload`
+   * handler of the {@link HTMLScriptElement} is called. If no external `src` is
+   * supplied through the `props`, the `onload` handler of the element is called
+   * asynchronously. When the returned {@link Observable} completes, the
+   * inserted {@link HTMLScriptElement} is removed.
    *
-   * [HTMLScriptElement]: https://developer.mozilla.org/docs/Web/API/HTMLScriptElement
-   * [Observable]: https://rxjs.dev/api/index/class/Observable
-   *
-   * @param props - [HTMLScriptElement][] properties.
-   * @returns [Observable][] of the [HTMLScriptElement][]s load and removal.
+   * @param props - Any properties to apply to the {@link HTMLScriptElement}.
+   * @returns An {@link Observable} of the {@link HTMLScriptElement}s `onload`.
    *
    * @example
-   * Insert an [HTMLScriptElement][]:
+   * Insert an {@link HTMLScriptElement}:
    * ```ts
    * import { Kernel } from '@sgrud/core';
    *
@@ -535,7 +497,7 @@ export class Kernel {
   public script(props: Partial<HTMLScriptElement>): Observable<void> {
     return new Observable<void>((observer) => {
       const script = assign(document.createElement('script'), props, {
-        onerror: (error: any) => {
+        onerror: (error: unknown) => {
           observer.error(error);
         },
         onload: () => {
@@ -545,7 +507,7 @@ export class Kernel {
       });
 
       if (!props.src || this.shimmed && props.type?.endsWith(this.shimmed)) {
-        setTimeout(script.onload);
+        asyncScheduler.schedule(script.onload);
       }
 
       document.head.appendChild(script);
@@ -554,19 +516,15 @@ export class Kernel {
   }
 
   /**
-   * Inserts an HTML link element and applies the supplied `props` to it. This
-   * method should be used to **verify** a [Module][] bundle before importing
-   * and evaluating it, by providing its [Subresource Integrity][].
+   * Inserts an {@link HTMLLinkElement} and applies the supplied `props` to it.
+   * This method is used to **verify** a {@link Kernel.Module} bundle before
+   * importing and executing it by **verify**ing its {@link Kernel.Digest}.
    *
-   * [Module]: https://sgrud.github.io/client/interfaces/core.Kernel-1.Module
-   * [Observable]: https://rxjs.dev/api/index/class/Observable
-   * [Subresource Integrity]: https://developer.mozilla.org/docs/Web/Security/Subresource_Integrity
-   *
-   * @param props - Link element properties.
-   * @returns [Observable][] of link appendage and removal.
+   * @param props - Any properties to apply to the {@link HTMLLinkElement}.
+   * @returns An {@link Observable} of the appendage and removal of the element.
    *
    * @example
-   * **Verify** the [Subresource Integrity][]:
+   * **verify** a {@link Kernel.Module} by {@link Kernel.Digest}:
    * ```ts
    * import { Kernel } from '@sgrud/core';
    *

@@ -1,162 +1,142 @@
-import { Symbol } from '@sgrud/core';
 import { Model } from '@sgrud/data';
-import { auditTime, catchError, EMPTY, first, from, identity } from 'rxjs';
+import { auditTime, firstValueFrom, from, map } from 'rxjs';
 
 describe('@sgrud/data/model/model', () => {
 
-  const values = [
-    { id: 'id' },
-    { created: new Date(0) },
-    { modified: new Date() }
-  ];
+  /*
+   * Variables
+   */
 
   class Class extends Model<Class> {
-    protected readonly [Symbol.toStringTag]: string = 'Class';
+
+    protected readonly [Symbol.toStringTag]: string = 'ModelEntity';
+
   }
 
-  describe('statically committing an operation', () => {
-    it('throws an error because no querier is available', (done) => {
-      Class.commit('query test').pipe(catchError((error) => {
-        expect(error).toBeInstanceOf(ReferenceError);
-        done();
+  const values = [
+    { uuid: 'uuid' },
+    { created: new Date(0) },
+    { modified: new Date() }
+  ] as const;
 
-        return EMPTY;
-      })).subscribe();
+  /*
+   * Unittests
+   */
+
+  describe('statically committing an operation', () => {
+    const operation = Class.commit('query test');
+
+    it('throws an error because no querier is available', async() => {
+      await expect(firstValueFrom(operation)).rejects.toThrow();
     });
   });
 
   describe('statically calling the deleteAll operation', () => {
-    it('throws an error because no querier is available', (done) => {
-      Class.deleteAll(['id']).pipe(catchError((error) => {
-        expect(error).toBeInstanceOf(ReferenceError);
-        done();
+    const operation = Class.deleteAll(['uuid']);
 
-        return EMPTY;
-      })).subscribe();
+    it('throws an error because no querier is available', async() => {
+      await expect(firstValueFrom(operation)).rejects.toThrow();
     });
   });
 
   describe('statically calling the deleteOne operation', () => {
-    it('throws an error because no querier is available', (done) => {
-      Class.deleteOne('id').pipe(catchError((error) => {
-        expect(error).toBeInstanceOf(ReferenceError);
-        done();
+    const operation = Class.deleteOne('uuid');
 
-        return EMPTY;
-      })).subscribe();
+    it('throws an error because no querier is available', async() => {
+      await expect(firstValueFrom(operation)).rejects.toThrow();
     });
   });
 
   describe('statically calling the findAll operation', () => {
-    it('throws an error because no querier is available', (done) => {
-      Class.findAll({ }, []).pipe(catchError((error) => {
-        expect(error).toBeInstanceOf(ReferenceError);
-        done();
+    const operation = Class.findAll({}, []);
 
-        return EMPTY;
-      })).subscribe();
+    it('throws an error because no querier is available', async() => {
+      await expect(firstValueFrom(operation)).rejects.toThrow();
     });
   });
 
   describe('statically calling the findOne operation', () => {
-    it('throws an error because no querier is available', (done) => {
-      Class.findOne({ }, []).pipe(catchError((error) => {
-        expect(error).toBeInstanceOf(ReferenceError);
-        done();
+    const operation = Class.findOne({}, []);
 
-        return EMPTY;
-      })).subscribe();
+    it('throws an error because no querier is available', async() => {
+      await expect(firstValueFrom(operation)).rejects.toThrow();
     });
   });
 
   describe('statically calling the saveAll operation', () => {
-    const model = new Class(...values);
+    const operation = Class.saveAll([new Class(...values)], []);
 
-    it('throws an error because no querier is available', (done) => {
-      Class.saveAll([model], []).pipe(catchError((error) => {
-        expect(error).toBeInstanceOf(ReferenceError);
-        done();
-
-        return EMPTY;
-      })).subscribe();
+    it('throws an error because no querier is available', async() => {
+      await expect(firstValueFrom(operation)).rejects.toThrow();
     });
   });
 
   describe('statically calling the saveOne operation', () => {
-    const model = new Class(...values);
+    const operation = Class.saveOne(new Class(...values), []);
 
-    it('throws an error because no querier is available', (done) => {
-      Class.saveOne(model, []).pipe(catchError((error) => {
-        expect(error).toBeInstanceOf(ReferenceError);
-        done();
-
-        return EMPTY;
-      })).subscribe();
+    it('throws an error because no querier is available', async() => {
+      await expect(firstValueFrom(operation)).rejects.toThrow();
     });
   });
 
   describe('statically serializing a model', () => {
-    const model = new Class(...values);
+    const result = Class.serialize(new Class(...values));
 
     it('returns the serialized model', () => {
-      expect(Class.serialize(model)).toStrictEqual({
-        id: values[0].id
-      });
+      expect(result).toStrictEqual(values[0]);
     });
   });
 
   describe('statically serializing a model shallowly', () => {
-    const model = new Class(...values);
+    const result = Class.serialize(new Class(...values), true);
 
     it('returns the serialized model', () => {
-      expect(Class.serialize(model, true)).toStrictEqual({
-        id: values[0].id
-      });
+      expect(result).toStrictEqual(values[0]);
     });
   });
 
   describe('statically treemapping a model', () => {
-    const model = new Class(...values);
+    const result = Class.treemap(new Class(...values));
 
     it('returns the treemapped model', () => {
-      expect(Class.treemap(model)).toStrictEqual(['id']);
+      expect(result).toStrictEqual(Object.keys(values[0]));
     });
   });
 
   describe('statically treemapping a model shallowly', () => {
-    const model = new Class(...values);
+    const result = Class.treemap(new Class(...values), true);
 
     it('returns the treemapped model', () => {
-      expect(Class.treemap(model, true)).toStrictEqual(['id']);
+      expect(result).toStrictEqual(Object.keys(values[0]));
     });
   });
 
   describe('statically unraveling a graph', () => {
-    const graph = [
+    const result = Class.unravel([
       undefined,
-      'id',
+      'uuid',
       { sub: [
-        'id'
+        'uuid'
       ] },
-      { call: () => ({
-        empty: undefined,
-        param: null,
-        call: [
+      { method: () => ({
+        empty: undefined!,
+        param: null!,
+        method: [
           'sub'
         ]
       }) },
-      { empty: undefined }
-    ] as Model.Graph<Class>;
+      { empty: undefined! }
+    ] as Model.Graph<Class>);
 
     it('returns the unraveled graph', () => {
-      expect(Class.unravel(graph)).toBe('{ id sub{id} call(param:null){sub} }');
+      expect(result).toBe('{ uuid sub{uuid} method(param:null){sub} }');
     });
   });
 
   describe('statically valuating model properties', () => {
     const model = new Class({
-      id: undefined,
-      created: null!,
+      uuid: null!,
+      created: undefined!,
       modified: new Date()
     });
 
@@ -165,14 +145,14 @@ describe('@sgrud/data/model/model', () => {
     });
 
     it('returns the valuated properties', () => {
-      expect(Class.valuate(model, 'id')).toBeUndefined();
+      expect(Class.valuate(model, 'uuid')).toBeNull();
     });
 
     it('returns the valuated null-properties', () => {
-      expect(Class.valuate(model, 'created')).toBeNull();
+      expect(Class.valuate(model, 'created')).toBeUndefined();
     });
 
-    it('returns the valuated ISO date strings', () => {
+    it('returns the valuated date strings with correct offset', () => {
       expect(Class.valuate(model, 'modified')).toMatch(/-02:00$/);
     });
   });
@@ -180,225 +160,166 @@ describe('@sgrud/data/model/model', () => {
   describe('instantiating a model using parts', () => {
     const model = new Class(...values);
 
-    const validate = (value: Class) => {
-      expect(value.id).toBe(values[0].id);
-      expect(value.created).toBe(values[1].created!.valueOf());
-      expect(value.modified).toBe(values[2].modified!.valueOf());
-    };
-
     it('assigns all supplied parts to the model', () => {
       expect(model).toBeInstanceOf(Model);
       expect(model).toBeInstanceOf(Class);
-      validate(model);
+      expect(model.uuid).toBe(values[0].uuid);
+      expect(model.created).toBe(values[1].created.valueOf());
+      expect(model.modified).toBe(values[2].modified.valueOf());
     });
   });
 
   describe('assigning parts to a model', () => {
     const model = new Class();
 
-    const validate = (value: Class) => {
-      expect(value.id).toBe(values[0].id);
-      expect(value.created).toBe(values[1].created!.valueOf());
-      expect(value.modified).toBe(values[2].modified!.valueOf());
-    };
-
-    it('emits the changed model', (done) => {
-      from(model).pipe(
-        auditTime(250),
-        first()
-      ).subscribe((value) => {
-        validate(value);
-        done();
+    it('assigns all supplied parts to the emitted model', (done) => {
+      const changes = from(model).pipe(auditTime(250), map((next) => {
+        expect(next.uuid).toBe(values[0].uuid);
+        expect(next.created).toBe(values[1].created.valueOf());
+        expect(next.modified).toBe(values[2].modified.valueOf());
+      })).subscribe({
+        error: done
       });
 
-      model.assign(...values).subscribe(validate);
-    });
-
-    it('assigns all supplied parts to the model', () => {
-      validate(model);
+      model.assign(...values).pipe(map((next) => {
+        changes.unsubscribe();
+        expect(next).toBe(model);
+      })).subscribe({
+        complete: done,
+        error: done
+      });
     });
   });
 
   describe('assigning null-parts to a model', () => {
     const model = new Class();
 
-    const validate = (value: Class) => {
-      expect(value.id).toBeNull();
-      expect(value.created).toBeNull();
-      expect(value.modified).toBeNull();
-    };
-
-    it('emits the changed model', (done) => {
-      from(model).pipe(
-        auditTime(250),
-        first()
-      ).subscribe((value) => {
-        validate(value);
-        done();
+    it('assigns all supplied null-parts to the emitted model', (done) => {
+      const changes = from(model).pipe(auditTime(250), map((next) => {
+        expect(next.uuid).toBeNull();
+        expect(next.created).toBeNull();
+        expect(next.modified).toBeNull();
+      })).subscribe({
+        error: done
       });
 
       model.assign(...values.flatMap((value) => {
-        return Object.keys(value).map((key) => ({
-          [key]: null
-        })) as Model.Shape<Class>;
-      })).subscribe(validate);
-    });
-
-    it('assigns all supplied null-parts to the model', () => {
-      validate(model);
+        return Object.keys(value).map((key) => ({ [key]: null }));
+      })).pipe(map((next) => {
+        changes.unsubscribe();
+        expect(next).toBe(model);
+      })).subscribe({
+        complete: done,
+        error: done
+      });
     });
   });
 
   describe('clearing a model', () => {
     const model = new Class(...values);
 
-    const validate = (value: Class) => {
-      expect(value.id).toBeUndefined();
-      expect(value.created).toBeUndefined();
-      expect(value.modified).toBeUndefined();
-    };
-
-    it('emits the changed model', (done) => {
-      from(model).pipe(
-        auditTime(250),
-        first()
-      ).subscribe((value) => {
-        validate(value);
-        done();
+    it('clears the emitted model', (done) => {
+      const changes = from(model).pipe(auditTime(250), map((next) => {
+        expect(next.uuid).toBeUndefined();
+        expect(next.created).toBeUndefined();
+        expect(next.modified).toBeUndefined();
+      })).subscribe({
+        error: done
       });
 
-      model.clear().subscribe(validate);
-    });
-
-    it('clears the model', () => {
-      validate(model);
+      model.clear().pipe(map((next) => {
+        changes.unsubscribe();
+        expect(next).toBe(model);
+      })).subscribe({
+        complete: done,
+        error: done
+      });
     });
   });
 
   describe('clearing a model partially', () => {
     const model = new Class(...values);
 
-    const validate = (value: Class) => {
-      expect(value.id).toBe(values[0].id);
-      expect(value.created).toBeUndefined();
-      expect(value.modified).toBeUndefined();
-    };
-
     it('emits the changed model', (done) => {
-      from(model).pipe(
-        auditTime(250),
-        first()
-      ).subscribe((value) => {
-        validate(value);
-        done();
+      const changes = from(model).pipe(auditTime(250), map((next) => {
+        expect(next.uuid).toBe(values[0].uuid);
+        expect(next.created).toBeUndefined();
+        expect(next.modified).toBeUndefined();
+      })).subscribe({
+        error: done
       });
 
-      model.clear(['created', 'modified']).subscribe(validate);
-    });
-
-    it('clears the model partially', () => {
-      validate(model);
+      model.clear(['created', 'modified']).pipe(map((next) => {
+        changes.unsubscribe();
+        expect(next).toBe(model);
+      })).subscribe({
+        complete: done,
+        error: done
+      });
     });
   });
 
   describe('committing an operation on an instance', () => {
-    const model = new Class(...values);
+    const operation = new Class(...values).commit('query test');
 
-    it('throws an error because no querier is available', (done) => {
-      model.commit('query test').pipe(catchError((error) => {
-        expect(error).toBeInstanceOf(ReferenceError);
-        done();
-
-        return EMPTY;
-      })).subscribe();
-    });
-  });
-
-  describe('committing an operation on an instance with variables', () => {
-    const model = new Class(...values);
-
-    it('throws an error because no querier is available', (done) => {
-      model.commit('query test', { }, identity).pipe(catchError((error) => {
-        expect(error).toBeInstanceOf(ReferenceError);
-        done();
-
-        return EMPTY;
-      })).subscribe();
+    it('throws an error because no querier is available', async() => {
+      await expect(firstValueFrom(operation)).rejects.toThrow();
     });
   });
 
   describe('calling the delete operation on an instance', () => {
-    const model = new Class(...values);
+    const operation = new Class(...values).delete();
 
-    it('throws an error because no querier is available', (done) => {
-      model.delete().pipe(catchError((error) => {
-        expect(error).toBeInstanceOf(ReferenceError);
-        done();
-
-        return EMPTY;
-      })).subscribe();
+    it('throws an error because no querier is available', async() => {
+      await expect(firstValueFrom(operation)).rejects.toThrow();
     });
   });
 
   describe('calling the find operation on an instance', () => {
-    const model = new Class(...values);
+    const operation = new Class(...values).find([], {});
 
-    it('throws an error because no querier is available', (done) => {
-      model.find([], { }).pipe(catchError((error) => {
-        expect(error).toBeInstanceOf(ReferenceError);
-        done();
-
-        return EMPTY;
-      })).subscribe();
+    it('throws an error because no querier is available', async() => {
+      await expect(firstValueFrom(operation)).rejects.toThrow();
     });
   });
 
   describe('calling the save operation on an instance', () => {
-    const model = new Class(...values);
+    const operation = new Class(...values).save([]);
 
-    it('throws an error because no querier is available', (done) => {
-      model.save([]).pipe(catchError((error) => {
-        expect(error).toBeInstanceOf(ReferenceError);
-        done();
-
-        return EMPTY;
-      })).subscribe();
+    it('throws an error because no querier is available', async() => {
+      await expect(firstValueFrom(operation)).rejects.toThrow();
     });
   });
 
   describe('serializing a model', () => {
-    const model = new Class(...values);
+    const result = new Class(...values).serialize();
 
     it('returns the serialized model', () => {
-      expect(model.serialize()).toStrictEqual({
-        id: values[0].id
-      });
+      expect(result).toStrictEqual(values[0]);
     });
   });
 
   describe('serializing a model shallowly', () => {
-    const model = new Class(...values);
+    const result = new Class(...values).serialize(true);
 
     it('returns the serialized model', () => {
-      expect(model.serialize(true)).toStrictEqual({
-        id: values[0].id
-      });
+      expect(result).toStrictEqual(values[0]);
     });
   });
 
   describe('treemapping a model', () => {
-    const model = new Class(...values);
+    const result = new Class(...values).treemap();
 
     it('returns the treemapped model', () => {
-      expect(model.treemap()).toStrictEqual(['id']);
+      expect(result).toStrictEqual(Object.keys(values[0]));
     });
   });
 
   describe('treemapping a model shallowly', () => {
-    const model = new Class(...values);
+    const result = new Class(...values).treemap(true);
 
     it('returns the treemapped model', () => {
-      expect(model.treemap(true)).toStrictEqual(['id']);
+      expect(result).toStrictEqual(Object.keys(values[0]));
     });
   });
 
