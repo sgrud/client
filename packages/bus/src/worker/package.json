@@ -1,7 +1,7 @@
 {
   "name": "@sgrud/bus/worker",
   "private": true,
-  "version": "0.0.17",
+  "version": "0.0.18",
   "source": "./index.ts",
   "types": "../src/worker/index.d.ts",
   "main": "../../../../dist/bus/worker/index.js",
