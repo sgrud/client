@@ -184,7 +184,7 @@ export async function runtimify({
     const { exports, main, module, type } = require(resolve('package.json'));
     let name = id.split(/\W/).filter(Boolean).join('.');
 
-    if (!scope.startsWith('!')) {
+    if (scope && !scope.startsWith('!')) {
       name += '.' + scope.split(/\W/).filter(Boolean).join('.');
     }
 
