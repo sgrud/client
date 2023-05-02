@@ -1,7 +1,7 @@
 {
   "name": "@sgrud/state/worker",
   "private": true,
-  "version": "0.0.18",
+  "version": "0.0.19",
   "source": "./index.ts",
   "types": "../src/worker/index.d.ts",
   "main": "../../../../dist/state/worker/index.js",

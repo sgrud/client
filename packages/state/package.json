@@ -1,6 +1,6 @@
 {
   "name": "@sgrud/state",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "source": "./index.ts",
   "types": "./index.d.ts",
   "main": "../../dist/state/index.js",
