@@ -1,4 +1,4 @@
-import { Subject } from 'rxjs';
+import { Subject, from, switchMap } from 'rxjs';
 import { Bus } from '../bus/bus';
 import { BusHandler } from './handler';
 
@@ -80,11 +80,12 @@ export function Publish(handle: Bus.Handle, suffix?: PropertyKey) {
    * @param propertyKey - The `prototype` property to be decorated.
    */
   return function(prototype: object, propertyKey: PropertyKey): void {
-    const handler = new BusHandler();
-
     if (!suffix) {
       const stream = new Subject<unknown>();
-      handler.publish(handle, stream).subscribe();
+
+      from(BusHandler).pipe(switchMap((handler) => {
+        return handler.publish(handle, stream);
+      })).subscribe();
 
       Object.defineProperty(prototype, propertyKey, {
         enumerable: true,
@@ -96,8 +97,11 @@ export function Publish(handle: Bus.Handle, suffix?: PropertyKey) {
         enumerable: true,
         set(this: object, value: string): void {
           if (value) {
-            const stream = new Subject();
-            handler.publish(`${handle}.${value}`, stream).subscribe();
+            const stream = new Subject<unknown>();
+
+            from(BusHandler).pipe(switchMap((handler) => {
+              return handler.publish(`${handle}.${value}`, stream);
+            })).subscribe();
 
             Object.defineProperties(this, {
               [suffix]: {

@@ -14,7 +14,10 @@ describe('@sgrud/state/handler/stateful', () => {
     return of<Store.State<any>>({ param: undefined });
   });
 
-  StateHandler[Symbol.observable] = () => of<any>({ deploy: mock });
+  StateHandler[Symbol.observable] = () => of<any>({
+    deploy: mock,
+    dispatch: mock
+  });
 
   /*
    * Variables

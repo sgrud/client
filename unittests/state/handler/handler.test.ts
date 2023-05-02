@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 
-import { Mutable } from '@sgrud/core';
+import { Mutable, Symbol } from '@sgrud/core';
 import { Effect, StateHandler, Store } from '@sgrud/state';
 import express from 'express';
 import { Server } from 'http';
-import { from, map } from 'rxjs';
+import { from, map, of } from 'rxjs';
 
 describe('@sgrud/state/handler/handler', () => {
 
@@ -159,11 +159,19 @@ describe('@sgrud/state/handler/handler', () => {
 
       jest.mock('@sgrud/bus', () => ({
         ...jest.requireActual('@sgrud/bus'),
-        BusHandler: jest.fn(() => ({
-          worker: {
-            [require('comlink').createEndpoint]: Function.prototype
+        BusHandler: class {
+
+          public static [Symbol.observable]() {
+            return of(new this());
           }
-        }))
+
+          public get worker() {
+            return {
+              [require('comlink').createEndpoint]: Function.prototype
+            };
+          }
+
+        }
       }));
 
       const { StateHandler: Handler } = require('@sgrud/state');
@@ -173,8 +181,8 @@ describe('@sgrud/state/handler/handler', () => {
 
   describe('constructing an instance in an esm environment', () => {
     it('constructs an esm worker through the factory', async() => {
-      jest.resetModules();
       globalThis.process = undefined!;
+      jest.resetModules();
 
       const { StateHandler: Handler } = require('@sgrud/state');
       await expect(new Handler().worker).resolves.toBe(module);
@@ -190,8 +198,8 @@ describe('@sgrud/state/handler/handler', () => {
 
   describe('constructing an instance in an umd environment', () => {
     it('constructs an umd worker through the factory', async() => {
-      jest.resetModules();
       globalThis.sgrud = undefined! || true;
+      jest.resetModules();
 
       const { StateHandler: Handler } = require('@sgrud/state');
       await expect(new Handler().worker).resolves.toBe(module);
@@ -207,9 +215,9 @@ describe('@sgrud/state/handler/handler', () => {
 
   describe('constructing an instance in an incompatible environment', () => {
     it('throws an error on worker construction', async() => {
-      jest.resetModules();
       module.exports = undefined!;
       module.unpkg = undefined!;
+      jest.resetModules();
 
       const { StateHandler: Handler } = require('@sgrud/state');
       await expect(new Handler().worker).rejects.toThrow();

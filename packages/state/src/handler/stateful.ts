@@ -90,15 +90,15 @@ export function Stateful<
     return class {
 
       public [Symbol.observable]() {
-        return loader.pipe(switchMap(() => {
-          return new BusHandler().observe(handle).pipe(dematerialize());
-        }));
+        return loader.pipe(switchMap(() => from(BusHandler).pipe(
+          switchMap((handler) => handler.observe(handle).pipe(dematerialize()))
+        )));
       }
 
       public dispatch(...action: Store.Action<I>) {
-        return loader.pipe(switchMap(() => {
-          return new StateHandler().dispatch<I>(handle, ...action);
-        }));
+        return loader.pipe(switchMap(() => from(StateHandler).pipe(
+          switchMap((handler) => handler.dispatch<I>(handle, ...action))
+        )));
       }
 
     } as unknown as T;

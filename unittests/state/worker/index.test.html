@@ -23,6 +23,12 @@
   import { first, firstValueFrom, forkJoin, from } from 'rxjs';
 
   /*
+  * Fixtures
+  */
+
+  new StateHandler(undefined, '/');
+
+  /*
   * Variables
   */
 
@@ -73,7 +79,6 @@
 
   }
 
-  const handler = new StateHandler(undefined, '/');
   Transient = Stateful(Transient.handle, Transient.state, true)(Transient);
   Universal = Stateful(Universal.handle, Universal.state, false)(Universal);
   Versatile = Stateful(Versatile.handle, Versatile.state, true)(Versatile);
@@ -81,7 +86,6 @@
   const transient = new Transient();
   const universal = new Universal();
   const versatile = new Versatile();
-
 
   /*
   * Unittests

@@ -1,7 +1,7 @@
 import { Bus, BusHandler } from '@sgrud/bus';
 import { Factor, Kernel, Singleton, Symbol, Thread, TypeOf } from '@sgrud/core';
 import { Remote, createEndpoint, transfer, wrap } from 'comlink';
-import { Observable, ReplaySubject, Subscribable, firstValueFrom, from, fromEvent, map, switchMap } from 'rxjs';
+import { Observable, ReplaySubject, Subscribable, asapScheduler, asyncScheduler, defer, firstValueFrom, from, fromEvent, map, of, race, scheduled, switchMap } from 'rxjs';
 import { Effect } from '../effect/effect';
 import { Store } from '../store/store';
 import { StateWorker } from '../worker';
@@ -74,14 +74,6 @@ export class StateHandler {
   public readonly worker: Thread<StateWorker>;
 
   /**
-   * {@link Factor}ed-in **handler** property linking the {@link BusHandler}.
-   *
-   * @decorator {@link Factor}
-   */
-  @Factor(() => BusHandler)
-  private readonly handler!: BusHandler;
-
-  /**
    * {@link Factor}ed-in **kernel** property linking the {@link Kernel}.
    *
    * @decorator {@link Factor}
@@ -93,8 +85,8 @@ export class StateHandler {
    * Public {@link StateHandler} **constructor**. As the {@link StateHandler} is
    * a {@link Singleton} class, this **constructor** is only invoked the first
    * time it is targeted by the `new` operator. Upon this first invocation, the
-   * {@link worker} property is assigned an appropriate instance of the
-   * {@link StateWorker} {@link Thread}.
+   * {@link worker} property is assigned an instance of the {@link StateWorker}
+   * {@link Thread} while using the supplied `source`, if any.
    *
    * @param source - An optional {@link Kernel.Module} `source`.
    * @param scope - An optionally `scope`d {@link ServiceWorkerRegistration}.
@@ -136,8 +128,12 @@ export class StateHandler {
         worker = wrap<StateWorker>(port2);
       }
 
-      const thread = await this.handler.worker;
-      const socket = await thread[createEndpoint]();
+      const remote = await firstValueFrom(race(
+        scheduled(defer(() => BusHandler), asapScheduler),
+        scheduled(defer(() => of(new BusHandler)), asyncScheduler)
+      )).then((handler) => handler.worker);
+
+      const socket = await remote[createEndpoint]();
       await worker.connect(transfer(socket, [socket]));
       return worker;
     })()).pipe(map(() => this)).subscribe(StateHandler.loader);

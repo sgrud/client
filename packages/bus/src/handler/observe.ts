@@ -1,4 +1,4 @@
-import { dematerialize, Observable } from 'rxjs';
+import { dematerialize, from, Observable, switchMap } from 'rxjs';
 import { Bus } from '../bus/bus';
 import { BusHandler } from './handler';
 
@@ -70,10 +70,9 @@ export function Observe(handle: Bus.Handle, suffix?: PropertyKey) {
    * @param propertyKey - The `prototype` property to be decorated.
    */
   return function(prototype: object, propertyKey: PropertyKey): void {
-    const handler = new BusHandler();
-
     if (!suffix) {
-      const stream = handler.observe(handle).pipe(
+      const stream = from(BusHandler).pipe(
+        switchMap((handler) => handler.observe(handle)),
         dematerialize()
       );
 
@@ -87,7 +86,8 @@ export function Observe(handle: Bus.Handle, suffix?: PropertyKey) {
         enumerable: true,
         set(this: object, value: string): void {
           if (value) {
-            const stream = handler.observe(`${handle}.${value}`).pipe(
+            const stream = from(BusHandler).pipe(
+              switchMap((handler) => handler.observe(`${handle}.${value}`)),
               dematerialize()
             );
 

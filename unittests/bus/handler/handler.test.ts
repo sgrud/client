@@ -25,6 +25,19 @@ describe('@sgrud/bus/handler/handler', () => {
     });
   }));
 
+  afterEach(() => (globalThis.Worker as jest.Mock).mockClear());
+  globalThis.Worker = jest.fn();
+
+  /*
+   * Variables
+   */
+
+  const module = {
+    name: '@sgrud/bus/worker',
+    exports: './worker.esmod.js',
+    unpkg: './worker.unpkg.js'
+  };
+
   /*
    * Unittests
    */
@@ -209,6 +222,64 @@ describe('@sgrud/bus/handler/handler', () => {
 
       timer(250).pipe(map(() => 'done')).subscribe(stream);
       handler.publish('sgrud.test.bus.stream', stream).subscribe();
+    });
+  });
+
+  describe('constructing an instance in an node environment', () => {
+    it('constructs a node worker through the factory', async() => {
+      jest.resetModules();
+
+      jest.mock('comlink', () => ({
+        ...jest.requireActual('comlink'),
+        wrap: jest.fn(() => module)
+      }));
+
+      jest.mock('rxjs', () => ({
+        ...jest.requireActual('rxjs'),
+        firstValueFrom: () => Promise.resolve(module)
+      }));
+
+      const { BusHandler: Handler } = require('@sgrud/bus');
+      await expect(new Handler().worker).resolves.toBe(module);
+    });
+  });
+
+  describe('constructing an instance in an esm environment', () => {
+    it('constructs an esm worker through the factory', async() => {
+      globalThis.process = undefined!;
+      jest.resetModules();
+
+      const { BusHandler: Handler } = require('@sgrud/bus');
+      await expect(new Handler().worker).resolves.toBe(module);
+
+      expect(globalThis.Worker).toBeCalledWith(
+        `/node_modules/${module.name}/${module.exports}`, { type: 'module' }
+      );
+    });
+  });
+
+  describe('constructing an instance in an umd environment', () => {
+    it('constructs an umd worker through the factory', async() => {
+      globalThis.sgrud = undefined! || true;
+      jest.resetModules();
+
+      const { BusHandler: Handler } = require('@sgrud/bus');
+      await expect(new Handler().worker).resolves.toBe(module);
+
+      expect(globalThis.Worker).toBeCalledWith(
+        `/node_modules/${module.name}/${module.unpkg}`, { type: 'classic' }
+      );
+    });
+  });
+
+  describe('constructing an instance in an incompatible environment', () => {
+    it('throws an error on worker construction', async() => {
+      module.exports = undefined!;
+      module.unpkg = undefined!;
+      jest.resetModules();
+
+      const { BusHandler: Handler } = require('@sgrud/bus');
+      await expect(new Handler().worker).rejects.toThrow();
     });
   });
 

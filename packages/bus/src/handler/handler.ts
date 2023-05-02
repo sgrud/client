@@ -1,19 +1,20 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 
-import { Singleton, Spawn, Target, Thread } from '@sgrud/core';
-import { Observable, ObservableInput, ReplaySubject, Subscription, connectable, from, switchMap } from 'rxjs';
+import { Kernel, Singleton, Symbol, Thread, TypeOf } from '@sgrud/core';
+import { Endpoint, wrap } from 'comlink';
+import { NodeEndpoint } from 'comlink/dist/umd/node-adapter';
+import { Observable, ObservableInput, ReplaySubject, Subscribable, Subscription, connectable, firstValueFrom, from, map, switchMap } from 'rxjs';
 import { Bus } from '../bus/bus';
 import { BusWorker } from '../worker';
 import { name } from '../worker/package.json';
 
 /**
- * The **BusHandler** is a {@link Target}ed {@link Singleton} class implementing
- * and orchestrating the establishment, transferral and deconstruction of any
- * number of {@link Observable} streams. It operates in conjunction with the
- * {@link BusWorker} {@link Thread} to run in the background. To designate and
- * organize the different {@link Observable} streams, the string literal helper
- * type {@link Bus.Handle} is employed. As an example, let the following
- * hierarchical structure be given:
+ * The **BusHandler** implements and orchestrates the establishment, transferral
+ * and deconstruction of any number of {@link Observable} streams. It operates
+ * in conjunction with the {@link BusWorker} {@link Thread} which is run in the
+ * background. To designate and organize different {@link Observable} streams,
+ * the string literal helper type {@link Bus.Handle} is employed. As an example,
+ * let the following hierarchical structure be given:
  *
  * ```text
  * io.github.sgrud
@@ -37,27 +38,100 @@ import { name } from '../worker/package.json';
  * originating from all streams beneath the root {@link Bus.Handle} in the first
  * case, or only {@link Bus.Value}s from one stream, in the second case.
  *
- * @decorator {@link Target}
  * @decorator {@link Singleton}
  *
  * @see {@link BusWorker}
  */
-@Target()
 @Singleton()
 export class BusHandler {
 
   /**
-   * {@link Spawn}ed **worker** {@link Thread} and main background workhorse.
-   * The underlying {@link BusWorker} is run inside a {@link Worker} context and
-   * handles {@link publish}ed and {@link observe}d streams and the aggregation
-   * of their values depending on their {@link Bus.Handle}, i.e., hierarchy.
+   * Private static {@link ReplaySubject} used as the {@link BusHandler}
+   * **loader**. This **loader** emits once after the {@link BusHandler} has
+   * been successfully initialized.
+   */
+  private static loader: ReplaySubject<BusHandler>;
+
+  /**
+   * Static `Symbol.observable` method returning a {@link Subscribable}. The
+   * returned {@link Subscribable} mirrors the private {@link loader} and is
+   * used for initializations after the {@link BusHandler} has been
+   * successfully initialized.
    *
-   * @decorator {@link Spawn}
+   * @returns A {@link Subscribable} emitting this {@link BusHandler}.
+   *
+   * @example
+   * Subscribe to the {@link BusHandler}:
+   * ```ts
+   * import { BusHandler } from '@sgrud/bus';
+   * import { from } from 'rxjs';
+   *
+   * from(BusHandler).subscribe(console.log);
+   * ```
+   */
+  public static [Symbol.observable](): Subscribable<BusHandler> {
+    return this.loader.asObservable();
+  }
+
+  /**
+   * Static initialization block.
+   */
+  static {
+    this.loader = new ReplaySubject<BusHandler>(1);
+  }
+
+  /**
+   * The **worker** {@link Thread} and main background workhorse. The underlying
+   * {@link BusWorker} is run inside a {@link Worker} context in the background
+   * and transparently handles {@link publish}ed and {@link observe}d streams
+   * and the aggregation of their values depending on their {@link Bus.Handle},
+   * i.e., hierarchy.
    *
    * @see {@link BusWorker}
    */
-  @Spawn(name)
-  public readonly worker!: Thread<BusWorker>;
+  public readonly worker: Thread<BusWorker>;
+
+  /**
+   * Public {@link BusHandler} **constructor**. As the {@link BusHandler} is a
+   * {@link Singleton} class, this **constructor** is only invoked the first
+   * time it is targeted by the `new` operator. Upon this first invocation, the
+   * {@link worker} property is assigned an instance of the {@link BusWorker}
+   * {@link Thread} while using the supplied `source`, if any.
+   *
+   * @param source - An optional {@link Kernel.Module} `source`.
+   * @throws A {@link ReferenceError} when the environment is incompatible.
+   */
+  public constructor(source?: string) {
+    from(this.worker = (async() => {
+      let worker: Endpoint | NodeEndpoint;
+
+      if (TypeOf.process(globalThis.process)) {
+        const { Worker } = require('worker_threads');
+        worker = new Worker(require.resolve(name));
+
+        const nodeEndpoint = require('comlink/dist/umd/node-adapter');
+        worker = nodeEndpoint(worker);
+      } else {
+        const kernel = new Kernel();
+        source ||= `${kernel.nodeModules}/${name}`;
+        const module = await firstValueFrom(kernel.resolve(name, source));
+
+        if (!globalThis.sgrud && module.exports) {
+          worker = new Worker(`${source}/${module.exports}`, {
+            type: 'module'
+          });
+        } else if (globalThis.sgrud && module.unpkg) {
+          worker = new Worker(`${source}/${module.unpkg}`, {
+            type: 'classic'
+          });
+        } else {
+          throw new ReferenceError(module.name);
+        }
+      }
+
+      return wrap(worker as Endpoint);
+    })()).pipe(map(() => this)).subscribe(BusHandler.loader);
+  }
 
   /**
    * Invoking this method **observe**s the {@link Observable} stream represented

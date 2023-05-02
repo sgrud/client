@@ -1,5 +1,5 @@
-import { Factor, Symbol } from '@sgrud/core';
-import { Observable, ObservableNotification, Observer, Subject, Subscribable, Unsubscribable, dematerialize, filter } from 'rxjs';
+import { Symbol } from '@sgrud/core';
+import { Observable, ObservableNotification, Observer, ReplaySubject, Subject, Subscribable, Unsubscribable, connectable, dematerialize, filter, from, map, switchMap } from 'rxjs';
 import { BusHandler } from '../handler/handler';
 
 /**
@@ -109,14 +109,6 @@ export namespace Bus {
 export class Bus<I, O> implements Observer<I>, Subscribable<O> {
 
   /**
-   * {@link Factor}ed-in **handler** property linking the {@link BusHandler}.
-   *
-   * @decorator {@link Factor}
-   */
-  @Factor(() => BusHandler)
-  private readonly handler!: BusHandler;
-
-  /**
    * The **observe**d side of this {@link Bus}. The {@link Observable} assigned
    * to this property is used to fullfil the {@link Subscribable} contract and
    * is obtained through the {@link BusHandler}.
@@ -147,10 +139,20 @@ export class Bus<I, O> implements Observer<I>, Subscribable<O> {
     public readonly handle: Bus.Handle
 
   ) {
-    this.handler.publish(handle, this.publish = new Subject<I>()).subscribe();
-    this.observe = this.handler.observe<O>(handle).pipe(
+    const loader = connectable(from(BusHandler).pipe(switchMap((handler) => {
+      return handler.publish(handle, this.publish).pipe(map(() => handler));
+    })), {
+      connector: () => new ReplaySubject<BusHandler>(1),
+      resetOnDisconnect: false
+    });
+
+    this.observe = loader.pipe(
+      switchMap((handler) => handler.observe<O>(handle)),
       filter((value) => value.handle !== handle)
     );
+
+    this.publish = new Subject<I>();
+    loader.connect();
   }
 
   /**
