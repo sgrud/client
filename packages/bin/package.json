@@ -1,6 +1,6 @@
 {
   "name": "@sgrud/bin",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "source": "./index.ts",
   "types": "./index.d.ts",
   "main": "../../dist/bin/index.js",
