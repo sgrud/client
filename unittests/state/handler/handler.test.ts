@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 
-import { Mutable, Symbol } from '@sgrud/core';
+import { Symbol } from '@sgrud/core';
 import { Effect, StateHandler, Store } from '@sgrud/state';
 import express from 'express';
 import { Server } from 'http';
@@ -18,12 +18,11 @@ describe('@sgrud/state/handler/handler', () => {
     .use('/node_modules/@sgrud/state/worker', (_, r) => r.send(module))
     .listen(location.port));
 
-  (navigator as Mutable<Navigator>).serviceWorker = {
-    register: jest.fn(),
-    controller: {
-      postMessage: jest.fn()
-    }
-  } as unknown as ServiceWorkerContainer;
+  // @ts-expect-error readonly assignment
+  navigator.serviceWorker = Object.assign(new EventTarget(), {
+    controller: { postMessage: Function.prototype },
+    register: jest.fn()
+  });
 
   /*
    * Variables
@@ -153,8 +152,8 @@ describe('@sgrud/state/handler/handler', () => {
 
       jest.mock('comlink', () => ({
         ...jest.requireActual('comlink'),
-        transfer: jest.fn(),
-        wrap: jest.fn(() => module)
+        transfer: Function.prototype,
+        wrap: () => module
       }));
 
       jest.mock('@sgrud/bus', () => ({

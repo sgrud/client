@@ -1,7 +1,7 @@
 import { Bus, BusHandler } from '@sgrud/bus';
 import { Factor, Kernel, Singleton, Symbol, Thread, TypeOf } from '@sgrud/core';
 import { Remote, createEndpoint, transfer, wrap } from 'comlink';
-import { Observable, ReplaySubject, Subscribable, asapScheduler, asyncScheduler, defer, firstValueFrom, from, fromEvent, map, of, race, scheduled, switchMap } from 'rxjs';
+import { Observable, ReplaySubject, Subscribable, asapScheduler, asyncScheduler, defer, first, firstValueFrom, from, fromEvent, ignoreElements, map, of, race, scheduled, switchMap, timeout, timer } from 'rxjs';
 import { Effect } from '../effect/effect';
 import { Store } from '../store/store';
 import { StateWorker } from '../worker';
@@ -122,6 +122,16 @@ export class StateHandler {
         const serviceWorker = navigator.serviceWorker.controller! || await (
           firstValueFrom(fromEvent(navigator.serviceWorker, 'controllerchange'))
         ).then(() => navigator.serviceWorker.controller);
+
+        void firstValueFrom(timer(0, 2500).pipe(switchMap((counter) => {
+          serviceWorker.postMessage({ ping: counter = performance.now() });
+
+          return fromEvent(navigator.serviceWorker, 'message').pipe(
+            first((event) => (event as MessageEvent).data.pong === counter),
+            timeout({ first: 250 }),
+            ignoreElements()
+          );
+        })));
 
         const { port1, port2 } = new MessageChannel();
         serviceWorker.postMessage({ [name]: port1 }, [port1]);

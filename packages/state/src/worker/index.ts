@@ -92,7 +92,8 @@ export class StateWorker {
   private static message(event: ExtendableMessageEvent): void {
     if (event.data[name] instanceof MessagePort) {
       expose(new StateWorker(event.source), event.data[name]);
-      event.preventDefault();
+    } else if (event.data.ping && event.source) {
+      event.source.postMessage({ pong: event.data.ping });
     }
   }
 
