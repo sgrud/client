@@ -1,6 +1,6 @@
 const { readdirSync } = require('fs');
-const { join, sep } = require('path');
-const { Application, Converter, ReflectionKind } = require('typedoc');
+const { join, parse, sep } = require('path');
+const { Converter, ReflectionKind } = require('typedoc');
 
 /**
  * Plugin for the [TypeDoc](https://typedoc.org) documentation processor. This
@@ -12,27 +12,18 @@ const { Application, Converter, ReflectionKind } = require('typedoc');
  *
  * @param {import('typedoc').Application} app - A TypeDoc application reference.
  */
-exports.load = function(app) {
+exports.load = (app) => {
   const reflections = [];
 
-  app.converter.addUnknownSymbolResolver(resolveUnknownSymbols);
-  app.converter.on(Converter.EVENT_RESOLVE_END, collectReflections);
-  app.on(Application.EVENT_PROJECT_REVIVE, collectReflections);
-
-  function collectReflections(context) {
+  app.converter.on(Converter.EVENT_RESOLVE_END, (context) => {
     for (const reflection of context.project.children) {
       if (reflection.kind === ReflectionKind.Module) {
         reflections.push(...reflection.children);
       }
     }
+  });
 
-    for (let resolver of readdirSync(join(__dirname, 'resolver'))) {
-      resolver = require(join(__dirname, 'resolver', resolver));
-      app.converter.addUnknownSymbolResolver(resolver);
-    }
-  }
-
-  function resolveUnknownSymbols(ref, refl, part, symbolId) {
+  app.converter.addUnknownSymbolResolver((ref, refl, part, symbolId) => {
     if (!ref.moduleSource && symbolId) {
       const path = symbolId.fileName.split(sep);
       let index = path.indexOf('node_modules');
@@ -70,6 +61,16 @@ exports.load = function(app) {
 
         symbols = children;
       }
+    }
+  });
+
+  for (let resolver of readdirSync(join(__dirname, 'resolver'))) {
+    try {
+      resolver = require(join(__dirname, 'resolver', resolver));
+      app.converter.addUnknownSymbolResolver(resolver);
+    } catch {
+      resolver = parse(resolver).name;
+      app.logger.warn(`Failed to load the ${resolver} subresolver`);
     }
   }
 };
