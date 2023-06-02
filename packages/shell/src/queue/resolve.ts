@@ -76,16 +76,16 @@ export function Resolve<S extends string>(resolve: Resolve<S>) {
    */
   return function(prototype: Component, propertyKey: PropertyKey): void {
     const linker = new Linker();
-    const queues = new ResolveQueue();
-    let required = queues.required.get(prototype.constructor);
+    const queued = new ResolveQueue();
+    let required = queued.required.get(prototype.constructor);
 
     if (!linker.has(ResolveQueue)) {
-      linker.set(ResolveQueue, queues);
+      linker.set(ResolveQueue, queued);
     }
 
     if (!required) {
       required = new Map<PropertyKey, Resolve<string>>();
-      queues.required.set(prototype.constructor, required);
+      queued.required.set(prototype.constructor, required);
     }
 
     required.set(propertyKey, resolve as unknown as Resolve<string>);
@@ -93,15 +93,17 @@ export function Resolve<S extends string>(resolve: Resolve<S>) {
     Object.defineProperty(prototype, propertyKey, {
       enumerable: true,
       get(this: Component) {
-        return queues.resolved.get(prototype.constructor)?.[propertyKey];
+        return queued.resolved.get(prototype.constructor)?.[propertyKey];
       },
       set(this: Component, value: unknown): void {
         if (this.isConnected) {
-          Object.defineProperty(this, propertyKey, {
-            enumerable: true,
-            writable: true,
-            value
-          });
+          let resolved = queued.resolved.get(prototype.constructor);
+
+          if (!resolved) {
+            queued.resolved.set(prototype.constructor, resolved = {});
+          }
+
+          resolved[propertyKey] = value;
         }
       }
     });

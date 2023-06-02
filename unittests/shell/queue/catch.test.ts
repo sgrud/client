@@ -5,6 +5,12 @@ import { catchError, map, of } from 'rxjs';
 describe('@sgrud/shell/queue/catch', () => {
 
   /*
+   * Fixtures
+   */
+
+  document.body.innerHTML = '<element-tag></element-tag>';
+
+  /*
    * Variables
    */
 
@@ -81,13 +87,21 @@ describe('@sgrud/shell/queue/catch', () => {
    * Unittests
    */
 
+  describe('assigning a value to a decorated property', () => {
+    it('', () => {
+      const element = document.querySelector<Element>('element-tag')!;
+      (element as Mutable<Element>).uriError = null;
+
+      expect(element.uriError).toBeNull();
+    });
+  });
+
   describe('navigating to an unknown path', () => {
     const navigate = new Router().navigate('unknown');
 
     it('redirects to the correct error handling route', (done) => {
       navigate.pipe(map((next) =>{
         const element = document.querySelector<Element>('element-tag')!;
-        (element as Mutable<Element>).error = undefined;
 
         expect(next.path).toBe('error');
         expect(element.uriError).toBeInstanceOf(URIError);

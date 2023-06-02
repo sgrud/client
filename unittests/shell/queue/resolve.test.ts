@@ -5,6 +5,12 @@ import { map, of } from 'rxjs';
 describe('@sgrud/shell/queue/resolve', () => {
 
   /*
+   * Fixtures
+   */
+
+  document.body.innerHTML = '<element-one></element-one>';
+
+  /*
    * Variables
    */
 
@@ -57,17 +63,24 @@ describe('@sgrud/shell/queue/resolve', () => {
    * Unittests
    */
 
+  describe('assigning a value to a decorated property', () => {
+    it('', () => {
+      const element = document.querySelector<ElementOne>('element-one')!;
+      (element as Mutable<ElementOne>).segment = null!;
+
+      expect(element.segment).toBeNull();
+    });
+  });
+
   describe('resolving a property of a plain custom component', () => {
     const navigate = new Router().navigate('one');
 
     it('replaces the property value with the resolved reference', (done) => {
       navigate.pipe(map((next) => {
         const elementOne = document.querySelector<ElementOne>('element-one')!;
-        (elementOne as Mutable<ElementTwo>).state = undefined!;
 
         expect(elementOne).toBeInstanceOf(ElementOne);
         expect(elementOne.segment).toBe(next.segment.child);
-        expect(elementOne.state).toBeUndefined();
       })).subscribe({
         complete: done,
         error: done
@@ -81,11 +94,9 @@ describe('@sgrud/shell/queue/resolve', () => {
     it('replaces the property value with the resolved reference', (done) => {
       navigate.pipe(map((next) => {
         const elementTwo = document.querySelector<ElementTwo>('element-two')!;
-        (elementTwo as Mutable<ElementTwo>).state = undefined!;
 
         expect(elementTwo).toBeInstanceOf(ElementTwo);
         expect(elementTwo.segment).toBe(next.segment.child);
-        expect(elementTwo.state).toBeUndefined();
       })).subscribe({
         complete: done,
         error: done

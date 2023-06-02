@@ -66,16 +66,16 @@ export function Catch(trap?: Catch) {
    */
   return function(prototype: Component, propertyKey: PropertyKey): void {
     const linker = new Linker();
-    const queues = new CatchQueue();
-    let traps = queues.traps.get(prototype.constructor);
+    const queued = new CatchQueue();
+    let traps = queued.traps.get(prototype.constructor);
 
     if (!linker.has(CatchQueue)) {
-      linker.set(CatchQueue, queues);
+      linker.set(CatchQueue, queued);
     }
 
     if (!traps) {
       traps = new Map<PropertyKey, Catch>();
-      queues.traps.set(prototype.constructor, traps);
+      queued.traps.set(prototype.constructor, traps);
     }
 
     traps.set(propertyKey, trap);
@@ -83,15 +83,17 @@ export function Catch(trap?: Catch) {
     Object.defineProperty(prototype, propertyKey, {
       enumerable: true,
       get(this: Component) {
-        return queues.trapped.get(prototype.constructor)?.[propertyKey];
+        return queued.trapped.get(prototype.constructor)?.[propertyKey];
       },
       set(this: Component, value: unknown): void {
         if (this.isConnected) {
-          Object.defineProperty(this, propertyKey, {
-            enumerable: true,
-            writable: true,
-            value
-          });
+          let trapped = queued.trapped.get(prototype.constructor);
+
+          if (!trapped) {
+            queued.trapped.set(prototype.constructor, trapped = {});
+          }
+
+          trapped[propertyKey] = value;
         }
       }
     });
