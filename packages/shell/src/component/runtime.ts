@@ -137,7 +137,7 @@ export function createElement(
         break;
 
       case 'is':
-        type = customElements.get(props[key]) || type;
+        type = (customElements.get(props[key]) || type) as typeof type;
         break;
 
       case 'key':
@@ -160,7 +160,7 @@ export function createElement(
     }
   }
 
-  element.push(elementClose.bind({}, type as keyof JSX.IntrinsicElements));
+  element.push(elementClose.bind({}, type));
 
   return element;
 }
