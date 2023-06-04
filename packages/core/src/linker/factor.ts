@@ -8,7 +8,7 @@ import { Linker } from './linker';
  * invoked to construct (and link) an instance, if none is linked beforehand.
  *
  * @param targetFactory - A forward reference to the target constructor.
- * @param transient - Wether an instance is constructed if none is linked.
+ * @param transient - Whether an instance is constructed if none is linked.
  * @typeParam K - The {@link Target}ed constructor type.
  * @returns A prototype property decorator.
  *

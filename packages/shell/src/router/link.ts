@@ -66,7 +66,7 @@ export class RouterLink extends HTMLAnchorElement {
   /**
    * This method is called whenever this element's {@link href} attribute is
    * added, removed or changed. The `next` attribute value is used to determine
-   * wether to {@link Router.rebase} the {@link href}.
+   * whether to {@link Router.rebase} the {@link href}.
    *
    * @param _name - The `_name` of the changed attribute (ignored).
    * @param _prev - The `_prev`ious value of the changed attribute (ignored).

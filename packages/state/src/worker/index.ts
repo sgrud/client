@@ -194,7 +194,7 @@ export class StateWorker {
    * @param handle - The {@link Bus.Handle} representing the {@link Store}.
    * @param store - The {@link Store} to **deploy** under the supplied `handle`.
    * @param state - An initial {@link Store.State} for the {@link Store}.
-   * @param transient - Wether the {@link Store} is considered `transient`.
+   * @param transient - Whether the {@link Store} is considered `transient`.
    * @typeParam T - The extending {@link Store} {@link InstanceType}.
    * @returns A {@link Promise} resolving upon {@link Store} **deploy**ment.
    * @throws A {@link TypeError} when the supplied `store` mismatches.

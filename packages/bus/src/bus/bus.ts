@@ -130,6 +130,8 @@ export class Bus<I, O> implements Observer<I>, Subscribable<O> {
    * {@link BusHandler}.
    *
    * @param handle - The {@link Handle} to publish this {@link Bus} under.
+   * @typeParam I - The input value type of a **Bus** instance.
+   * @typeParam O - The output value type of a **Bus** instance.
    */
   public constructor(
 

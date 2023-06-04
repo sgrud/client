@@ -4,7 +4,7 @@
  *
  * @param version - The to-be tested semantic `version` string.
  * @param range - The `range` to test the `version` against.
- * @returns Wether `version` satisfies `range`.
+ * @returns Whether `version` satisfies `range`.
  *
  * @example
  * Test `'1.2.3'` against `'>2 <1 || ~1.2.*'`:

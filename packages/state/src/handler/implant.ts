@@ -26,7 +26,7 @@ import { StateHandler } from './handler';
  * }
  *
  * ⁠@Implant('importScripts')
- * export class FetchEffect extends Effect {
+ * export class ImportScriptsEffect extends Effect {
  *
  *   public override function(
  *     this: StateWorker

@@ -282,7 +282,7 @@ export class Kernel {
    *
    * @param module - The {@link Kernel.Module} definition to **insmod**.
    * @param source - An optional {@link Kernel.Module} `source`.
-   * @param execute - Wether to `execute` the {@link Kernel.Module}.
+   * @param execute - Whether to `execute` the {@link Kernel.Module}.
    * @returns An {@link Observable} of the {@link Kernel.Module} definition.
    * @throws An {@link Observable} {@link RangeError} or {@link ReferenceError}.
    *
@@ -413,7 +413,7 @@ export class Kernel {
    * definition is then passed to the {@link insmod} method and returned.
    *
    * @param id - The {@link Kernel.Module} name or source to **require**.
-   * @param execute - Wether to `execute` the {@link Kernel.Module}.
+   * @param execute - Whether to `execute` the {@link Kernel.Module}.
    * @returns An {@link Observable} of the {@link Kernel.Module} definition.
    *
    * @example

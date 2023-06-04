@@ -19,7 +19,7 @@ import { StateHandler } from './handler';
  *
  * @param handle - The {@link Bus.Handle} representing the {@link Store}.
  * @param state - An initial {@link Store.State} for the {@link Store}.
- * @param transient - Wether the {@link Store} is considered `transient`.
+ * @param transient - Whether the {@link Store} is considered `transient`.
  * @typeParam I - The extending {@link Store} {@link InstanceType}.
  * @typeParam T - A constructor type extending the {@link Store.Type}.
  * @returns A class constructor decorator.

@@ -9,8 +9,8 @@ import { Queue } from './queue';
  * The **Catch** type alias is used and intended to be used in conjunction with
  * the {@link CatchQueue} and represents a function that is called with the
  * thrown `error`. The return value of this callback will be used to examine
- * wether the {@link Component} containing the decorated property is responsible
- * to handle the thrown `error`.
+ * whether the {@link Component} containing the decorated property is
+ * responsible to handle the thrown `error`.
  *
  * @see {@link CatchQueue}
  */
@@ -29,7 +29,7 @@ export type Catch = ((
  * navigate to the {@link Component} containing the decorated property when an
  * error, **trap**ed by this **Catch** decorator, occurs during navigation.
  *
- * @param trap - The {@link Catch} callback to decide wether to `trap` an error.
+ * @param trap - The {@link Catch} callback deciding whether to `trap` an error.
  * @returns A {@link Component} prototype property decorator.
  *
  * @example

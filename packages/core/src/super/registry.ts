@@ -162,7 +162,7 @@ export class Registry<
 
   /**
    * Overridden **set** method. Whenever a class constructor is provided by
-   * magic string through calling this method, a test is run, wether this
+   * magic string through calling this method, a test is run, whether this
    * constructor was previously requested and therefore {@link cached} as
    * intermediary class. If so, the intermediary class is removed from the
    * internal mapping and further steps are taken to guarantee the transparent

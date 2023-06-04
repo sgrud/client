@@ -158,7 +158,7 @@ export class StateHandler {
    * @param handle - The {@link Bus.Handle} representing the {@link Store}.
    * @param store - The {@link Store} to **deploy** under the supplied `handle`.
    * @param state - An initial {@link Store.State} for the {@link Store}.
-   * @param transient - Wether the {@link Store} is considered `transient`.
+   * @param transient - Whether the {@link Store} is considered `transient`.
    * @typeParam T - The extending {@link Store} {@link InstanceType}.
    * @returns An {@link Observable} of the {@link Store} **deploy**ment.
    */

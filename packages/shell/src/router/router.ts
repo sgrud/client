@@ -215,7 +215,7 @@ export class Router extends Set<Route> implements Router.Queue {
   public readonly baseHref: string;
 
   /**
-   * Wether to employ **hashBased** routing.
+   * Whether to employ **hashBased** routing.
    *
    * @defaultValue `false`
    */
@@ -325,7 +325,7 @@ export class Router extends Set<Route> implements Router.Queue {
    * @param this - The {@link Mutable} explicit polymorphic `this` parameter.
    * @param outlet - The rendering `outlet` for {@link Route}s.
    * @param baseHref - An absolute `baseHref` for navigation.
-   * @param hashBased - Wether to employ `hashBased` routing.
+   * @param hashBased - Whether to employ `hashBased` routing.
    * @throws A {@link ReferenceError} if already **connect**ed.
    */
   public connect(
@@ -495,7 +495,7 @@ export class Router extends Set<Route> implements Router.Queue {
    * If no `routes` are supplied, routes previously added to the {@link Router}
    * will be used. The **match** method represents the backbone of this
    * {@link Router} class, as it, given a list of `routes` and a `path`, will
-   * determine wether this path represents a **match** within the list of
+   * determine whether this path represents a **match** within the list of
    * `routes`, thereby effectively determining navigational integrity.
    *
    * @param path - The `path` to **match** `routes` against.
@@ -673,7 +673,7 @@ export class Router extends Set<Route> implements Router.Queue {
    * supplied `path` or stripping it, depending on the `prefix` argument.
    *
    * @param path - The `path` to **rebase** against the {@link baseHref}.
-   * @param prefix - Wether to `prefix` or strip the {@link baseHref}.
+   * @param prefix - Whether to `prefix` or strip the {@link baseHref}.
    * @returns The `path` **rebase**d against the {@link baseHref}.
    */
   public rebase(path: string, prefix: boolean = true): string {
@@ -694,12 +694,12 @@ export class Router extends Set<Route> implements Router.Queue {
   }
 
   /**
-   * **spool**ing helper method. Given a `segment` (and wether to `rewind`), the
-   * top-most parent (or deepest child) of the graph-link {@link Segment} is
+   * **spool**ing helper method. Given a `segment` (and whether to `rewind`),
+   * the top-most parent (or deepest child) of the graph-link {@link Segment} is
    * returned.
    *
    * @param segment - The {@link Segment} to **spool**.
-   * @param rewind - Wether to `rewind` the **spool** direction.
+   * @param rewind - Whether to `rewind` the **spool** direction.
    * @returns The **spool**ed {@link Segment}.
    */
   public spool(

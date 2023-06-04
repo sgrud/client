@@ -61,6 +61,7 @@ export class BusWorker {
    * are {@link publish}ed under the supplied `handle`.
    *
    * @param handle - The {@link Bus.Handle} to **observe**.
+   * @typeParam T - The type of the **observe**d {@link Observable} stream.
    * @returns An {@link Observable} stream for `handle`.
    *
    * @remarks This method should only be invoked by the {@link BusHandler}.
@@ -103,6 +104,7 @@ export class BusWorker {
    *
    * @param handle - The {@link Bus.Handle} to **publish** under.
    * @param stream - The {@link ObservableInput} `stream` for `handle`.
+   * @typeParam T - The type of the **publish**ed {@link Observable} stream.
    * @returns A {@link Promise} of the `stream` **publish**ment.
    * @throws A {@link ReferenceError} on collision of `handle`s.
    *
