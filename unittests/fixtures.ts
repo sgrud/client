@@ -1,5 +1,5 @@
 import { indexedDB } from 'fake-indexeddb';
-import { setImmediate } from 'timers';
+import { clearImmediate, setImmediate } from 'timers';
 import { MessageChannel } from 'worker_threads';
 
 /*
@@ -25,6 +25,8 @@ declare global {
 
 globalThis.indexedDB = indexedDB;
 globalThis.MessageChannel = MessageChannel as any;
+
+globalThis.clearImmediate = clearImmediate;
 globalThis.setImmediate = setImmediate;
 
 jest.mock('comlink', () => ({

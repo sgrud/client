@@ -22,11 +22,11 @@ describe('@sgrud/state/effect/dispatch', () => {
 
   describe('applying the effect', () => {
     it('successfully applies the effect', async() => {
-      const dispatch = effect.function.call(stateWorker);
-      await expect(dispatch(undefined!)).resolves.not.toThrow();
+      const dispatch = effect.function.call(stateWorker) as Function;
+      await expect(dispatch()).resolves.not.toThrow();
 
       mock.mockImplementationOnce(() => undefined);
-      await expect(dispatch(undefined!)).resolves.not.toThrow();
+      await expect(dispatch()).resolves.not.toThrow();
 
       expect(mock).toBeCalled();
     });
@@ -38,8 +38,8 @@ describe('@sgrud/state/effect/dispatch', () => {
     it('throws an error when applying the effect', async() => {
       mock.mockImplementation(construct);
 
-      const dispatch = effect.function.call(stateWorker);
-      await expect(dispatch(undefined!)).rejects.toThrowError(TypeError);
+      const dispatch = effect.function.call(stateWorker) as Function;
+      await expect(dispatch()).rejects.toThrowError(TypeError);
 
       expect(mock).toBeCalled();
     });
