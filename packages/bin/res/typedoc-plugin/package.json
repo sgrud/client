@@ -4,9 +4,9 @@
   "version": "0.0.21",
   "main": "./index.js",
   "peerDependencies": {
-    "better-sqlite3": "^8.3.0",
-    "jsdom": "^21.1.2",
+    "better-sqlite3": "^8.4.0",
+    "jsdom": "^22.1.0",
     "rxjs": "^7.8.1",
-    "typedoc": "^0.24.6"
+    "typedoc": "^0.24.8"
   }
 }
