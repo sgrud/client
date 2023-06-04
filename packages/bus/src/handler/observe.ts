@@ -71,10 +71,9 @@ export function Observe(handle: Bus.Handle, suffix?: PropertyKey) {
    */
   return function(prototype: object, propertyKey: PropertyKey): void {
     if (!suffix) {
-      const stream = from(BusHandler).pipe(
-        switchMap((handler) => handler.observe(handle)),
-        dematerialize()
-      );
+      const stream = from(BusHandler).pipe(switchMap((handler) => {
+        return handler.observe(handle).pipe(dematerialize());
+      }));
 
       Object.defineProperty(prototype, propertyKey, {
         enumerable: true,
@@ -86,10 +85,10 @@ export function Observe(handle: Bus.Handle, suffix?: PropertyKey) {
         enumerable: true,
         set(this: object, value: string): void {
           if (value) {
-            const stream = from(BusHandler).pipe(
-              switchMap((handler) => handler.observe(`${handle}.${value}`)),
-              dematerialize()
-            );
+            const scoped = `${handle}.${value}` as Bus.Handle;
+            const stream = from(BusHandler).pipe(switchMap((handler) => {
+              return handler.observe(scoped).pipe(dematerialize());
+            }));
 
             Object.defineProperties(this, {
               [suffix]: {

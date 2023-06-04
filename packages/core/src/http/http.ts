@@ -1,6 +1,7 @@
 import { Observable } from 'rxjs';
 import { ajax, AjaxConfig, AjaxResponse } from 'rxjs/ajax';
 import { Linker } from '../linker/linker';
+import { Alias } from '../typing/alias';
 import { Proxy } from './proxy';
 
 /**
@@ -15,7 +16,7 @@ export namespace Http {
    * The **Request** type alias references the {@link AjaxConfig} interface and
    * describes the shape of any {@link Http} **Request** parameters.
    */
-  export type Request = AjaxConfig;
+  export type Request = Alias<AjaxConfig>;
 
   /**
    * The **Response** type alias references the {@link AjaxResponse} class and
@@ -23,7 +24,7 @@ export namespace Http {
    *
    * @typeParam T - The **Response** type of a {@link Request}.
    */
-  export type Response<T = any> = AjaxResponse<T>;
+  export type Response<T = any> = Alias<AjaxResponse<T>>;
 
   /**
    * The **Handler** interface enforces the {@link handle} method with

@@ -1,4 +1,4 @@
-import { BusHandler, BusQuerier } from '@sgrud/bus';
+import { Bus, BusHandler, BusQuerier } from '@sgrud/bus';
 import { Linker, Target } from '@sgrud/core';
 import { Model } from '@sgrud/data';
 import { BehaviorSubject, Subject, catchError, delay, map, of, switchMap, takeWhile, throwError, timer } from 'rxjs';
@@ -47,8 +47,9 @@ describe('@sgrud/bus/bus/querier', () => {
         }
 
         if (next.kind === 'C') {
+          const handle = `${next.handle}.test` as Bus.Handle;
           of('done').pipe(delay(250)).subscribe(stream);
-          handler.publish(`${next.handle}.test`, stream).subscribe();
+          handler.publish(handle, stream).subscribe();
         }
 
         return next.kind !== 'C';
@@ -98,8 +99,9 @@ describe('@sgrud/bus/bus/querier', () => {
         }
 
         if (next.kind === 'C') {
+          const handle = `${next.handle}.test` as Bus.Handle;
           of('done').pipe(delay(250)).subscribe(stream);
-          handler.publish(`${next.handle}.test`, stream).subscribe();
+          handler.publish(handle, stream).subscribe();
         }
 
         return next.kind !== 'C';
@@ -143,7 +145,8 @@ describe('@sgrud/bus/bus/querier', () => {
         }
 
         if (next.kind === 'C') {
-          handler.publish(`${next.handle}.test`, stream).subscribe();
+          const handle = `${next.handle}.test` as Bus.Handle;
+          handler.publish(handle, stream).subscribe();
         }
 
         return next.kind !== 'C';

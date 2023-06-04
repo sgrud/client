@@ -1,5 +1,6 @@
 /* eslint-disable valid-jsdoc */
 
+import { Alias } from '@sgrud/core';
 import { BehaviorSubject, Observable, Subscribable } from 'rxjs';
 
 /**
@@ -46,7 +47,7 @@ export namespace Store {
   /**
    * The **Effect** helper type represents a `keyof` the {@link Effects} map.
    */
-  export type Effect = keyof Effects;
+  export type Effect = Alias<keyof Effects>;
 
   /**
    * The **Effects** helper type represents the `typeof` the globally available

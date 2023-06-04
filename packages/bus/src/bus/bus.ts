@@ -1,4 +1,4 @@
-import { Symbol } from '@sgrud/core';
+import { Alias, Symbol } from '@sgrud/core';
 import { Observable, ObservableNotification, Observer, ReplaySubject, Subject, Subscribable, Unsubscribable, connectable, dematerialize, filter, from, map, switchMap } from 'rxjs';
 import { BusHandler } from '../handler/handler';
 
@@ -39,7 +39,7 @@ export namespace Bus {
    *
    * @see {@link BusHandler}
    */
-  export type Handle = `${string}.${string}.${string}`;
+  export type Handle = Alias<`${string}.${string}.${string}`>;
 
   /**
    * The **Value** type helper extends the {@link ObservableNotification} type

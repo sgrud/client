@@ -1,4 +1,4 @@
-import { provide, Provide } from '@sgrud/core';
+import { Alias, provide, Provide } from '@sgrud/core';
 import { Observable } from 'rxjs';
 import { Model } from '../model/model';
 
@@ -25,7 +25,7 @@ export namespace Querier {
    * standard form of an **Operation**: A string starting with the {@link Type},
    * followed by one whitespace and the operation content.
    */
-  export type Operation = `${Type} ${string}`;
+  export type Operation = Alias<`${Type} ${string}`>;
 
   /**
    * Interface describing the shape of **Variables** which may be embedded

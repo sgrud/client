@@ -92,7 +92,8 @@ export function Stream(handle: Bus.Handle, suffix?: PropertyKey) {
         enumerable: true,
         set(this: object, value: string): void {
           if (value) {
-            const stream = new Bus(`${handle}.${value}`);
+            const scoped = `${handle}.${value}` as Bus.Handle;
+            const stream = new Bus(scoped);
 
             Object.defineProperties(this, {
               [suffix]: {

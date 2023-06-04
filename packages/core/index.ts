@@ -29,6 +29,7 @@ export * from './src/super/registry';
 export * from './src/thread/spawn';
 export * from './src/thread/thread';
 export * from './src/thread/transfer';
+export * from './src/typing/alias';
 export * from './src/typing/assign';
 export * from './src/typing/merge';
 export * from './src/typing/mutable';

@@ -1,5 +1,6 @@
 import { asyncScheduler, concat, defaultIfEmpty, defer, forkJoin, ignoreElements, map, Observable, of, ReplaySubject, Subscribable, switchMap, throwError } from 'rxjs';
 import { Http } from '../http/http';
+import { Alias } from '../typing/alias';
 import { Mutable } from '../typing/mutable';
 import { assign } from '../utility/assign';
 import { Singleton } from '../utility/singleton';
@@ -27,7 +28,7 @@ export namespace Kernel {
    * const digest: Kernel.Digest = 'sha256-[...]';
    * ```
    */
-  export type Digest = `sha${256 | 384 | 512}-${string}`;
+  export type Digest = Alias<`sha${256 | 384 | 512}-${string}`>;
 
   /**
    * Interface describing the shape of a **Module** while being aligned with

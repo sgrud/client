@@ -97,10 +97,11 @@ export function Publish(handle: Bus.Handle, suffix?: PropertyKey) {
         enumerable: true,
         set(this: object, value: string): void {
           if (value) {
+            const scoped = `${handle}.${value}` as Bus.Handle;
             const stream = new Subject<unknown>();
 
             from(BusHandler).pipe(switchMap((handler) => {
-              return handler.publish(`${handle}.${value}`, stream);
+              return handler.publish(scoped, stream);
             })).subscribe();
 
             Object.defineProperties(this, {

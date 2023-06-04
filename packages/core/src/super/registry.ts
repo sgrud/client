@@ -1,3 +1,4 @@
+import { Alias } from '../typing/alias';
 import { Singleton } from '../utility/singleton';
 
 /**
@@ -16,7 +17,7 @@ import { Singleton } from '../utility/singleton';
  *
  * @see {@link Registry}
  */
-export type Registration = `${string}.${string}.${string}`;
+export type Registration = Alias<`${string}.${string}.${string}`>;
 
 /**
  * The {@link Singleton} **Registry** is a mapping used by the {@link Provider}
