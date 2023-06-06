@@ -7,8 +7,8 @@ on:
       - main
 
 jobs:
-  pages:
-    name: Pages
+  client:
+    name: Client
     runs-on: ubuntu-latest
     steps:
       - name: Install node
@@ -34,7 +34,15 @@ jobs:
           npm install
           npm run build
           npx typedoc --out ./client
+
+      - name: Test source
+        working-directory: ./source
+        run: |
           npx jest --collectCoverage --coverageReporters html
+
+      - name: Stage source
+        working-directory: ./source
+        run: |
           git --git-dir ../target/.git add -Af ./client ./coverage
 
       - name: Push target
