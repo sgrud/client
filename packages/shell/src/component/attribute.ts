@@ -1,4 +1,4 @@
-import { Mutable } from '@sgrud/core';
+import { Mutable, TypeOf } from '@sgrud/core';
 import { Component } from './component';
 
 /**
@@ -49,20 +49,31 @@ export function Attribute(name?: string) {
    * @param propertyKey - The {@link Component} property to be decorated.
    */
   return function(prototype: Component, propertyKey: PropertyKey): void {
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    const connectedCallback = prototype.connectedCallback;
     const key = name || propertyKey as string;
-    ((prototype as Mutable<Component>).observedAttributes ||= []).push(key);
 
-    Object.defineProperty(prototype, propertyKey, {
-      enumerable: true,
-      get(this: Component): string | undefined {
-        return this.getAttribute(key) ?? undefined;
-      },
-      set(this: Component, value: string): void {
-        if (this.isConnected || !this.hasAttribute(key)) {
-          this.setAttribute(key, value);
+    prototype.connectedCallback = function(this: Component): void {
+      Object.defineProperty(this, propertyKey, {
+        enumerable: true,
+        get(this: Component): string | undefined {
+          return this.getAttribute(key) ?? undefined;
+        },
+        set(this: Component, value: string): void {
+          if (TypeOf.null(value) || TypeOf.undefined(value)) {
+            this.removeAttribute(key);
+          } else {
+            this.setAttribute(key, value);
+          }
         }
-      }
-    });
+      });
+
+      return connectedCallback
+        ? connectedCallback.call(this)
+        : this.renderComponent?.();
+    };
+
+    ((prototype as Mutable<Component>).observedAttributes ||= []).push(key);
   };
 
 }

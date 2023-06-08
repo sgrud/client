@@ -42,6 +42,12 @@ describe('@sgrud/shell/component/attribute', () => {
 
       expect(element.attribute).toBe(element.getAttribute('attribute'));
     });
+
+    it('mirrors the attribute to the bound property', () => {
+      element.setAttribute('attribute', 'value');
+
+      expect(element.attribute).toBe(element.attribute);
+    });
   });
 
   describe('binding a property to a data attribute', () => {
@@ -51,6 +57,12 @@ describe('@sgrud/shell/component/attribute', () => {
       element.data = 'value';
 
       expect(element.dataset.attr).toBe(element.getAttribute('data-attr'));
+    });
+
+    it('mirrors the dataset to the bound property', () => {
+      element.setAttribute('data-attr', 'value');
+
+      expect(element.dataset.attr).toBe(element.data);
     });
   });
 
