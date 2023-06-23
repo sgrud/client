@@ -33,7 +33,7 @@
     ]
   },
   "dependencies": {
-    "@babel/runtime": "^7.22.3",
+    "@babel/runtime": "^7.22.5",
     "@sgrud/bus": "latest",
     "@sgrud/core": "latest",
     "better-sqlite3": "^8.4.0",

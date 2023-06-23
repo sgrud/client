@@ -28,7 +28,7 @@
     ]
   },
   "dependencies": {
-    "@babel/runtime": "^7.22.3",
+    "@babel/runtime": "^7.22.5",
     "comlink": "^4.4.1",
     "rxjs": "^7.8.1",
     "tslib": "^2.5.3"
