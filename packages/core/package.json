@@ -1,6 +1,6 @@
 {
   "name": "@sgrud/core",
-  "version": "0.0.22",
+  "version": "0.0.24",
   "source": "./index.ts",
   "types": "./index.d.ts",
   "main": "../../dist/core/index.js",
