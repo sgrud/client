@@ -40,7 +40,7 @@ jobs:
         run: |
           npx jest --collectCoverage --coverageReporters html
 
-      - name: Stage source
+      - name: Stage target
         working-directory: ./source
         run: |
           git --git-dir ../target/.git add -Af ./client ./coverage
