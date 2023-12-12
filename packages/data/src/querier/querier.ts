@@ -36,7 +36,7 @@ export namespace Querier {
 
     /**
      * Index signature allowing keys to be of type `string` and values of type
-     * {@link Variables} or `undefined`.
+     * {@link Variables} or `unknown`.
      */
     readonly [key: string]: Variables | unknown;
 
