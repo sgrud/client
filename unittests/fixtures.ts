@@ -25,6 +25,7 @@ declare global {
 
 globalThis.indexedDB = indexedDB;
 globalThis.MessageChannel = MessageChannel as any;
+globalThis.structuredClone = (ignored) => ignored;
 
 globalThis.clearImmediate = clearImmediate;
 globalThis.setImmediate = setImmediate;
