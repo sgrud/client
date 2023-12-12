@@ -30,11 +30,11 @@
     ]
   },
   "dependencies": {
-    "@babel/runtime": "^7.22.5",
+    "@babel/runtime": "^7.23.6",
     "@sgrud/core": "latest",
     "comlink": "^4.4.1",
     "rxjs": "^7.8.1",
-    "tslib": "^2.5.3"
+    "tslib": "^2.6.2"
   },
   "sgrudDependencies": {
     "@sgrud/core": "latest"
