@@ -1,5 +1,5 @@
 import { Assign } from '@sgrud/core';
-import { createWriteStream, readFileSync } from 'fs';
+import { closeSync, openSync, readFileSync, writeSync } from 'fs';
 import { Module } from 'module';
 import { join, relative, resolve } from 'path';
 import { dependencies } from '../package.json';
@@ -161,7 +161,7 @@ export async function runtimify({
 
     output = config.output.replace('[format]', format);
     process.chdir(resolve(prefix, 'node_modules', id));
-    const stream = createWriteStream(output);
+    const file = openSync(output, 'w');
 
     const write = (name: string, path: string) => {
       const source = resolve(relative(id, path));
@@ -172,11 +172,11 @@ export async function runtimify({
         if (name === path || (
           new RegExp(join(name, 'index') + '\\.[cm]?js').test(path)
         )) {
-          stream.write(`export * from '${source}';`);
+          writeSync(file, `export * from '${source}';`);
         } else {
           const namespace = relative(join(id, scope), name);
           const target = namespace ? '* as ' + namespace : '*';
-          stream.write(`export ${target} from '${source}';`);
+          writeSync(file, `export ${target} from '${source}';`);
         }
       }
     };
@@ -187,8 +187,6 @@ export async function runtimify({
     if (scope && !scope.startsWith('!')) {
       name += '.' + scope.split(/\W/).filter(Boolean).join('.');
     }
-
-    stream.cork();
 
     if (Array.isArray(exports)) {
       exports.map((i) => write(id, join(id, i)));
@@ -209,7 +207,7 @@ export async function runtimify({
       write(id, join(id, main));
     }
 
-    stream.end();
+    closeSync(file);
 
     console.log(
       _g, '[runtimify]',
