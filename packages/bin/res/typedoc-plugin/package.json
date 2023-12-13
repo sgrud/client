@@ -1,7 +1,7 @@
 {
   "name": "@sgrud/typedoc-plugin",
   "private": true,
-  "version": "0.0.25",
+  "version": "0.0.26",
   "main": "./index.js",
   "peerDependencies": {
     "better-sqlite3": "^9.2.2",
