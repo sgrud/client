@@ -153,6 +153,7 @@ export function Route<S extends string>(config: Assign<{
 
         if (delete config.parent && parent) {
           router.add(assign(parent, {
+            // eslint-disable-next-line
             children: (parent.children || []).concat(constructor[route]!)
           }));
         }
