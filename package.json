@@ -89,6 +89,7 @@
   "jest": {
     "coverageProvider": "v8",
     "forceExit": true,
+    "globalSetup": "<rootDir>/unittests/globals.ts",
     "maxWorkers": 1,
     "testEnvironment": "jest-environment-jsdom",
     "moduleNameMapper": {

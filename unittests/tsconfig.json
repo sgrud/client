@@ -12,6 +12,7 @@
 
   "include": [
     "./fixtures.ts",
+    "./globals.ts",
     "./**/*.test.ts"
   ]
 }
